@@ -114,11 +114,19 @@ public class SignInActivity extends Screen implements Account.Listener {
                         (acc.claude() ? "Use your Claude account (Pro or Max)." : "Use your ChatGPT account (Plus, Pro or Business).")
                                 + " Your browser opens; approve there and Buddy comes back by itself.", false);
                 primary(acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT", v -> acc.startLogin(this));
+                secondary(acc.claude() ? "Sign in on another device" : "Sign in with a code", v -> {
+                    pasteOpen = true;
+                    acc.startLogin(this, true);
+                });
                 break;
             case WAITING_BROWSER:
                 if (acc.url == null) {
                     header(R.drawable.ms_shield_person, "Sign in", "Starting sign-in…", false);
                     spinnerRow();
+                    break;
+                }
+                if (acc.remote) {
+                    remoteSignIn();
                     break;
                 }
                 openBrowserOnce();
@@ -152,6 +160,77 @@ public class SignInActivity extends Screen implements Account.Listener {
                 });
                 break;
         }
+    }
+
+    /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */
+    private void remoteSignIn() {
+        final String link = acc.url;
+        if (acc.claude()) {
+            header(R.drawable.ms_shield_person, "Sign in on another device",
+                    "Open this link on any device and approve. Then copy the code the page shows and paste it below.", false);
+        } else {
+            header(R.drawable.ms_shield_person, "Enter this code",
+                    "On any device, open the link below, sign in to ChatGPT and enter the code. Buddy finishes by itself.", false);
+            TextView code = monoText(this, acc.userCode == null ? "…" : acc.userCode, 34, TEXT);
+            code.setTypeface(mono(this, 600));
+            code.setLetterSpacing(0.08f);
+            code.setTextIsSelectable(true);
+            code.setGravity(Gravity.CENTER);
+            code.setPadding(dp(this, 12), dp(this, 18), dp(this, 12), dp(this, 18));
+            code.setBackground(rounded(this, CARD, 16));
+            LinearLayout.LayoutParams cp = full();
+            cp.topMargin = dp(this, 20);
+            body.addView(code, cp);
+            Button copyCode = button(this, "Copy code", false);
+            copyCode.setOnClickListener(v -> copy(acc.userCode, "Code copied"));
+            LinearLayout.LayoutParams ccp = wrap();
+            ccp.topMargin = dp(this, 8);
+            body.addView(copyCode, ccp);
+            TextView exp = text(this, "The code works for 15 minutes.", 13, MUTED);
+            exp.setPadding(0, dp(this, 6), 0, 0);
+            body.addView(exp);
+        }
+        TextView l = monoText(this, link, 13, ACCENT_TEXT);
+        l.setTextIsSelectable(true);
+        l.setMaxLines(acc.claude() ? 3 : 2);
+        l.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        l.setPadding(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        l.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        LinearLayout.LayoutParams lp = full();
+        lp.topMargin = dp(this, 20);
+        body.addView(l, lp);
+        LinearLayout btns = row(this);
+        Button copyLink = button(this, "Copy link", false);
+        copyLink.setOnClickListener(v -> copy(link, "Link copied"));
+        btns.addView(copyLink, wrap());
+        Button share = button(this, "Share", false);
+        share.setOnClickListener(v -> startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND)
+                .setType("text/plain").putExtra(Intent.EXTRA_TEXT, link), null)));
+        LinearLayout.LayoutParams sp = wrap();
+        sp.leftMargin = dp(this, 8);
+        btns.addView(share, sp);
+        Button here = button(this, "Open here", false);
+        here.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+            } catch (Exception e) {
+                Toast.makeText(this, "No browser found.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        LinearLayout.LayoutParams hp = wrap();
+        hp.leftMargin = dp(this, 8);
+        btns.addView(here, hp);
+        LinearLayout.LayoutParams bp = full();
+        bp.topMargin = dp(this, 10);
+        body.addView(btns, bp);
+        if (acc.claude()) pasteBox();
+        secondary("Cancel", v -> acc.cancelLogin());
+    }
+
+    private void copy(String s, String toast) {
+        if (s == null) return;
+        getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Sign-in", s));
+        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
     }
 
     private void openBrowserOnce() {

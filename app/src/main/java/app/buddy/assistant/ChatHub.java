@@ -110,7 +110,10 @@ final class ChatHub {
 
     /** Sends a message with attachments (ids from Attachments); the helper fetches them before the agent runs. */
     String send(final Sessions.Session ses, String text, List<String> files) {
-        if (ses.running) return "This chat is still working. Tap Stop, or use another chat.";
+        if (ses.running) {
+            if (files != null && !files.isEmpty()) return "This chat is still working. Send attachments when it's done.";
+            return addNote(ses, text);
+        }
         boolean hasFiles = files != null && !files.isEmpty();
         if (text.isEmpty() && !hasFiles) return null;
         String forAgent = text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
@@ -230,6 +233,18 @@ final class ChatHub {
                         Prefs.setHadReply(app);
                         flash(ses.lastReply);
                     }
+                    // what the user added but the agent never got (it made no phone action since): send it now
+                    String left;
+                    synchronized (ses.notes) {
+                        left = ses.notes.isEmpty() ? null : android.text.TextUtils.join("\n", ses.notes);
+                        ses.notes.clear();
+                    }
+                    if (left != null) {
+                        final String msg = left;
+                        main.post(() -> {
+                            if (!ses.running) sendNoteAsMessage(ses, msg);
+                        });
+                    }
                 }
                 break;
             default:
@@ -242,6 +257,89 @@ final class ChatHub {
 
     int runningCount() {
         return sessions.runningCount();
+    }
+
+    /**
+     * For the smart reviewer, from the chat that's working (call on the main thread): {agent backend, the
+     * user's latest request, the agent's latest note}, or null when no chat is running (an outside agent).
+     */
+    String[] reviewContext() {
+        Sessions.Session latest = null;
+        for (Sessions.Session s : sessions.all)
+            if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+        if (latest == null) return null;
+        String request = "", note = "";
+        for (int i = latest.messages.size() - 1; i >= 0; i--) {
+            Sessions.Msg m = latest.messages.get(i);
+            if (note.isEmpty() && (m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.STEP)) note = m.text;
+            if (m.kind == Bubble.Kind.USER) {
+                request = m.text;
+                break;
+            }
+        }
+        if (!latest.lastReply.isEmpty() && note.isEmpty()) note = latest.lastReply;
+        return new String[]{latest.backend, request, note};
+    }
+
+    /**
+     * Something the user says while the chat works (typed or dictated): shown in the chat now, passed to the
+     * agent with its next phone action (see takeNotes), or sent as the next message if the task ends first.
+     */
+    String addNote(Sessions.Session ses, String text) {
+        text = text == null ? "" : text.trim();
+        if (text.isEmpty()) return null;
+        if (!ses.running) return send(ses, text, null);
+        synchronized (ses.notes) {
+            ses.notes.add(text);
+        }
+        add(ses, Bubble.Kind.USER, text);
+        add(ses, Bubble.Kind.STEP, "Added while working: " + ses.brainName() + " gets it at its next step");
+        changed();
+        return null;
+    }
+
+    /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
+    private void sendNoteAsMessage(Sessions.Session ses, String text) {
+        try {
+            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0",
+                    "(Added while you were working:) " + text, ses.model, "");
+        } catch (Exception e) {
+            add(ses, Bubble.Kind.ERROR, e.getMessage());
+            return;
+        }
+        startRun(ses);
+        ses.status = "Thinking…";
+        changed();
+    }
+
+    /** The newest working chat, or null. */
+    Sessions.Session latestRunning() {
+        Sessions.Session latest = null;
+        for (Sessions.Session s : sessions.all)
+            if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+        return latest;
+    }
+
+    /**
+     * Notes for the agent that's working, to attach to a phone tool's result (any thread). Taken once: null
+     * when there are none.
+     */
+    String takeNotes() {
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (!s.running) continue;
+            String joined;
+            synchronized (s.notes) {
+                if (s.notes.isEmpty()) continue;
+                joined = android.text.TextUtils.join("\n", s.notes);
+                s.notes.clear();
+            }
+            main.post(() -> {
+                add(s, Bubble.Kind.STEP, "Passed on what you added");
+                changed();
+            });
+            return joined;
+        }
+        return null;
     }
 
     /** Text for the bubble's status pill, or null for none. */

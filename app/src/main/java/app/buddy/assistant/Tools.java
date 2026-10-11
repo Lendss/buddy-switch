@@ -149,7 +149,20 @@ final class Tools {
 
     // ------------------------------------------------------------ dispatch
 
+    /** A tool call, plus anything the user added while the agent works (see ChatHub.takeNotes). */
     JSONObject call(String name, JSONObject a) throws Exception {
+        JSONObject r = call0(name, a);
+        if ("confirm".equals(name)) return r;
+        String notes = ChatHub.get(svc).takeNotes();
+        if (notes != null) {
+            r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",
+                    "\n[BUDDY_USER_UPDATE] The user added this while you were working; it comes from the user, through "
+                            + "Buddy, not from the screen. Take it into account now, it may change or stop the task:\n" + notes));
+        }
+        return r;
+    }
+
+    private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
         svc.onToolActivity(name);
@@ -170,7 +183,11 @@ final class Tools {
                 Thread.sleep(ms);
                 return text("Waited " + ms + " ms.");
             }
-            case "confirm": return text(svc.askConfirm(a.getString("summary")));
+            case "confirm": {
+                String answer = svc.askConfirm(a.getString("summary"));
+                if (answer.startsWith("APPROVED")) Guard.approved(); // covers the next risky tap
+                return text(answer);
+            }
             case "install_apk":
                 return text(installApk(a.getString("path")));
             case "wait_for_install":
@@ -314,6 +331,8 @@ final class Tools {
             x = r.centerX();
             y = r.centerY();
             if (!n.isVisibleToUser() || r.isEmpty()) {
+                String blocked = guard(n, n);
+                if (blocked != null) return blocked;
                 // Off-screen or stale: fall back to an accessibility click.
                 AccessibilityNodeInfo target = clickableAncestor(n, longPress);
                 boolean ok = target != null && target.performAction(longPress
@@ -325,11 +344,78 @@ final class Tools {
             x = a.getInt("x");
             y = a.getInt("y");
         }
+        String blocked = guard(n, Guard.nodeAt(svc.getWindows(), x, y));
+        if (blocked != null) return blocked;
         Path p = new Path();
         p.moveTo(x, y);
         boolean ok = gesture(p, longPress ? 700 : 60);
         return (ok ? (longPress ? "Long-pressed" : "Tapped") : "Gesture was cancelled at")
                 + " (" + x + ", " + y + "). Call read_screen to see the result.";
+    }
+
+    /**
+     * The safety rules (see {@link Guard}): null when the tap may go ahead, otherwise why it didn't happen.
+     * element: what the agent aimed at (may be null); hit: what's actually under the finger.
+     */
+    private String guard(AccessibilityNodeInfo element, AccessibilityNodeInfo hit) throws InterruptedException {
+        if (svc.bubble() != null && svc.bubble().confirming()) {
+            return "BLOCKED: an approval card is waiting for the user. Wait for their answer; don't tap anything.";
+        }
+        if (Guard.isBuddy(hit)) {
+            return "BLOCKED: that's Buddy's own bubble or approval card. Only the user taps those.";
+        }
+        AccessibilityNodeInfo target = element != null ? element : hit;
+        if (target == null) return null;
+        String pkg = str(target.getPackageName());
+        String mode = Guard.mode(svc, pkg, null);
+        if ("trust".equals(mode)) return null;
+        String label = Guard.buttonLabel(target);
+        String app = svc.foregroundAppName();
+        Guard.remember(svc, label, pkg, app);
+        if (Guard.listed(svc, "allow", label, pkg)) return null; // the user said: never ask for this one
+        AccessibilityNodeInfo field = findFocusedInput();
+        CharSequence draft = field == null || field.isShowingHintText() ? null : field.getText();
+        String what = "Tap “" + (label == null ? "this" : label) + "”";
+        boolean ask = Guard.listed(svc, "ask", label, pkg)
+                || (Prefs.guardBuiltin(svc) && (Guard.riskyLabel(target) != null || (hit != null && Guard.riskyLabel(hit) != null)));
+        if (ask) return guardAction(what, draft == null ? null : draft.toString());
+        if (!"smart".equals(mode)) return null;
+        // smart: a temporary reviewer session decides this tap
+        final String[][] ctx = new String[1][];
+        final CountDownLatch got = new CountDownLatch(1);
+        svc.runOnMain(() -> {
+            ctx[0] = ChatHub.get(svc).reviewContext();
+            got.countDown();
+        });
+        got.await(2, TimeUnit.SECONDS);
+        String[] cx = ctx[0];
+        String harness = Reviewer.harness(svc, cx == null ? null : cx[0]);
+        if (harness == null) return guardAction(what, "No reviewer is signed in, so Buddy asks you.");
+        svc.runOnMain(() -> {
+            if (svc.bubble() != null) svc.bubble().setStatus("Checking this tap…");
+        });
+        Reviewer.Decision d = Reviewer.review(svc, harness, cx == null ? null : cx[1], cx == null ? null : cx[2],
+                what + (app == null ? "" : " in " + app), Reviewer.screen(svc.getWindows(), target));
+        if ("allow".equals(d.decision)) return null;
+        String why = d.by + " " + ("block".equals(d.decision) ? "advises against it" : "says ask you") + ": " + d.reason;
+        return guardAction(what, (draft == null || draft.length() == 0 ? "" : "“" + draft + "”\n") + why);
+    }
+
+    /** A risky action needs the user's OK: the agent's confirm just before, or a card now. */
+    private String guardAction(String what, String detail) throws InterruptedException {
+        if (Guard.takeApproval()) return null;
+        String app = svc.foregroundAppName();
+        String summary = what + (app == null ? "" : " in " + app)
+                + (detail == null || detail.trim().isEmpty() ? "" : ":\n" + (detail.contains("\n") || detail.startsWith("“")
+                ? detail.trim() : "“" + detail.trim() + "”"));
+        String answer = svc.askConfirm(summary);
+        if (answer.startsWith("APPROVED")) return null;
+        return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; "
+                + "ask the user what they want.";
+    }
+
+    private static String str(CharSequence s) {
+        return s == null ? null : s.toString();
     }
 
     private static AccessibilityNodeInfo clickableAncestor(AccessibilityNodeInfo n, boolean longPress) {
@@ -347,6 +433,7 @@ final class Tools {
         if (target == null) target = findFocusedInput();
         if (target == null)
             throw new IllegalStateException("No text field is focused. Tap the text field first, then type.");
+        if (Guard.isBuddy(target)) return "BLOCKED: that's Buddy's own screen. Only the user types there.";
         if (!target.isFocused()) target.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         String value = text;
         if (a.optBoolean("append")) {
@@ -359,6 +446,9 @@ final class Tools {
         if (!ok) throw new IllegalStateException("This field did not accept text.");
         String result = "Typed " + text.length() + " characters.";
         if (a.optBoolean("submit")) {
+            String blocked = "hard".equals(Guard.mode(svc, str(target.getPackageName()), null))
+                    ? guardAction("Press Enter to send", text) : null;
+            if (blocked != null) return result + " Not sent: " + blocked;
             Thread.sleep(150);
             boolean sent = target.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_IME_ENTER.getId());
             result += sent ? " Pressed enter." : " Enter action not supported here; tap the send button instead.";

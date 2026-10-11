@@ -19,6 +19,10 @@ final class Helper {
     private static final String[][] FILES = {
             // asset, path inside Linux, mode
             {"linux/buddy-run", "/root/bin/buddy-run", "700"},
+            {"linux/profile.sh", "/etc/profile.d/buddy.sh", "644"},
+            {"linux/arecord", "/usr/local/bin/arecord", "755"},
+            {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},
+            {"linux/arecord", "/usr/local/bin/rec", "755"}, // SoX's recorder, same arguments that matter (-r, -c)
             {"linux/system-prompt.md", "/root/.buddy/system-prompt.md", "600"},
             {"linux/AGENTS.md", "/root/.buddy/work/AGENTS.md", "600"},
             {"linux/android-app/SKILL.md", "/root/.buddy/work/.claude/skills/android-app/SKILL.md", "600"},

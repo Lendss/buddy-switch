@@ -150,6 +150,15 @@ final class Prefs {
         sp(c).edit().putBoolean("onboarded", on).apply();
     }
 
+    /** Numbering of onboard_step: 1 = Termux-era steps (1.x), 2 = since 2.0. */
+    static int onboardVersion(Context c) {
+        return sp(c).getInt("onboard_v", sp(c).contains("onboard_step") ? 1 : 2);
+    }
+
+    static void setOnboardVersion(Context c, int v) {
+        sp(c).edit().putInt("onboard_v", v).apply();
+    }
+
     static int onboardStep(Context c) {
         return sp(c).getInt("onboard_step", 0);
     }
@@ -197,6 +206,135 @@ final class Prefs {
     /** Its name in the Claude app. */
     static String remoteName(Context c) {
         return sp(c).getString("remote_name", "Buddy");
+    }
+
+    /** Terminal text size in sp (pinch to zoom). */
+    static float termFont(Context c) {
+        return sp(c).getFloat("term_font", 13f);
+    }
+
+    static void setTermFont(Context c, float sp) {
+        sp(c).edit().putFloat("term_font", sp).apply();
+    }
+
+    /** Keep the screen on while the Terminal is open. */
+    static boolean termAwake(Context c) {
+        return sp(c).getBoolean("term_awake", false);
+    }
+
+    static void setTermAwake(Context c, boolean on) {
+        sp(c).edit().putBoolean("term_awake", on).apply();
+    }
+
+    /** Voice input engine: "phone" (Android's recognizer), "claude" (Claude Code's dictation) or "chatgpt". */
+    static String voiceEngine(Context c) {
+        return sp(c).getString("voice_engine", "phone");
+    }
+
+    static void setVoiceEngine(Context c, String e) {
+        sp(c).edit().putString("voice_engine", e).apply();
+    }
+
+    /** The user's choice for an app: "trust" or "hard" (hard limit), or null for the default (see Guard.mode). */
+    static String appSafety(Context c, String pkg) {
+        return sp(c).getString("app_safety_" + pkg, null);
+    }
+
+    static void setAppSafety(Context c, String pkg, String mode) {
+        sp(c).edit().putString("app_safety_" + pkg, mode).apply();
+    }
+
+    /** Guard lists as JSON: "allow", "ask", "seen". */
+    static String guardList(Context c, String list) {
+        return sp(c).getString("guard_" + list, "[]");
+    }
+
+    static void setGuardList(Context c, String list, String json) {
+        sp(c).edit().putString("guard_" + list, json).apply();
+    }
+
+    /** The built-in risky words (Send, Pay, Delete… in several languages) count as "always ask". */
+    static boolean guardBuiltin(Context c) {
+        return sp(c).getBoolean("guard_builtin", true);
+    }
+
+    static void setGuardBuiltin(Context c, boolean on) {
+        sp(c).edit().putBoolean("guard_builtin", on).apply();
+    }
+
+    /** The smart reviewer's harness: "same" (as the chat's agent), "claude" or "codex". */
+    static String reviewer(Context c) {
+        return sp(c).getString("reviewer", "same");
+    }
+
+    static void setReviewer(Context c, String r) {
+        sp(c).edit().putString("reviewer", r).apply();
+    }
+
+    /** The user has opened the bubble's hold menu once (no more hint in the status pill). */
+    static boolean menuHinted(Context c) {
+        return sp(c).getBoolean("menu_hinted", false);
+    }
+
+    static void setMenuHinted(Context c) {
+        sp(c).edit().putBoolean("menu_hinted", true).apply();
+    }
+
+    /** How many times the hold menu peeked out / the "hold the bubble" tip was shown (each stops after 3). */
+    static int peekCount(Context c) {
+        return sp(c).getInt("menu_peeks", 0);
+    }
+
+    static void addPeek(Context c) {
+        sp(c).edit().putInt("menu_peeks", peekCount(c) + 1).apply();
+    }
+
+    static int tipCount(Context c) {
+        return sp(c).getInt("menu_tips", 0);
+    }
+
+    static void addTip(Context c) {
+        sp(c).edit().putInt("menu_tips", tipCount(c) + 1).apply();
+    }
+
+    /** Who reads replies aloud: "phone" (Android's voices) or "chatgpt" (ChatGPT's voice through Codex). */
+    static String speechEngine(Context c) {
+        return sp(c).getString("speech_engine", "phone");
+    }
+
+    static void setSpeechEngine(Context c, String e) {
+        sp(c).edit().putString("speech_engine", e).apply();
+    }
+
+    /** Which ChatGPT voice reads replies. */
+    static String speechVoice(Context c) {
+        return sp(c).getString("speech_voice", "juniper");
+    }
+
+    static void setSpeechVoice(Context c, String v) {
+        sp(c).edit().putString("speech_voice", v).apply();
+    }
+
+    /** The user's voice languages, comma-separated BCP-47 tags (first = default). */
+    static String voiceLangs(Context c) {
+        String d = java.util.Locale.getDefault().toLanguageTag();
+        return sp(c).getString("voice_langs", d);
+    }
+
+    static void setVoiceLangs(Context c, String csv) {
+        sp(c).edit().putString("voice_langs", csv).apply();
+    }
+
+    /** The language to listen for next (one of voiceLangs). */
+    static String voiceLang(Context c) {
+        String all = voiceLangs(c);
+        String cur = sp(c).getString("voice_lang", null);
+        if (cur != null && ("," + all + ",").contains("," + cur + ",")) return cur;
+        return all.split(",")[0];
+    }
+
+    static void setVoiceLang(Context c, String tag) {
+        sp(c).edit().putString("voice_lang", tag).apply();
     }
 
     static void saveBubblePos(Context c, int x, int y) {

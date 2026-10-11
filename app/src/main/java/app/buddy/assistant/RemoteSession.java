@@ -37,6 +37,8 @@ final class RemoteSession {
     private static OutputStream keepOpen; // the terminal's input; closing it would end the session
     private static long lastStart;
     private static int quickFails;
+    /** A start is in progress (prepare() can take a while on first run): don't begin a second one. */
+    private static boolean starting;
 
     private RemoteSession() {
     }
@@ -58,16 +60,19 @@ final class RemoteSession {
     }
 
     static synchronized boolean running() {
-        return proc != null;
+        return proc != null || starting;
     }
 
     /** Start if switched on and not running (called on service start and from Settings). */
     static void ensure(Context c) {
         final Context app = c.getApplicationContext();
-        if (!Prefs.remoteSession(app) || running()) return;
-        if (!SetupState.signedIn(app, "claude")) {
-            set(State.ERROR, "Sign in to Claude Code first.");
-            return;
+        synchronized (RemoteSession.class) {
+            if (!Prefs.remoteSession(app) || proc != null || starting) return;
+            if (!SetupState.signedIn(app, "claude")) {
+                set(State.ERROR, "Sign in to Claude Code first.");
+                return;
+            }
+            starting = true;
         }
         set(State.STARTING, "Starting…");
         new Thread(() -> run(app)).start();
@@ -82,6 +87,7 @@ final class RemoteSession {
         }
         if (p != null) p.destroy();
         url = null;
+        quickFails = 0; // turning it off and on again starts with fresh retries
         set(State.OFF, "");
     }
 
@@ -94,6 +100,7 @@ final class RemoteSession {
             Process p = Linux.builder(app, "/bin/sh", "-c",
                     "cd " + DIR + " && exec script -qfc '" + cmd.replace("'", "'\\''") + "' /root/.buddy/remote.log").start();
             synchronized (RemoteSession.class) {
+                starting = false;
                 if (!Prefs.remoteSession(app)) {
                     p.destroy();
                     return;
@@ -126,6 +133,7 @@ final class RemoteSession {
         }
         boolean wanted;
         synchronized (RemoteSession.class) {
+            starting = false;
             wanted = proc != null && Prefs.remoteSession(app);
             proc = null;
             keepOpen = null;

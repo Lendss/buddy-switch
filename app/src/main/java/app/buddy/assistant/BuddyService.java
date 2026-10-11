@@ -62,6 +62,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         if (!Prefs.onboarded(this)) main.postDelayed(this::showGuide, 600);
         main.postDelayed(() -> RemoteSession.ensure(this), 4000);
+        // the helper's answer refreshes Codex's model list
+        main.postDelayed(() -> {
+            if (Linux.installed(this)) {
+                try {
+                    Helper.run(this, "ping");
+                } catch (Exception ignored) {
+                }
+            }
+        }, 8000);
     }
 
     private final BroadcastReceiver lockReceiver = new BroadcastReceiver() {
@@ -162,12 +171,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private final Runnable codeWatch = new Runnable() {
         @Override
         public void run() {
-            if (!Account.CLAUDE.waitingForCode()) return;
+            if (!Account.CLAUDE.waitingForCode() || System.currentTimeMillis() > codeWatchUntil) return;
             String code = null;
             try {
                 for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
                     android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
-                    if (r != null && (code = scanForCode(r, new int[]{0})) != null) break;
+                    if (r == null) continue;
+                    code = scanForCode(r, new int[]{0});
+                    r.recycle();
+                    if (code != null) break;
                 }
             } catch (Exception ignored) {
             }
@@ -181,7 +193,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     };
 
     /** While a Claude sign-in waits for its code, look for it on screen (the browser's confirmation page). */
+    private long codeWatchUntil;
+
     void watchForLoginCode() {
+        codeWatchUntil = System.currentTimeMillis() + 10 * 60_000L; // the old Termux watcher also gave up eventually
         main.removeCallbacks(codeWatch);
         main.postDelayed(codeWatch, 1500);
     }
@@ -192,7 +207,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (c == null) c = Account.CLAUDE.findCode(n.getContentDescription());
         if (c != null) return c;
         for (int i = 0; i < n.getChildCount(); i++) {
-            c = scanForCode(n.getChild(i), seen);
+            android.view.accessibility.AccessibilityNodeInfo k = n.getChild(i);
+            if (k == null) continue;
+            c = scanForCode(k, seen);
+            k.recycle(); // these are pooled before Android 13; scanning repeats every 0.7 s
             if (c != null) return c;
         }
         return null;
@@ -206,6 +224,30 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
         } catch (Exception ignored) {
         }
+    }
+
+    void runOnMain(Runnable r) {
+        main.post(r);
+    }
+
+    /** The name of the app on screen (for approval cards), or null. */
+    String foregroundAppName() {
+        try {
+            for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
+                if (w.getType() != android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION || !w.isActive()) continue;
+                android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
+                if (r == null || r.getPackageName() == null) continue;
+                String pkg = r.getPackageName().toString();
+                try {
+                    android.content.pm.PackageManager pm = getPackageManager();
+                    return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString();
+                } catch (Exception e) {
+                    return pkg;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     Bubble bubble() {

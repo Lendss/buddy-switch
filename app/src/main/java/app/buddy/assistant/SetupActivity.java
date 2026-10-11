@@ -190,6 +190,108 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         for (String a : new String[]{"claude", "codex"}) ag.addView(agentRow(a), topGap(a.equals("claude") ? 12 : 4));
         addCard(ag);
 
+        // ---------------------------------------------------------------- voice
+        list.addView(sectionLabel(this, "Voice"));
+        LinearLayout vc = card();
+        vc.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        vc.addView(fieldLabel("Voice input", null));
+        String engine = Prefs.voiceEngine(this);
+        vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"claude", "Claude"}, {"chatgpt", "ChatGPT"}},
+                engine, false, v -> {
+                    if ("claude".equals(v) && !SetupState.signedIn(this, "claude")) {
+                        Toast.makeText(this, "Sign in to Claude Code first.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if ("chatgpt".equals(v) && !SetupState.signedIn(this, "codex")) {
+                        Toast.makeText(this, "Sign in to Codex first.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Prefs.setVoiceEngine(this, v);
+                    render();
+                }), topGap(8));
+        String engineNote = "claude".equals(engine)
+                ? "Claude Code's dictation on your Claude plan: very accurate. Supports English, French, German, Spanish, "
+                + "Italian, Portuguese, Dutch, Turkish, Russian, Japanese and more, but not Arabic: for Arabic, Buddy uses "
+                + "the phone's recognizer. Hold-to-talk; the words appear when you stop."
+                : "chatgpt".equals(engine)
+                ? "ChatGPT's voice through Codex, on your ChatGPT plan. Understands any language, even mixed in one sentence. "
+                + "Only your words are used: ChatGPT's spoken replies are muted and it can't run anything."
+                : "Your phone's speech recognition (Google on most phones). Live text while you speak; detects which "
+                + "of your languages you're speaking.";
+        vc.addView(text(this, engineNote, 13, MUTED), topGap(8));
+        vc.addView(fieldLabel("Voice output", null), topGap(16));
+        String speech = Prefs.speechEngine(this);
+        vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"chatgpt", "ChatGPT"}}, speech, false, v -> {
+            if ("chatgpt".equals(v) && !SetupState.signedIn(this, "codex")) {
+                Toast.makeText(this, "Sign in to Codex first.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Prefs.setSpeechEngine(this, v);
+            render();
+        }), topGap(8));
+        vc.addView(text(this, "chatgpt".equals(speech)
+                ? "Replies are read in ChatGPT's natural voice (your ChatGPT plan, through Codex). It counts toward "
+                + "your ChatGPT voice usage; if it's unavailable, the phone's voice reads instead."
+                : "Your phone's text-to-speech voices, in the reply's language.", 13, MUTED), topGap(8));
+        if ("chatgpt".equals(speech)) {
+            LinearLayout voices = segmented(this, CodexSpeech.VOICES, Prefs.speechVoice(this), false, v -> {
+                Prefs.setSpeechVoice(this, v);
+                render();
+                Voice.stopSpeaking();
+                Voice.speak(this, "Bonjour ! Hi, I'm Buddy. This is how I sound.");
+            });
+            vc.addView(voices, topGap(8));
+        }
+        vc.addView(fieldLabel("Languages", Voice.languageName(Prefs.voiceLang(this))), topGap(16));
+        TextView lh = text(this, "Tap to choose the languages you speak. Long-press one to make it the default. "
+                + "In a chat, long-press the mic to switch language.", 13, MUTED);
+        vc.addView(lh, topGap(4));
+        java.util.List<String> chosen = new java.util.ArrayList<>(java.util.Arrays.asList(Prefs.voiceLangs(this).split(",")));
+        LinearLayout chipRow = null;
+        int inRow = 0;
+        for (String[] lang : Voice.LANGUAGES) {
+            if (chipRow == null || inRow == 3) {
+                chipRow = row(this);
+                vc.addView(chipRow, topGap(8));
+                inRow = 0;
+            }
+            boolean on = chosen.contains(lang[0]);
+            boolean def = lang[0].equals(Prefs.voiceLang(this));
+            TextView chip = text(this, (def ? "★ " : "") + lang[1], 13, on ? ACCENT_TEXT : TEXT);
+            chip.setTypeface(sans(this, on ? 600 : 400));
+            chip.setGravity(Gravity.CENTER);
+            chip.setSingleLine(true);
+            chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            chip.setPadding(dp(this, 8), dp(this, 8), dp(this, 8), dp(this, 8));
+            chip.setBackground(on ? outlined(this, ACCENT_SOFT, 10, Theme.withAlpha(ACCENT, 0x66), 1)
+                    : outlined(this, 0x00000000, 10, OUTLINE, 1));
+            chip.setOnClickListener(v -> {
+                java.util.List<String> cur = new java.util.ArrayList<>(java.util.Arrays.asList(Prefs.voiceLangs(this).split(",")));
+                if (cur.contains(lang[0])) {
+                    if (cur.size() == 1) return; // keep at least one
+                    cur.remove(lang[0]);
+                } else {
+                    cur.add(lang[0]);
+                }
+                Prefs.setVoiceLangs(this, android.text.TextUtils.join(",", cur));
+                render();
+            });
+            chip.setOnLongClickListener(v -> {
+                java.util.List<String> cur = new java.util.ArrayList<>(java.util.Arrays.asList(Prefs.voiceLangs(this).split(",")));
+                if (!cur.contains(lang[0])) cur.add(0, lang[0]);
+                Prefs.setVoiceLangs(this, android.text.TextUtils.join(",", cur));
+                Prefs.setVoiceLang(this, lang[0]);
+                render();
+                return true;
+            });
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            if (inRow > 0) cp.leftMargin = dp(this, 6);
+            chipRow.addView(chip, cp);
+            inRow++;
+        }
+        while (chipRow != null && inRow++ < 3) chipRow.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
+        addCard(vc);
+
         // ------------------------------------------------------- remote control
         list.addView(sectionLabel(this, "Remote Control"));
         LinearLayout rcc = card();
@@ -274,6 +376,17 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     Prefs.setSpeakReplies(this, on);
                     if (!on) Voice.stopSpeaking();
                 }), full());
+        ex.addView(divider(), lineParams());
+        LinearLayout perms = listRow(this);
+        perms.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout pt = column(this);
+        pt.addView(title(this, "App permissions", 15));
+        pt.addView(text(this, "Choose per app: trust it, or put it on a hard limit where Buddy itself asks you "
+                + "before Send, Pay, Delete…", 13, MUTED), topGap(2));
+        perms.addView(pt, weight1());
+        perms.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
+        ex.addView(perms, full());
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
         ex.addView(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "

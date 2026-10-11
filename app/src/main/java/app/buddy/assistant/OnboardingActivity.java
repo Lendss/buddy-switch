@@ -41,6 +41,11 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        if (Prefs.onboardVersion(this) < 2) {
+            // 1.x saved its step with the old numbering (it had Termux steps): resume at Accessibility instead
+            if (Prefs.onboardStep(this) > BRAIN) Prefs.setOnboardStep(this, ACCESS);
+            Prefs.setOnboardVersion(this, 2);
+        }
         step = Math.min(Prefs.onboardStep(this), LAST);
 
         LinearLayout root = column(this);

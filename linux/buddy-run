@@ -109,7 +109,8 @@ case "$CMD" in
     exit 0 ;;
   recent)
     {
-      for f in $(ls -t "$HOME"/.claude/projects/*/*.jsonl 2>/dev/null | head -15); do
+      # skip the Remote Control session's folder (RemoteSession.DIR): it must not be adopted while it runs
+      for f in $(ls -t "$HOME"/.claude/projects/*/*.jsonl 2>/dev/null | grep -v '/-root-remote/' | head -15); do
         head -n 300 "$f" | jq -c --arg f "$f" --arg m "$(stat -c %Y "$f")" -s '
           ([.[] | select(.type=="user") | .message.content
                 | if type=="string" then . else ([.[]? | select(.type=="text") | .text] | join(" ")) end

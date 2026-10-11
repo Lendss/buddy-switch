@@ -32,6 +32,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private ScrollView scroll;
     private TextView title, chipText, stripText;
     private Button mic;
+    private LinearLayout pill;
+    private VoiceBar voiceBar;
     private ImageButton speaker, send;
     private EditText input;
     private int maxBubble;
@@ -131,7 +133,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         trayScroll.setVisibility(View.GONE);
         root.addView(trayScroll, full());
 
-        LinearLayout pill = row(this);
+        pill = row(this);
         pill.setPadding(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
         ImageButton attach = iconButton(this, R.drawable.ms_attach_file, "Attach a photo or file", MUTED);
         attach.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
@@ -153,6 +155,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         mic = button(this, "", false);
         mic.setContentDescription("Talk");
         mic.setOnClickListener(v -> toggleMic());
+        mic.setOnLongClickListener(v -> {
+            languageSheet();
+            return true;
+        });
         pill.addView(mic, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
         micIdle();
         send = new ImageButton(this);
@@ -183,6 +189,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         pp.bottomMargin = dp(this, 10);
         pp.topMargin = dp(this, 4);
         root.addView(pill, pp);
+        voiceBar = new VoiceBar(this, new VoiceBar.Actions() {
+            @Override
+            public void cancel() {
+                Voice.stopListening();
+            }
+
+            @Override
+            public void send() {
+                Voice.finishListening();
+            }
+        });
+        voiceBar.setVisibility(View.GONE);
+        root.addView(voiceBar, pp);
 
         // the outer frame takes the system-bar insets
         FrameLayout frame = new FrameLayout(this);
@@ -214,6 +233,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         hub.addListener(this);
         hub.setViewing(ses, true);
         hub.select(ses);
+        Voice.prepare(this); // so the mic is quick
         refresh();
         scrollToEnd();
     }
@@ -349,11 +369,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             return;
         }
         final String before = input.getText().toString().trim();
+        showVoiceBar(true);
         String err = Voice.listen(this, new Voice.Listener() {
             @Override
             public void onPartial(String text) {
-                input.setText(join(before, text));
-                input.setSelection(input.getText().length());
+                voiceBar.setHeard(text);
             }
 
             @Override
@@ -368,22 +388,81 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 micIdle();
                 if (message != null) Toast.makeText(ChatActivity.this, message, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onLevel(float level) {
+                voiceBar.level(level);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                voiceBar.setState(status);
+            }
         });
         if (err != null) {
+            showVoiceBar(false);
             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
-            return;
         }
-        mic.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_mic, 0, 0, 0);
-        mic.setCompoundDrawableTintList(ColorStateList.valueOf(ON_ACCENT));
-        mic.setCompoundDrawablePadding(dp(this, 4));
-        mic.setText("Listening");
-        mic.setTextColor(ON_ACCENT);
-        mic.setPadding(dp(this, 10), 0, dp(this, 12), 0);
-        mic.setBackground(rounded(this, ACCENT, 20));
-        input.setHint("Speak now…");
+    }
+
+    /** While talking the composer becomes the recording bar (cancel, waveform, send). */
+    private void showVoiceBar(boolean on) {
+        if (on) {
+            voiceBar.begin(null);
+            ((android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(input.getWindowToken(), 0);
+        }
+        voiceBar.setVisibility(on ? View.VISIBLE : View.GONE);
+        pill.setVisibility(on ? View.GONE : View.VISIBLE);
+    }
+
+    /** Long-press the mic: which of your languages to listen for. */
+    private void languageSheet() {
+        LinearLayout c = column(this);
+        c.addView(title(this, "Speak in", 18));
+        TextView sub = text(this, "Choose your languages in Settings → Voice.", 13, MUTED);
+        sub.setPadding(0, dp(this, 2), 0, dp(this, 8));
+        c.addView(sub);
+        final Dialog[] d = new Dialog[1];
+        String cur = Prefs.voiceLang(this);
+        for (String tag : Prefs.voiceLangs(this).split(",")) {
+            LinearLayout r = row(this);
+            r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(radio(tag.equals(cur)));
+            TextView t = title(this, Voice.languageName(tag), 15);
+            t.setPadding(dp(this, 14), 0, 0, 0);
+            r.addView(t, weight1());
+            if ("claude".equals(Prefs.voiceEngine(this)) && !ClaudeDictation.supports(tag)) {
+                r.addView(monoText(this, "phone voice", 11, MUTED));
+            }
+            r.setOnClickListener(v -> {
+                Prefs.setVoiceLang(this, tag);
+                d[0].dismiss();
+                micIdle();
+            });
+            c.addView(r, full());
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
     }
 
     private void micIdle() {
+        if (voiceBar != null) showVoiceBar(false);
+        String[] langs = Prefs.voiceLangs(this).split(",");
+        if (langs.length > 1) { // show which language the mic listens for
+            mic.setText(Prefs.voiceLang(this).split("-")[0].toUpperCase(java.util.Locale.ROOT));
+            mic.setTextSize(10);
+            mic.setTypeface(mono(this, 600));
+            mic.setTextColor(MUTED);
+            mic.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_mic, 0, 0, 0);
+            mic.setCompoundDrawableTintList(ColorStateList.valueOf(MUTED));
+            mic.setCompoundDrawablePadding(dp(this, 2));
+            mic.setPadding(dp(this, 6), 0, dp(this, 8), 0);
+            mic.setBackgroundResource(ripple(this, true));
+            input.setHint("Ask " + ses.brainName() + "…");
+            return;
+        }
         mic.setText("");
         mic.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_mic, 0, 0, 0);
         mic.setCompoundDrawableTintList(ColorStateList.valueOf(MUTED));
@@ -411,6 +490,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         chipText.setText(ses.brainName() + " · " + Models.label(ses.backend, ses.model)
                 + (Prefs.devMode(this) ? " · dev" : ""));
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
+        input.setHint(ses.running ? "Add an instruction while it works…" : "Ask " + ses.brainName() + "…");
         stripText.setText(ses.status.isEmpty() ? "Working…" : ses.status);
         if (log != null) {
             if (ses.running) log.setLive(true);

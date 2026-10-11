@@ -64,6 +64,29 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         head.addView(sub);
         list.addView(head, full());
 
+        // a shell in Buddy's Linux
+        LinearLayout tc = row(this);
+        tc.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+        tc.setBackground(rounded(this, CARD, 16));
+        tc.setForeground(getDrawable(ripple(this, false)));
+        android.widget.FrameLayout ti = new android.widget.FrameLayout(this);
+        ti.setBackground(rounded(this, CODE, 12));
+        ti.addView(monoText(this, ">_", 14, ACCENT), new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+                android.view.Gravity.CENTER));
+        tc.addView(ti, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        LinearLayout tt = column(this);
+        tt.setPadding(dp(this, 14), 0, dp(this, 8), 0);
+        tt.addView(title(this, "Terminal", 15));
+        tt.addView(text(this, TermSession.current != null && !TermSession.current.exited
+                ? "A shell is running · tap to return" : "A shell in Buddy's Linux", 13, MUTED));
+        tc.addView(tt, weight1());
+        tc.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        tc.setOnClickListener(v -> startActivity(new Intent(this, TerminalActivity.class)));
+        LinearLayout.LayoutParams tp = full();
+        tp.setMargins(dp(this, 16), dp(this, 12), dp(this, 16), 0);
+        list.addView(tc, tp);
+
         LinearLayout rh = row(this);
         TextView rl = sectionLabel(this, "Running now");
         rl.setPadding(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));

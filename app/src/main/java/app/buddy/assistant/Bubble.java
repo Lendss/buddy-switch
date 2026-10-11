@@ -65,7 +65,7 @@ final class Bubble implements ChatHub.Listener {
     private TextView badge, pill;
     private ValueAnimator breathing;
     private RingView ring;
-    private ImageView stopChip;
+    private boolean noteListening;
     // expanded
     private LinearLayout panel, messages, confirmCard;
     private ScrollView scroll;
@@ -120,6 +120,7 @@ final class Bubble implements ChatHub.Listener {
         createDismissTarget();
         wm.addView(root, lp);
         hub = ChatHub.get(svc);
+        radial = new RadialMenu(svc, wm);
         sessions = hub.sessions;
         hub.addListener(this);
         renderCurrent();
@@ -167,7 +168,7 @@ final class Bubble implements ChatHub.Listener {
         });
         face.setElevation(dp(5));
         face.setContentDescription("Buddy");
-        // room around the face for the working ring, and below it for the stop button
+        // room around the face for the working ring
         bubbleFrame.setPadding(dp(4), dp(4), dp(4), dp(4));
         bubbleFrame.setClipToPadding(false);
         bubbleFrame.setClipChildren(false);
@@ -177,20 +178,21 @@ final class Bubble implements ChatHub.Listener {
         ring.setVisibility(View.GONE);
         faceBox.addView(ring, new FrameLayout.LayoutParams(dp(74), dp(74), Gravity.CENTER));
         faceBox.addView(face, new FrameLayout.LayoutParams(dp(60), dp(60), Gravity.CENTER));
-        stopChip = new ImageView(svc);
-        stopChip.setImageResource(R.drawable.ic_stop);
-        stopChip.setScaleType(ImageView.ScaleType.CENTER);
-        stopChip.setBackground(circle(0xF01F1D1A, 0xCCFFFFFF, 1));
-        stopChip.setElevation(dp(8));
-        stopChip.setContentDescription("Stop Buddy");
-        stopChip.setVisibility(View.GONE);
-        stopChip.setOnClickListener(v -> {
-            vibrate(25);
-            if (controlling) {
-                svc.takeBackControl(); // also refuses phone actions from other sessions for a minute
-            } else {
-                hub.stopAll();
-                toast("Stopping…");
+        holdRing = new HoldRing(svc);
+        faceBox.addView(holdRing, new FrameLayout.LayoutParams(dp(74), dp(74), Gravity.CENTER));
+        // 4. screen readers: "double-tap and hold for actions"
+        face.setContentDescription("Buddy. Tap to open, hold for actions");
+        face.setLongClickable(true);
+        face.setOnLongClickListener(v -> { // TalkBack's double-tap-and-hold (touches go to DragListener)
+            openMenu();
+            return true;
+        });
+        face.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.addAction(new android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction(
+                        android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK, "show actions"));
             }
         });
         LinearLayout column = new LinearLayout(svc);
@@ -198,9 +200,7 @@ final class Bubble implements ChatHub.Listener {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         column.setClipChildren(false);
         column.addView(faceBox, new LinearLayout.LayoutParams(dp(74), dp(74)));
-        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(dp(30), dp(30));
-        sp.topMargin = dp(2);
-        column.addView(stopChip, sp);
+        // Stop, Add instruction, Stop voice… are in the hold menu (RadialMenu), not chips under the bubble
         bubbleFrame.addView(column);
 
         badge = new TextView(svc);
@@ -250,11 +250,32 @@ final class Bubble implements ChatHub.Listener {
         header.setSingleLine(true);
         header.setEllipsize(TextUtils.TruncateAt.END);
         top.addView(header, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        top.addView(panelIcon(R.drawable.ms_forum, "Chats", v -> toggleSessionList()));
-        top.addView(panelIcon(R.drawable.ms_add, "New chat", v -> newChat(Prefs.backend(svc))));
-        top.addView(panelIcon(R.drawable.ic_stop, "Stop", v -> stop()));
-        top.addView(panelIcon(R.drawable.ms_close, "Close", v -> collapse()));
-        panel.addView(top);
+        // Stop (only while it works), then the chat tools in one capsule, then close
+        headerStop = toolIcon(R.drawable.ic_stop, "Stop", Ui.ERR, v -> stop());
+        headerStop.setBackground(rounded(Theme.withAlpha(Ui.ERR, 0x26), 18, 0, 0));
+        LinearLayout.LayoutParams hsp = new LinearLayout.LayoutParams(dp(36), dp(36));
+        hsp.rightMargin = dp(6);
+        headerStop.setLayoutParams(hsp);
+        headerStop.setVisibility(View.GONE);
+        top.addView(headerStop);
+        LinearLayout tools = new LinearLayout(svc);
+        tools.setGravity(Gravity.CENTER_VERTICAL);
+        tools.setPadding(dp(2), dp(2), dp(2), dp(2));
+        tools.setBackground(rounded(Ui.CARD, 20, Ui.OUTLINE, 1));
+        tools.addView(toolIcon(R.drawable.ms_forum, "Chats", Ui.MUTED, v -> toggleSessionList()));
+        tools.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> newChat(Prefs.backend(svc))));
+        top.addView(tools);
+        android.widget.ImageButton close = toolIcon(R.drawable.ms_close, "Close", Ui.MUTED, v -> collapse());
+        close.setBackground(rounded(Ui.CARD, 18, Ui.OUTLINE, 1));
+        LinearLayout.LayoutParams clp2 = new LinearLayout.LayoutParams(dp(36), dp(36));
+        clp2.leftMargin = dp(6);
+        close.setLayoutParams(clp2);
+        top.addView(close);
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        tlp.leftMargin = dp(4);
+        tlp.bottomMargin = dp(4);
+        panel.addView(top, tlp);
 
         scroll = new ScrollView(svc);
         // Tapping the conversation hides the keyboard.
@@ -329,6 +350,8 @@ final class Bubble implements ChatHub.Listener {
         input.setImeOptions(EditorInfo.IME_ACTION_SEND);
         input.setPadding(0, dp(10), 0, dp(10));
         input.setBackground(null);
+        input.setOnFocusChangeListener((v, has) -> refit());
+        root.getViewTreeObserver().addOnWindowFocusChangeListener(has -> refit());
         inputRow.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         mic = new ImageButton(svc);
         mic.setImageResource(R.drawable.ms_mic);
@@ -368,6 +391,30 @@ final class Bubble implements ChatHub.Listener {
         });
         panel.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+        composer = inputRow;
+        voiceBar = new VoiceBar(svc, new VoiceBar.Actions() {
+            @Override
+            public void cancel() {
+                Voice.stopListening();
+            }
+
+            @Override
+            public void send() {
+                Voice.finishListening();
+            }
+        });
+        voiceBar.setVisibility(View.GONE);
+        panel.addView(voiceBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    private LinearLayout composer;
+    private VoiceBar voiceBar;
+
+    private void showVoiceBar(boolean on) {
+        if (on) voiceBar.begin(null);
+        voiceBar.setVisibility(on ? View.VISIBLE : View.GONE);
+        composer.setVisibility(on ? View.GONE : View.VISIBLE);
     }
 
     private void applyCollapsedParams() {
@@ -435,10 +482,25 @@ final class Bubble implements ChatHub.Listener {
         }
     }
 
+    /** Resize the open panel (Buddy's keyboard came or went). */
+    private void refit() {
+        if (!expanded || passThrough) return;
+        int h = lp.height;
+        applyExpandedParams();
+        if (lp.height == h) return;
+        try {
+            wm.updateViewLayout(root, lp);
+        } catch (Exception ignored) {
+        }
+    }
+
     private void applyExpandedParams() {
         Rect screen = screen();
         lp.width = screen.width() - dp(20);
-        int bottom = imeTop > 0 && !imeInsetsWork ? imeTop : screen.height() - dp(24);
+        // make room for the keyboard only when it's for Buddy's own text field (not another app's, e.g. while
+        // the agent types in Messenger: the panel would shrink to half the screen for nothing)
+        boolean ours = input != null && input.hasFocus() && root.hasWindowFocus();
+        int bottom = imeTop > 0 && !imeInsetsWork && ours ? imeTop : screen.height() - dp(24);
         lp.height = Math.max(dp(220), bottom - dp(8) - dp(10));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
@@ -458,6 +520,7 @@ final class Bubble implements ChatHub.Listener {
         root.removeAllViews();
         root.addView(panel);
         applyExpandedParams();
+        Voice.prepare(svc); // so the mic is quick
         wm.updateViewLayout(root, lp);
         boolean right = Prefs.bubblePos(svc)[0] != 0;
         panel.setPivotX(right ? lp.width : 0);
@@ -838,6 +901,166 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private ImageButton mic;
+    private RadialMenu radial;
+    private HoldRing holdRing;
+    private boolean wasWorking;
+
+    /** 2. A ring that fills while the bubble is held: the menu opens when it's full. */
+    private final class HoldRing extends View {
+        private final android.graphics.Paint p = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private float progress;
+        private ValueAnimator anim;
+
+        HoldRing(android.content.Context c) {
+            super(c);
+            p.setStyle(android.graphics.Paint.Style.STROKE);
+            p.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            p.setStrokeWidth(dp(4));
+        }
+
+        void begin(long ms) {
+            cancel();
+            anim = ValueAnimator.ofFloat(0f, 1f);
+            anim.setStartDelay(90); // a quick tap shows nothing
+            anim.setDuration(ms - 90);
+            anim.addUpdateListener(a -> {
+                progress = (float) a.getAnimatedValue();
+                invalidate();
+            });
+            anim.start();
+        }
+
+        void cancel() {
+            if (anim != null) anim.cancel();
+            progress = 0;
+            invalidate();
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas c) {
+            if (progress <= 0) return;
+            float in = dp(3);
+            android.graphics.RectF r = new android.graphics.RectF(in, in, getWidth() - in, getHeight() - in);
+            p.setColor(Theme.withAlpha(Ui.ACCENT, 0x40));
+            c.drawArc(r, 0, 360, false, p);
+            p.setColor(Ui.ACCENT);
+            c.drawArc(r, -90, 360 * progress, false, p);
+        }
+    }
+
+    /** 1. The first few times a task starts: the hold menu peeks out ("Hold me") and slides back. */
+    private void maybePeek() {
+        if (expanded || Prefs.menuHinted(svc) || Prefs.peekCount(svc) >= 3 || radial.isOpen() || root.getVisibility() != View.VISIBLE) return;
+        Prefs.addPeek(svc);
+        face.postDelayed(() -> {
+            if (expanded || radial.isOpen()) return;
+            int[] loc = new int[2];
+            face.getLocationOnScreen(loc);
+            int cx = loc[0] + face.getWidth() / 2, cy = loc[1] + face.getHeight() / 2;
+            java.util.List<RadialMenu.Action> acts = new java.util.ArrayList<>();
+            acts.add(new RadialMenu.Action(R.drawable.ic_stop, "Stop", true, () -> { }));
+            acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Add", false, () -> { }));
+            acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, "Voice", false, () -> { }));
+            radial.peek(cx, cy, cx > screen().width() / 2, acts);
+        }, 900);
+    }
+
+    /** 3. Tapped (not held) while it talks or works: say, a few times, that holding gives Stop. */
+    private void maybeTip() {
+        if (Prefs.menuHinted(svc) || Prefs.tipCount(svc) >= 3) return;
+        boolean speaking = Voice.isSpeaking(), working = running || controlling;
+        if (!speaking && !working) return;
+        Prefs.addTip(svc);
+        toast(speaking ? "Tip: hold the bubble to stop the voice" : "Tip: hold the bubble to stop the task or add an instruction");
+    }
+
+    /** Hold the bubble: what can be done right now, fanned out around it. */
+    private void openMenu() {
+        vibrate(30);
+        Prefs.setMenuHinted(svc);
+        java.util.List<RadialMenu.Action> acts = new java.util.ArrayList<>();
+        boolean working = running || controlling;
+        if (working) acts.add(new RadialMenu.Action(R.drawable.ic_stop, "Stop task", true, () -> {
+            if (controlling) svc.takeBackControl();
+            else {
+                hub.stopAll();
+                toast("Stopping…");
+            }
+        }));
+        if (hub.runningCount() > 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Add instruction", false, this::dictateNote));
+        if (Voice.isSpeaking()) acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, "Stop voice", false, Voice::stopSpeaking));
+        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Talk", false, () -> {
+            expand();
+            face.post(this::toggleMic);
+        }));
+        acts.add(new RadialMenu.Action(R.drawable.ms_forum, "Open chat", false, this::expand));
+        acts.add(new RadialMenu.Action(R.drawable.ms_close, "Hide", false, this::dismissToNotification));
+        int[] loc = new int[2];
+        face.getLocationOnScreen(loc);
+        int cx = loc[0] + face.getWidth() / 2, cy = loc[1] + face.getHeight() / 2;
+        ((View) face.getParent()).animate().scaleX(1.12f).scaleY(1.12f).setDuration(160).start();
+        radial.open(cx, cy, cx > screen().width() / 2, acts,
+                () -> ((View) face.getParent()).animate().scaleX(1f).scaleY(1f).setDuration(160).start());
+    }
+
+    /** The bubble's 🎙 while a task runs: say something, it goes to the working agent (ChatHub.addNote). */
+    private void dictateNote() {
+        if (noteListening) {
+            Voice.finishListening();
+            return;
+        }
+        final Sessions.Session ses = hub.latestRunning();
+        if (ses == null) {
+            toast("Nothing is running in Buddy's chats.");
+            return;
+        }
+        if (!Voice.micAllowed(svc)) {
+            toast("Allow the microphone in Buddy, then tap the mic again.");
+            svc.startActivity(new android.content.Intent(svc, MainActivity.class)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
+            return;
+        }
+        String err = Voice.listen(svc, new Voice.Listener() {
+            @Override
+            public void onPartial(String text) {
+                if (!text.isEmpty()) noteStatus("“" + text + "”");
+            }
+
+            @Override
+            public void onFinal(String text) {
+                noteDone();
+                String e = hub.addNote(ses, text);
+                toast(e != null ? e : "Got it: " + ses.brainName() + " will take it into account");
+            }
+
+            @Override
+            public void onEnd(String message) {
+                noteDone();
+                if (message != null) toast(message);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                noteStatus(status == null ? "Listening… tap the bubble when done" : status);
+            }
+        });
+        if (err != null) {
+            toast(err);
+            return;
+        }
+        noteListening = true;
+        noteStatus("Listening… tap the bubble when done");
+    }
+
+    private void noteStatus(String s) {
+        pill.setText(s);
+        pill.setVisibility(View.VISIBLE);
+    }
+
+    private void noteDone() {
+        noteListening = false;
+        refreshStatus();
+    }
 
     /** Talk in the bubble: tap, speak, it sends when you stop. Tap again to send right away. */
     private void toggleMic() {
@@ -854,11 +1077,12 @@ final class Bubble implements ChatHub.Listener {
             return;
         }
         final String before = input.getText().toString().trim();
+        hideKeyboard();
+        showVoiceBar(true);
         String err = Voice.listen(svc, new Voice.Listener() {
             @Override
             public void onPartial(String text) {
-                input.setText(before.isEmpty() ? text : before + " " + text);
-                input.setSelection(input.getText().length());
+                voiceBar.setHeard(text);
             }
 
             @Override
@@ -873,18 +1097,25 @@ final class Bubble implements ChatHub.Listener {
                 micIdle();
                 if (message != null) toast(message);
             }
+
+            @Override
+            public void onLevel(float level) {
+                voiceBar.level(level);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                voiceBar.setState(status);
+            }
         });
         if (err != null) {
+            showVoiceBar(false);
             toast(err);
-            return;
         }
-        hideKeyboard();
-        mic.setBackground(circle(Ui.ACCENT, 0, 0));
-        mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.ON_ACCENT));
-        input.setHint("Listening… speak now");
     }
 
     private void micIdle() {
+        if (voiceBar != null) showVoiceBar(false);
         mic.setBackground(null);
         mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
         input.setHint("Ask " + sessions.current.brainName() + "…");
@@ -992,6 +1223,7 @@ final class Bubble implements ChatHub.Listener {
 
     private void updateHeader() {
         Sessions.Session ses = sessions.current;
+        if (headerStop != null) headerStop.setVisibility(ses.running || controlling ? View.VISIBLE : View.GONE);
         String h = showingList ? "Chats" : ses.label() + " ▾";
         if (!showingList && ses.running && !ses.status.isEmpty()) h = ses.status;
         header.setText(h);
@@ -1037,6 +1269,11 @@ final class Bubble implements ChatHub.Listener {
         hub.changed();
     }
 
+    /** An approval card is waiting for the user (the agent must not tap anything meanwhile). */
+    boolean confirming() {
+        return pendingConfirm != null;
+    }
+
     void cancelConfirm() {
         pendingConfirm = null;
         confirmCard.setVisibility(View.GONE);
@@ -1074,12 +1311,20 @@ final class Bubble implements ChatHub.Listener {
     /** Pill, face, badge and header from the hub's state. */
     private void refreshStatus() {
         running = hub.runningCount() > 0;
+        boolean working = running || controlling;
+        if (working && !wasWorking) maybePeek();
+        wasWorking = working;
         String text = pendingConfirm != null ? "Waiting for your approval" : hub.pillText();
         if (controlling && pendingConfirm == null) {
             text = "Using your phone" + (text == null || text.isEmpty() ? "" : " · " + text);
         }
-        pill.setText(text == null ? "" : text);
-        pill.setVisibility(text == null ? View.GONE : View.VISIBLE);
+        if ((controlling || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
+            text = (text == null ? "" : text + " · ") + "hold the bubble for Stop and more";
+        }
+        if (!noteListening) { // while dictating a note the pill shows what's heard
+            pill.setText(text == null ? "" : text);
+            pill.setVisibility(text == null ? View.GONE : View.VISIBLE);
+        }
         // in control: a solid accent pill, so it's clear not to touch the phone
         pill.setTextColor(controlling ? Ui.ON_ACCENT : Ui.TEXT);
         pill.setBackground(rounded(controlling ? Ui.ACCENT : Ui.BG, 18, Ui.ACCENT, 1));
@@ -1105,7 +1350,6 @@ final class Bubble implements ChatHub.Listener {
 
     private void setWorking(boolean on, boolean force) {
         ring.setSpinning(on);
-        stopChip.setVisibility(on ? View.VISIBLE : View.GONE);
         // keep the fired-up / bracing face while the bubble is being dragged
         if (force || !faceDragging()) face.setImageResource(on ? R.drawable.bubble_face_thinking : R.drawable.bubble_face);
         if (on && breathing == null) {
@@ -1174,6 +1418,18 @@ final class Bubble implements ChatHub.Listener {
 
     private void scrollToEnd() {
         scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
+    }
+
+    private android.widget.ImageButton headerStop;
+
+    /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */
+    private android.widget.ImageButton toolIcon(int icon, String description, int tint, View.OnClickListener l) {
+        android.widget.ImageButton b = Ui.iconButton(svc, icon, description, tint);
+        b.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        b.setPadding(dp(8), dp(8), dp(8), dp(8));
+        b.setLayoutParams(new LinearLayout.LayoutParams(dp(36), dp(36)));
+        b.setOnClickListener(l);
+        return b;
     }
 
     private android.widget.ImageButton panelIcon(int icon, String description, View.OnClickListener l) {
@@ -1261,7 +1517,12 @@ final class Bubble implements ChatHub.Listener {
         private final int slop = ViewConfiguration.get(svc).getScaledTouchSlop();
         private float downX, downY;
         private int startX, startY;
-        private boolean dragging;
+        private boolean dragging, menu;
+        private final Runnable hold = () -> {
+            menu = true;
+            holdRing.cancel();
+            openMenu();
+        };
 
         @Override
         public boolean onTouch(View v, MotionEvent e) {
@@ -1272,10 +1533,20 @@ final class Bubble implements ChatHub.Listener {
                     startX = lp.x;
                     startY = lp.y;
                     dragging = false;
+                    menu = false;
+                    if (radial.isOpen()) radial.close(true);
+                    face.postDelayed(hold, ViewConfiguration.getLongPressTimeout());
+                    holdRing.begin(ViewConfiguration.getLongPressTimeout());
                     return true;
                 case MotionEvent.ACTION_MOVE: {
                     float dx = e.getRawX() - downX, dy = e.getRawY() - downY;
+                    if (menu) { // held: slide onto an action
+                        radial.hover(e.getRawX(), e.getRawY());
+                        return true;
+                    }
                     if (!dragging && Math.hypot(dx, dy) > slop) {
+                        face.removeCallbacks(hold);
+                        holdRing.cancel();
                         dragging = true;
                         // Switch to left-anchored coordinates for free dragging.
                         int[] loc = new int[2];
@@ -1318,6 +1589,16 @@ final class Bubble implements ChatHub.Listener {
                     return true;
                 }
                 case MotionEvent.ACTION_UP:
+                    face.removeCallbacks(hold);
+                    holdRing.cancel();
+                    if (menu) {
+                        radial.release();
+                        return true;
+                    }
+                    if (noteListening && !dragging) { // dictating an instruction: a tap ends it
+                        Voice.finishListening();
+                        return true;
+                    }
                     if (dragging) {
                         ((View) face.getParent()).animate().scaleX(1f).scaleY(1f).setDuration(160).start();
                         if (overTarget) {
@@ -1338,10 +1619,14 @@ final class Bubble implements ChatHub.Listener {
                             wm.updateViewLayout(root, lp);
                         });
                     } else {
+                        maybeTip();
                         expand();
                     }
                     return true;
                 case MotionEvent.ACTION_CANCEL:
+                    face.removeCallbacks(hold);
+                    holdRing.cancel();
+                    if (menu) return true;
                     endArcs(false);
                     showDismissTarget(false);
                     setWorking(running || controlling, true);

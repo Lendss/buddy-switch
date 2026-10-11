@@ -22,6 +22,14 @@ final class Voice {
 
         /** Stopped without a result (silence, error, cancelled). message may be null. */
         void onEnd(String message);
+
+        /** Microphone loudness, 0..1, many times a second while recording. */
+        default void onLevel(float level) {
+        }
+
+        /** What's happening when not simply recording ("Starting Claude…", "Transcribing…"); null: recording. */
+        default void onStatus(String status) {
+        }
     }
 
     private static SpeechRecognizer recognizer;
@@ -38,16 +46,42 @@ final class Voice {
     }
 
     static boolean listening() {
-        return current != null;
+        return current != null || ClaudeDictation.active() || CodexDictation.active();
+    }
+
+    /** Languages offered for voice: {BCP-47 tag, name}. */
+    static final String[][] LANGUAGES = {
+            {"en-US", "English"}, {"fr-FR", "Français"}, {"de-DE", "Deutsch"}, {"ar-TN", "العربية · تونس"},
+            {"ar-SA", "العربية"}, {"es-ES", "Español"}, {"it-IT", "Italiano"}, {"pt-PT", "Português"},
+            {"nl-NL", "Nederlands"}, {"tr-TR", "Türkçe"}, {"ru-RU", "Русский"}, {"ja-JP", "日本語"},
+    };
+
+    static String languageName(String tag) {
+        for (String[] l : LANGUAGES) if (l[0].equals(tag)) return l[1];
+        return tag;
+    }
+
+    /** Warm up the chosen engine (a chat or the bubble opened) so the first tap on the mic is quick. */
+    static void prepare(Context c) {
+        String engine = Prefs.voiceEngine(c), lang = Prefs.voiceLang(c);
+        if ("claude".equals(engine) && ClaudeDictation.supports(lang)) ClaudeDictation.prepare(c, lang);
+        else if ("chatgpt".equals(engine)) CodexDictation.prepare(c);
     }
 
     /** Start listening. Returns an error message, or null when started. */
     static String listen(Context c, Listener l) {
         if (!micAllowed(c)) return "Buddy needs the microphone. Open the Buddy app and tap 🎙 once to allow it.";
-        if (!SpeechRecognizer.isRecognitionAvailable(c)) return "No speech recognition service on this phone.";
         stopListening();
         stopSpeaking();
+        String lang = Prefs.voiceLang(c);
+        // Claude's dictation (on the user's Claude plan) for the languages it supports; otherwise the phone's
+        if ("claude".equals(Prefs.voiceEngine(c)) && ClaudeDictation.supports(lang)) {
+            return ClaudeDictation.listen(c, lang, l);
+        }
+        if ("chatgpt".equals(Prefs.voiceEngine(c))) return CodexDictation.listen(c, l);
+        if (!SpeechRecognizer.isRecognitionAvailable(c)) return "No speech recognition service on this phone.";
         current = l;
+        l.onStatus("Starting…");
         recognizer = SpeechRecognizer.createSpeechRecognizer(c.getApplicationContext());
         recognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -72,27 +106,67 @@ final class Voice {
                         : "Speech recognition error " + error + ".");
             }
 
-            @Override public void onReadyForSpeech(Bundle b) {}
+            @Override
+            public void onReadyForSpeech(Bundle b) {
+                if (current == l) l.onStatus(null);
+            }
+
+            @Override
+            public void onRmsChanged(float rms) { // about -2 (quiet) to 10 dB (loud)
+                if (current == l) l.onLevel(Math.max(0f, Math.min(1f, (rms + 2f) / 12f)));
+            }
+
             @Override public void onBeginningOfSpeech() {}
-            @Override public void onRmsChanged(float rms) {}
             @Override public void onBufferReceived(byte[] buf) {}
-            @Override public void onEndOfSpeech() {}
+            @Override
+            public void onEndOfSpeech() {
+                if (current == l) l.onStatus("Finishing…");
+            }
             @Override public void onEvent(int type, Bundle b) {}
         });
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang);
+        ArrayList<String> langs = new ArrayList<>(java.util.Arrays.asList(Prefs.voiceLangs(c).split(",")));
+        if (langs.size() > 1 && android.os.Build.VERSION.SDK_INT >= 33) {
+            // detect which of the user's languages is being spoken
+            i.putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
+                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE_DETECTION_ALLOWED_LANGUAGES, langs);
+        }
+        if (langs.size() > 1 && android.os.Build.VERSION.SDK_INT >= 34) {
+            // and follow a switch of language mid-sentence
+            i.putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_SWITCH, RecognizerIntent.LANGUAGE_SWITCH_BALANCED)
+                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE_SWITCH_ALLOWED_LANGUAGES, langs);
+        }
         recognizer.startListening(i);
         return null;
     }
 
     /** Stop listening now; whatever was heard so far is delivered as the final result. */
     static void finishListening() {
+        if (ClaudeDictation.active()) {
+            ClaudeDictation.finish();
+            return;
+        }
+        if (CodexDictation.active()) {
+            CodexDictation.finish();
+            return;
+        }
         if (recognizer != null) recognizer.stopListening();
     }
 
     static void stopListening() {
+        if (ClaudeDictation.active()) {
+            ClaudeDictation.cancel();
+            return;
+        }
+        if (CodexDictation.active()) {
+            CodexDictation.cancel();
+            return;
+        }
         Listener l = current;
         if (recognizer != null) recognizer.cancel();
         finish();
@@ -121,6 +195,16 @@ final class Voice {
                 .replaceAll("https?://\\S+", "link")
                 .trim();
         if (clean.isEmpty()) return;
+        if ("chatgpt".equals(Prefs.speechEngine(c)) && SetupState.signedIn(c, "codex")) {
+            final Context app = c.getApplicationContext();
+            CodexSpeech.speak(app, clean, t -> phoneSpeak(app, t)); // the phone's voice if ChatGPT's fails
+            return;
+        }
+        phoneSpeak(c, clean);
+    }
+
+    private static void phoneSpeak(Context c, String clean) {
+        appCtx = c.getApplicationContext();
         if (tts == null) {
             pending = clean;
             tts = new TextToSpeech(c.getApplicationContext(), status -> {
@@ -140,12 +224,52 @@ final class Voice {
         }
     }
 
+    /** Speak in the reply's own language: detect it (on a worker thread), then pick a matching voice. */
     private static void say(String text) {
-        Bundle p = new Bundle();
-        tts.speak(text, TextToSpeech.QUEUE_ADD, p, "buddy-" + System.nanoTime());
+        final Context c = appCtx;
+        new Thread(() -> {
+            java.util.Locale loc = c == null ? null : detectLanguage(c, text);
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                if (tts == null || !ttsReady) return;
+                if (loc != null && tts.isLanguageAvailable(loc) >= TextToSpeech.LANG_AVAILABLE) {
+                    tts.setLanguage(loc);
+                    android.speech.tts.Voice best = null;
+                    for (android.speech.tts.Voice v : tts.getVoices()) {
+                        if (!v.getLocale().getLanguage().equals(loc.getLanguage())) continue;
+                        if (v.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
+                        if (best == null || v.getQuality() > best.getQuality()
+                                || (v.getQuality() == best.getQuality() && v.getLocale().equals(loc))) best = v;
+                    }
+                    if (best != null) tts.setVoice(best);
+                }
+                tts.speak(text, TextToSpeech.QUEUE_ADD, new Bundle(), "buddy-" + System.nanoTime());
+            });
+        }, "tts-language").start();
+    }
+
+    private static Context appCtx;
+
+    private static java.util.Locale detectLanguage(Context c, String text) {
+        try {
+            android.view.textclassifier.TextClassificationManager m =
+                    c.getSystemService(android.view.textclassifier.TextClassificationManager.class);
+            android.view.textclassifier.TextLanguage r = m.getTextClassifier().detectLanguage(
+                    new android.view.textclassifier.TextLanguage.Request.Builder(text).build());
+            if (r.getLocaleHypothesisCount() > 0 && r.getConfidenceScore(r.getLocale(0)) > 0.5f) {
+                return r.getLocale(0).toLocale();
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    /** Buddy is reading something aloud (phone voice or ChatGPT's). */
+    static boolean isSpeaking() {
+        return CodexSpeech.active() || (tts != null && ttsReady && tts.isSpeaking());
     }
 
     static void stopSpeaking() {
+        CodexSpeech.stop();
         if (tts != null && ttsReady) tts.stop();
     }
 }

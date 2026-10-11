@@ -77,8 +77,11 @@ final class Linux {
                 "--kill-on-exit", "--link2symlink", "-0",
                 "-r", root(c).getAbsolutePath(),
                 "-b", "/dev", "-b", "/proc", "-b", "/sys",
+                // one sound card, "Buddy microphone" (Android hides its own): programs then try to record, and
+                // recording goes through Buddy's stand-in arecord/rec (MicServer)
+                "-b", root(c).getAbsolutePath() + "/etc/buddy/asound-cards:/proc/asound/cards",
                 "-w", "/root",
-                "/usr/bin/env", "-i", "HOME=/root", "LANG=C.UTF-8", "TERM=xterm-256color",
+                "/usr/bin/env", "-i", "HOME=/root", "LANG=C.UTF-8", "TERM=xterm-256color", "COLORTERM=truecolor",
                 "PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"));
         a.addAll(Arrays.asList(cmd));
         return a;
@@ -130,13 +133,22 @@ final class Linux {
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setConnectTimeout(20000);
         con.setReadTimeout(60000);
-        if (con.getResponseCode() != 200) throw new IOException("Download failed: HTTP " + con.getResponseCode());
-        try (InputStream in = con.getInputStream(); OutputStream out = new FileOutputStream(to)) {
+        try (InputStream in = openOk(con); OutputStream out = new FileOutputStream(to)) {
             byte[] buf = new byte[64 * 1024];
             int n;
             while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
         } finally {
             con.disconnect();
+        }
+    }
+
+    private static InputStream openOk(HttpURLConnection con) throws IOException {
+        try {
+            if (con.getResponseCode() != 200) throw new IOException("Download failed: HTTP " + con.getResponseCode());
+            return con.getInputStream();
+        } catch (IOException e) {
+            con.disconnect();
+            throw e;
         }
     }
 

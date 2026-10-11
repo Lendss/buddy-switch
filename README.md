@@ -45,9 +45,11 @@ You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan
 |---|---|
 | Choose your agent | **Claude Code** (recommended), **Codex**, or both |
 | Accessibility | Turn on *Buddy assistant*. Greyed out ("Restricted setting")? App info → ⋮ → **Allow restricted settings**, then try again |
-| Install and sign in | One tap installs your agent in Buddy's Linux (Claude Code about 235 MB, Codex about 150 MB; use Wi-Fi). Then **Sign in**: your browser opens, you approve, and Buddy comes back by itself. For Claude, Buddy picks the one-time code off the confirmation page for you |
+| Install and sign in | One tap installs your agent in Buddy's Linux (Claude Code about 235 MB, Codex about 150 MB; use Wi-Fi). Then **Sign in**: your browser opens, you approve, and Buddy comes back by itself. For Claude, Buddy picks the one-time code off the confirmation page for you. No browser on this phone you want to use? **Sign in on another device** (Claude: a link to open anywhere) or **Sign in with a code** (Codex) |
 | Keep it running | Battery: unrestricted for Buddy |
 | Try it | A first chat with a ready-made prompt |
+
+**Android blocked the install?** Play Protect may say *"App blocked to protect your device"* for apps that use Accessibility and come from a browser: tap **More details → Install anyway** (or install from a file manager). On Android 13+, if *Buddy assistant* is greyed out in Accessibility, open App info → ⋮ → **Allow restricted settings** first.
 
 Updating from 1.x (Termux): install the new APK, then install and sign in to your agent in Settings. Termux isn't needed anymore. Chats from the Termux days can't be continued; Settings offers to remove them.
 
@@ -58,11 +60,14 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 - **Chats:** start one with **New chat** (Claude Code or Codex), tap a chat to open it, long-press to delete it. Several chats can work at the same time.
 - **Models:** tap the chip under a chat's title to pick the model for that chat (Opus, Sonnet, Haiku, Fable, Codex's own list, or any model name). The conversation continues with the new model.
 - **Photos and files:** tap the paperclip to take a photo, pick photos, or attach any file up to 25 MB.
-- **Voice:** tap the mic to talk; it sends when you stop. The speaker button reads replies aloud.
+- **Voice:** tap the mic to talk; the box turns into a recording bar (✕ cancel, live waveform, ↑ send). Choose the engine in Settings → Voice: the **phone's** recognizer, **Claude** (Claude Code's own dictation, on your Claude plan) or **ChatGPT** (ChatGPT's voice through Codex, on your ChatGPT plan; any language, even mixed). Pick your languages there; long-press the mic to switch.
+- **Read aloud:** the speaker button reads replies, in the phone's voice or in **ChatGPT's voice** (Juniper, Maple, Ember, Cove: Settings → Voice → Voice output).
+- **Add instructions while it works:** type or talk while a task runs; the agent gets it at its next step, without stopping.
 - **Tool calls** fold into one "N tool calls" line you can open.
 - **Approvals** appear in the chat and in the bubble: **Approve** or **Deny**.
 - **Sessions:** every Claude Code and Codex session in Buddy's Linux, with a Stop button. Recent sessions can be read, or continued in Buddy.
-- **Settings:** setup, appearance (light/dark/system, accent colour, surface), agents (install, sign in, sign out), the bubble, read-aloud, developer mode and Remote Control.
+- **Settings:** setup, appearance (light/dark/system, accent colour, surface), agents (install, sign in, sign out), voice, the bubble, app permissions, developer mode and Remote Control.
+- **Terminal:** a real terminal for Buddy's Linux (Sessions → Terminal): tabs, text selection and copy, links, pinch to zoom. Claude Code's and Codex's own screens run in it.
 
 ### Remote Control: a Claude Code session in your Claude app
 
@@ -70,14 +75,15 @@ Settings → **Remote Control → Claude Code session** keeps a Claude Code sess
 
 ### When an agent is using your phone
 
-As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill with a stop button (even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute.
+As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill (hold the bubble for **Stop task**; it shows even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute.
 
 ### The bubble
 
 | | |
 |---|---|
 | Tap the bubble | Open the chat panel |
-| Spinning ring | An agent is working; the ■ button under the bubble stops it |
+| Spinning ring | An agent is working |
+| **Hold the bubble** | Its actions fan out: **Stop task**, **Add instruction** (by voice), **Stop voice**, **Talk**, **Open chat**, **Hide**. Slide onto one and let go, or let go and tap |
 | Drag the bubble | Move it; it snaps to the nearest edge |
 | Drag it onto the ✕ | Hide it. A notification brings it back. It never shows on the lock screen. |
 | Back | Close the keyboard, then collapse the panel |
@@ -96,6 +102,12 @@ An accessibility service is powerful. Please read this before installing.
 
 - **Local only.** The MCP server listens on `127.0.0.1` and requires a random per-install token. Nothing is reachable from the network.
 - **Approval gate.** The agent is instructed to call `confirm` before sending messages, posting, buying, deleting or changing settings. You see the exact action with **Approve / Deny**.
+- **App permissions (enforced by Buddy, not the agent).** Settings → Experience → App permissions, per app:
+  - **Trust:** asking is left to the agent.
+  - **Hard:** Buddy itself checks every tap; buttons like Send, Pay, Delete (built-in words in six languages, plus your own *always ask* / *never ask* rules, with suggestions from buttons the agent has tapped) need your OK.
+  - **Smart:** the rules, then a separate temporary Claude Code or Codex session without tools reviews every other tap against your request and the screen (about 3 s a tap).
+  
+  Messaging, social, email, calling, shopping and money apps start on Hard. The agent can never tap or type in Buddy's own bubble, cards or settings, so it can't approve for you or loosen the rules.
 - **Prompt injection is the main risk.** Buddy reads whatever is on screen. A malicious message, email or web page could contain text like "send this to all your contacts". Buddy's instructions treat on-screen text as content, never commands, and the approval gate is the backstop, but no model is perfect. Read approval cards carefully.
 - **Limited tools.** Outside developer mode, Claude Code gets the phone tools, web search and fetch, and read access to that chat's attachments only (no shell, no other files). Codex runs in its read-only sandbox. Everything runs inside Buddy's own app storage, separate from your other apps' files.
 - **What leaves the phone:** only what Claude Code or Codex sends to Anthropic or OpenAI to answer you, including screen text, screenshots and attachments it reads.

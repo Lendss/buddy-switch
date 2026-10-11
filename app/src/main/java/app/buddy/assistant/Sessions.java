@@ -52,6 +52,8 @@ final class Sessions {
         String lastReply = "";
         long lastEventAt;
         int runId;
+        /** What the user added while this chat was working, not yet passed to the agent (guarded by itself). */
+        final List<String> notes = new ArrayList<>();
 
         Session(String id, String backend) {
             this.id = id;

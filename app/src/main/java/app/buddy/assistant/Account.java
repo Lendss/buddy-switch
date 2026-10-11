@@ -41,6 +41,10 @@ final class Account {
     volatile String detail = "", email = "", plan = "";
     /** The sign-in page to open, and (Claude) the OAuth state that the confirmation code ends with. */
     volatile String url, state;
+    /** Signing in from another device: show the link (and Codex's one-time code) instead of opening the browser here. */
+    volatile boolean remote;
+    /** Codex's device code ("ABCD-12345") in remote mode. */
+    volatile String userCode;
 
     private static final Handler main = new Handler(Looper.getMainLooper());
     private static volatile Context app;
@@ -173,34 +177,57 @@ final class Account {
 
     /** Starts the agent's login; the sign-in URL appears in {@link #url} when it's ready. */
     void startLogin(Context c) {
+        startLogin(c, false);
+    }
+
+    /** remote = sign in on another device: Codex uses its device code; Claude shows its link to open elsewhere. */
+    void startLogin(Context c, boolean onOtherDevice) {
         app = c.getApplicationContext();
         if (busy()) return;
         final Context app = c.getApplicationContext();
         url = null;
         state = null;
+        userCode = null;
+        remote = onOtherDevice;
         set(Step.WAITING_BROWSER, "Starting sign-in…");
         new Thread(() -> {
             StringBuilder out = new StringBuilder();
             try {
                 Process p = (claude()
                         ? Linux.builder(app, "/root/.local/bin/claude", "auth", "login", "--claudeai")
+                        : onOtherDevice ? Linux.builder(app, "codex", "login", "--device-auth")
                         : Linux.builder(app, "codex", "login")).start();
                 synchronized (this) {
                     login = p;
                     loginIn = p.getOutputStream();
                 }
-                Pattern u = Pattern.compile("https://\\S*/oauth/authorize\\?\\S+");
+                Pattern u = Pattern.compile(onOtherDevice && !claude()
+                        ? "https://\\S*/codex/device\\S*" : "https://\\S*/oauth/authorize\\?\\S+");
+                Pattern code = Pattern.compile("one-time code[^\\n]*\\n\\s*([A-Z0-9][A-Z0-9-]{4,15})");
                 try (InputStream in = p.getInputStream()) {
                     byte[] buf = new byte[4096];
                     int n;
                     while ((n = in.read(buf)) > 0) {
                         out.append(new String(buf, 0, n, StandardCharsets.UTF_8));
+                        String plain = stripAnsi(out.toString());
                         if (url == null) {
-                            Matcher m = u.matcher(stripAnsi(out.toString()));
+                            Matcher m = u.matcher(plain);
                             if (m.find()) {
                                 url = m.group();
                                 state = Uri.parse(url).getQueryParameter("state");
-                                set(Step.WAITING_BROWSER, "");
+                                // Codex's device flow also needs its code before the screen is useful
+                                if (!(onOtherDevice && !claude())) set(Step.WAITING_BROWSER, "");
+                            }
+                        }
+                        if (onOtherDevice && !claude() && userCode == null) {
+                            Matcher m = code.matcher(plain);
+                            if (!m.find()) {
+                                m = Pattern.compile("\\b([A-Z0-9]{4,5}-[A-Z0-9]{4,6})\\b").matcher(plain);
+                                if (!m.find()) m = null;
+                            }
+                            if (m != null) {
+                                userCode = m.group(1);
+                                if (url != null) set(Step.WAITING_BROWSER, "");
                             }
                         }
                     }
