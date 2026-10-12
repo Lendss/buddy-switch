@@ -179,7 +179,8 @@ case "$CMD" in
     [ -f "$S/pid" ] && kill_tree "$(cat "$S/pid")"
     rm -rf "${S:?}"
     exit 0 ;;
-  ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-} ;;
+  ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
+    [[ "$EFFORT" =~ ^(low|medium|high|xhigh|max)$ ]] || EFFORT="" ;;
   *) echo "usage: buddy-run <token> ask|stop|delete|ping ..." >&2; exit 2 ;;
 esac
 
@@ -229,7 +230,7 @@ fi
 # ---------------------------------------------------------------- Claude Code
 run_claude() {
   local mcp tools
-  mcp=$(jq -cn --arg url "$URL/mcp" --arg auth "Bearer $TOKEN" \
+  mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
     '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth}}}}')
   tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)")
   [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
@@ -239,6 +240,7 @@ run_claude() {
     --append-system-prompt "$SYSTEM")
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
+  [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
   cd "$W" && claude "${args[@]}" 2>"$S/last-error.log"
 }
 
@@ -256,12 +258,13 @@ stream_claude() {
 # pre-approved. Normal mode keeps Codex's shell read-only; developer mode lets it write in $W.
 run_codex() {
   local prompt=$MSG
-  local cfg=(-c 'mcp_servers.phone.url="'"$URL"'/mcp"'
+  local cfg=(-c 'mcp_servers.phone.url="'"$URL"'/mcp?chat='"$SID"'"'
     -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"'
     -c 'mcp_servers.phone.default_tools_approval_mode="approve"')
   local sandbox=(--sandbox read-only)
   [ "$DEV" = 1 ] && sandbox=(--sandbox workspace-write -c 'sandbox_workspace_write.network_access=true')
   [ -n "${MODEL:-}" ] && cfg+=(-m "$MODEL")
+  [ -n "${EFFORT:-}" ] && cfg+=(-c "model_reasoning_effort=\"$EFFORT\"")
   local img=() f
   for f in "${IMGS[@]}"; do img+=("--image=$f"); done
   cd "$W" || return 1
@@ -282,6 +285,13 @@ stream_codex() {
     [ -z "$line" ] && continue
     tid=$(printf '%s' "$line" | jq -r 'select(.type=="thread.started") | .thread_id // empty' 2>/dev/null)
     [ -n "$tid" ] && printf '%s' "$tid" > "$S/codex-thread"
+    # Codex doesn't say which model it used; its session log does (shown when the chat is on "Default")
+    if [ "$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)" = turn.completed ] && [ -s "$S/codex-thread" ]; then
+      local log model
+      log=$(find "$HOME/.codex/sessions" -name "rollout-*$(cat "$S/codex-thread").jsonl" 2>/dev/null | head -1)
+      model=$([ -n "$log" ] && grep '"turn_context"' "$log" | tail -1 | jq -r '.payload.model // empty' 2>/dev/null)
+      [ -n "$model" ] && jq -cn --arg m "$model" --arg s "$SID" '{type:"system", subtype:"model", model:$m, buddy_session:$s}' | post
+    fi
     printf '%s' "$line" | jq -c --arg s "$SID" '
       (if .type == "item.started" and .item.type == "mcp_tool_call" then
         {type:"assistant", message:{content:[{type:"tool_use",
@@ -315,7 +325,7 @@ phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone
 phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
   local cfg
-  cfg=$(jq -cn --arg url "$URL/mcp" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" '
+  cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" '
     {mcp:{phone:{type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false, timeout:310000}},
      instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} else {permission:{bash:"ask", edit:"ask"}} end)')

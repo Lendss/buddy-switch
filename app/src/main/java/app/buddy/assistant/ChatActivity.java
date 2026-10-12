@@ -303,6 +303,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         sub.setPadding(0, dp(this, 2), 0, dp(this, 10));
         c.addView(sub);
         final Dialog[] d = new Dialog[1];
+        String[][] efforts = Models.efforts(ses.backend);
+        if (efforts != null) {
+            c.addView(sectionLabel(this, "Effort"));
+            TextView es = text(this, "Auto lets the agent decide. Higher thinks longer and uses more of your plan.", 13, MUTED);
+            es.setPadding(0, dp(this, 2), 0, dp(this, 8));
+            c.addView(es);
+            c.addView(segmented(this, efforts, ses.effort, false, v -> {
+                d[0].dismiss();
+                hub.setEffort(ses, v);
+            }), full());
+            TextView ml = sectionLabel(this, "Model");
+            ml.setPadding(0, dp(this, 16), 0, dp(this, 4));
+            c.addView(ml);
+        }
         boolean known = false;
         for (final String[] o : options) {
             boolean on = o[0].equals(ses.model);
@@ -314,7 +328,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             LinearLayout t = column(this);
             t.setPadding(dp(this, 14), 0, 0, 0);
             t.addView(title(this, o[1], 15));
-            t.addView(single(monoText(this, o[0].isEmpty() ? "agent default" : o[0], 12, MUTED)));
+            t.addView(single(monoText(this, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, MUTED)));
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();
@@ -490,8 +504,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
-        chipText.setText(ses.brainName() + " · " + Models.label(ses.backend, ses.model)
-                + (Prefs.devMode(this) ? " · dev" : ""));
+        chipText.setText(Models.summary(ses) + (Prefs.devMode(this) ? " · dev" : ""));
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? "Add an instruction while it works…" : "Ask " + ses.brainName() + "…");
         stripText.setText(ses.status.isEmpty() ? "Working…" : ses.status);
@@ -506,7 +519,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
     private void renderApproval() {
         BuddyService svc = BuddyService.get();
-        String ask = svc != null && svc.bubble() != null && hub.sessions.current == ses ? svc.bubble().pendingConfirmText() : null;
+        String ask = svc != null && svc.bubble() != null && svc.bubble().pendingChat() == ses ? svc.bubble().pendingConfirmText() : null;
         java.util.List<String> options = ask == null ? null : svc.bubble().pendingOptions();
         String key = ask == null ? null : ask + (options == null ? "" : "\u0000" + options);
         if (key == null ? shownApproval == null : key.equals(shownApproval)) return;
@@ -525,13 +538,21 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         hr.addView(lab);
         card.addView(hr);
         TextView well = text(this, ask, 14, TEXT);
-        well.setMaxLines(8);
         well.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
-        well.setBackground(rounded(this, BG, 12));
+        // long texts scroll inside the card, so its buttons always stay on screen
+        final int maxH = (int) (getResources().getDisplayMetrics().heightPixels * 0.3f);
+        ScrollView ws = new ScrollView(this) {
+            @Override
+            protected void onMeasure(int w, int h) {
+                super.onMeasure(w, MeasureSpec.makeMeasureSpec(maxH, MeasureSpec.AT_MOST));
+            }
+        };
+        ws.setBackground(rounded(this, BG, 12));
+        ws.addView(well);
         LinearLayout.LayoutParams wp = full();
         wp.topMargin = dp(this, 10);
         wp.bottomMargin = dp(this, 12);
-        card.addView(well, wp);
+        card.addView(ws, wp);
         if (options != null) {
             renderQuestion(card, options);
             approval.addView(card, full());

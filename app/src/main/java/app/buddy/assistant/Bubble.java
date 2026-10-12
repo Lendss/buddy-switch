@@ -223,8 +223,9 @@ final class Bubble implements ChatHub.Listener {
         pill.setTextColor(Ui.TEXT);
         pill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         pill.setTypeface(Ui.sans(svc, 500));
-        pill.setMaxWidth(dp(230));
-        pill.setSingleLine(true);
+        pill.setMaxWidth(dp(250));
+        pill.setMaxLines(2); // status lines are often longer than one line
+        pill.setLineSpacing(0, 1.05f);
         pill.setEllipsize(TextUtils.TruncateAt.END);
         pill.setPadding(dp(12), dp(8), dp(12), dp(8));
         pill.setBackground(rounded(Ui.BG, 18, Ui.ACCENT, 1));
@@ -266,10 +267,16 @@ final class Bubble implements ChatHub.Listener {
         header.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
         header.setCompoundDrawablePadding(dp(2));
         titles.addView(header, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        subtitle = Ui.single(Ui.monoText(svc, "", 12, Ui.MUTED));
-        titles.addView(subtitle);
+        // agent · model · effort, as a chip like the chat screen's: tap to change the model or effort
+        LinearLayout chip = Ui.chip(svc, "");
+        subtitle = (TextView) chip.getChildAt(0);
+        chip.setOnClickListener(v -> showModelPicker());
+        modelChip = chip;
+        LinearLayout.LayoutParams chp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        chp.topMargin = dp(3);
+        titles.addView(chip, chp);
         top.addView(titles, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        top.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> newChat(Prefs.backend(svc))));
+        top.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> showNewChat()));
         top.addView(toolIcon(R.drawable.ms_open_in_full, "Open in the app", Ui.MUTED, v -> openInApp(false)));
         top.addView(toolIcon(R.drawable.ms_close, "Close", Ui.MUTED, v -> collapse()));
         panel.addView(top, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -338,7 +345,13 @@ final class Bubble implements ChatHub.Listener {
         confirmText.setTextColor(Ui.TEXT);
         confirmText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         confirmText.setPadding(0, dp(6), 0, dp(10));
-        ScrollView cs = new ScrollView(svc);
+        // long texts scroll inside the card, so its buttons always stay on screen
+        ScrollView cs = new ScrollView(svc) {
+            @Override
+            protected void onMeasure(int w, int h) {
+                super.onMeasure(w, MeasureSpec.makeMeasureSpec((int) (screen().height() * 0.3f), MeasureSpec.AT_MOST));
+            }
+        };
         cs.addView(confirmText);
         confirmCard.addView(cs, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         // a question's answers, one button each (filled in by showCard)
@@ -1193,70 +1206,255 @@ final class Bubble implements ChatHub.Listener {
     private void deleteChat(Sessions.Session ses) {
         hub.delete(ses);
         renderCurrent();
+        if (showingList) renderSessionList();
+    }
+
+    /** The chats list or the new-chat picker is showing: no composer, like the app's Chats tab. */
+    private void showListMode() {
+        listScroll.setVisibility(showingList ? View.VISIBLE : View.GONE);
+        scroll.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        if (composer != null && voiceBar != null && voiceBar.getVisibility() != View.VISIBLE) {
+            composer.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    /** "+": pick the agent for a new chat, as in the app's New chat sheet. */
+    private boolean picking;
+
+    /** The chip: pick this chat's model and effort (the next message uses them). */
+    private boolean pickingModel;
+
+    private void showModelPicker() {
+        hideKeyboard();
+        showingList = true;
+        picking = false;
+        pickingModel = true;
+        renderSessionList();
+        showListMode();
+        updateViewing();
+        updateHeader();
+    }
+
+    private void closePicker() {
+        pickingModel = false;
+        showingList = false;
+        renderCurrent();
+        updateHeader();
+    }
+
+    private void renderModelPicker() {
+        final Sessions.Session ses = sessions.current;
+        TextView note = Ui.text(svc, "For this chat. The conversation continues; the next message uses the new choice.", 13, Ui.MUTED);
+        note.setPadding(dp(8), dp(4), dp(8), dp(10));
+        sessionList.addView(note);
+        String[][] efforts = Models.efforts(ses.backend);
+        if (efforts != null) {
+            TextView el = Ui.sectionLabel(svc, "Effort");
+            el.setPadding(dp(8), dp(4), 0, dp(2));
+            sessionList.addView(el);
+            TextView es = Ui.text(svc, "Auto lets the agent decide. Higher thinks longer and uses more of your plan.", 13, Ui.MUTED);
+            es.setPadding(dp(8), 0, dp(8), dp(8));
+            sessionList.addView(es);
+            LinearLayout seg = Ui.segmented(svc, efforts, ses.effort, false, v -> {
+                hub.setEffort(ses, v);
+                closePicker();
+            });
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.leftMargin = sp.rightMargin = dp(4);
+            sessionList.addView(seg, sp);
+        }
+        TextView ml = Ui.sectionLabel(svc, "Model");
+        ml.setPadding(dp(8), dp(16), 0, dp(4));
+        sessionList.addView(ml);
+        for (final String[] o : Models.forBackend(ses.backend)) {
+            boolean on = o[0].equals(ses.model);
+            LinearLayout r = Ui.listRow(svc);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPadding(dp(8), dp(10), dp(8), dp(10));
+            FrameLayout radio = new FrameLayout(svc);
+            radio.setBackground(rounded(0x00000000, 11, on ? Ui.ACCENT : Ui.MUTED, 2));
+            if (on) {
+                View in = new View(svc);
+                in.setBackground(Ui.oval(Ui.ACCENT));
+                radio.addView(in, new FrameLayout.LayoutParams(dp(10), dp(10), Gravity.CENTER));
+            }
+            r.addView(radio, new LinearLayout.LayoutParams(dp(22), dp(22)));
+            LinearLayout t = new LinearLayout(svc);
+            t.setOrientation(LinearLayout.VERTICAL);
+            t.setPadding(dp(14), 0, 0, 0);
+            t.addView(Ui.title(svc, o[1], 15));
+            t.addView(Ui.single(Ui.monoText(svc, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, Ui.MUTED)));
+            r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            r.setOnClickListener(v -> {
+                if (!o[0].equals(ses.model)) hub.setModel(ses, o[0]);
+                closePicker();
+            });
+            sessionList.addView(r, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
+    }
+
+    private void showNewChat() {
+        hideKeyboard();
+        showingList = true;
+        pickingModel = false;
+        picking = true;
+        renderSessionList();
+        showListMode();
+        updateViewing();
+        updateHeader();
     }
 
     // ------------------------------------------------------------ sessions
 
     private void toggleSessionList() {
-        showingList = !showingList;
+        showingList = !showingList || picking || pickingModel;
+        picking = false;
+        pickingModel = false;
         if (showingList) {
             hideKeyboard();
             renderSessionList();
         }
-        listScroll.setVisibility(showingList ? View.VISIBLE : View.GONE);
-        scroll.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        showListMode();
         updateViewing();
         updateHeader();
     }
 
     private void renderSessionList() {
         sessionList.removeAllViews();
-        LinearLayout add = new LinearLayout(svc);
-        // only agents that are set up (installed and signed in) get a "+" button
-        for (Account a : Account.ALL) {
-            if (SetupState.signedIn(svc, a.agent)) add.addView(smallButton("+ " + a.name(), v -> newChat(a.agent)));
+        if (pickingModel) {
+            renderModelPicker();
+            return;
         }
-        sessionList.addView(add);
-        for (final Sessions.Session ses : sessions.all) {
-            LinearLayout row = new LinearLayout(svc);
-            row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding(dp(12), dp(10), dp(6), dp(10));
-            row.setBackground(rounded(ses == sessions.current ? Ui.USER : Ui.CARD, 14, 0, 0));
-            LinearLayout texts = new LinearLayout(svc);
-            texts.setOrientation(LinearLayout.VERTICAL);
-            TextView t = new TextView(svc);
-            t.setText((ses.unread ? "● " : "") + ses.label());
-            t.setTextColor(Ui.TEXT);
-            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            t.setSingleLine(true);
-            t.setEllipsize(TextUtils.TruncateAt.END);
-            texts.addView(t);
-            TextView sub = new TextView(svc);
-            sub.setText(ses.brainName() + (ses.running ? " · working: " + ses.status
-                    : " · " + android.text.format.DateUtils.getRelativeTimeSpanString(ses.updated)));
-            sub.setTextColor(ses.running ? Ui.ACCENT : Ui.MUTED);
-            sub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            sub.setSingleLine(true);
-            sub.setEllipsize(TextUtils.TruncateAt.END);
-            texts.addView(sub);
-            row.addView(texts, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-            row.addView(panelIcon(R.drawable.ms_close, "Delete chat", v -> deleteChat(ses)));
-            row.setOnClickListener(v -> {
-                hub.select(ses);
-                showingList = false;
-                renderCurrent();
+        if (picking) {
+            renderNewChat();
+            return;
+        }
+        for (final Sessions.Session ses : sessions.all) sessionList.addView(chatRow(ses), new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    /** A chat, laid out like the app's Chats tab: agent tile, title and time, agent · model, last message. */
+    private View chatRow(final Sessions.Session ses) {
+        LinearLayout r = Ui.listRow(svc);
+        r.setPadding(dp(8), dp(12), dp(8), dp(12));
+        r.addView(Ui.agentTile(svc, ses.backend));
+        LinearLayout col = new LinearLayout(svc);
+        col.setOrientation(LinearLayout.VERTICAL);
+        col.setPadding(dp(14), 0, 0, 0);
+        LinearLayout first = new LinearLayout(svc);
+        first.setGravity(Gravity.CENTER_VERTICAL);
+        first.addView(Ui.single(Ui.title(svc, ses.label(), 15)), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        TextView time = Ui.monoText(svc, MainActivity.ago(ses.updated), 12, Ui.MUTED);
+        time.setPadding(dp(8), 0, 0, 0);
+        first.addView(time);
+        if (ses.unread) {
+            View d = Ui.dot(svc, Ui.OK, 8);
+            ((LinearLayout.LayoutParams) d.getLayoutParams()).leftMargin = dp(6);
+            first.addView(d);
+        }
+        col.addView(first);
+        col.addView(Ui.single(Ui.monoText(svc, Account.cliOf(ses.backend) + " · "
+                + Models.shownModel(ses).toLowerCase(java.util.Locale.ROOT), 12, Ui.MUTED)));
+        if (ses.running) {
+            TextView st = Ui.single(Ui.monoText(svc, ses.status.isEmpty() ? "working…" : ses.status, 12, Ui.ACCENT_TEXT));
+            st.setPadding(0, dp(4), 0, dp(6));
+            col.addView(st);
+            col.addView(Ui.thinBar(svc));
+        } else {
+            String last = "";
+            for (int i = ses.messages.size() - 1; i >= 0; i--) {
+                Sessions.Msg m = ses.messages.get(i);
+                if (m.kind == Kind.BUDDY || m.kind == Kind.USER) {
+                    last = (m.kind == Kind.USER ? "You: " : "") + m.label().replace('\n', ' ');
+                    break;
+                }
+            }
+            if (!last.isEmpty()) {
+                TextView l = Ui.text(svc, last, 14, Ui.MUTED);
+                l.setMaxLines(2);
+                l.setEllipsize(TextUtils.TruncateAt.END);
+                l.setPadding(0, dp(4), 0, 0);
+                col.addView(l);
+            }
+        }
+        r.addView(col, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        r.setOnClickListener(v -> {
+            hub.select(ses);
+            showingList = false;
+            renderCurrent();
+        });
+        // long-press to delete, as in the app (asked right in the row: the bubble can't show a dialog)
+        r.setOnLongClickListener(v -> {
+            vibrate(20);
+            r.removeAllViews();
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.addView(Ui.text(svc, "Delete this chat?", 15, Ui.TEXT), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            Button cancel = actionButton("Cancel", Ui.CARD);
+            cancel.setOnClickListener(x -> renderSessionList());
+            r.addView(cancel);
+            Button del = actionButton("Delete", Ui.ERR_SOFT);
+            del.setTextColor(Ui.ERR);
+            del.setOnClickListener(x -> deleteChat(ses));
+            LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            dlp.leftMargin = dp(8);
+            r.addView(del, dlp);
+            r.setOnClickListener(null);
+            r.setOnLongClickListener(null);
+            return true;
+        });
+        return r;
+    }
+
+    /** The agents for a new chat, like the app's New chat sheet (the ones not set up open their setup). */
+    private void renderNewChat() {
+        TextView h = Ui.title(svc, "New chat", 18);
+        h.setPadding(dp(8), dp(8), 0, dp(8));
+        sessionList.addView(h);
+        String def = Prefs.backend(svc);
+        for (Account acc : Account.ALL) {
+            boolean ready = SetupState.signedIn(svc, acc.agent);
+            LinearLayout r = Ui.listRow(svc);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPadding(dp(8), dp(12), dp(8), dp(12));
+            if (!ready) r.setAlpha(0.45f);
+            r.addView(Ui.agentTile(svc, acc.agent));
+            LinearLayout t = new LinearLayout(svc);
+            t.setOrientation(LinearLayout.VERTICAL);
+            t.setPadding(dp(14), 0, 0, 0);
+            LinearLayout tr = new LinearLayout(svc);
+            tr.setGravity(Gravity.CENTER_VERTICAL);
+            tr.addView(Ui.title(svc, acc.name(), 15));
+            if (acc.agent.equals(def)) {
+                TextView tag = Ui.monoText(svc, "default", 11, Ui.ACCENT_TEXT);
+                tag.setPadding(dp(6), dp(1), dp(6), dp(1));
+                tag.setBackground(rounded(Ui.ACCENT_SOFT, 6, 0, 0));
+                LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                tp.leftMargin = dp(8);
+                tr.addView(tag, tp);
+            }
+            t.addView(tr);
+            t.addView(Ui.text(svc, ready ? acc.tagline() : SetupState.installed(svc, acc.agent)
+                    ? "Not signed in · tap to set up" : "Not installed · tap to set up", 13, Ui.MUTED));
+            r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            r.addView(Ui.icon(svc, R.drawable.ms_chevron_right, Ui.MUTED, 22));
+            r.setOnClickListener(v -> {
+                picking = false;
+                if (ready) {
+                    newChat(acc.agent);
+                } else {
+                    collapse();
+                    svc.startActivity(new android.content.Intent(svc, SignInActivity.class).putExtra("agent", acc.agent)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                }
             });
-            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            rp.topMargin = dp(8);
-            sessionList.addView(row, rp);
+            sessionList.addView(r, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         }
     }
 
     /** Show the current chat's history in the panel. */
     private void renderCurrent() {
-        listScroll.setVisibility(showingList ? View.VISIBLE : View.GONE);
-        scroll.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        if (!showingList) picking = pickingModel = false;
+        showListMode();
         messages.removeAllViews();
         log = null;
         renderedFor = sessions.current;
@@ -1290,9 +1488,9 @@ final class Bubble implements ChatHub.Listener {
 
     private void updateHeader() {
         Sessions.Session ses = sessions.current;
-        header.setText(showingList ? "Chats" : ses.label());
-        subtitle.setText(ses.brainName() + " · " + Models.label(ses.backend, ses.model) + (Prefs.devMode(svc) ? " · dev" : ""));
-        subtitle.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        header.setText(pickingModel ? "Model & effort" : picking ? "New chat" : showingList ? "Chats" : ses.label());
+        subtitle.setText(Models.summary(ses) + (Prefs.devMode(svc) ? " · dev" : ""));
+        modelChip.setVisibility(showingList ? View.GONE : View.VISIBLE);
         boolean working = !showingList && (ses.running || controlling);
         strip.setVisibility(working ? View.VISIBLE : View.GONE);
         stripText.setText(!ses.status.isEmpty() ? ses.status : ses.running ? "Working…" : "Using your phone");
@@ -1381,8 +1579,8 @@ final class Bubble implements ChatHub.Listener {
         endChange();
         confirmCard.setVisibility(View.GONE);
         // OpenCode chats show the answer on the approval step itself (it arrives after the answer)
-        if (!"opencode".equals(sessions.current.backend)) {
-            hub.note(sessions.current, Kind.STEP, (asking ? "✓ Answered: " : "✎ Change requested: ") + clip(change, 80));
+        if (cardChat != null && !"opencode".equals(cardChat.backend)) {
+            hub.note(cardChat, Kind.STEP, (asking ? "✓ Answered: " : "✎ Change requested: ") + clip(change, 80));
         }
         if (cb != null) cb.onAnswer(false, change);
         refreshStatus();
@@ -1390,22 +1588,35 @@ final class Bubble implements ChatHub.Listener {
         hub.changed();
     }
 
-    void askConfirm(String summary, ConfirmCallback cb) {
-        showCard(summary, null, cb);
+    void askConfirm(String summary, String chat, ConfirmCallback cb) {
+        showCard(summary, null, chat, cb);
     }
 
     /** The ask tool: the same card, with a button per answer and one to type an answer instead. */
-    void askQuestion(String question, java.util.List<String> options, ConfirmCallback cb) {
-        showCard(question, options, cb);
+    void askQuestion(String question, java.util.List<String> options, String chat, ConfirmCallback cb) {
+        showCard(question, options, chat, cb);
     }
 
-    private void showCard(String text, java.util.List<String> options, ConfirmCallback cb) {
+    /** The Buddy chat the waiting card belongs to, or null when it comes from another session (a terminal…). */
+    private Sessions.Session cardChat;
+
+    /** The chat the waiting card belongs to (null: none, or another session). */
+    Sessions.Session pendingChat() {
+        return pendingConfirm == null ? null : cardChat;
+    }
+
+    private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb) {
         if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
         if (changing) endChange();
         pendingConfirm = cb;
+        cardChat = chat == null ? null : sessions.find(chat);
+        if (cardChat != null && cardChat != sessions.current) { // show the chat that's asking
+            sessions.select(cardChat);
+            showingList = false;
+        }
         asking = options != null;
         askOptions = options;
-        confirmLabel.setText(asking ? "QUESTION" : "NEEDS YOUR OK");
+        confirmLabel.setText((asking ? "QUESTION" : "NEEDS YOUR OK") + (cardChat == null ? " · FROM ANOTHER SESSION" : ""));
         confirmOptions.removeAllViews();
         if (asking) {
             for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)), optionLp());
@@ -1463,8 +1674,8 @@ final class Bubble implements ChatHub.Listener {
         pendingConfirm = null;
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
-        if (!"opencode".equals(sessions.current.backend)) {
-            hub.note(sessions.current, Kind.STEP, "✓ Answered: " + clip(option, 80));
+        if (cardChat != null && !"opencode".equals(cardChat.backend)) {
+            hub.note(cardChat, Kind.STEP, "✓ Answered: " + clip(option, 80));
         }
         if (cb != null) cb.onAnswer(true, option);
         refreshStatus();
@@ -1477,8 +1688,8 @@ final class Bubble implements ChatHub.Listener {
         pendingConfirm = null;
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
-        if (!"opencode".equals(sessions.current.backend)) {
-            hub.note(sessions.current, Kind.STEP, asking ? "Question skipped"
+        if (cardChat != null && !"opencode".equals(cardChat.backend)) {
+            hub.note(cardChat, Kind.STEP, asking ? "Question skipped"
                     : approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
         }
         if (cb != null) cb.onAnswer(approved, null);
@@ -1750,6 +1961,7 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private TextView subtitle, stripText;
+    private View modelChip;
     private LinearLayout strip;
 
     /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */

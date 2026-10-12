@@ -121,7 +121,7 @@ final class ChatHub {
         if (svc != null) svc.allowControl();
         try {
             Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, ses.model,
-                    hasFiles ? android.text.TextUtils.join(",", files) : "");
+                    hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -146,6 +146,13 @@ final class ChatHub {
     void setModel(Sessions.Session ses, String model) {
         ses.model = model == null ? "" : model.trim();
         add(ses, Bubble.Kind.STEP, "Model: " + Models.label(ses.backend, ses.model));
+        changed();
+    }
+
+    /** Change a chat's effort ("" = the agent's default); the next message uses it. */
+    void setEffort(Sessions.Session ses, String effort) {
+        ses.effort = effort == null ? "" : effort;
+        add(ses, Bubble.Kind.STEP, "Effort: " + (ses.effort.isEmpty() ? "default" : ses.effort));
         changed();
     }
 
@@ -180,10 +187,25 @@ final class ChatHub {
         if (ses == null) return; // unknown chat (deleted, or started outside Buddy)
         ses.lastEventAt = SystemClock.elapsedRealtime();
         String type = ev.optString("type");
-        if (!ses.running && ("system".equals(type) || "assistant".equals(type))) startRun(ses);
+        if (!ses.running && (("system".equals(type) && !"model".equals(ev.optString("subtype"))) || "assistant".equals(type))) startRun(ses);
         switch (type) {
             case "system":
-                if ("init".equals(ev.optString("subtype"))) ses.status = "Thinking…";
+                if ("model".equals(ev.optString("subtype"))) { // Codex, after its turn (see buddy-run)
+                    String m = ev.optString("model", "");
+                    if (!m.isEmpty() && !m.equals(ses.actualModel)) {
+                        ses.actualModel = m;
+                        sessions.save();
+                        changed();
+                    }
+                } else if ("init".equals(ev.optString("subtype"))) {
+                    ses.status = "Thinking…";
+                    // the model really in use (Claude Code says it here), shown when the chat is on "Default"
+                    String m = ev.optString("model", "");
+                    if (!m.isEmpty() && !m.equals(ses.actualModel)) {
+                        ses.actualModel = m;
+                        sessions.save();
+                    }
+                }
                 break;
             case "assistant": {
                 JSONObject msg = ev.optJSONObject("message");
@@ -302,7 +324,7 @@ final class ChatHub {
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         try {
             Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0",
-                    "(Added while you were working:) " + text, ses.model, "");
+                    "(Added while you were working:) " + text, ses.model, "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;

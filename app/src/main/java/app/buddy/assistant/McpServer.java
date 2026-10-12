@@ -106,7 +106,15 @@ final class McpServer {
             String method = parts[0];
             String path = parts[1];
             int q = path.indexOf('?');
-            if (q >= 0) path = path.substring(0, q);
+            String chat = null;
+            if (q >= 0) {
+                // Buddy's own chats connect to /mcp?chat=<id>; other sessions (a terminal, Remote Control) don't
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:^|&)chat=([A-Za-z0-9_-]{1,64})")
+                        .matcher(path.substring(q + 1));
+                if (m.find()) chat = m.group(1);
+                path = path.substring(0, q);
+            }
+            CALLER_CHAT.set(chat);
 
             Map<String, String> headers = new HashMap<>();
             String line;
@@ -172,6 +180,9 @@ final class McpServer {
     }
 
     /** Returns null for notifications. */
+    /** The Buddy chat whose agent made the current request (on this thread), or null for another session. */
+    static final ThreadLocal<String> CALLER_CHAT = new ThreadLocal<>();
+
     private JSONObject rpc(JSONObject req) throws JSONException {
         if (!req.has("id")) return null;
         Object id = req.get("id");

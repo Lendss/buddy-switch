@@ -229,7 +229,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         col.addView(first, full());
 
         String agent = Account.cliOf(ses.backend);
-        col.addView(single(monoText(this, agent + " · " + Models.label(ses.backend, ses.model).toLowerCase(Locale.ROOT),
+        col.addView(single(monoText(this, agent + " · " + Models.shownModel(ses).toLowerCase(Locale.ROOT),
                 12, MUTED)));
         if (ses.running) {
             TextView s = single(monoText(this, ses.status.isEmpty() ? "working…" : ses.status, 12, ACCENT_TEXT));

@@ -373,7 +373,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Boolean> answer = new AtomicReference<>();
         final AtomicReference<String> change = new AtomicReference<>();
-        main.post(() -> bubble.askConfirm(summary, (approved, wanted) -> {
+        final String chat = McpServer.CALLER_CHAT.get();
+        main.post(() -> bubble.askConfirm(summary, chat, (approved, wanted) -> {
             answer.set(approved);
             change.set(wanted);
             done.countDown();
@@ -397,7 +398,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Boolean> picked = new AtomicReference<>();
         final AtomicReference<String> answer = new AtomicReference<>();
-        main.post(() -> bubble.askQuestion(question, options, (fromButton, text) -> {
+        final String chat = McpServer.CALLER_CHAT.get();
+        main.post(() -> bubble.askQuestion(question, options, chat, (fromButton, text) -> {
             picked.set(fromButton);
             answer.set(text);
             done.countDown();

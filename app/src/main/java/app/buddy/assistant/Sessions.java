@@ -44,6 +44,10 @@ final class Sessions {
         String title = "";
         /** Model for this chat ("" = the agent's default), e.g. claude-opus-5-5. */
         String model = "";
+        /** Reasoning effort for this chat ("" = the agent's default); see Models.efforts. */
+        String effort = "";
+        /** The model the agent last reported using (for "Default"), or "" if it doesn't say. */
+        String actualModel = "";
         long updated = System.currentTimeMillis();
         final List<Msg> messages = new ArrayList<>();
         // runtime only
@@ -149,7 +153,7 @@ final class Sessions {
                     if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
                     msgs.put(mo);
                 }
-                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
+                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
                         .put("updated", s.updated).put("messages", msgs));
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
@@ -165,6 +169,8 @@ final class Sessions {
                 Session s = new Session(o.getString("id"), o.optString("backend", "claude"));
                 s.title = o.optString("title");
                 s.model = o.optString("model");
+                s.effort = o.optString("effort");
+                s.actualModel = o.optString("actual_model");
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");
                 if (msgs != null) for (int j = 0; j < msgs.length(); j++) {
