@@ -19,8 +19,12 @@ It runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/d
 
 <p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>⬇ Download buddy.apk</b></a> · Android 11+, 64-bit · <a href="#setup">Setup</a> · <a href="#faq">FAQ</a></p>
 
-<!-- DEMO_VIDEO -->
-<p align="center"><a href="docs/buddy-demo.mp4">▶ Watch the 50-second demo</a> (lights, then a pizza order changed mid-task)</p>
+<div align="center">
+
+https://github.com/user-attachments/assets/6659a546-9bbd-4adf-bb42-d924cf58e98e
+
+<sub>Turning on the lights, then a pizza order changed mid-task (sped up)</sub>
+</div>
 
 <table>
   <tr>
