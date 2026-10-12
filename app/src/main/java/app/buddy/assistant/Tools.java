@@ -99,12 +99,30 @@ final class Tools {
                         + "what the user wants changed: then make those changes and call confirm again.",
                 props().put("summary", strProp("Exactly what you are about to do, including any text to be sent")),
                 "summary"));
+        t.put(tool("ask",
+                "Ask the user a question in the Buddy bubble and wait for the answer: 2 to 4 answer buttons, and "
+                        + "the user can always type their own answer instead. Use it when you need the user to choose "
+                        + "or decide (which reply, which item, which time) instead of guessing. Returns ANSWER with "
+                        + "the option picked, ANSWER (typed) with the user's own words, or NO ANSWER. "
+                        + "It is not an approval: still call confirm before anything outward-facing.",
+                props().put("question", strProp("The question, short and clear"))
+                        .put("options", new JSONObject().put("type", "array").put("minItems", 2).put("maxItems", 4)
+                                .put("items", new JSONObject().put("type", "string"))
+                                .put("description", "2 to 4 short answers, one per button")),
+                "question", "options"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
         t.put(tool("install_apk",
                 "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
-                        + "/root/.buddy/work/myapp/build/app.apk. The user taps Install/Update themselves; call wait_for_install next.",
-                props().put("path", strProp("Full path of the .apk inside Buddy's Linux")), "path"));
+                        + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
+                        + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
+                        + "call wait_for_install next.",
+                props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
+        t.put(tool("update_buddy",
+                "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
+                        + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
+                        + "there's a new version. Only the user can tap Update.",
+                props().put("install", boolProp("true: download the update and open the installer (after the user said yes)"))));
         t.put(tool("wait_for_install",
                 "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
                         + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
@@ -153,7 +171,7 @@ final class Tools {
     /** A tool call, plus anything the user added while the agent works (see ChatHub.takeNotes). */
     JSONObject call(String name, JSONObject a) throws Exception {
         JSONObject r = call0(name, a);
-        if ("confirm".equals(name)) return r;
+        if ("confirm".equals(name) || "ask".equals(name)) return r;
         String notes = ChatHub.get(svc).takeNotes();
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",
@@ -189,6 +207,18 @@ final class Tools {
                 if (answer.startsWith("APPROVED")) Guard.approved(); // covers the next risky tap
                 return text(answer);
             }
+            case "ask": {
+                JSONArray o = a.optJSONArray("options");
+                java.util.List<String> options = new java.util.ArrayList<>();
+                for (int i = 0; o != null && i < o.length() && options.size() < 4; i++) {
+                    String v = o.optString(i, "").trim();
+                    if (!v.isEmpty() && !options.contains(v)) options.add(v);
+                }
+                if (options.size() < 2) return text("Give 2 to 4 options. The user can always type their own answer.");
+                return text(svc.askQuestion(a.getString("question"), options));
+            }
+            case "update_buddy":
+                return text(updateBuddy(a.optBoolean("install", false)));
             case "install_apk":
                 return text(installApk(a.getString("path")));
             case "wait_for_install":
@@ -360,7 +390,7 @@ final class Tools {
      */
     private String guard(AccessibilityNodeInfo element, AccessibilityNodeInfo hit) throws InterruptedException {
         if (svc.bubble() != null && svc.bubble().confirming()) {
-            return "BLOCKED: an approval card is waiting for the user. Wait for their answer; don't tap anything.";
+            return "BLOCKED: a card is waiting for the user's answer. Wait for it; don't tap anything.";
         }
         if (Guard.offLimits(svc, hit) || (element != null && Guard.offLimits(svc, element))) {
             return "BLOCKED: that's one of Buddy's own screens. Only the user taps those.";
@@ -648,15 +678,28 @@ final class Tools {
     /** Copies an APK out of Buddy's Linux and opens Android's installer for it. */
     private String installApk(String path) throws Exception {
         if (!Prefs.devMode(svc)) return "Installing apps needs developer mode. Ask the user to turn it on in Buddy's Settings.";
-        if (path == null || !path.startsWith("/") || !path.endsWith(".apk")) return "Give the full path of an .apk file.";
-        java.io.File root = Linux.root(svc).getCanonicalFile();
-        java.io.File f = new java.io.File(root, path.substring(1)).getCanonicalFile();
-        if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile()) return "No APK at " + path + ".";
         java.io.File out = FilesProvider.apkFile(svc);
-        try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream o = new java.io.FileOutputStream(out)) {
-            byte[] buf = new byte[64 * 1024];
-            int n;
-            while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
+        if (path != null && path.matches("http://(127\\.0\\.0\\.1|localhost):\\d+/.*")) {
+            // only from this phone: another app (e.g. Termux) serving an APK it built
+            java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(path).openConnection();
+            c.setConnectTimeout(5000);
+            c.setReadTimeout(30000);
+            try (java.io.InputStream in = c.getInputStream(); java.io.OutputStream o = new java.io.FileOutputStream(out)) {
+                copy(in, o);
+            } catch (java.io.IOException e) {
+                return "Couldn't download " + path + ": " + e.getMessage();
+            } finally {
+                c.disconnect();
+            }
+            if (out.length() < 4) return "No APK at " + path + ".";
+        } else {
+            if (path == null || !path.startsWith("/") || !path.endsWith(".apk")) return "Give the full path of an .apk file.";
+            java.io.File root = Linux.root(svc).getCanonicalFile();
+            java.io.File f = new java.io.File(root, path.substring(1)).getCanonicalFile();
+            if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile()) return "No APK at " + path + ".";
+            try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream o = new java.io.FileOutputStream(out)) {
+                copy(in, o);
+            }
         }
         if (!svc.getPackageManager().canRequestPackageInstalls()) {
             svc.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
@@ -668,6 +711,39 @@ final class Tools {
                 .setDataAndType(FilesProvider.apkUri(), "application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION));
         return "The installer is open. The user must tap Install/Update and confirm (you can't). Call wait_for_install now.";
+    }
+
+    /** Buddy's own updates (see {@link Updates}). */
+    private String updateBuddy(boolean install) {
+        Updates.Release r;
+        try {
+            r = Updates.latest();
+        } catch (Exception e) {
+            return "Couldn't reach GitHub to check for updates (" + e.getMessage() + "). " + Updates.MANUAL;
+        }
+        String head = "Installed: Buddy " + BuildInfo.VERSION + ". Latest release: " + r.version + ".";
+        if (!r.newer()) return head + " Buddy is up to date.";
+        if (!install) {
+            return head + " An update is available. What's new:\n" + r.notes + "\n\nAsk the user if they want it now; "
+                    + "if yes, call update_buddy with install=true.";
+        }
+        svc.showStatus("Downloading Buddy " + r.version + "…");
+        String res = Updates.install(svc, r);
+        if (Updates.NEEDS_PERMISSION.equals(res)) {
+            return "Downloaded Buddy " + r.version + ", but Buddy isn't allowed to install apps yet. Android's settings page "
+                    + "for that is open now: ask the user to turn on 'Allow from this source' for Buddy, then call "
+                    + "update_buddy with install=true again.";
+        }
+        if (!Updates.OPENED.equals(res)) return res + " " + Updates.MANUAL;
+        return "The installer is open with Buddy " + r.version + ". Tell the user now, in one line, to tap Update (only "
+                + "they can): Buddy restarts once it's installed, which ends this task, and their chats stay. Then stop; "
+                + "don't call wait_for_install.";
+    }
+
+    private static void copy(java.io.InputStream in, java.io.OutputStream o) throws java.io.IOException {
+        byte[] buf = new byte[64 * 1024];
+        int n;
+        while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
     }
 
     private String listApps() {

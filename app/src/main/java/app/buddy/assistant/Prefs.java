@@ -66,6 +66,32 @@ final class Prefs {
     }
 
     /** Developer mode: the bubble's agent may run commands and edit files in ~/.buddy/work. */
+    /** Notify when a new Buddy release is out (checked about once a day). */
+    static boolean updateNotices(Context c) {
+        return sp(c).getBoolean("update_notices", true);
+    }
+
+    static void setUpdateNotices(Context c, boolean on) {
+        sp(c).edit().putBoolean("update_notices", on).apply();
+    }
+
+    static long updateCheckedAt(Context c) {
+        return sp(c).getLong("update_checked_at", 0);
+    }
+
+    static void setUpdateCheckedAt(Context c, long t) {
+        sp(c).edit().putLong("update_checked_at", t).apply();
+    }
+
+    /** The last version an update notice was shown for (one notice per version). */
+    static String updateNotified(Context c) {
+        return sp(c).getString("update_notified", "");
+    }
+
+    static void setUpdateNotified(Context c, String v) {
+        sp(c).edit().putString("update_notified", v).apply();
+    }
+
     static boolean devMode(Context c) {
         return sp(c).getBoolean("dev", false);
     }

@@ -224,6 +224,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             input.setText(draft);
             input.setSelection(draft.length());
         }
+        // from the bubble's attach button
+        if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
     }
 
     @Override
@@ -505,8 +507,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private void renderApproval() {
         BuddyService svc = BuddyService.get();
         String ask = svc != null && svc.bubble() != null && hub.sessions.current == ses ? svc.bubble().pendingConfirmText() : null;
-        if (ask == null ? shownApproval == null : ask.equals(shownApproval)) return;
-        shownApproval = ask;
+        java.util.List<String> options = ask == null ? null : svc.bubble().pendingOptions();
+        String key = ask == null ? null : ask + (options == null ? "" : "\u0000" + options);
+        if (key == null ? shownApproval == null : key.equals(shownApproval)) return;
+        shownApproval = key;
         approval.removeAllViews();
         if (ask == null) return;
         LinearLayout card = column(this);
@@ -514,7 +518,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         card.setBackground(outlined(this, CARD, 18, Theme.withAlpha(ACCENT, 0x73), 1));
         LinearLayout hr = row(this);
         hr.addView(icon(this, R.drawable.ms_shield_person, ACCENT_TEXT, 18));
-        TextView lab = text(this, "NEEDS YOUR OK", 12, ACCENT_TEXT);
+        TextView lab = text(this, options != null ? "QUESTION" : "NEEDS YOUR OK", 12, ACCENT_TEXT);
         lab.setTypeface(sans(this, 600));
         lab.setLetterSpacing(0.06f);
         lab.setPadding(dp(this, 8), 0, 0, 0);
@@ -528,6 +532,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         wp.topMargin = dp(this, 10);
         wp.bottomMargin = dp(this, 12);
         card.addView(well, wp);
+        if (options != null) {
+            renderQuestion(card, options);
+            approval.addView(card, full());
+            return;
+        }
         LinearLayout btns = row(this);
         Button deny = button(this, "Deny", false);
         deny.setTextColor(ERR);
@@ -548,11 +557,51 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         approval.addView(card, full());
     }
 
+    /** A question from the ask tool: a button per answer, then Skip and "Type my own answer". */
+    private void renderQuestion(LinearLayout card, java.util.List<String> options) {
+        LinearLayout opts = column(this);
+        for (String o : options) {
+            Button b = button(this, o, false);
+            b.setSingleLine(false);
+            b.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+            b.setBackground(outlined(this, CARD2, 12, Theme.withAlpha(ACCENT, 0x40), 1));
+            b.setOnClickListener(v -> {
+                BuddyService svc = BuddyService.get();
+                if (svc != null && svc.bubble() != null) svc.bubble().pickFromApp(o);
+                renderApproval();
+            });
+            LinearLayout.LayoutParams bp = full();
+            bp.bottomMargin = dp(this, 8);
+            opts.addView(b, bp);
+        }
+        card.addView(opts, full());
+        LinearLayout btns = row(this);
+        Button skip = button(this, "Skip", false);
+        Button own = button(this, "Type my own answer", false);
+        btns.addView(skip, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(0, dp(this, 44), 2);
+        op.leftMargin = dp(this, 10);
+        btns.addView(own, op);
+        LinearLayout.LayoutParams rp = full();
+        rp.topMargin = dp(this, 4);
+        card.addView(btns, rp);
+        skip.setOnClickListener(v -> answer(false));
+        own.setOnClickListener(v -> {
+            opts.setVisibility(View.GONE);
+            askChange(card, btns, true);
+        });
+    }
+
     /** Change: the user writes what to adjust, and the agent gets it back instead of a yes/no. */
     private void askChange(LinearLayout card, LinearLayout btns) {
+        askChange(card, btns, false);
+    }
+
+    /** answering: the same box types an answer to a question instead. */
+    private void askChange(LinearLayout card, LinearLayout btns, boolean answering) {
         btns.setVisibility(View.GONE);
         EditText what = new EditText(this);
-        what.setHint("What should change?");
+        what.setHint(answering ? "Your answer" : "What should change?");
         what.setHintTextColor(MUTED);
         what.setTextColor(TEXT);
         what.setTextSize(15);
@@ -565,7 +614,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         card.addView(what, full());
         LinearLayout row = row(this);
         Button back = button(this, "Back", false);
-        Button send = button(this, "Send change", true);
+        Button send = button(this, answering ? "Send answer" : "Send change", true);
         row.addView(back, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
         sp.leftMargin = dp(this, 10);
@@ -577,6 +626,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             card.removeView(what);
             card.removeView(row);
             btns.setVisibility(View.VISIBLE);
+            if (answering) { // redraw the answer buttons
+                shownApproval = null;
+                renderApproval();
+            }
         });
         send.setOnClickListener(v -> {
             String text = what.getText().toString().trim();
@@ -615,6 +668,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             }
             if (!m.text.isEmpty()) {
                 TextView tv = text(this, m.text, 15, TEXT);
+                links(tv);
                 tv.setMaxWidth(maxBubble);
                 tv.setBackground(corners(this, USER, 20, 20, 6, 20));
                 tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
@@ -835,6 +889,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         switch (kind) {
             case USER: {
                 TextView tv = text(this, text, 15, TEXT);
+                links(tv);
                 tv.setMaxWidth(maxBubble);
                 tv.setBackground(corners(this, USER, 20, 20, 6, 20));
                 tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
@@ -856,6 +911,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 r.addView(av, avp);
                 TextView tv = text(this, text, 15, TEXT);
                 tv.setTextIsSelectable(true);
+                links(tv);
                 tv.setLineSpacing(0, 1.15f);
                 tv.setMaxWidth(maxBubble - dp(this, 32));
                 tv.setBackground(corners(this, CARD, 20, 20, 20, 6));
@@ -878,6 +934,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         }
         messages.addView(v, p);
         while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
+    }
+
+    /** Web links and email addresses become tappable (selectable text stays selectable). */
+    private static void links(TextView tv) {
+        tv.setAutoLinkMask(android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES);
+        tv.setLinkTextColor(ACCENT_TEXT);
+        tv.setText(tv.getText()); // the mask applies on setText
     }
 
     private void copyOnLongPress(View v, String text) {
@@ -928,6 +991,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             count.setText(n + (n == 1 ? " tool call" : " tool calls"));
             if (lastMark != null) swapToCheck(lastMark);
             String s = step.trim();
+            if (s.startsWith("✓ ")) s = s.substring(2); // the row gets its own check mark
             int cut = -1;
             for (int i = 0; i < s.length(); i++) {
                 char ch = s.charAt(i);

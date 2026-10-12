@@ -383,6 +383,35 @@ final class Ui {
         return p;
     }
 
+    /**
+     * Make web links and email addresses in t tappable, opened with a new task (for the bubble, which isn't an
+     * activity). Then runs before each one opens (e.g. to fold the panel).
+     */
+    static void linkifyForService(TextView t, Runnable then) {
+        android.text.SpannableString s = new android.text.SpannableString(t.getText());
+        if (!android.text.util.Linkify.addLinks(s, android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES)) return;
+        for (android.text.style.URLSpan u : s.getSpans(0, s.length(), android.text.style.URLSpan.class)) {
+            final String url = u.getURL();
+            int a = s.getSpanStart(u), b = s.getSpanEnd(u);
+            s.removeSpan(u);
+            s.setSpan(new android.text.style.ClickableSpan() {
+                @Override
+                public void onClick(android.view.View v) {
+                    if (then != null) then.run();
+                    try {
+                        v.getContext().startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                    } catch (Exception e) {
+                        android.widget.Toast.makeText(v.getContext(), "No app can open this link", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }, a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        t.setText(s);
+        t.setLinkTextColor(ACCENT_TEXT);
+        t.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+    }
+
     static ProgressBar spinner(Context c, int sizeDp) {
         ProgressBar p = new ProgressBar(c, null, android.R.attr.progressBarStyleSmall);
         p.setIndeterminateTintList(ColorStateList.valueOf(ACCENT));

@@ -312,7 +312,7 @@ run_opencode() {
   # OpenCode names MCP tools <server>_<tool>; small models otherwise call "read_screen" and give up
   printf '%s\n\n%s\n' "$SYSTEM" "In this app the phone tools are named with a phone_ prefix: phone_read_screen, phone_tap, \
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
-phone_screenshot, phone_wait, phone_confirm, phone_notify, phone_install_apk and phone_wait_for_install. Always call them by \
+phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
   local cfg
   cfg=$(jq -cn --arg url "$URL/mcp" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" '
@@ -360,7 +360,7 @@ stream_opencode() {
                 name:(if ($t | startswith("phone_")) then "mcp__phone__" + ($t | ltrimstr("phone_"))
                       elif $t == "bash" then "Bash" elif ($t == "edit" or $t == "write" or $t == "patch") then "Edit"
                       elif $t == "read" then "Read" else $t end),
-                input:((.part.state.input // {}) + (if $t == "phone_confirm"
+                input:((.part.state.input // {}) + (if ($t == "phone_confirm" or $t == "phone_ask")
                   then {_answer:(.part.state.output // "")} else {} end))}]}}
           else
             {type:"result", subtype:"error", is_error:true,

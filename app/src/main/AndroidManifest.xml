@@ -98,6 +98,10 @@
             android:name=".HiddenNotice"
             android:exported="false" />
 
+        <receiver
+            android:name=".Updates"
+            android:exported="false" />
+
         <service
             android:name=".BuddyService"
             android:exported="true"

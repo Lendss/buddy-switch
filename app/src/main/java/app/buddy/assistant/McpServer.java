@@ -188,7 +188,8 @@ final class McpServer {
                             .put("capabilities", new JSONObject().put("tools", new JSONObject()))
                             .put("serverInfo", new JSONObject().put("name", "buddy-phone").put("version", BuildInfo.VERSION))
                             .put("instructions", "Tools to see and operate this Android phone's screen. "
-                                    + "Prefer read_screen over screenshot. Call confirm before anything irreversible or outward-facing.");
+                                    + "Prefer read_screen over screenshot. Call confirm before anything irreversible or outward-facing. "
+                                    + "Use ask when the user has to choose between options.");
                     return res.put("result", result);
                 }
                 case "ping":

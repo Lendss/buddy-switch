@@ -39,6 +39,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return instance;
     }
 
+    /** Update notices: Updates.maybeCheck asks GitHub at most once a day. */
+    private final Runnable updateCheck = new Runnable() {
+        @Override
+        public void run() {
+            Updates.maybeCheck(BuddyService.this);
+            main.postDelayed(this, 6 * 3600_000L);
+        }
+    };
+
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
@@ -63,6 +72,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         if (!Prefs.onboarded(this)) main.postDelayed(this::showGuide, 600);
         main.postDelayed(() -> RemoteSession.ensure(this), 4000);
+        main.postDelayed(updateCheck, 20_000);
         // the helper's answer refreshes Codex's model list
         main.postDelayed(() -> {
             if (Linux.installed(this)) {
@@ -136,6 +146,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         } catch (Exception ignored) {
         }
         RemoteSession.stop();
+        main.removeCallbacks(updateCheck);
         if (server != null) server.stop();
         if (bubble != null) bubble.remove();
         if (control != null) control.end();
@@ -303,8 +314,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     void onToolActivity(final String tool) {
         main.post(() -> {
             bubble.onToolActivity(tool);
-            // asking for approval or posting a note isn't operating the phone
-            if (!"confirm".equals(tool) && !"notify".equals(tool)) control.onActivity();
+            // asking for approval, asking a question or posting a note isn't operating the phone
+            if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool)) control.onActivity();
         });
     }
 
@@ -379,5 +390,27 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return Boolean.TRUE.equals(answer.get())
                 ? "APPROVED by the user. Go ahead."
                 : "DENIED by the user. Do not do it; ask what they want instead.";
+    }
+
+    /** Blocks the calling (tool) thread until the user picks an option or types an answer in the bubble. */
+    String askQuestion(final String question, final java.util.List<String> options) throws InterruptedException {
+        final CountDownLatch done = new CountDownLatch(1);
+        final AtomicReference<Boolean> picked = new AtomicReference<>();
+        final AtomicReference<String> answer = new AtomicReference<>();
+        main.post(() -> bubble.askQuestion(question, options, (fromButton, text) -> {
+            picked.set(fromButton);
+            answer.set(text);
+            done.countDown();
+        }));
+        if (!done.await(5, TimeUnit.MINUTES)) {
+            main.post(() -> bubble.cancelConfirm());
+            return "NO ANSWER: the user did not answer within 5 minutes. Don't guess; stop and ask in your reply.";
+        }
+        if (answer.get() == null) {
+            return "NO ANSWER: the user closed the question. Don't guess; stop and ask what they want.";
+        }
+        return Boolean.TRUE.equals(picked.get())
+                ? "ANSWER: \u201c" + answer.get() + "\u201d"
+                : "ANSWER (typed by the user): \u201c" + answer.get() + "\u201d";
     }
 }

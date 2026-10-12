@@ -30,7 +30,7 @@ Buddy app / bubble ──► Buddy's Linux (Alpine via proot): buddy-run ──�
 Buddy accessibility service ◄──── MCP over http://127.0.0.1:8765/mcp (phone tools)
 ```
 
-- The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `install_apk`, `wait_for_install`, `confirm` and `notify`.
+- The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `install_apk`, `wait_for_install`, `confirm`, `ask`, `notify` and `update_buddy`.
 - **Buddy's Linux** is a small Alpine Linux that Buddy downloads into its own storage (4 MB) and runs with [proot](https://proot-me.github.io/), which ships inside the APK. Claude Code installs there with Anthropic's official installer; Codex and OpenCode from npm.
 - Your message goes to the agent in Buddy's Linux, which uses those tools and streams its progress back to the app.
 
@@ -56,6 +56,8 @@ Updating from 1.x (Termux): install the new APK, then install and sign in to you
 ## Updating
 
 Buddy isn't on the Play Store (Google doesn't allow its accessibility use or the agents it downloads), so updates come from [GitHub Releases](https://github.com/ghorbelhamdi/buddy-android/releases). Every release is signed with the same key, so **installing a new APK over the old one keeps your chats, settings, sign-ins and Buddy's Linux**. Don't uninstall first: that deletes them.
+
+**Ask Buddy:** *"Is there a Buddy update?"* or *"Update yourself."* The agent checks the latest release, tells you what's new, and with your OK downloads `buddy.apk` from this repo's releases and opens Android's installer; you tap **Update**.
 
 **Automatic updates with [Obtainium](https://obtainium.imranr.dev)** (free, open source; it checks GitHub for you and installs new versions):
 1. Install Obtainium (from its website, F-Droid or IzzyOnDroid).
@@ -117,7 +119,7 @@ Leave it off for everyday use: with it on, text on screen that tries to trick th
 An accessibility service is powerful. Please read this before installing.
 
 - **Local only.** The MCP server listens on `127.0.0.1` and requires a random per-install token. Nothing is reachable from the network.
-- **Approval gate.** The agent is instructed to call `confirm` before sending messages, posting, buying, deleting or changing settings. You see the exact action with **Approve / Deny**.
+- **Approval gate.** The agent is instructed to call `confirm` before sending messages, posting, buying, deleting or changing settings. You see the exact action with **Approve / Change / Deny**. When the agent needs you to choose (which reply, which item), it can call `ask` instead: a card with 2–4 answers and your own typed answer.
 - **App permissions (enforced by Buddy, not the agent).** Settings → Experience → App permissions, per app:
   - **Trust:** asking is left to the agent.
   - **Hard:** Buddy itself checks every tap; buttons like Send, Pay, Delete (built-in words in six languages, plus your own *always ask* / *never ask* rules, with suggestions from buttons the agent has tapped) need your OK.

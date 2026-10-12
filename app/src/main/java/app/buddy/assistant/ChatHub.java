@@ -433,6 +433,16 @@ final class ChatHub {
                 if (ans.startsWith("DENIED")) return "✗ Denied";
                 return "Asking for your approval";
             }
+            case "ask": {
+                String ans = in.optString("_answer", ""); // OpenCode, as for confirm
+                if (ans.startsWith("ANSWER")) {
+                    int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
+                    return "✓ Answered" + (a >= 0 && b > a ? ": " + clip(ans.substring(a + 1, b), 80) : "");
+                }
+                if (ans.startsWith("NO ANSWER")) return "Question skipped";
+                return "Asking: " + clip(in.optString("question"), 80);
+            }
+            case "update_buddy": return in.optBoolean("install") ? "Downloading the Buddy update" : "Checking for a Buddy update";
             case "notify": return in.optString("text");
             case "WebSearch": return "Searching the web: " + clip(in.optString("query"), 40);
             case "WebFetch": return "Reading " + clip(in.optString("url"), 40);

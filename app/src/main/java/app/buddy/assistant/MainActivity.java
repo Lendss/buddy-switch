@@ -26,6 +26,12 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
     private FrameLayout navSlot;
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getBooleanExtra("update", false)) Updates.showSheet(this);
+    }
+
+    @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         hub = ChatHub.get(this);
@@ -35,6 +41,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             else startActivity(new Intent(this, OnboardingActivity.class));
         }
         // Needed for the "Buddy is hidden" notification after dragging the bubble away.
+        // from the "update available" notification
+        if (state == null && getIntent().getBooleanExtra("update", false)) Updates.showSheet(this);
         if (getIntent().getBooleanExtra("askMic", false) && !Voice.micAllowed(this)) {
             requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 3);
         } else if (android.os.Build.VERSION.SDK_INT >= 33

@@ -420,6 +420,24 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     if (!on) Voice.stopSpeaking();
                 }), full());
         ex.addView(divider(), lineParams());
+        ex.addView(switchRow(this, "Update notices", "Buddy checks GitHub once a day and notifies you when a new "
+                + "version is out.", Prefs.updateNotices(this), on -> {
+            Prefs.setUpdateNotices(this, on);
+            if (!on) Updates.cancel(this);
+            else Prefs.setUpdateNotified(this, ""); // notify again about a version muted before
+        }), full());
+        ex.addView(divider(), lineParams());
+        LinearLayout upd = listRow(this);
+        upd.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout ut = column(this);
+        ut.addView(title(this, "Check for updates", 15));
+        ut.addView(text(this, "You have Buddy " + BuildInfo.VERSION + ". Or ask any agent: \u201cupdate yourself\u201d.",
+                13, MUTED), topGap(2));
+        upd.addView(ut, weight1());
+        upd.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        upd.setOnClickListener(v -> Updates.showSheet(this));
+        ex.addView(upd, full());
+        ex.addView(divider(), lineParams());
         LinearLayout perms = listRow(this);
         perms.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout pt = column(this);

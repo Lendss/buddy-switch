@@ -48,7 +48,10 @@ import org.json.JSONObject;
 /** The floating Buddy bubble and its mini chat panel, drawn as an accessibility overlay. */
 final class Bubble implements ChatHub.Listener {
     interface ConfirmCallback {
-        /** change: what the user wants changed first (approved is then false), or null. */
+        /**
+         * change: what the user wants changed first (approved is then false), or null.
+         * For a question (ask): change is the answer, and approved says it's one of the buttons (not typed).
+         */
         void onAnswer(boolean approved, String change);
     }
 
@@ -70,7 +73,12 @@ final class Bubble implements ChatHub.Listener {
     // expanded
     private LinearLayout panel, messages, confirmCard;
     private ScrollView scroll;
-    private TextView header, confirmText;
+    private TextView header, confirmText, confirmLabel;
+    private LinearLayout confirmOptions, confirmRow;
+    private Button confirmDeny, confirmChange, confirmApprove;
+    /** The card asks a question (the ask tool) rather than for approval; askOptions are its buttons. */
+    private boolean asking;
+    private java.util.List<String> askOptions;
     private EditText input;
 
     private boolean expanded, running, passThrough, showingList;
@@ -240,43 +248,61 @@ final class Bubble implements ChatHub.Listener {
         panel.setBackground(rounded(Ui.BG, 24, Ui.OUTLINE, 1));
         panel.setElevation(dp(10));
 
+        // header like the chat screen: the chat's title (tap: all chats) and agent · model, then plain icons
         LinearLayout top = new LinearLayout(svc);
         top.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout titles = new LinearLayout(svc);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(dp(4), dp(2), dp(4), dp(2));
+        titles.setOnClickListener(v -> toggleSessionList());
         header = new TextView(svc);
         header.setText("Buddy");
-        header.setOnClickListener(v -> toggleSessionList());
         header.setTextColor(Ui.TEXT);
         header.setTypeface(Ui.sans(svc, 600));
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         header.setSingleLine(true);
         header.setEllipsize(TextUtils.TruncateAt.END);
-        top.addView(header, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        // Stop (only while it works), then the chat tools in one capsule, then close
-        headerStop = toolIcon(R.drawable.ic_stop, "Stop", Ui.ERR, v -> stop());
-        headerStop.setBackground(rounded(Theme.withAlpha(Ui.ERR, 0x26), 18, 0, 0));
-        LinearLayout.LayoutParams hsp = new LinearLayout.LayoutParams(dp(36), dp(36));
-        hsp.rightMargin = dp(6);
-        headerStop.setLayoutParams(hsp);
-        headerStop.setVisibility(View.GONE);
-        top.addView(headerStop);
-        LinearLayout tools = new LinearLayout(svc);
-        tools.setGravity(Gravity.CENTER_VERTICAL);
-        tools.setPadding(dp(2), dp(2), dp(2), dp(2));
-        tools.setBackground(rounded(Ui.CARD, 20, Ui.OUTLINE, 1));
-        tools.addView(toolIcon(R.drawable.ms_forum, "Chats", Ui.MUTED, v -> toggleSessionList()));
-        tools.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> newChat(Prefs.backend(svc))));
-        top.addView(tools);
-        android.widget.ImageButton close = toolIcon(R.drawable.ms_close, "Close", Ui.MUTED, v -> collapse());
-        close.setBackground(rounded(Ui.CARD, 18, Ui.OUTLINE, 1));
-        LinearLayout.LayoutParams clp2 = new LinearLayout.LayoutParams(dp(36), dp(36));
-        clp2.leftMargin = dp(6);
-        close.setLayoutParams(clp2);
-        top.addView(close);
-        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+        header.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ms_expand_more, 0);
+        header.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
+        header.setCompoundDrawablePadding(dp(2));
+        titles.addView(header, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        subtitle = Ui.single(Ui.monoText(svc, "", 12, Ui.MUTED));
+        titles.addView(subtitle);
+        top.addView(titles, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        top.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> newChat(Prefs.backend(svc))));
+        top.addView(toolIcon(R.drawable.ms_open_in_full, "Open in the app", Ui.MUTED, v -> openInApp(false)));
+        top.addView(toolIcon(R.drawable.ms_close, "Close", Ui.MUTED, v -> collapse()));
+        panel.addView(top, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        View line = new View(svc);
+        line.setBackgroundColor(Ui.OUTLINE);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        llp.topMargin = dp(8);
+        llp.leftMargin = llp.rightMargin = -dp(12);
+        panel.addView(line, llp);
+
+        // running strip, as in the chat screen: what it's doing, and Stop
+        strip = new LinearLayout(svc);
+        strip.setGravity(Gravity.CENTER_VERTICAL);
+        strip.setPadding(dp(12), dp(6), dp(6), dp(6));
+        strip.setBackground(rounded(Ui.CARD, 12, 0, 0));
+        strip.addView(Ui.spinner(svc, 16));
+        stripText = Ui.single(Ui.monoText(svc, "", 12, Ui.ACCENT_TEXT));
+        stripText.setPadding(dp(10), 0, dp(8), 0);
+        strip.addView(stripText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        Button stopBtn = Ui.button(svc, "Stop", false);
+        stopBtn.setTextColor(Ui.ERR);
+        stopBtn.setBackground(rounded(Ui.ERR_SOFT, 10, 0, 0));
+        stopBtn.setMinHeight(dp(34));
+        stopBtn.setMinimumHeight(dp(34));
+        stopBtn.setPadding(dp(14), 0, dp(14), 0);
+        stopBtn.setOnClickListener(v -> stop());
+        strip.addView(stopBtn, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(34)));
+        strip.setVisibility(View.GONE);
+        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        tlp.leftMargin = dp(4);
-        tlp.bottomMargin = dp(4);
-        panel.addView(top, tlp);
+        stp.topMargin = dp(8);
+        panel.addView(strip, stp);
 
         scroll = new ScrollView(svc);
         // Tapping the conversation hides the keyboard.
@@ -301,13 +327,13 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setOrientation(LinearLayout.VERTICAL);
         confirmCard.setPadding(dp(12), dp(10), dp(12), dp(10));
         confirmCard.setBackground(rounded(Ui.CARD, 18, Theme.withAlpha(Ui.ACCENT, 0x73), 1));
-        TextView ct = new TextView(svc);
-        ct.setText("NEEDS YOUR OK");
-        ct.setLetterSpacing(0.06f);
-        ct.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        ct.setTextColor(Ui.ACCENT_TEXT);
-        ct.setTypeface(Ui.sans(svc, 600));
-        confirmCard.addView(ct);
+        confirmLabel = new TextView(svc);
+        confirmLabel.setText("NEEDS YOUR OK");
+        confirmLabel.setLetterSpacing(0.06f);
+        confirmLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        confirmLabel.setTextColor(Ui.ACCENT_TEXT);
+        confirmLabel.setTypeface(Ui.sans(svc, 600));
+        confirmCard.addView(confirmLabel);
         confirmText = new TextView(svc);
         confirmText.setTextColor(Ui.TEXT);
         confirmText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -315,16 +341,24 @@ final class Bubble implements ChatHub.Listener {
         ScrollView cs = new ScrollView(svc);
         cs.addView(confirmText);
         confirmCard.addView(cs, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        // a question's answers, one button each (filled in by showCard)
+        confirmOptions = new LinearLayout(svc);
+        confirmOptions.setOrientation(LinearLayout.VERTICAL);
+        confirmCard.addView(confirmOptions, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         LinearLayout row = new LinearLayout(svc);
+        confirmRow = row;
         row.setGravity(Gravity.END);
         Button deny = actionButton("Deny", Ui.ERR_SOFT);
+        confirmDeny = deny;
         deny.setTextColor(Ui.ERR);
         deny.setOnClickListener(v -> answerConfirm(false));
         // Change: the user types or says what to change, and the agent gets that back instead of a yes/no
         Button change = actionButton("Change", Ui.CARD);
+        confirmChange = change;
         change.setTextColor(Ui.TEXT);
         change.setOnClickListener(v -> startChange());
         Button approve = actionButton("Approve", Ui.ACCENT);
+        confirmApprove = approve;
         approve.setOnClickListener(v -> answerConfirm(true));
         row.addView(deny);
         LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(
@@ -345,8 +379,12 @@ final class Bubble implements ChatHub.Listener {
         // composer: one pill with the text field, a mic and a round send button (like the chat screen)
         LinearLayout inputRow = new LinearLayout(svc);
         inputRow.setGravity(Gravity.CENTER_VERTICAL);
-        inputRow.setPadding(dp(14), dp(3), dp(4), dp(3));
-        inputRow.setBackground(rounded(Ui.CARD, 24, Ui.OUTLINE, 1));
+        inputRow.setPadding(dp(4), dp(4), dp(4), dp(4));
+        inputRow.setBackground(rounded(Ui.CARD, 26, Ui.OUTLINE, 1));
+        // attachments are picked in the app (camera, gallery, files), with this chat and draft open
+        android.widget.ImageButton attach = Ui.iconButton(svc, R.drawable.ms_attach_file, "Attach a photo or file", Ui.MUTED);
+        attach.setOnClickListener(v -> openInApp(true));
+        inputRow.addView(attach, new LinearLayout.LayoutParams(dp(40), dp(40)));
         input = new EditText(svc);
         input.setHint("Ask Buddy…");
         input.setHintTextColor(Ui.MUTED);
@@ -463,44 +501,50 @@ final class Bubble implements ChatHub.Listener {
         });
     }
 
-    /** True once the window has reported the keyboard itself; then the slower accessibility path is ignored. */
-    private boolean imeInsetsWork;
+    /** The keyboard's height as the window last reported it (0: hidden, or not reported). */
+    private int insetIme;
 
     private void applyIme(android.view.WindowInsets insets) {
-        int ime = insets.getInsets(android.view.WindowInsets.Type.ime()).bottom;
-        if (ime > 0) imeInsetsWork = true;
-        if (!expanded || !imeInsetsWork) return;
-        int pad = ime > 0 ? ime + dp(8) : 0;
+        insetIme = insets.getInsets(android.view.WindowInsets.Type.ime()).bottom;
+        fitKeyboard(false);
+    }
+
+    /** Where the accessibility service sees the keyboard's top (0: no keyboard). */
+    void onKeyboardTop(int top) {
+        if (top == imeTop) return;
+        imeTop = top;
+        // the window's own insets normally move the panel smoothly; if they haven't come shortly
+        // after the keyboard showed (it happens), go by the keyboard's position instead
+        root.removeCallbacks(lateFit);
+        if (top > 0) root.postDelayed(lateFit, 350);
+        else fitKeyboard(false);
+    }
+
+    private final Runnable lateFit = () -> fitKeyboard(true);
+
+    /**
+     * Keep the composer above the keyboard: pad the open panel by the keyboard's height. fallback: also use
+     * the keyboard's position on screen (only for Buddy's own text field, not when another app's is focused).
+     */
+    private void fitKeyboard(boolean fallback) {
+        if (!expanded || passThrough) return;
+        int kb = insetIme;
+        if (fallback && kb == 0 && imeTop > 0 && input != null && input.hasFocus() && root.hasWindowFocus()) {
+            int[] loc = new int[2];
+            root.getLocationOnScreen(loc);
+            kb = Math.max(0, loc[1] + root.getHeight() - imeTop);
+        }
+        int pad = kb > 0 ? kb + dp(8) : 0;
         if (root.getPaddingBottom() != pad) {
             root.setPadding(0, 0, 0, pad);
             scrollToEnd();
         }
     }
 
-    void onKeyboardTop(int top) {
-        if (imeInsetsWork) return; // the window follows the keyboard itself (see followKeyboard)
-        if (top == imeTop) return;
-        imeTop = top;
-        if (expanded && !passThrough) {
-            applyExpandedParams();
-            try {
-                wm.updateViewLayout(root, lp);
-            } catch (Exception ignored) {
-            }
-            scrollToEnd();
-        }
-    }
-
-    /** Resize the open panel (Buddy's keyboard came or went). */
+    /** Buddy's text field or window gained or lost focus: check the composer is above the keyboard. */
     private void refit() {
-        if (!expanded || passThrough) return;
-        int h = lp.height;
-        applyExpandedParams();
-        if (lp.height == h) return;
-        try {
-            wm.updateViewLayout(root, lp);
-        } catch (Exception ignored) {
-        }
+        root.removeCallbacks(lateFit);
+        root.postDelayed(lateFit, 350);
     }
 
     private void applyExpandedParams() {
@@ -508,9 +552,8 @@ final class Bubble implements ChatHub.Listener {
         lp.width = screen.width() - dp(20);
         // make room for the keyboard only when it's for Buddy's own text field (not another app's, e.g. while
         // the agent types in Messenger: the panel would shrink to half the screen for nothing)
-        boolean ours = input != null && input.hasFocus() && root.hasWindowFocus();
-        int bottom = imeTop > 0 && !imeInsetsWork && ours ? imeTop : screen.height() - dp(24);
-        lp.height = Math.max(dp(220), bottom - dp(8) - dp(10));
+        // full height; the keyboard is made room for by padding (fitKeyboard)
+        lp.height = Math.max(dp(220), screen.height() - dp(24) - dp(8) - dp(10));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
         lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
@@ -901,7 +944,7 @@ final class Bubble implements ChatHub.Listener {
     private void send() {
         String text = input.getText().toString().trim();
         if (text.isEmpty()) return;
-        if (changing && pendingConfirm != null) {
+        if ((changing || asking) && pendingConfirm != null) { // typing while a question waits answers it
             input.setText("");
             answerChange(text);
             return;
@@ -1215,12 +1258,19 @@ final class Bubble implements ChatHub.Listener {
         listScroll.setVisibility(showingList ? View.VISIBLE : View.GONE);
         scroll.setVisibility(showingList ? View.GONE : View.VISIBLE);
         messages.removeAllViews();
+        log = null;
         renderedFor = sessions.current;
         Sessions.Session ses = sessions.current;
         if (ses.messages.isEmpty()) {
-            showMessage(Kind.STEP, "New " + ses.brainName() + " chat. Ask me to do something on your phone.");
+            TextView hint = Ui.text(svc, "New " + ses.brainName() + " chat. Ask me to do something on your phone.", 14, Ui.MUTED);
+            hint.setGravity(Gravity.CENTER);
+            hint.setPadding(dp(24), dp(32), dp(24), 0);
+            hint.setTag("hint"); // removed by the first message
+            messages.addView(hint, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
         }
         for (Sessions.Msg m : ses.messages) showMessage(m.kind, m.label());
+        if (log != null && !ses.running) log.finish();
         input.setHint("Ask " + ses.brainName() + "…");
         updateViewing();
         refreshStatus();
@@ -1240,10 +1290,26 @@ final class Bubble implements ChatHub.Listener {
 
     private void updateHeader() {
         Sessions.Session ses = sessions.current;
-        if (headerStop != null) headerStop.setVisibility(ses.running || controlling ? View.VISIBLE : View.GONE);
-        String h = showingList ? "Chats" : ses.label() + " ▾";
-        if (!showingList && ses.running && !ses.status.isEmpty()) h = ses.status;
-        header.setText(h);
+        header.setText(showingList ? "Chats" : ses.label());
+        subtitle.setText(ses.brainName() + " · " + Models.label(ses.backend, ses.model) + (Prefs.devMode(svc) ? " · dev" : ""));
+        subtitle.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        boolean working = !showingList && (ses.running || controlling);
+        strip.setVisibility(working ? View.VISIBLE : View.GONE);
+        stripText.setText(!ses.status.isEmpty() ? ses.status : ses.running ? "Working…" : "Using your phone");
+        if (log != null) log.setLive(ses.running);
+    }
+
+    /** Open this chat in the app (with what's typed so far); attach: straight to the attachment sheet. */
+    private void openInApp(boolean attach) {
+        String draft = input.getText().toString();
+        android.content.Intent i = new android.content.Intent(svc, ChatActivity.class)
+                .putExtra("id", sessions.current.id)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (!draft.trim().isEmpty()) i.putExtra("draft", draft);
+        if (attach) i.putExtra("attach", true);
+        input.setText("");
+        collapse();
+        svc.startActivity(i);
     }
 
     // ------------------------------------------------------- hub listener
@@ -1269,6 +1335,16 @@ final class Bubble implements ChatHub.Listener {
         return pendingConfirm == null ? null : confirmText.getText().toString();
     }
 
+    /** The answers of the question being asked right now, or null when it's an approval (or nothing). */
+    java.util.List<String> pendingOptions() {
+        return pendingConfirm != null && asking ? askOptions : null;
+    }
+
+    /** An answer picked on the chat screen's inline question card. */
+    void pickFromApp(String option) {
+        if (pendingConfirm != null && asking) answerOption(option);
+    }
+
     /** Answer from the chat screen's inline approval card. */
     void answerFromApp(boolean approved) {
         if (pendingConfirm != null) answerConfirm(approved);
@@ -1285,7 +1361,7 @@ final class Bubble implements ChatHub.Listener {
     private void startChange() {
         if (pendingConfirm == null) return;
         changing = true;
-        input.setHint("What should change?");
+        input.setHint(asking ? "Your answer…" : "What should change?");
         input.requestFocus();
         input.postDelayed(() -> {
             InputMethodManager imm = svc.getSystemService(InputMethodManager.class);
@@ -1306,7 +1382,7 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setVisibility(View.GONE);
         // OpenCode chats show the answer on the approval step itself (it arrives after the answer)
         if (!"opencode".equals(sessions.current.backend)) {
-            hub.note(sessions.current, Kind.STEP, "✎ Change requested: " + clip(change, 80));
+            hub.note(sessions.current, Kind.STEP, (asking ? "✓ Answered: " : "✎ Change requested: ") + clip(change, 80));
         }
         if (cb != null) cb.onAnswer(false, change);
         refreshStatus();
@@ -1315,11 +1391,37 @@ final class Bubble implements ChatHub.Listener {
     }
 
     void askConfirm(String summary, ConfirmCallback cb) {
+        showCard(summary, null, cb);
+    }
+
+    /** The ask tool: the same card, with a button per answer and one to type an answer instead. */
+    void askQuestion(String question, java.util.List<String> options, ConfirmCallback cb) {
+        showCard(question, options, cb);
+    }
+
+    private void showCard(String text, java.util.List<String> options, ConfirmCallback cb) {
         if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
         if (changing) endChange();
         pendingConfirm = cb;
+        asking = options != null;
+        askOptions = options;
+        confirmLabel.setText(asking ? "QUESTION" : "NEEDS YOUR OK");
+        confirmOptions.removeAllViews();
+        if (asking) {
+            for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)), optionLp());
+            confirmOptions.addView(optionButton("Type my own answer…", true, v -> startChange()), optionLp());
+        }
+        confirmOptions.setVisibility(asking ? View.VISIBLE : View.GONE);
+        // a question only needs Skip in the bottom row
+        confirmDeny.setText(asking ? "Skip" : "Deny");
+        confirmDeny.setTextColor(asking ? Ui.TEXT : Ui.ERR);
+        confirmDeny.setBackground(rounded(asking ? Ui.CARD : Ui.ERR_SOFT, 16, 0, 0));
+        confirmChange.setVisibility(asking ? View.GONE : View.VISIBLE);
+        confirmApprove.setVisibility(asking ? View.GONE : View.VISIBLE);
+        if (asking) confirmRow.setPadding(0, dp(8), 0, 0);
+        else confirmRow.setPadding(0, 0, 0, 0);
         root.setVisibility(View.VISIBLE);
-        confirmText.setText(summary);
+        confirmText.setText(text);
         confirmCard.setVisibility(View.VISIBLE);
         refreshStatus();
         vibrate(60);
@@ -1340,13 +1442,44 @@ final class Bubble implements ChatHub.Listener {
         hub.changed();
     }
 
+    private Button optionButton(String label, boolean muted, View.OnClickListener onClick) {
+        Button b = actionButton(label, muted ? Ui.CARD : Ui.CARD2);
+        b.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        b.setTextColor(muted ? Ui.MUTED : Ui.TEXT);
+        if (!muted) b.setBackground(rounded(Ui.CARD2, 16, Theme.withAlpha(Ui.ACCENT, 0x40), 1));
+        b.setOnClickListener(onClick);
+        return b;
+    }
+
+    private LinearLayout.LayoutParams optionLp() {
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        p.topMargin = dp(6);
+        return p;
+    }
+
+    private void answerOption(String option) {
+        ConfirmCallback cb = pendingConfirm;
+        pendingConfirm = null;
+        if (changing) endChange();
+        confirmCard.setVisibility(View.GONE);
+        if (!"opencode".equals(sessions.current.backend)) {
+            hub.note(sessions.current, Kind.STEP, "✓ Answered: " + clip(option, 80));
+        }
+        if (cb != null) cb.onAnswer(true, option);
+        refreshStatus();
+        collapse();
+        hub.changed();
+    }
+
     private void answerConfirm(boolean approved) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (!"opencode".equals(sessions.current.backend)) {
-            hub.note(sessions.current, Kind.STEP, approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
+            hub.note(sessions.current, Kind.STEP, asking ? "Question skipped"
+                    : approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
         }
         if (cb != null) cb.onAnswer(approved, null);
         refreshStatus();
@@ -1376,7 +1509,7 @@ final class Bubble implements ChatHub.Listener {
         boolean working = running || controlling;
         if (working && !wasWorking) maybePeek();
         wasWorking = working;
-        String text = pendingConfirm != null ? "Waiting for your approval" : hub.pillText();
+        String text = pendingConfirm != null ? (asking ? "Waiting for your answer" : "Waiting for your approval") : hub.pillText();
         if (controlling && pendingConfirm == null) {
             text = "Using your phone" + (text == null || text.isEmpty() ? "" : " · " + text);
         }
@@ -1433,56 +1566,191 @@ final class Bubble implements ChatHub.Listener {
         }
     }
 
+    /** The open run of tool steps (grouped like the chat screen's log), or null. */
+    private StepLog log;
+
     private void showMessage(Kind kind, String text) {
         if (text == null) return;
-        TextView tv = new TextView(svc);
-        tv.setText(text);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, kind == Kind.STEP ? 12 : 15);
-        tv.setTypeface(kind == Kind.STEP ? Ui.mono(svc, 400) : Ui.sans(svc, 400));
+        View hint = messages.findViewWithTag("hint");
+        if (hint != null) messages.removeView(hint);
+        if (kind == Kind.STEP) {
+            if (log == null) {
+                log = new StepLog();
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.topMargin = dp(10);
+                messages.addView(log.view, lp);
+            }
+            log.add(text);
+            log.setLive(sessions.current.running);
+            scrollToEnd();
+            return;
+        }
+        if (log != null) {
+            log.finish();
+            log = null;
+        }
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        p.topMargin = dp(kind == Kind.STEP ? 2 : 6);
+        p.topMargin = dp(10);
+        View v;
         switch (kind) {
-            case USER:
-                tv.setTextColor(Ui.TEXT);
-                tv.setBackground(Ui.corners(svc, Ui.USER, 18, 18, 6, 18));
-                tv.setPadding(dp(12), dp(8), dp(12), dp(8));
+            case USER: {
+                TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
+                tv.setBackground(Ui.corners(svc, Ui.USER, 20, 20, 6, 20));
+                tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+                Ui.linkifyForService(tv, this::collapse);
                 p.gravity = Gravity.END;
                 p.leftMargin = dp(40);
+                v = tv;
                 break;
-            case BUDDY:
-                tv.setTextColor(Ui.TEXT);
-                tv.setBackground(Ui.corners(svc, Ui.CARD, 18, 18, 18, 6));
-                tv.setPadding(dp(12), dp(8), dp(12), dp(8));
+            }
+            case BUDDY: {
+                LinearLayout r = new LinearLayout(svc);
+                r.setGravity(Gravity.BOTTOM);
+                FrameLayout av = new FrameLayout(svc);
+                av.setBackground(Ui.oval(Ui.ACCENT_SOFT));
+                ImageView f = new ImageView(svc);
+                f.setImageResource(R.drawable.bubble_face);
+                av.addView(f, new FrameLayout.LayoutParams(dp(20), dp(20), Gravity.CENTER));
+                LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
+                avp.rightMargin = dp(8);
+                r.addView(av, avp);
+                TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
+                tv.setLineSpacing(0, 1.15f);
+                tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
+                tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+                Ui.linkifyForService(tv, this::collapse);
+                copyOnLongPress(tv, text);
+                r.addView(tv);
                 p.rightMargin = dp(24);
+                v = r;
                 break;
-            case STEP:
-                tv.setTextColor(Ui.MUTED);
-                tv.setPadding(dp(4), 0, dp(4), 0);
-                tv.setText("· " + text);
-                break;
-            case ERROR:
-                tv.setTextColor(Ui.ERR);
-                tv.setPadding(dp(4), dp(4), dp(4), dp(4));
-                tv.setText("⚠ " + text);
-                break;
+            }
+            default: { // ERROR
+                LinearLayout r = new LinearLayout(svc);
+                r.setGravity(Gravity.TOP);
+                r.addView(Ui.icon(svc, R.drawable.ms_error, Ui.ERR, 18));
+                TextView tv = Ui.text(svc, text, 13, Ui.ERR);
+                tv.setPadding(dp(8), 0, 0, 0);
+                r.addView(tv, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                p.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                v = r;
+            }
         }
-        tv.setOnLongClickListener(v -> {
+        copyOnLongPress(v, text);
+        messages.addView(v, p);
+        while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
+        scrollToEnd();
+    }
+
+    private void copyOnLongPress(View v, String text) {
+        v.setOnLongClickListener(x -> {
             ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
             cm.setPrimaryClip(ClipData.newPlainText("Buddy", text));
             toast("Copied");
             return true;
         });
-        messages.addView(tv, p);
-        while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
-        scrollToEnd();
+    }
+
+    /** Consecutive tool steps in one collapsible card ("3 tool calls"), as in the chat screen. */
+    private final class StepLog {
+        final LinearLayout view = new LinearLayout(svc), rows = new LinearLayout(svc);
+        final TextView count;
+        final ImageView chevron;
+        int n;
+        boolean open, live, userToggled;
+        FrameLayout lastMark;
+
+        StepLog() {
+            view.setOrientation(LinearLayout.VERTICAL);
+            rows.setOrientation(LinearLayout.VERTICAL);
+            view.setBackground(rounded(0x00000000, 14, Ui.OUTLINE, 1));
+            LinearLayout head = new LinearLayout(svc);
+            head.setGravity(Gravity.CENTER_VERTICAL);
+            head.setPadding(dp(12), dp(9), dp(8), dp(9));
+            head.addView(Ui.icon(svc, R.drawable.ms_terminal, Ui.MUTED, 16));
+            count = Ui.monoText(svc, "", 12, Ui.MUTED);
+            count.setPadding(dp(8), 0, 0, 0);
+            head.addView(count, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            chevron = Ui.icon(svc, R.drawable.ms_expand_more, Ui.MUTED, 18);
+            head.addView(chevron);
+            head.setOnClickListener(v -> {
+                userToggled = true;
+                setOpen(!open);
+            });
+            view.addView(head);
+            rows.setPadding(dp(12), 0, dp(12), dp(8));
+            view.addView(rows);
+            setOpen(false);
+        }
+
+        void add(String step) {
+            n++;
+            count.setText(n + (n == 1 ? " tool call" : " tool calls"));
+            if (lastMark != null) mark(lastMark, false);
+            String s = step.trim();
+            if (s.startsWith("✓ ")) s = s.substring(2); // the row gets its own check mark
+            int cut = -1;
+            for (int i = 0; i < s.length(); i++) {
+                char ch = s.charAt(i);
+                if (ch == ' ' || ch == ':' || ch == '(') {
+                    cut = i;
+                    break;
+                }
+            }
+            String name = cut > 0 ? s.substring(0, cut) : s, arg = cut > 0 ? s.substring(cut) : "";
+            LinearLayout r = new LinearLayout(svc);
+            r.setGravity(Gravity.TOP);
+            r.setPadding(0, dp(3), 0, dp(3));
+            FrameLayout m = new FrameLayout(svc);
+            r.addView(m, new LinearLayout.LayoutParams(dp(16), dp(16)));
+            TextView t = Ui.monoText(svc, "", 12, Ui.MUTED);
+            android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(name);
+            sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.TEXT), 0, name.length(), 0);
+            sb.append(arg);
+            t.setText(sb);
+            t.setMaxLines(3);
+            t.setEllipsize(TextUtils.TruncateAt.END);
+            t.setPadding(dp(8), 0, 0, 0);
+            r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            copyOnLongPress(r, step);
+            rows.addView(r);
+            lastMark = m;
+            mark(m, live);
+        }
+
+        private void mark(FrameLayout f, boolean spinning) {
+            f.removeAllViews();
+            if (spinning) f.addView(Ui.spinner(svc, 14), new FrameLayout.LayoutParams(dp(14), dp(14), Gravity.CENTER));
+            else f.addView(Ui.icon(svc, R.drawable.ms_check, Ui.OK, 16), new FrameLayout.LayoutParams(dp(16), dp(16)));
+        }
+
+        void setLive(boolean on) {
+            if (live == on) return;
+            live = on;
+            if (lastMark != null) mark(lastMark, on);
+            if (!userToggled) setOpen(on);
+        }
+
+        void finish() {
+            setLive(false);
+            if (!userToggled) setOpen(false);
+        }
+
+        void setOpen(boolean o) {
+            open = o;
+            rows.setVisibility(o ? View.VISIBLE : View.GONE);
+            chevron.setImageResource(o ? R.drawable.ms_expand_less : R.drawable.ms_expand_more);
+        }
     }
 
     private void scrollToEnd() {
         scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
     }
 
-    private android.widget.ImageButton headerStop;
+    private TextView subtitle, stripText;
+    private LinearLayout strip;
 
     /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */
     private android.widget.ImageButton toolIcon(int icon, String description, int tint, View.OnClickListener l) {
