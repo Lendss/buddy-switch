@@ -65,7 +65,7 @@ public class AppPermissionsActivity extends Screen {
         frame.setBackgroundColor(BG);
         frame.setFitsSystemWindows(true);
         frame.addView(root);
-        setContentView(frame);
+        setContentView(protect(frame)); // agents never change App permissions, even when they may tap Buddy's screens
     }
 
     @Override
@@ -85,17 +85,18 @@ public class AppPermissionsActivity extends Screen {
                 + "The agent can never tap Buddy's own bubble, cards or settings.", 13, MUTED), full());
 
         body.addView(label("Smart reviewer"), gap(18));
+        // a reviewer that isn't signed in is greyed out
+        java.util.Set<String> noReviewer = new java.util.HashSet<>();
+        for (String r : new String[]{"claude", "codex"}) if (!SetupState.signedIn(this, r)) noReviewer.add(r);
         body.addView(segmented(this, new String[][]{{"same", "Same as chat"}, {"claude", "Claude Code"}, {"codex", "Codex"}},
                 Prefs.reviewer(this), false, v -> {
-                    if (!"same".equals(v) && !SetupState.signedIn(this, v)) {
-                        Toast.makeText(this, "Sign in to " + ("codex".equals(v) ? "Codex" : "Claude Code") + " first.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
                     Prefs.setReviewer(this, v);
                     renderApps();
-                }), gap(8));
+                }, noReviewer, v -> Toast.makeText(this, "Sign in to " + Account.nameOf(v) + " first (Settings).",
+                        Toast.LENGTH_LONG).show()), gap(8));
         body.addView(text(this, "A temporary session per tap, without tools: it sees your request, the agent's note and "
-                + "the screen, and says allow, ask you, or advise against. About 3 seconds a tap.", 12, MUTED), gap(6));
+                + "the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode chats are "
+                + "reviewed by Claude Code (or Codex).", 12, MUTED), gap(6));
 
         LinearLayout rules = row(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);

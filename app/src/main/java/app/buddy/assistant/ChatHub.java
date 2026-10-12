@@ -422,7 +422,17 @@ final class ChatHub {
             case "ToolSearch":
             case "TodoWrite":
                 return null;
-            case "confirm": return "Asking for your approval";
+            case "confirm": {
+                // OpenCode reports a step only once it's done, so its approval step carries the answer (_answer)
+                String ans = in.optString("_answer", "");
+                if (ans.startsWith("APPROVED")) return "✓ Approved: " + clip(in.optString("summary"), 80);
+                if (ans.startsWith("CHANGES")) {
+                    int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
+                    return "✎ Change requested" + (a >= 0 && b > a ? ": " + clip(ans.substring(a + 1, b), 80) : "");
+                }
+                if (ans.startsWith("DENIED")) return "✗ Denied";
+                return "Asking for your approval";
+            }
             case "notify": return in.optString("text");
             case "WebSearch": return "Searching the web: " + clip(in.optString("query"), 40);
             case "WebFetch": return "Reading " + clip(in.optString("url"), 40);

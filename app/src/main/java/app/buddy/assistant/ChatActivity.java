@@ -118,7 +118,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         // inline approval card (when an agent asks for an OK)
-        approval = column(this);
+        approval = protect(column(this)); // the inline approval card: only the user answers it
         LinearLayout.LayoutParams ap = full();
         ap.leftMargin = ap.rightMargin = dp(this, 12);
         ap.bottomMargin = dp(this, 8);
@@ -323,7 +323,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         LinearLayout other = row(this);
         other.setPadding(0, dp(this, 10), 0, 0);
         final EditText et = new EditText(this);
-        et.setHint("other… e.g. " + ("claude".equals(ses.backend) ? "claude-opus-5-5" : "gpt-6.1-sol"));
+        et.setHint("other… e.g. " + ("claude".equals(ses.backend) ? "claude-opus-5-5"
+                : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);
@@ -531,15 +532,65 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         Button deny = button(this, "Deny", false);
         deny.setTextColor(ERR);
         deny.setBackground(rounded(this, ERR_SOFT, 12));
+        Button change = button(this, "Change", false);
         Button ok = button(this, "Approve", true);
         btns.addView(deny, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        cp.leftMargin = dp(this, 10);
+        btns.addView(change, cp);
         LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
         op.leftMargin = dp(this, 10);
         btns.addView(ok, op);
         card.addView(btns, full());
         deny.setOnClickListener(v -> answer(false));
         ok.setOnClickListener(v -> answer(true));
+        change.setOnClickListener(v -> askChange(card, btns));
         approval.addView(card, full());
+    }
+
+    /** Change: the user writes what to adjust, and the agent gets it back instead of a yes/no. */
+    private void askChange(LinearLayout card, LinearLayout btns) {
+        btns.setVisibility(View.GONE);
+        EditText what = new EditText(this);
+        what.setHint("What should change?");
+        what.setHintTextColor(MUTED);
+        what.setTextColor(TEXT);
+        what.setTextSize(15);
+        what.setMinLines(2);
+        what.setMaxLines(6);
+        what.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        what.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        what.setBackground(rounded(this, BG, 12));
+        card.addView(what, full());
+        LinearLayout row = row(this);
+        Button back = button(this, "Back", false);
+        Button send = button(this, "Send change", true);
+        row.addView(back, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        sp.leftMargin = dp(this, 10);
+        row.addView(send, sp);
+        LinearLayout.LayoutParams rp = full();
+        rp.topMargin = dp(this, 10);
+        card.addView(row, rp);
+        back.setOnClickListener(v -> {
+            card.removeView(what);
+            card.removeView(row);
+            btns.setVisibility(View.VISIBLE);
+        });
+        send.setOnClickListener(v -> {
+            String text = what.getText().toString().trim();
+            if (text.isEmpty()) {
+                what.requestFocus();
+                return;
+            }
+            BuddyService svc = BuddyService.get();
+            if (svc != null && svc.bubble() != null) svc.bubble().changeFromApp(text);
+            renderApproval();
+        });
+        what.requestFocus();
+        what.postDelayed(() -> getSystemService(android.view.inputmethod.InputMethodManager.class)
+                .showSoftInput(what, 0), 150);
     }
 
     private void answer(boolean approved) {

@@ -17,29 +17,47 @@ final class Models {
             {"gpt-6-astra", "GPT-6-Astra"},
             {"gpt-6-luna", "GPT-6-Luna"},
     };
-    private static String[][] codexLive;
+    /** Used until OpenCode reports its own list (`opencode models`, which includes the free ones). */
+    static final String[][] OPENCODE = {
+            {"", "Default"},
+            {"opencode/big-pickle", "opencode/big-pickle"},
+    };
+    private static String[][] codexLive, opencodeLive;
 
     private Models() {
     }
 
     static String[][] forBackend(String backend) {
+        if ("opencode".equals(backend)) return opencodeLive != null ? opencodeLive : OPENCODE;
         if (!"codex".equals(backend)) return CLAUDE;
         return codexLive != null ? codexLive : CODEX;
     }
 
+    /** OpenCode's models as JSON [[id, name], …] ("provider/model" for both). */
+    static void setOpencode(String json) {
+        String[][] m = parse(json);
+        if (m != null) opencodeLive = m;
+    }
+
     /** Codex's model list as reported by the helper: JSON [[slug, name], …]. */
     static void setCodex(String json) {
+        String[][] m = parse(json);
+        if (m != null) codexLive = m;
+    }
+
+    private static String[][] parse(String json) {
         try {
             org.json.JSONArray a = new org.json.JSONArray(json);
-            if (a.length() == 0) return;
+            if (a.length() == 0) return null;
             String[][] m = new String[a.length() + 1][];
             m[0] = new String[]{"", "Default"};
             for (int i = 0; i < a.length(); i++) {
                 org.json.JSONArray e = a.getJSONArray(i);
                 m[i + 1] = new String[]{e.getString(0), e.getString(1)};
             }
-            codexLive = m;
+            return m;
         } catch (Exception ignored) {
+            return null;
         }
     }
 

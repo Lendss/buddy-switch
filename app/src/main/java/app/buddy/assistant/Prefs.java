@@ -44,13 +44,25 @@ final class Prefs {
         sp(c).edit().putString("helper", status).putLong("helper_at", System.currentTimeMillis()).apply();
     }
 
-    /** Which agent answers the bubble: "claude" (default) or "codex". */
+    /** Which agent answers the bubble: "claude" (default), "codex" or "opencode". */
     static String backend(Context c) {
         return sp(c).getString("backend", "claude");
     }
 
     static void setBackend(Context c, String backend) {
         sp(c).edit().putString("backend", backend).apply();
+    }
+
+    /**
+     * Agents (any MCP client, e.g. Claude Code testing Buddy) may tap and type in Buddy's own screens, except the
+     * bubble, approval cards, App permissions and the developer switches. Off by default.
+     */
+    static boolean agentsTapBuddy(Context c) {
+        return sp(c).getBoolean("agents_tap_buddy", false);
+    }
+
+    static void setAgentsTapBuddy(Context c, boolean on) {
+        sp(c).edit().putBoolean("agents_tap_buddy", on).apply();
     }
 
     /** Developer mode: the bubble's agent may run commands and edit files in ~/.buddy/work. */
@@ -141,6 +153,15 @@ final class Prefs {
         sp(c).edit().putString("codex_models", json).apply();
     }
 
+    /** OpenCode's model list (`opencode models`), as JSON [[id, name], …]. */
+    static String opencodeModels(Context c) {
+        return sp(c).getString("opencode_models", "[]");
+    }
+
+    static void setOpencodeModels(Context c, String json) {
+        sp(c).edit().putString("opencode_models", json).apply();
+    }
+
     /** First-run guide finished (or skipped). */
     static boolean onboarded(Context c) {
         return sp(c).getBoolean("onboarded", false);
@@ -167,7 +188,7 @@ final class Prefs {
         sp(c).edit().putInt("onboard_step", step).apply();
     }
 
-    /** Which agents the user wants: "claude", "codex" or "both". */
+    /** Which agents the user wants: "claude", "codex", "opencode" or "both" (Claude Code and Codex). */
     static String agents(Context c) {
         return sp(c).getString("agents", "claude");
     }

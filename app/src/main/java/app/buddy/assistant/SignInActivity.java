@@ -18,7 +18,10 @@ import android.widget.Toast;
 
 import static app.buddy.assistant.Ui.*;
 
-/** Install an agent (Claude Code or Codex) in Buddy's built-in Linux and sign in: one button, approve in the browser, done. */
+/**
+ * Install an agent (Claude Code, Codex or OpenCode) in Buddy's built-in Linux and sign in: one button, approve in the
+ * browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
+ */
 public class SignInActivity extends Screen implements Account.Listener {
     private LinearLayout body, bottom;
     private Account acc;
@@ -99,8 +102,11 @@ public class SignInActivity extends Screen implements Account.Listener {
             case NEED_INSTALL:
                 header(R.drawable.ms_terminal, "Install " + acc.name(), acc.claude()
                         ? "Runs Claude Code inside Buddy on your Claude subscription."
+                        : acc.opencode() ? "Runs OpenCode inside Buddy. Its free models work right away, no account needed; "
+                        + "connect your own providers (Anthropic, OpenAI, GitHub Copilot…) anytime."
                         : "Runs Codex inside Buddy on your ChatGPT plan.", false);
                 note(acc.claude() ? "Downloads about 235 MB once: Buddy's Linux and Claude Code from Anthropic. Use Wi-Fi if you can."
+                        : acc.opencode() ? "Downloads about 230 MB once: Buddy's Linux, Node.js and OpenCode. Use Wi-Fi if you can."
                         : "Downloads about 150 MB once: Buddy's Linux, Node.js and Codex from OpenAI. Use Wi-Fi if you can.");
                 primary("Install " + acc.name(), v -> acc.install(this));
                 break;
@@ -110,6 +116,10 @@ public class SignInActivity extends Screen implements Account.Listener {
                 note("This takes a few minutes. You can leave this screen; it keeps going.");
                 break;
             case SIGNED_OUT:
+                if (acc.opencode()) {
+                    openCodeReady();
+                    break;
+                }
                 header(R.drawable.ms_shield_person, acc.claude() ? "Sign in to Claude" : "Sign in to ChatGPT",
                         (acc.claude() ? "Use your Claude account (Pro or Max)." : "Use your ChatGPT account (Plus, Pro or Business).")
                                 + " Your browser opens; approve there and Buddy comes back by itself.", false);
@@ -145,6 +155,10 @@ public class SignInActivity extends Screen implements Account.Listener {
                 spinnerRow();
                 break;
             case SIGNED_IN:
+                if (acc.opencode()) {
+                    openCodeReady();
+                    break;
+                }
                 header(R.drawable.ms_check, "Signed in", (acc.email.isEmpty() ? acc.name() + " is ready."
                         : acc.email) + (acc.plan.isEmpty() ? "" : " · " + acc.plan), true);
                 primary("Done", v -> finish());
@@ -160,6 +174,19 @@ public class SignInActivity extends Screen implements Account.Listener {
                 });
                 break;
         }
+    }
+
+    /** OpenCode is installed: nothing to sign in to. Providers are connected with `opencode auth login` in the terminal. */
+    private void openCodeReady() {
+        boolean free = acc.plan.isEmpty() || "free models".equals(acc.plan);
+        header(R.drawable.ms_check, "OpenCode is ready", free
+                ? "Using OpenCode's free models. Pick one per chat with the model chip, or connect your own provider."
+                : "Connected: " + acc.plan + ". OpenCode's free models stay available too.", true);
+        note("Connecting a provider opens Buddy's terminal with opencode auth login: pick a provider and follow its steps. "
+                + "To remove one later, run opencode auth logout there.");
+        primary("Done", v -> finish());
+        secondary("Connect a provider", v -> startActivity(new Intent(this, TerminalActivity.class)
+                .putExtra("run", "opencode auth login")));
     }
 
     /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */

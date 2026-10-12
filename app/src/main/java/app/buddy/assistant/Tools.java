@@ -95,7 +95,8 @@ final class Tools {
         t.put(tool("confirm",
                 "Ask the user to approve an action in the Buddy bubble and wait for the answer. "
                         + "REQUIRED before sending messages, posting, buying, deleting, or changing settings. "
-                        + "Show the exact text or action. Returns APPROVED or DENIED.",
+                        + "Show the exact text or action. Returns APPROVED, DENIED, or CHANGES REQUESTED with "
+                        + "what the user wants changed: then make those changes and call confirm again.",
                 props().put("summary", strProp("Exactly what you are about to do, including any text to be sent")),
                 "summary"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
@@ -361,8 +362,8 @@ final class Tools {
         if (svc.bubble() != null && svc.bubble().confirming()) {
             return "BLOCKED: an approval card is waiting for the user. Wait for their answer; don't tap anything.";
         }
-        if (Guard.isBuddy(hit)) {
-            return "BLOCKED: that's Buddy's own bubble or approval card. Only the user taps those.";
+        if (Guard.offLimits(svc, hit) || (element != null && Guard.offLimits(svc, element))) {
+            return "BLOCKED: that's one of Buddy's own screens. Only the user taps those.";
         }
         AccessibilityNodeInfo target = element != null ? element : hit;
         if (target == null) return null;
@@ -410,6 +411,7 @@ final class Tools {
                 ? detail.trim() : "“" + detail.trim() + "”"));
         String answer = svc.askConfirm(summary);
         if (answer.startsWith("APPROVED")) return null;
+        if (answer.startsWith("CHANGES")) return "Not tapped: the user wants changes first. " + answer;
         return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; "
                 + "ask the user what they want.";
     }
@@ -433,7 +435,7 @@ final class Tools {
         if (target == null) target = findFocusedInput();
         if (target == null)
             throw new IllegalStateException("No text field is focused. Tap the text field first, then type.");
-        if (Guard.isBuddy(target)) return "BLOCKED: that's Buddy's own screen. Only the user types there.";
+        if (Guard.offLimits(svc, target)) return "BLOCKED: that's Buddy's own screen. Only the user types there.";
         if (!target.isFocused()) target.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         String value = text;
         if (a.optBoolean("append")) {

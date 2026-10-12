@@ -45,6 +45,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         instance = this;
         Theme.load(this);
         Models.setCodex(Prefs.codexModels(this));
+        Models.setOpencode(Prefs.opencodeModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
         tools = new Tools(this);
         bubble = new Bubble(this);
@@ -282,6 +283,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 Prefs.setCodexModels(this, cm.toString());
                 Models.setCodex(cm.toString());
             }
+            org.json.JSONArray om = event.optJSONArray("opencode_models");
+            if (om != null && om.length() > 0) {
+                Prefs.setOpencodeModels(this, om.toString());
+                Models.setOpencode(om.toString());
+            }
             return;
         }
         String t = event.optString("type");
@@ -355,13 +361,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     String askConfirm(final String summary) throws InterruptedException {
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Boolean> answer = new AtomicReference<>();
-        main.post(() -> bubble.askConfirm(summary, approved -> {
+        final AtomicReference<String> change = new AtomicReference<>();
+        main.post(() -> bubble.askConfirm(summary, (approved, wanted) -> {
             answer.set(approved);
+            change.set(wanted);
             done.countDown();
         }));
         if (!done.await(5, TimeUnit.MINUTES)) {
             main.post(() -> bubble.cancelConfirm());
             return "DENIED: the user did not answer within 5 minutes. Do not do it.";
+        }
+        if (change.get() != null) {
+            return "CHANGES REQUESTED by the user: \u201c" + change.get() + "\u201d. Don't do it as it was; "
+                    + "make these changes (for example, rewrite the text), then call confirm again with the "
+                    + "updated version and wait for the answer.";
         }
         return Boolean.TRUE.equals(answer.get())
                 ? "APPROVED by the user. Go ahead."

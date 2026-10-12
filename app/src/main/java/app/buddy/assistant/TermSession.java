@@ -59,7 +59,17 @@ final class TermSession implements TermEmulator.Host {
 
     /** Starts a login shell in Buddy's Linux, as a new tab. Linux must be installed. */
     static TermSession start(Context c, int rows, int cols) throws IOException {
-        TermSession s = launch(c, rows, cols, "cd /root; if command -v bash >/dev/null; then exec bash -l; else exec sh -l; fi");
+        return start(c, rows, cols, null);
+    }
+
+    /** Same, running {@code first} in the login shell before handing it over (e.g. "opencode auth login"). */
+    static TermSession start(Context c, int rows, int cols, String first) throws IOException {
+        String shell = "cd /root; if command -v bash >/dev/null; then exec bash -l; else exec sh -l; fi";
+        if (first != null) {
+            // bash -l -c runs the profile (PATH), then the command, then stays as an interactive shell
+            shell = "cd /root; exec bash -l -c '" + (first + "; exec bash -l").replace("'", "'\\''") + "'";
+        }
+        TermSession s = launch(c, rows, cols, shell);
         all.add(s);
         current = s;
         return s;

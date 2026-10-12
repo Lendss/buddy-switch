@@ -235,13 +235,14 @@ final class Ui {
         return t;
     }
 
-    /** 40×40 tile with "CC" (Claude Code) or "CX" (Codex). */
+    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex) or "OC" (OpenCode). */
     static TextView agentTile(Context c, String backend) {
-        boolean codex = "codex".equals(backend);
-        TextView t = monoText(c, codex ? "CX" : "CC", 12, codex ? TEXT : ACCENT_TEXT);
+        boolean claude = !"codex".equals(backend) && !"opencode".equals(backend);
+        TextView t = monoText(c, "codex".equals(backend) ? "CX" : "opencode".equals(backend) ? "OC" : "CC", 12,
+                claude ? ACCENT_TEXT : TEXT);
         t.setTypeface(mono(c, 600));
         t.setGravity(Gravity.CENTER);
-        t.setBackground(rounded(c, codex ? CARD2 : ACCENT_SOFT, 12));
+        t.setBackground(rounded(c, claude ? ACCENT_SOFT : CARD2, 12));
         t.setLayoutParams(new LinearLayout.LayoutParams(dp(c, 40), dp(c, 40)));
         return t;
     }
@@ -272,6 +273,24 @@ final class Ui {
     }
 
     /** Title + subtitle with a switch on the right. */
+    /** Accessibility extra that marks a view (and everything inside it) as off-limits to agents. */
+    static final String PROTECTED = "app.buddy.protected";
+
+    /**
+     * Agents may never tap or type in this view, even when "Let agents tap Buddy's screens" is on (see Guard).
+     * Invisible to the user and to screen readers: it's only an extra on the accessibility node.
+     */
+    static <T extends View> T protect(T v) {
+        v.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.getExtras().putBoolean(PROTECTED, true);
+            }
+        });
+        return v;
+    }
+
     static LinearLayout switchRow(Context c, String title, String sub, boolean on, Toggle l) {
         LinearLayout r = row(c);
         r.setPadding(dp(c, 16), dp(c, 14), dp(c, 16), dp(c, 14));
@@ -312,6 +331,15 @@ final class Ui {
 
     /** Segmented control: options are {value, label}. */
     static LinearLayout segmented(Context c, String[][] options, String selected, boolean monoLabels, Pick l) {
+        return segmented(c, options, selected, monoLabels, l, null, null);
+    }
+
+    /**
+     * Like {@link #segmented(Context, String[][], String, boolean, Pick)}, but the options in {@code disabled} are
+     * dimmed and can't be picked: tapping one calls {@code whyNot} (e.g. to say what to set up first).
+     */
+    static LinearLayout segmented(Context c, String[][] options, String selected, boolean monoLabels, Pick l,
+                                  java.util.Set<String> disabled, Pick whyNot) {
         LinearLayout box = row(c);
         box.setPadding(dp(c, 3), dp(c, 3), dp(c, 3), dp(c, 3));
         box.setBackground(rounded(c, BG, 12));
@@ -323,8 +351,12 @@ final class Ui {
             t.setPadding(dp(c, 10), dp(c, 8), dp(c, 10), dp(c, 8));
             if (on) t.setBackground(rounded(c, CARD2, 10));
             else t.setBackgroundResource(ripple(c, false));
+            boolean off = !on && disabled != null && disabled.contains(o[0]);
+            if (off) t.setAlpha(0.38f);
             t.setOnClickListener(v -> {
-                if (!on) l.onPick(o[0]);
+                if (off) {
+                    if (whyNot != null) whyNot.onPick(o[0]);
+                } else if (!on) l.onPick(o[0]);
             });
             box.addView(t, weight1());
         }

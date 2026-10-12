@@ -18,9 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * One agent (Claude Code or Codex) inside Buddy's built-in Linux: install it, sign in, check the account.
+ * One agent (Claude Code, Codex or OpenCode) inside Buddy's built-in Linux: install it, sign in, check the account.
  * Claude Code's sign-in shows a one-time code in the browser; Buddy reads it off the screen (accessibility),
  * the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by itself.
+ * OpenCode needs no sign-in (its free models work right away); providers are connected in the terminal.
  */
 final class Account {
     enum Step { CHECKING, NEED_INSTALL, INSTALLING, SIGNED_OUT, WAITING_BROWSER, FINISHING, SIGNED_IN, ERROR }
@@ -31,9 +32,21 @@ final class Account {
 
     static final Account CLAUDE = new Account("claude");
     static final Account CODEX = new Account("codex");
+    static final Account OPENCODE = new Account("opencode");
+    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE};
 
     static Account of(String agent) {
-        return "codex".equals(agent) ? CODEX : CLAUDE;
+        return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : CLAUDE;
+    }
+
+    /** The agent's display name: "Claude Code", "Codex" or "OpenCode". */
+    static String nameOf(String agent) {
+        return of(agent).name();
+    }
+
+    /** Its command-line name, shown in mono labels: "claude-code", "codex" or "opencode". */
+    static String cliOf(String agent) {
+        return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "claude-code";
     }
 
     final String agent;
@@ -60,8 +73,17 @@ final class Account {
         return "claude".equals(agent);
     }
 
+    boolean opencode() {
+        return "opencode".equals(agent);
+    }
+
     String name() {
-        return claude() ? "Claude Code" : "Codex";
+        return claude() ? "Claude Code" : opencode() ? "OpenCode" : "Codex";
+    }
+
+    /** One line on what the agent runs on, for pickers. */
+    String tagline() {
+        return claude() ? "Uses your Claude plan" : opencode() ? "Free models, or your own providers" : "Uses your ChatGPT plan";
     }
 
     static void addListener(Listener l) {
@@ -119,6 +141,29 @@ final class Account {
                     } else {
                         set(Step.SIGNED_OUT, "");
                     }
+                } else if (opencode()) {
+                    // no sign-in needed: installed means ready. Connected providers (if any) are shown as the plan.
+                    String out = Linux.exec(app, "command -v opencode >/dev/null || { echo NOTINSTALLED; exit 0; }; "
+                            + "jq -r 'keys | join(\", \")' /root/.local/share/opencode/auth.json 2>/dev/null; echo OC_OK", 60);
+                    if (out.contains("NOTINSTALLED")) {
+                        set(Step.NEED_INSTALL, "");
+                    } else {
+                        String providers = out.substring(0, out.indexOf("OC_OK")).trim();
+                        email = "";
+                        plan = providers.isEmpty() ? "free models" : providers;
+                        set(Step.SIGNED_IN, "");
+                        // its model list (free ones plus connected providers), for the model picker
+                        String list = Linux.exec(app, "timeout 60 opencode models 2>/dev/null", 70);
+                        org.json.JSONArray a = new org.json.JSONArray();
+                        for (String line : list.split("\n")) {
+                            String m = line.trim();
+                            if (m.matches("[A-Za-z0-9._-]+/\\S+")) a.put(new org.json.JSONArray().put(m).put(m.substring(m.indexOf('/') + 1)));
+                        }
+                        if (a.length() > 0) {
+                            Prefs.setOpencodeModels(app, a.toString());
+                            Models.setOpencode(a.toString());
+                        }
+                    }
                 } else {
                     String out = Linux.exec(app, "command -v codex >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "codex login status 2>&1", 60);
@@ -161,6 +206,13 @@ final class Account {
                     String o = Linux.exec(app, "curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && bash /tmp/install.sh"
                             + " && /root/.local/bin/claude --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                } else if (opencode()) {
+                    set(Step.INSTALLING, "Downloading OpenCode…");
+                    // npm also fetches the glibc build; Buddy's Alpine only runs the musl one, so drop the other (~180 MB)
+                    String o = Linux.exec(app, "npm install -g opencode-ai >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
+                            + " rm -rf /usr/local/lib/node_modules/opencode-ai/node_modules/opencode-linux-arm64;"
+                            + " opencode --version && echo AGENT_OK", 1800);
+                    if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else {
                     set(Step.INSTALLING, "Downloading Codex…");
                     String o = Linux.exec(app, "npm install -g @openai/codex >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
@@ -183,7 +235,7 @@ final class Account {
     /** remote = sign in on another device: Codex uses its device code; Claude shows its link to open elsewhere. */
     void startLogin(Context c, boolean onOtherDevice) {
         app = c.getApplicationContext();
-        if (busy()) return;
+        if (busy() || opencode()) return; // OpenCode: providers are connected in the terminal (opencode auth login)
         final Context app = c.getApplicationContext();
         url = null;
         state = null;
@@ -282,7 +334,7 @@ final class Account {
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {
-                Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
+                if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
             } catch (Exception ignored) {
             }
             refresh(app);

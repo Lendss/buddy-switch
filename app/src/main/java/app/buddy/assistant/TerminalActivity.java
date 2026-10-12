@@ -118,14 +118,17 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         setContentView(root);
 
         if (!Linux.installed(this)) {
-            Toast.makeText(this, "Install Claude Code or Codex in Settings first: that sets up Buddy's Linux.",
+            Toast.makeText(this, "Install Claude Code, Codex or OpenCode in Settings first: that sets up Buddy's Linux.",
                     Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, SetupActivity.class));
             finish();
             return;
         }
+        // opened to run something (e.g. "opencode auth login"): always in a new tab
+        String run = getIntent().getStringExtra("run");
         TermSession s = TermSession.current;
-        if (s == null) term.post(this::newSession);
+        if (run != null) term.post(() -> newSession(run));
+        else if (s == null) term.post(this::newSession);
         else show(s);
     }
 
@@ -163,11 +166,15 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
     }
 
     private void newSession() {
+        newSession(null);
+    }
+
+    private void newSession(String run) {
         int[] g = term.gridFor(term.getWidth() > 0 ? term.getWidth() : getResources().getDisplayMetrics().widthPixels,
                 term.getHeight() > 0 ? term.getHeight() : getResources().getDisplayMetrics().heightPixels / 2);
         TermSession s;
         try {
-            s = TermSession.start(this, g[0], g[1]);
+            s = TermSession.start(this, g[0], g[1], run);
         } catch (Exception e) {
             Toast.makeText(this, "Couldn't start the terminal: " + e.getMessage(), Toast.LENGTH_LONG).show();
             return;

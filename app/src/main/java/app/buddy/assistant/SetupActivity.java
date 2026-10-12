@@ -58,6 +58,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         RemoteSession.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
+        Account.OPENCODE.refresh(this);
         render();
     }
 
@@ -101,7 +102,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout head = column(this);
         head.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
         head.addView(title(this, "Settings", 28));
-        TextView sub = text(this, "Buddy runs Claude Code (or Codex) on your own subscription, inside the app.", 14, MUTED);
+        TextView sub = text(this, "Buddy runs Claude Code, Codex or OpenCode inside the app, on your own subscription "
+                + "(or OpenCode's free models).", 14, MUTED);
         sub.setPadding(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
@@ -125,12 +127,15 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         steps[1] = step("Install " + acc.name(), installed ? acc.name() + " is installed in Buddy."
                         : acc.step == Account.Step.INSTALLING ? acc.detail
                         : "Buddy downloads its own small Linux and " + acc.name() + (acc.claude()
-                        ? " from Anthropic (about 235 MB)." : " from OpenAI (about 150 MB)."),
+                        ? " from Anthropic (about 235 MB)." : acc.opencode() ? " (about 230 MB with Node.js)."
+                        : " from OpenAI (about 150 MB)."),
                 installed, installed || acc.step == Account.Step.INSTALLING ? null : "Install", v -> openAgent(backend),
                 null, null);
 
         boolean signed = SetupState.signedIn(this, backend);
-        steps[2] = step("Sign in", signed ? "Signed in" + (acc.email.isEmpty() ? "." : " as " + acc.email + ".")
+        steps[2] = step("Sign in", acc.opencode() ? (signed ? "No sign-in needed: OpenCode's free models work right away. "
+                        + "Connect your own providers anytime." : "No sign-in needed for OpenCode's free models.")
+                        : signed ? "Signed in" + (acc.email.isEmpty() ? "." : " as " + acc.email + ".")
                         : (acc.claude() ? "With your Claude account (Pro or Max)." : "With your ChatGPT account.")
                         + " Your browser opens; approve there and Buddy comes back by itself.",
                 installed ? signed : null, installed && !signed ? "Sign in" : null, v -> openAgent(backend), null, null);
@@ -178,17 +183,63 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ag.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         ag.addView(title(this, "Default brain", 15));
         TextView brainInfo = text(this, "Who answers new chats from the bubble or the New chat button. Claude Code uses "
-                + "your Claude plan; Codex uses your ChatGPT plan.", 13, MUTED);
+                + "your Claude plan, Codex your ChatGPT plan, OpenCode its free models or your own providers. "
+                + "Only agents that are set up can be picked.", 13, MUTED);
         brainInfo.setPadding(0, dp(this, 2), 0, 0);
         ag.addView(brainInfo);
-        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}}, backend, false, v -> {
-            Prefs.setBackend(this, v);
-            Toast.makeText(this, "New chats will use " + ("codex".equals(v) ? "Codex" : "Claude Code")
-                    + ". You can pick per chat with the New chat button.", Toast.LENGTH_LONG).show();
-            render();
-        }), topGap(12));
-        for (String a : new String[]{"claude", "codex"}) ag.addView(agentRow(a), topGap(a.equals("claude") ? 12 : 4));
+        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}},
+                backend, false, v -> {
+                    Prefs.setBackend(this, v);
+                    Toast.makeText(this, "New chats will use " + Account.nameOf(v)
+                            + ". You can pick per chat with the New chat button.", Toast.LENGTH_LONG).show();
+                    render();
+                }, notReady(), v -> {
+                    Toast.makeText(this, "Set up " + Account.nameOf(v) + " first.", Toast.LENGTH_SHORT).show();
+                    openAgent(v);
+                }), topGap(12));
+        for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
         addCard(ag);
+
+        // ---------------------------------------------------------- phone tools
+        list.addView(sectionLabel(this, "Phone tools in your own sessions"));
+        LinearLayout mcp = card();
+        mcp.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        mcp.addView(text(this, "Buddy's phone tools are a regular MCP server on this phone. Run this once in a terminal "
+                + "on the phone (Termux, for example) and that agent gets the phone tools in every session, even without "
+                + "the bubble.", 14, MUTED));
+        mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"}},
+                mcpAgent, true, v -> {
+                    mcpAgent = v;
+                    render();
+                }), topGap(12));
+        String token = Prefs.token(this);
+        String url = "http://127.0.0.1:" + McpServer.PORT + "/mcp";
+        final String cmd = "codex".equals(mcpAgent)
+                // Codex reads the bearer token from an environment variable, so save it in ~/.bashrc too.
+                ? "codex mcp add phone --url " + url + " --bearer-token-env-var BUDDY_TOKEN"
+                + " && echo 'export BUDDY_TOKEN=" + token + "' >> ~/.bashrc && export BUDDY_TOKEN=" + token
+                : "opencode".equals(mcpAgent)
+                // OpenCode reads extra config from OPENCODE_CONFIG_CONTENT; keep it for every shell
+                ? "echo 'export OPENCODE_CONFIG_CONTENT='\\''{\"mcp\":{\"phone\":{\"type\":\"remote\",\"url\":\"" + url
+                + "\",\"oauth\":false,\"timeout\":310000,\"headers\":{\"Authorization\":\"Bearer " + token
+                + "\"}}}}'\\''' >> ~/.bashrc && . ~/.bashrc"
+                : "claude mcp add --transport http -s user phone " + url
+                + " --header \"Authorization: Bearer " + token + "\"";
+        // the token is masked on screen so screenshots never leak it
+        mcp.addView(codeBlock(this, cmd.replace(token, token.substring(0, 4) + "••••••••")), topGap(12));
+        Button copy = button(this, "Copy command", false);
+        copy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
+        copy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
+        copy.setCompoundDrawablePadding(dp(this, 8));
+        copy.setOnClickListener(v -> {
+            ClipboardManager cm = getSystemService(ClipboardManager.class);
+            cm.setPrimaryClip(ClipData.newPlainText("Buddy MCP", cmd));
+            Toast.makeText(this, "Copied. Paste it in your terminal.", Toast.LENGTH_SHORT).show();
+        });
+        LinearLayout.LayoutParams cpp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+        cpp.topMargin = dp(this, 12);
+        mcp.addView(copy, cpp);
+        addCard(mcp);
 
         // ---------------------------------------------------------------- voice
         list.addView(sectionLabel(this, "Voice"));
@@ -196,19 +247,15 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         vc.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         vc.addView(fieldLabel("Voice input", null));
         String engine = Prefs.voiceEngine(this);
+        // Claude's dictation needs Claude Code signed in, ChatGPT's voice needs Codex: otherwise greyed out
+        java.util.Set<String> noVoice = new java.util.HashSet<>();
+        if (!SetupState.signedIn(this, "claude")) noVoice.add("claude");
+        if (!SetupState.signedIn(this, "codex")) noVoice.add("chatgpt");
         vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"claude", "Claude"}, {"chatgpt", "ChatGPT"}},
                 engine, false, v -> {
-                    if ("claude".equals(v) && !SetupState.signedIn(this, "claude")) {
-                        Toast.makeText(this, "Sign in to Claude Code first.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    if ("chatgpt".equals(v) && !SetupState.signedIn(this, "codex")) {
-                        Toast.makeText(this, "Sign in to Codex first.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
                     Prefs.setVoiceEngine(this, v);
                     render();
-                }), topGap(8));
+                }, noVoice, this::needSignIn), topGap(8));
         String engineNote = "claude".equals(engine)
                 ? "Claude Code's dictation on your Claude plan: very accurate. Supports English, French, German, Spanish, "
                 + "Italian, Portuguese, Dutch, Turkish, Russian, Japanese and more, but not Arabic: for Arabic, Buddy uses "
@@ -222,13 +269,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         vc.addView(fieldLabel("Voice output", null), topGap(16));
         String speech = Prefs.speechEngine(this);
         vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"chatgpt", "ChatGPT"}}, speech, false, v -> {
-            if ("chatgpt".equals(v) && !SetupState.signedIn(this, "codex")) {
-                Toast.makeText(this, "Sign in to Codex first.", Toast.LENGTH_LONG).show();
-                return;
-            }
             Prefs.setSpeechEngine(this, v);
             render();
-        }), topGap(8));
+        }, noVoice, this::needSignIn), topGap(8));
         vc.addView(text(this, "chatgpt".equals(speech)
                 ? "Replies are read in ChatGPT's natural voice (your ChatGPT plan, through Codex). It counts toward "
                 + "your ChatGPT voice usage; if it's unavailable, the phone's voice reads instead."
@@ -389,11 +432,18 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ex.addView(perms, full());
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
-        ex.addView(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
+        ex.addView(protect(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
                 + "~/.buddy/work, so it can build and install apps.", dev, on -> {
             Prefs.setDevMode(this, on);
             render();
-        }), full());
+        })), full());
+        ex.addView(divider(), lineParams());
+        ex.addView(protect(switchRow(this, "Let agents tap Buddy's screens", "For testing Buddy with an agent (for "
+                + "example Claude Code in Termux with the phone tools). The bubble, approval cards, App permissions and "
+                + "these switches stay off-limits.", Prefs.agentsTapBuddy(this), on -> {
+            Prefs.setAgentsTapBuddy(this, on);
+            render();
+        })), full());
         if (dev) {
             LinearLayout warn = row(this);
             warn.setGravity(Gravity.TOP);
@@ -724,12 +774,32 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         startActivity(new Intent(this, SignInActivity.class).putExtra("agent", agent));
     }
 
+    /** Which agent the "phone tools in your own sessions" command is for. */
+    private String mcpAgent = "claude";
+
+    /** Agents that can't answer chats yet (not installed or not signed in): greyed out in pickers. */
+    private java.util.Set<String> notReady() {
+        java.util.Set<String> s = new java.util.HashSet<>();
+        for (Account a : Account.ALL) if (!SetupState.signedIn(this, a.agent)) s.add(a.agent);
+        return s;
+    }
+
+    /** A greyed-out voice option was tapped: say which agent it needs, and offer to set it up. */
+    private void needSignIn(String option) {
+        String agent = "claude".equals(option) ? "claude" : "codex";
+        confirmSheet(this, "Sign in to " + Account.nameOf(agent) + " first",
+                ("claude".equals(option) ? "Claude's dictation" : "ChatGPT's voice") + " runs on your "
+                        + ("claude".equals(option) ? "Claude" : "ChatGPT") + " plan through " + Account.nameOf(agent) + ".",
+                "Set up " + Account.nameOf(agent), false, () -> openAgent(agent));
+    }
+
     /** An agent with its state (not installed / signed out / signed in); tap to install or sign in. */
     private View agentRow(String agent) {
         Account a = Account.of(agent);
         String st = Prefs.agentState(this, agent);
         boolean busy = a.step == Account.Step.INSTALLING;
         String state = busy ? "installing…" : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? "not installed"
+                : a.opencode() ? "ready" + (a.plan.isEmpty() ? "" : " · " + a.plan)
                 : "SIGNED_IN".equals(st) ? "signed in" + (a.email.isEmpty() ? "" : " · " + a.email) : "not signed in";
         LinearLayout r = row(this);
         r.setPadding(0, dp(this, 10), 0, dp(this, 10));

@@ -82,6 +82,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         Account.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
+        Account.OPENCODE.refresh(this);
     }
 
     @Override
@@ -219,7 +220,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         }
         col.addView(first, full());
 
-        String agent = "codex".equals(ses.backend) ? "codex" : "claude-code";
+        String agent = Account.cliOf(ses.backend);
         col.addView(single(monoText(this, agent + " · " + Models.label(ses.backend, ses.model).toLowerCase(Locale.ROOT),
                 12, MUTED)));
         if (ses.running) {
@@ -260,11 +261,15 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         c.addView(h);
         final Dialog[] d = new Dialog[1];
         String def = Prefs.backend(this);
-        String[][] agents = {{"claude", "Claude Code", "Uses your Claude plan"}, {"codex", "Codex", "Uses your ChatGPT plan"}};
-        for (String[] a : agents) {
+        for (Account acc : Account.ALL) {
+            String[] a = {acc.agent, acc.name(), acc.tagline()};
+            // agents that aren't set up are greyed out; tapping one opens its setup instead of a chat
+            boolean ready = SetupState.signedIn(this, acc.agent);
+            if (!ready) a[2] = SetupState.installed(this, acc.agent) ? "Not signed in · tap to set up" : "Not installed · tap to set up";
             LinearLayout r = row(this);
             r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             r.setBackgroundResource(ripple(this, false));
+            if (!ready) r.setAlpha(0.45f);
             r.addView(agentTile(this, a[0]));
             LinearLayout t = column(this);
             t.setPadding(dp(this, 14), 0, 0, 0);
@@ -284,7 +289,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
             r.setOnClickListener(v -> {
                 d[0].dismiss();
-                open(hub.create(a[0]));
+                if (ready) open(hub.create(a[0]));
+                else startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a[0]));
             });
             c.addView(r, full());
         }

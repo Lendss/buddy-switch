@@ -48,7 +48,8 @@ import org.json.JSONObject;
 /** The floating Buddy bubble and its mini chat panel, drawn as an accessibility overlay. */
 final class Bubble implements ChatHub.Listener {
     interface ConfirmCallback {
-        void onAnswer(boolean approved);
+        /** change: what the user wants changed first (approved is then false), or null. */
+        void onAnswer(boolean approved, String change);
     }
 
 
@@ -319,9 +320,17 @@ final class Bubble implements ChatHub.Listener {
         Button deny = actionButton("Deny", Ui.ERR_SOFT);
         deny.setTextColor(Ui.ERR);
         deny.setOnClickListener(v -> answerConfirm(false));
+        // Change: the user types or says what to change, and the agent gets that back instead of a yes/no
+        Button change = actionButton("Change", Ui.CARD);
+        change.setTextColor(Ui.TEXT);
+        change.setOnClickListener(v -> startChange());
         Button approve = actionButton("Approve", Ui.ACCENT);
         approve.setOnClickListener(v -> answerConfirm(true));
         row.addView(deny);
+        LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        changeLp.leftMargin = dp(8);
+        row.addView(change, changeLp);
         LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         alp.leftMargin = dp(8);
@@ -863,6 +872,7 @@ final class Bubble implements ChatHub.Listener {
     private void onBack() {
         root.removeCallbacks(outsideCollapse);
         if (keyboardVisible()) hideKeyboard();
+        else if (changing) endChange();
         else if (pendingConfirm != null) answerConfirm(false);
         else collapse();
     }
@@ -891,6 +901,11 @@ final class Bubble implements ChatHub.Listener {
     private void send() {
         String text = input.getText().toString().trim();
         if (text.isEmpty()) return;
+        if (changing && pendingConfirm != null) {
+            input.setText("");
+            answerChange(text);
+            return;
+        }
         String err = hub.send(sessions.current, text);
         if (err != null) {
             toast(err);
@@ -1118,7 +1133,7 @@ final class Bubble implements ChatHub.Listener {
         if (voiceBar != null) showVoiceBar(false);
         mic.setBackground(null);
         mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
-        input.setHint("Ask " + sessions.current.brainName() + "…");
+        input.setHint(changing ? "What should change?" : "Ask " + sessions.current.brainName() + "…");
     }
 
     private void stop() {
@@ -1154,8 +1169,10 @@ final class Bubble implements ChatHub.Listener {
     private void renderSessionList() {
         sessionList.removeAllViews();
         LinearLayout add = new LinearLayout(svc);
-        add.addView(smallButton("+ Claude Code", v -> newChat("claude")));
-        add.addView(smallButton("+ Codex", v -> newChat("codex")));
+        // only agents that are set up (installed and signed in) get a "+" button
+        for (Account a : Account.ALL) {
+            if (SetupState.signedIn(svc, a.agent)) add.addView(smallButton("+ " + a.name(), v -> newChat(a.agent)));
+        }
         sessionList.addView(add);
         for (final Sessions.Session ses : sessions.all) {
             LinearLayout row = new LinearLayout(svc);
@@ -1257,8 +1274,49 @@ final class Bubble implements ChatHub.Listener {
         if (pendingConfirm != null) answerConfirm(approved);
     }
 
+    /** "Change" from the chat screen's inline approval card. */
+    void changeFromApp(String change) {
+        if (pendingConfirm != null) answerChange(change);
+    }
+
+    /** The user tapped Change: the composer (typing or the mic) now answers the card with what to change. */
+    private boolean changing;
+
+    private void startChange() {
+        if (pendingConfirm == null) return;
+        changing = true;
+        input.setHint("What should change?");
+        input.requestFocus();
+        input.postDelayed(() -> {
+            InputMethodManager imm = svc.getSystemService(InputMethodManager.class);
+            imm.showSoftInput(input, 0);
+        }, 150);
+    }
+
+    private void endChange() {
+        changing = false;
+        input.setHint("Ask " + sessions.current.brainName() + "…");
+        hideKeyboard();
+    }
+
+    private void answerChange(String change) {
+        ConfirmCallback cb = pendingConfirm;
+        pendingConfirm = null;
+        endChange();
+        confirmCard.setVisibility(View.GONE);
+        // OpenCode chats show the answer on the approval step itself (it arrives after the answer)
+        if (!"opencode".equals(sessions.current.backend)) {
+            hub.note(sessions.current, Kind.STEP, "✎ Change requested: " + clip(change, 80));
+        }
+        if (cb != null) cb.onAnswer(false, change);
+        refreshStatus();
+        collapse();
+        hub.changed();
+    }
+
     void askConfirm(String summary, ConfirmCallback cb) {
-        if (pendingConfirm != null) pendingConfirm.onAnswer(false);
+        if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
+        if (changing) endChange();
         pendingConfirm = cb;
         root.setVisibility(View.VISIBLE);
         confirmText.setText(summary);
@@ -1276,6 +1334,7 @@ final class Bubble implements ChatHub.Listener {
 
     void cancelConfirm() {
         pendingConfirm = null;
+        if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         refreshStatus();
         hub.changed();
@@ -1284,9 +1343,12 @@ final class Bubble implements ChatHub.Listener {
     private void answerConfirm(boolean approved) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
+        if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
-        hub.note(sessions.current, Kind.STEP, approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
-        if (cb != null) cb.onAnswer(approved);
+        if (!"opencode".equals(sessions.current.backend)) {
+            hub.note(sessions.current, Kind.STEP, approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
+        }
+        if (cb != null) cb.onAnswer(approved, null);
         refreshStatus();
         collapse();
         hub.changed();

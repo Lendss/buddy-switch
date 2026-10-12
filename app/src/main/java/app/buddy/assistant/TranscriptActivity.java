@@ -47,7 +47,7 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
         LinearLayout titles = column(this);
         titles.setPadding(dp(this, 4), 0, 0, 0);
         titles.addView(single(title(this, title, 16)));
-        titles.addView(single(monoText(this, ("codex".equals(agent) ? "codex" : "claude-code")
+        titles.addView(single(monoText(this, Account.cliOf(agent)
                 + (cwd != null && !cwd.isEmpty() ? " · " + cwd : ""), 12, MUTED)));
         top.addView(titles, weight1());
         root.addView(top, full());

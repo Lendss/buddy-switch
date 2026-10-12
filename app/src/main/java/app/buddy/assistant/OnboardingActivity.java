@@ -128,7 +128,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     static String[] wanted(Context c) {
         String a = Prefs.agents(c);
         if ("both".equals(a)) return new String[]{"claude", "codex"};
-        return new String[]{"codex".equals(a) ? "codex" : "claude"};
+        return new String[]{"codex".equals(a) || "opencode".equals(a) ? a : "claude"};
     }
 
     private void go(int s) {
@@ -176,7 +176,8 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                                 + "only when you ask it to do something.", ok);
                 if (!ok) {
                     note("Nothing leaves the phone except what " + agentNames() + " sends to "
-                            + ("codex".equals(Prefs.agents(this)) ? "OpenAI" : "Anthropic")
+                            + ("codex".equals(Prefs.agents(this)) ? "OpenAI" : "opencode".equals(Prefs.agents(this))
+                            ? "the model's provider" : "Anthropic")
                             + " to answer you. Sending, posting, buying and deleting always ask for your OK first.");
                     if (accessTries > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) restrictedHelp();
                     note("In the list: Downloaded apps → Buddy assistant → turn it on.");
@@ -253,12 +254,13 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     }
 
     private void brain() {
-        header(R.drawable.ms_forum, "Choose your agent", "Who answers your chats. You can add the other one later.", false);
+        header(R.drawable.ms_forum, "Choose your agent", "Who answers your chats. You can add others later in Settings.", false);
         String cur = Prefs.agents(this);
         String[][] opts = {
                 {"claude", "Claude Code", "Uses your Claude subscription (Pro or Max)."},
                 {"codex", "Codex", "Uses your ChatGPT plan."},
-                {"both", "Both", "Install both; pick per chat. Claude Code stays the default."},
+                {"opencode", "OpenCode", "Free models, no account needed. Connect your own providers later."},
+                {"both", "Claude Code + Codex", "Install both; pick per chat. Claude Code stays the default."},
         };
         for (String[] o : opts) {
             boolean on = o[0].equals(cur);
@@ -296,7 +298,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             r.addView(radio(on));
             r.setOnClickListener(v -> {
                 Prefs.setAgents(this, o[0]);
-                Prefs.setBackend(this, "codex".equals(o[0]) ? "codex" : "claude");
+                Prefs.setBackend(this, "codex".equals(o[0]) || "opencode".equals(o[0]) ? o[0] : "claude");
                 render();
             });
             LinearLayout.LayoutParams p = full();
@@ -323,7 +325,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             LinearLayout t = column(this);
             t.setPadding(dp(this, 12), 0, 0, 0);
             t.addView(title(this, acc.name(), 15));
-            t.addView(single(monoText(this, signed ? "signed in" + (acc.email.isEmpty() ? "" : " · " + acc.email)
+            t.addView(single(monoText(this, signed ? (acc.opencode() ? "ready · " + (acc.plan.isEmpty() ? "free models" : acc.plan) : "signed in" + (acc.email.isEmpty() ? "" : " · " + acc.email))
                     : installing ? "installing…" : installed ? "installed · not signed in" : "not installed", 12,
                     signed ? OK : MUTED)));
             r.addView(t, weight1());
@@ -334,13 +336,15 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 TextView how = text(this, installing ? acc.detail
                         : acc.step == Account.Step.ERROR ? acc.detail
                         : installed ? (acc.claude() ? "Sign in with your Claude account. Your browser opens; tap Authorize "
-                        + "and Buddy comes back by itself." : "Sign in with your ChatGPT account in the browser, then come back.")
+                        + "and Buddy comes back by itself." : acc.opencode() ? "Checking OpenCode…"
+                        : "Sign in with your ChatGPT account in the browser, then come back.")
                         : (acc.claude() ? "Downloads about 235 MB once (Buddy's Linux and Claude Code from Anthropic)."
+                        : acc.opencode() ? "Downloads about 230 MB once (Buddy's Linux, Node.js and OpenCode). No account needed."
                         : "Downloads about 150 MB once (Buddy's Linux, Node.js and Codex from OpenAI)."), 14,
                         acc.step == Account.Step.ERROR ? ERR : MUTED);
                 how.setPadding(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
                 card.addView(how);
-                if (!installing) {
+                if (!installing && !(installed && acc.opencode())) {
                     Button b = button(this, installed ? (acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT")
                             : "Install " + acc.name(), first);
                     b.setOnClickListener(v -> {
@@ -544,7 +548,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
 
     private String agentNames() {
         String a = Prefs.agents(this);
-        return "both".equals(a) ? "Claude Code and Codex" : "codex".equals(a) ? "Codex" : "Claude Code";
+        return "both".equals(a) ? "Claude Code and Codex" : Account.nameOf(a);
     }
 
     private void openAppInfo(String pkg) {

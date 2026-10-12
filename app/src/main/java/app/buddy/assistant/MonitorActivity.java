@@ -191,7 +191,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         }
         for (final JSONObject p : sessions) {
             final String backend = p.optString("agent");
-            final String agent = "codex".equals(backend) ? "Codex" : "Claude Code";
+            final String agent = Account.nameOf(backend);
             final Sessions.Session chat = hub.sessions.find(p.optString("buddy"));
             final String kind = p.optString("kind", "terminal");
             final boolean background = "background".equals(kind);
@@ -221,7 +221,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
                 tags.addView(id);
             }
             card.addView(tags, full());
-            TextView meta = single(monoText(this, ("codex".equals(backend) ? "codex" : "claude-code") + " · pid "
+            TextView meta = single(monoText(this, Account.cliOf(backend) + " · pid "
                     + p.optLong("pid") + " · " + shortPath(p.optString("cwd")), 12, MUTED));
             meta.setPadding(0, dp(this, 4), 0, 0);
             card.addView(meta);
@@ -318,7 +318,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
                 first.addView(tag, tp);
             }
             col.addView(first, full());
-            TextView meta = single(monoText(this, ("codex".equals(backend) ? "codex" : "claude-code") + " · "
+            TextView meta = single(monoText(this, Account.cliOf(backend) + " · "
                     + MainActivity.ago(s.optLong("mtime") * 1000) + " · " + shortPath(s.optString("cwd")), 12, MUTED));
             meta.setPadding(0, dp(this, 3), 0, 0);
             col.addView(meta);

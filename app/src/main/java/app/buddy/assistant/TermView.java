@@ -58,6 +58,10 @@ final class TermView extends View {
     private long selA, selB;  // start / end line
     private int colA, colB;   // start / end column, inclusive
     private int dragging;     // 0 none, 1 start handle, 2 end handle
+    /** The finger that long-pressed is still down and extends the selection from the pressed word. */
+    private boolean fromLongPress;
+    private long wordLn;
+    private int wordA, wordB;
     private android.view.ActionMode actionMode;
     private final float handleR;
 
@@ -424,6 +428,7 @@ final class TermView extends View {
             switch (e.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     dragging = handleAt(e.getX(), e.getY());
+                    fromLongPress = false;
                     if (dragging != 0) {
                         if (actionMode != null) actionMode.hide(60_000);
                         return true;
@@ -443,7 +448,17 @@ final class TermView extends View {
                             actionMode.invalidateContentRect();
                             actionMode.hide(0);
                         }
-                        gestures.onTouchEvent(e);
+                        if (fromLongPress) {
+                            gestures.onTouchEvent(e); // it saw this finger go down: let it end the long press
+                        } else {
+                            // a handle drag the detector never saw start: cancel it, or it takes the lift for a
+                            // tap (left over from the long press) and clears the selection
+                            MotionEvent c = MotionEvent.obtain(e);
+                            c.setAction(MotionEvent.ACTION_CANCEL);
+                            gestures.onTouchEvent(c);
+                            c.recycle();
+                        }
+                        fromLongPress = false;
                         return true;
                     }
                     break;
@@ -490,9 +505,13 @@ final class TermView extends View {
             selA = selB = ln;
             colA = a;
             colB = b;
+            wordLn = ln;
+            wordA = a;
+            wordB = b;
         }
         selecting = true;
         dragging = 2; // keep moving the finger to extend
+        fromLongPress = true;
         performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS);
         invalidate();
         showToolbar();
@@ -622,7 +641,26 @@ final class TermView extends View {
     }
 
     private void moveHandle(float x, float y) {
-        // the finger sits below the text: aim a little above it
+        if (fromLongPress) {
+            // the finger is on the text itself: extend from the pressed word, keeping all of it
+            long ln = lineFor(y);
+            int col = colFor(x);
+            if (!before(wordLn, wordA, ln, col)) { // before the word: select from here to the word's end
+                selA = wordLn;
+                colA = wordB;
+                selB = ln;
+                colB = col;
+            } else {
+                selA = wordLn;
+                colA = wordA;
+                boolean inWord = before(ln, col, wordLn, wordB);
+                selB = inWord ? wordLn : ln;
+                colB = inWord ? wordB : col;
+            }
+            invalidate();
+            return;
+        }
+        // dragging a handle: the finger sits below the text, so aim a little above it
         long ln = lineFor(y - handleR * 1.5f);
         int col = colFor(x);
         if (dragging == 1) {
@@ -651,9 +689,9 @@ final class TermView extends View {
             public boolean onPrepareActionMode(android.view.ActionMode m, android.view.Menu menu) {
                 menu.clear();
                 menu.add(0, 1, 0, "Copy");
-                menu.add(0, 2, 1, "Paste");
-                menu.add(0, 3, 2, "Select all");
-                if (selectedLink() != null) menu.add(0, 4, 3, "Open link");
+                if (selectedLink() != null) menu.add(0, 4, 1, "Open link"); // up front, not in the overflow
+                menu.add(0, 2, 2, "Paste");
+                menu.add(0, 3, 3, "Select all");
                 menu.add(0, 5, 4, "Share");
                 return true;
             }

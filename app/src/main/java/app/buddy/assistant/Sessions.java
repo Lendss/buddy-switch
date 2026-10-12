@@ -61,7 +61,7 @@ final class Sessions {
         }
 
         String brainName() {
-            return "codex".equals(backend) ? "Codex" : "Claude Code";
+            return Account.nameOf(backend);
         }
 
         String label() {

@@ -219,11 +219,14 @@ final class Guard {
         return ok;
     }
 
-    /** What a tap at (x, y) would hit: the topmost window's deepest node there. */
+    /** What a tap at (x, y) would hit: the topmost app window's deepest node there. */
     static AccessibilityNodeInfo nodeAt(List<AccessibilityWindowInfo> windows, int x, int y) {
         AccessibilityWindowInfo top = null;
         Rect r = new Rect();
         for (AccessibilityWindowInfo w : windows) {
+            // Buddy's floating bubble and panel let taps through while a gesture runs (see
+            // BuddyService.setBubblePassThrough), so what counts is the app underneath
+            if (w.getType() == AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue;
             w.getBoundsInScreen(r);
             if (!r.contains(x, y)) continue;
             if (top == null || w.getLayer() > top.getLayer()) top = w;
@@ -248,10 +251,27 @@ final class Guard {
         return n;
     }
 
-    /** Is this Buddy's own UI (the bubble, its approval card)? The agent never taps those. */
+    /** Is this Buddy's own UI (its screens, the bubble, its approval card)? */
     static boolean isBuddy(AccessibilityNodeInfo n) {
         return n != null && n.getPackageName() != null
                 && BuildInfo.class.getPackage().getName().contentEquals(n.getPackageName());
+    }
+
+    /**
+     * Must the agent keep out of this node? All of Buddy's UI, unless the user turned on "Let agents tap Buddy's
+     * screens"; even then the protected parts (Ui.protect: approval cards, App permissions, the developer
+     * switches) stay off-limits. The bubble and its card are overlays that taps never land on (see nodeAt).
+     */
+    static boolean offLimits(android.content.Context c, AccessibilityNodeInfo n) {
+        if (!isBuddy(n)) return false;
+        if (!Prefs.agentsTapBuddy(c)) return true;
+        AccessibilityNodeInfo cur = n;
+        for (int i = 0; cur != null && i < 60; i++) {
+            if (cur.getExtras().getBoolean(Ui.PROTECTED, false)) return true;
+            if (cur.getWindow() != null && cur.getWindow().getType() == AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) return true;
+            cur = cur.getParent();
+        }
+        return false;
     }
 
     /**
