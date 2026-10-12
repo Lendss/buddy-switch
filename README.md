@@ -1,12 +1,47 @@
+<p align="center">
+  <img src="docs/banner.png" alt="Buddy: Claude Code, Codex and OpenCode in a bubble on your Android phone" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest"><img src="https://img.shields.io/github/v/release/ghorbelhamdi/buddy-android?style=for-the-badge&label=release" alt="Latest release"></a>
+  <a href="https://github.com/ghorbelhamdi/buddy-android/releases"><img src="https://img.shields.io/github/downloads/ghorbelhamdi/buddy-android/total?style=for-the-badge" alt="Downloads"></a>
+  <img src="https://img.shields.io/badge/Android-11%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android 11+">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/ghorbelhamdi/buddy-android?style=for-the-badge" alt="License: Apache-2.0"></a>
+</p>
+
 # Buddy
 
-**A floating chat bubble that lets Claude Code (or Codex, or OpenCode) use your Android phone.**
+**A floating chat bubble that lets Claude Code, Codex or OpenCode use your Android phone.**
 
-Type a request into the bubble ("reply to Sam that I'm running late", "add a Nintendo Switch 2 to my Amazon cart") and Buddy reads the screen, taps, types and scrolls to get it done. It asks for your approval before anything that sends, posts, buys or deletes.
+Type or say what you want ("reply to Sam that I'm running late", "add a Nintendo Switch 2 to my Amazon cart") and Buddy reads the screen, taps, types and scrolls to get it done. It asks you before anything that sends, posts, buys or deletes.
 
-Buddy runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, or OpenAI's Codex CLI with your ChatGPT plan. Or [OpenCode](https://opencode.ai), which works with its **free models and no account at all**, or with your own providers. They all run **inside the app**, in Buddy's own small Linux on the phone: no Termux, no PC. The app has no API key, no server and no account of its own.
+It runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, or [OpenCode](https://opencode.ai) with its **free models and no account at all**. Everything runs **inside the app**, in Buddy's own small Linux on the phone: no PC, no adb, no root, no API key.
 
-**[⬇ Download the APK](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk)** (Android 11+, 64-bit phones)
+<p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>⬇ Download buddy.apk</b></a> · Android 11+, 64-bit · <a href="#setup">Setup</a> · <a href="#faq">FAQ</a></p>
+
+<!-- DEMO_VIDEO -->
+<p align="center"><a href="docs/buddy-demo.mp4">▶ Watch the 50-second demo</a> (lights, then a pizza order changed mid-task)</p>
+
+<table>
+  <tr>
+    <td width="33%" align="center"><img src="docs/screens/chats.jpg" alt="Chats with Claude Code, Codex and OpenCode"><br><sub>Chats with any of the three agents</sub></td>
+    <td width="33%" align="center"><img src="docs/screens/chat.jpg" alt="A chat with grouped tool calls"><br><sub>Tool calls fold into one line</sub></td>
+    <td width="33%" align="center"><img src="docs/screens/settings.jpg" alt="Settings"><br><sub>Setup guide and themes</sub></td>
+  </tr>
+</table>
+
+## What it can do
+
+<table>
+<tr><td><b>Uses your apps for you</b></td><td>Messages, shopping, smart home, settings, games: anything on screen. Add instructions while it works, by typing or by voice.</td></tr>
+<tr><td><b>Your agent, your plan</b></td><td>Claude Code (Opus, Sonnet, Haiku…), Codex, or OpenCode's free models. Pick the model per chat.</td></tr>
+<tr><td><b>Asks before it acts</b></td><td>Approve, Deny, or <b>Change</b> ("make it 9, add a smiley") before anything is sent, posted, bought or deleted. Messaging, shopping and money apps start on a <b>hard limit</b> that Buddy itself enforces.</td></tr>
+<tr><td><b>Asks when it's unsure</b></td><td>Questions come as a card with answer buttons, or type your own answer.</td></tr>
+<tr><td><b>Voice</b></td><td>Talk to it with the phone's recognizer, Claude's or ChatGPT's dictation, and hear replies in ChatGPT's voices.</td></tr>
+<tr><td><b>Phone tools for your own sessions</b></td><td>The same tools as a local MCP server, for Claude Code, Codex or OpenCode in any terminal, or a Remote Control session in your Claude app.</td></tr>
+<tr><td><b>Builds apps</b></td><td>In developer mode: "make me a calculator app" builds and installs a real APK, on the phone.</td></tr>
+<tr><td><b>Updates itself</b></td><td>A notice when a new version is out, or just ask: "update yourself".</td></tr>
+</table>
 
 > **Status: 2.1, early.** It works well day to day but still has rough edges. Tested on a OnePlus 12 (OxygenOS, Android 16); other Android 11+ phones should work, but may need battery settings adjusted.
 >
@@ -50,8 +85,6 @@ You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan
 | Try it | A first chat with a ready-made prompt |
 
 **Android blocked the install?** Play Protect may say *"App blocked to protect your device"* for apps that use Accessibility and come from a browser: tap **More details → Install anyway** (or install from a file manager). On Android 13+, if *Buddy assistant* is greyed out in Accessibility, open App info → ⋮ → **Allow restricted settings** first.
-
-Updating from 1.x (Termux): install the new APK, then install and sign in to your agent in Settings. Termux isn't needed anymore. Chats from the Termux days can't be continued; Settings offers to remove them.
 
 ## Updating
 
@@ -133,9 +166,29 @@ An accessibility service is powerful. Please read this before installing.
 
 Found a security problem? Please open a private security advisory on GitHub rather than a public issue.
 
-## Build
+## FAQ
 
-### Android Studio / Gradle
+**What does it cost?** Buddy is free. The agent runs on your existing Claude or ChatGPT plan (it uses your plan's limits), or on OpenCode's free models at no cost.
+
+**Does it work on iPhone?** No. iOS doesn't let apps operate other apps.
+
+**Which phones?** 64-bit Android 11 or newer. It's tested most on a OnePlus 12; on some brands you need to set Buddy's battery use to *Unrestricted* so Android doesn't stop it.
+
+**Why isn't it on Google Play?** Play's accessibility policy doesn't allow AI agents that operate other apps. Updates come from this repo: Buddy tells you when one is out (see [Updating](#updating)).
+
+**Can it see my passwords or pay for things?** It never types passwords, codes or payment details; it hands those to you. Paying, sending and deleting need your OK, enforced by Buddy itself in the apps on a hard limit. See [Security](#security).
+
+**Does it need a computer, adb or root?** No. Everything happens on the phone.
+
+## Contributing
+
+Bug reports and ideas are welcome in [Issues](https://github.com/ghorbelhamdi/buddy-android/issues), and pull requests too. If Buddy is useful to you, a ⭐ helps other people find it.
+
+## For developers
+
+### Build
+
+#### Android Studio / Gradle
 
 ```
 ./gradlew assembleRelease
@@ -143,7 +196,7 @@ Found a security problem? Please open a private security advisory on GitHub rath
 
 Release signing reads `BUDDY_KEYSTORE`, `BUDDY_KEYSTORE_PASSWORD` (and optionally `BUDDY_KEY_ALIAS`, `BUDDY_KEY_PASSWORD`) from the environment; without them the APK is unsigned. GitHub Actions builds every push and attaches the APK to a release for `v*` tags.
 
-### On the phone, without Gradle
+#### On the phone, without Gradle
 
 In Termux (or any Linux with these tools):
 
@@ -157,7 +210,7 @@ pkg install openjdk-17 aapt2 d8 apksigner python
 
 The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 
-## Project layout
+### Project layout
 
 | Path | What it is |
 |---|---|
