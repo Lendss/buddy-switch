@@ -102,11 +102,11 @@ final class Prefs {
 
     /** The user agreed to the accessibility disclosure (shown before Android's accessibility settings). */
     static boolean a11yConsent(Context c) {
-        return sp(c).getBoolean("a11y_consent", false);
+        return sp(c).getBoolean("a11y_consent_v3", false);
     }
 
     static void setA11yConsent(Context c) {
-        sp(c).edit().putBoolean("a11y_consent", true).apply();
+        sp(c).edit().putBoolean("a11y_consent_v3", true).apply();
     }
 
     static int helperVersion(Context c) {
