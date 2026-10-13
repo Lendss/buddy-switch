@@ -11,6 +11,7 @@ INFO=app/src/main/java/app/buddy/assistant/BuildInfo.java
 VERSION_NAME=$(sed -n 's/.*VERSION = "\(.*\)";/\1/p' "$INFO")
 VERSION_CODE=$(sed -n 's/.*VERSION_CODE = \([0-9]*\);/\1/p' "$INFO")
 SRC=app/src/main
+FLAVOR=${FLAVOR:-github} # github or play (see app/build.gradle.kts)
 OUT=build
 
 rm -rf "$OUT"
@@ -22,6 +23,8 @@ aapt2 compile --dir "$SRC/res" -o "$OUT/res.zip"
 echo "2/6 Linking resources and manifest"
 # The manifest has no package attribute (Gradle uses `namespace`), so add it for aapt2.
 sed "s|<manifest |<manifest package=\"$PACKAGE\" |" "$SRC/AndroidManifest.xml" > "$OUT/AndroidManifest.xml"
+# The play flavor drops REQUEST_INSTALL_PACKAGES (Gradle does this with app/src/play/AndroidManifest.xml).
+[ "$FLAVOR" = play ] && sed -i '/REQUEST_INSTALL_PACKAGES/d' "$OUT/AndroidManifest.xml"
 aapt2 link -I "$SDK_JAR" --manifest "$OUT/AndroidManifest.xml" \
   --min-sdk-version 30 --target-sdk-version 36 \
   --version-code "$VERSION_CODE" --version-name "$VERSION_NAME" \
@@ -29,7 +32,7 @@ aapt2 link -I "$SDK_JAR" --manifest "$OUT/AndroidManifest.xml" \
 
 echo "3/6 Compiling Java"
 javac --release 8 -classpath "$SDK_JAR" -Xlint:-options -encoding UTF-8 \
-  -d "$OUT/classes" $(find "$SRC/java" "$OUT/gen" -name '*.java')
+  -d "$OUT/classes" $(find "$SRC/java" "app/src/$FLAVOR/java" "$OUT/gen" -name '*.java')
 
 echo "4/6 Dexing"
 d8 --release --min-api 30 --lib "$SDK_JAR" --output "$OUT/dex" $(find "$OUT/classes" -name '*.class')

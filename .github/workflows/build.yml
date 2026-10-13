@@ -33,15 +33,15 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
           echo "BUDDY_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
-      - name: Build release APK
+      - name: Build release APK (GitHub) and bundle (Google Play)
         env:
           BUDDY_KEYSTORE_PASSWORD: ${{ secrets.BUDDY_KEYSTORE_PASSWORD }}
-        run: ./gradlew --no-daemon assembleRelease
+        run: ./gradlew --no-daemon assembleGithubRelease bundlePlayRelease
 
       - name: Collect APK
         run: |
           mkdir -p dist
-          apk=$(find app/build/outputs/apk/release -name '*.apk' | head -1)
+          apk=$(find app/build/outputs/apk/github/release -name '*.apk' | head -1)
           cp "$apk" "dist/buddy-${GITHUB_REF_NAME//\//-}.apk"
           # fixed name too, so releases/latest/download/buddy.apk always gets the newest version
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then cp "$apk" dist/buddy.apk; fi
@@ -51,6 +51,12 @@ jobs:
         with:
           name: buddy-apk
           path: dist/*.apk
+
+      # The Play bundle is uploaded to the Play Console by hand; it's never attached to the GitHub release.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: buddy-play-aab
+          path: app/build/outputs/bundle/playRelease/*.aab
 
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')

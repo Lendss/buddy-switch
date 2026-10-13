@@ -68,7 +68,7 @@ final class Prefs {
     /** Developer mode: the bubble's agent may run commands and edit files in ~/.buddy/work. */
     /** Notify when a new Buddy release is out (checked about once a day). */
     static boolean updateNotices(Context c) {
-        return sp(c).getBoolean("update_notices", true);
+        return !Flavor.PLAY && sp(c).getBoolean("update_notices", true);
     }
 
     static void setUpdateNotices(Context c, boolean on) {
@@ -93,11 +93,20 @@ final class Prefs {
     }
 
     static boolean devMode(Context c) {
-        return sp(c).getBoolean("dev", false);
+        return !Flavor.PLAY && sp(c).getBoolean("dev", false);
     }
 
     static void setDevMode(Context c, boolean on) {
         sp(c).edit().putBoolean("dev", on).apply();
+    }
+
+    /** The user agreed to the accessibility disclosure (shown before Android's accessibility settings). */
+    static boolean a11yConsent(Context c) {
+        return sp(c).getBoolean("a11y_consent", false);
+    }
+
+    static void setA11yConsent(Context c) {
+        sp(c).edit().putBoolean("a11y_consent", true).apply();
     }
 
     static int helperVersion(Context c) {

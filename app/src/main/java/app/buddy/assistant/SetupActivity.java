@@ -120,7 +120,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     + "Tap App info, then ⋮ in the top right → Allow restricted settings, and try again.";
         }
         steps[0] = step("Turn on the Buddy accessibility service", a11yText, a11y,
-                a11y ? null : "Open settings", v -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)),
+                a11y ? null : "Open settings", v -> openAccessibilitySettings(this),
                 a11y || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ? null : "App info", v -> openAppInfo(getPackageName()));
 
         boolean installed = SetupState.installed(this, backend);
@@ -420,24 +420,26 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     if (!on) Voice.stopSpeaking();
                 }), full());
         ex.addView(divider(), lineParams());
-        ex.addView(switchRow(this, "Update notices", "Buddy checks GitHub once a day and notifies you when a new "
-                + "version is out.", Prefs.updateNotices(this), on -> {
-            Prefs.setUpdateNotices(this, on);
-            if (!on) Updates.cancel(this);
-            else Prefs.setUpdateNotified(this, ""); // notify again about a version muted before
-        }), full());
-        ex.addView(divider(), lineParams());
-        LinearLayout upd = listRow(this);
-        upd.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout ut = column(this);
-        ut.addView(title(this, "Check for updates", 15));
-        ut.addView(text(this, "You have Buddy " + BuildInfo.VERSION + ". Or ask any agent: \u201cupdate yourself\u201d.",
-                13, MUTED), topGap(2));
-        upd.addView(ut, weight1());
-        upd.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-        upd.setOnClickListener(v -> Updates.showSheet(this));
-        ex.addView(upd, full());
-        ex.addView(divider(), lineParams());
+        if (!Flavor.PLAY) { // the Play build is updated by Play
+            ex.addView(switchRow(this, "Update notices", "Buddy checks GitHub once a day and notifies you when a new "
+                    + "version is out.", Prefs.updateNotices(this), on -> {
+                Prefs.setUpdateNotices(this, on);
+                if (!on) Updates.cancel(this);
+                else Prefs.setUpdateNotified(this, ""); // notify again about a version muted before
+            }), full());
+            ex.addView(divider(), lineParams());
+            LinearLayout upd = listRow(this);
+            upd.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout ut = column(this);
+            ut.addView(title(this, "Check for updates", 15));
+            ut.addView(text(this, "You have Buddy " + BuildInfo.VERSION + ". Or ask any agent: \u201cupdate yourself\u201d.",
+                    13, MUTED), topGap(2));
+            upd.addView(ut, weight1());
+            upd.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+            upd.setOnClickListener(v -> Updates.showSheet(this));
+            ex.addView(upd, full());
+            ex.addView(divider(), lineParams());
+        }
         LinearLayout perms = listRow(this);
         perms.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout pt = column(this);
@@ -450,12 +452,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ex.addView(perms, full());
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
-        ex.addView(protect(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
-                + "~/.buddy/work, so it can build and install apps.", dev, on -> {
-            Prefs.setDevMode(this, on);
-            render();
-        })), full());
-        ex.addView(divider(), lineParams());
+        if (!Flavor.PLAY) { // building and installing apps isn't allowed on Play
+            ex.addView(protect(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
+                    + "~/.buddy/work, so it can build and install apps.", dev, on -> {
+                Prefs.setDevMode(this, on);
+                render();
+            })), full());
+            ex.addView(divider(), lineParams());
+        }
         ex.addView(protect(switchRow(this, "Let agents tap Buddy's screens", "For testing Buddy with an agent (for "
                 + "example Claude Code in Termux with the phone tools). The bubble, approval cards, App permissions and "
                 + "these switches stay off-limits.", Prefs.agentsTapBuddy(this), on -> {

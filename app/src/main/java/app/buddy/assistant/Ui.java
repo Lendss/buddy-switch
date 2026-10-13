@@ -454,6 +454,53 @@ final class Ui {
         return d;
     }
 
+    /**
+     * Opens Android's accessibility settings, after the user has agreed to what Buddy's accessibility service does
+     * (Google Play's prominent disclosure: shown in the app, before the permission, with an explicit choice).
+     */
+    static void openAccessibilitySettings(Activity a) {
+        Runnable open = () -> a.startActivity(new android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        if (Prefs.a11yConsent(a)) {
+            open.run();
+            return;
+        }
+        LinearLayout c = column(a);
+        c.addView(title(a, "How Buddy uses accessibility", 18));
+        String[] points = {
+                "Buddy uses Android's accessibility service to do what you ask in other apps: it reads what's on the "
+                        + "screen and taps, types and scrolls for you. It also shows the floating bubble.",
+                "While a task runs, the screen content, which can include personal information such as messages, names "
+                        + "or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, "
+                        + "OpenAI for Codex, or your OpenCode model's provider), only to carry out your request.",
+                "Buddy has no servers of its own. It doesn't collect, sell or share this data, and doesn't use it for ads.",
+                "Before anything that sends, posts, buys or deletes, Buddy asks for your OK. You can turn the service "
+                        + "off anytime in Android's accessibility settings.",
+        };
+        for (String pt : points) {
+            TextView t = text(a, pt, 14, MUTED);
+            t.setPadding(0, dp(a, 8), 0, 0);
+            c.addView(t);
+        }
+        LinearLayout btns = row(a);
+        btns.setPadding(0, dp(a, 18), 0, 0);
+        Button no = button(a, "No thanks", false);
+        Button yes = button(a, "Agree and continue", true);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
+        btns.addView(no, bp);
+        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
+        yp.leftMargin = dp(a, 10);
+        btns.addView(yes, yp);
+        c.addView(btns, full());
+        Dialog d = bottomSheet(a, c);
+        no.setOnClickListener(v -> d.dismiss());
+        yes.setOnClickListener(v -> {
+            Prefs.setA11yConsent(a);
+            d.dismiss();
+            open.run();
+        });
+        d.show();
+    }
+
     /** A sheet asking to confirm; the action runs on the destructive button. */
     static void confirmSheet(Activity a, String title, String message, String action, boolean destructive, Runnable onYes) {
         LinearLayout c = column(a);

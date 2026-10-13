@@ -39,6 +39,14 @@ android {
         }
     }
 
+    // github: the release on GitHub (self-updates, APK installs, developer mode).
+    // play: the Google Play build, without those (Play's policies). Same package, same key.
+    flavorDimensions += "store"
+    productFlavors {
+        create("github") { dimension = "store" }
+        create("play") { dimension = "store" }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

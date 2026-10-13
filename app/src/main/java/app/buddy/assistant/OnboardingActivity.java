@@ -183,7 +183,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                     note("In the list: Downloaded apps → Buddy assistant → turn it on.");
                     primary("Open accessibility settings", v -> {
                         accessTries++;
-                        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                        openAccessibilitySettings(this);
                     });
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         stuck("Switch greyed out?", "Android blocks this for apps installed from a file. Tap App info "

@@ -112,25 +112,27 @@ final class Tools {
                 "question", "options"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
-        t.put(tool("install_apk",
-                "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
-                        + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
-                        + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
-                        + "call wait_for_install next.",
-                props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
-        t.put(tool("update_buddy",
-                "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
-                        + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
-                        + "there's a new version. Only the user can tap Update.",
-                props().put("install", boolProp("true: download the update and open the installer (after the user said yes)"))));
-        t.put(tool("wait_for_install",
-                "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
-                        + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
-                        + "installer is no longer on screen, or after the timeout. Use this instead of shell polling loops.",
-                props().put("package", strProp("Package name, e.g. com.buddyapps.flappy"))
-                        .put("min_version_code", intProp("Wait for at least this versionCode (for updates)"))
-                        .put("timeout_s", intProp("Default 120, max 300")),
-                "package"));
+        if (!Flavor.PLAY) { // Play updates Buddy itself and doesn't allow installing other APKs
+            t.put(tool("install_apk",
+                    "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
+                            + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
+                            + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
+                            + "call wait_for_install next.",
+                    props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
+            t.put(tool("update_buddy",
+                    "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
+                            + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
+                            + "there's a new version. Only the user can tap Update.",
+                    props().put("install", boolProp("true: download the update and open the installer (after the user said yes)"))));
+            t.put(tool("wait_for_install",
+                    "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
+                            + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
+                            + "installer is no longer on screen, or after the timeout. Use this instead of shell polling loops.",
+                    props().put("package", strProp("Package name, e.g. com.buddyapps.flappy"))
+                            .put("min_version_code", intProp("Wait for at least this versionCode (for updates)"))
+                            .put("timeout_s", intProp("Default 120, max 300")),
+                    "package"));
+        }
         return t;
     }
 
@@ -218,8 +220,10 @@ final class Tools {
                 return text(svc.askQuestion(a.getString("question"), options));
             }
             case "update_buddy":
+                if (Flavor.PLAY) return text("Buddy updates through Google Play.");
                 return text(updateBuddy(a.optBoolean("install", false)));
             case "install_apk":
+                if (Flavor.PLAY) return text("Installing APKs isn't available in Buddy from Google Play.");
                 return text(installApk(a.getString("path")));
             case "wait_for_install":
                 return text(waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
