@@ -52,4 +52,4 @@ Buddy is not directed at children under 13.
 
 ## Changes and contact
 
-Changes to this policy are published in this file, with their history in the repository. Questions: open an issue at https://github.com/ghorbelhamdi/buddy-android/issues or email ghorbelhamdi@gmail.com.
+Changes to this policy are published in this file, with their history in the repository. Questions: open an issue at https://github.com/ghorbelhamdi/buddy-android/issues or email duoboard.support@gmail.com.
