@@ -184,6 +184,10 @@ Found a security problem? Please open a private security advisory on GitHub rath
 
 **Does it need a computer, adb or root?** No. Everything happens on the phone.
 
+## In the press
+
+- ProPakistani: [This Free Android App Lets Claude Code Use Your Phone](https://propakistani.pk/2026/10/12/this-free-android-app-lets-claude-code-use-your-phone/) (October 2026)
+
 ## Contributing
 
 Bug reports and ideas are welcome in [Issues](https://github.com/ghorbelhamdi/buddy-android/issues), and pull requests too. If Buddy is useful to you, a ⭐ helps other people find it.
