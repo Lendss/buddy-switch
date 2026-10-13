@@ -454,6 +454,8 @@ final class Ui {
         return d;
     }
 
+    static final String PRIVACY_URL = "https://github.com/ghorbelhamdi/buddy-android/blob/main/docs/PRIVACY.md";
+
     /**
      * Opens Android's accessibility settings, after the user has agreed to what Buddy's accessibility service does
      * (Google Play's prominent disclosure: shown in the app, before the permission, with an explicit choice).
@@ -481,6 +483,11 @@ final class Ui {
             t.setPadding(0, dp(a, 8), 0, 0);
             c.addView(t);
         }
+        TextView policy = text(a, "Privacy policy", 14, ACCENT_TEXT);
+        policy.setPadding(0, dp(a, 10), 0, 0);
+        policy.setOnClickListener(v -> a.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse(PRIVACY_URL))));
+        c.addView(policy);
         LinearLayout btns = row(a);
         btns.setPadding(0, dp(a, 18), 0, 0);
         Button no = button(a, "No thanks", false);

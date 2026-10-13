@@ -489,9 +489,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         list.addView(ver, full());
         TextView lic = text(this, "Open-source licences", 13, ACCENT_TEXT);
         lic.setGravity(Gravity.CENTER);
-        lic.setPadding(0, dp(this, 8), 0, dp(this, 8));
+        lic.setPadding(0, dp(this, 8), 0, dp(this, 4));
         lic.setOnClickListener(v -> licences());
         list.addView(lic, full());
+        TextView priv = text(this, "Privacy policy", 13, ACCENT_TEXT);
+        priv.setGravity(Gravity.CENTER);
+        priv.setPadding(0, dp(this, 4), 0, dp(this, 8));
+        priv.setOnClickListener(v -> openUrl(Ui.PRIVACY_URL));
+        list.addView(priv, full());
     }
 
     // ------------------------------------------------------------- setup card
