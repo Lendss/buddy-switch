@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -421,7 +422,7 @@ final class Ui {
 
     // --------------------------------------------------------------- bottom sheet
 
-    /** A bottom sheet dialog: CARD, top radius 28, a handle, and the given content. */
+    /** A bottom sheet dialog: CARD, top radius 28, a handle, and the given content (scrolls when tall). */
     static Dialog bottomSheet(Activity a, View content) {
         Dialog d = new Dialog(a);
         d.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -434,7 +435,12 @@ final class Ui {
         hp.gravity = Gravity.CENTER_HORIZONTAL;
         hp.bottomMargin = dp(a, 14);
         box.addView(handle, hp);
-        box.addView(content, full());
+        // Long content (e.g. many models) scrolls instead of running off the screen.
+        ScrollView scroll = new ScrollView(a);
+        scroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.addView(content, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        box.addView(scroll, full());
         d.setContentView(box);
         Window w = d.getWindow();
         if (w != null) {
