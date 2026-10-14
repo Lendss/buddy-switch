@@ -187,6 +187,7 @@ Found a security problem? Please open a private security advisory on GitHub rath
 ## In the press
 
 - ProPakistani: [This Free Android App Lets Claude Code Use Your Phone](https://propakistani.pk/2026/10/12/this-free-android-app-lets-claude-code-use-your-phone/) (October 2026)
+- Trendshift: [featured among trending GitHub repositories](https://trendshift.io/repositories/289557) (October 2026)
 
 ## Contributing
 
