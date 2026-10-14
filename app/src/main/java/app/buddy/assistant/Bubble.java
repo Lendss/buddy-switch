@@ -412,9 +412,23 @@ final class Bubble implements ChatHub.Listener {
         input.setImeOptions(EditorInfo.IME_ACTION_SEND);
         input.setPadding(0, dp(10), 0, dp(10));
         input.setBackground(null);
-        input.setOnFocusChangeListener((v, has) -> refit());
-        root.getViewTreeObserver().addOnWindowFocusChangeListener(has -> refit());
+        input.setOnFocusChangeListener((v, has) -> {
+            refit();
+            updatePaste();
+        });
+        root.getViewTreeObserver().addOnWindowFocusChangeListener(has -> {
+            refit();
+            updatePaste();
+        });
         inputRow.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        // Android shows no Copy/Paste menu in an overlay window: a Paste button shows while something is copied
+        paste = Ui.iconButton(svc, R.drawable.ms_content_paste, "Paste", Ui.MUTED);
+        paste.setOnClickListener(v -> pasteClip());
+        paste.setVisibility(View.GONE);
+        inputRow.addView(paste, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        svc.getSystemService(ClipboardManager.class).addPrimaryClipChangedListener(() -> input.post(this::updatePaste));
+        // holding the field would select a word with handles, which misbehave over the keyboard in an overlay
+        input.setLongClickable(false);
         mic = new ImageButton(svc);
         mic.setImageResource(R.drawable.ms_mic);
         mic.setContentDescription("Talk");
@@ -450,19 +464,6 @@ final class Bubble implements ChatHub.Listener {
             public void afterTextChanged(android.text.Editable e) {
                 paintSend.run();
             }
-        });
-        // Android shows no Copy/Paste menu in an overlay window, so holding the field shows Buddy's own
-        editBar = new LinearLayout(svc);
-        editBar.setGravity(Gravity.END);
-        editBar.setVisibility(View.GONE);
-        LinearLayout.LayoutParams eblp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        eblp.bottomMargin = dp(6);
-        panel.addView(editBar, eblp);
-        input.setOnLongClickListener(v -> {
-            // after the field has selected the word under the finger
-            input.post(this::showEditBar);
-            return false;
         });
         panel.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -534,40 +535,35 @@ final class Bubble implements ChatHub.Listener {
 
     private void applyIme(android.view.WindowInsets insets) {
         insetIme = insets.getInsets(android.view.WindowInsets.Type.ime()).bottom;
-        fitKeyboard(false);
+        fitKeyboard();
     }
 
     /** Where the accessibility service sees the keyboard's top (0: no keyboard). */
     void onKeyboardTop(int top) {
         if (top == imeTop) return;
         imeTop = top;
-        // the window's own insets normally move the panel smoothly; if they haven't come shortly
-        // after the keyboard showed (it happens), go by the keyboard's position instead
+        fitKeyboard();
+        // focus may still be settling (the panel just opened): check again shortly
         root.removeCallbacks(lateFit);
         if (top > 0) root.postDelayed(lateFit, 350);
-        else fitKeyboard(false);
     }
 
-    private final Runnable lateFit = () -> fitKeyboard(true);
+    private final Runnable lateFit = this::fitKeyboard;
 
     /**
-     * Keep the composer above the keyboard: pad the open panel by the keyboard's height. fallback: also use
-     * the keyboard's position on screen (only for Buddy's own text field, not when another app's is focused).
+     * Keep the composer above the keyboard: pad the open panel by the keyboard's height. The window's own
+     * insets slide it smoothly, but they come late (or not at all) over some apps, so the keyboard's position
+     * on screen counts too (only for Buddy's own text field, not when another app's is focused).
      */
-    private void fitKeyboard(boolean fallback) {
+    private void fitKeyboard() {
         if (!expanded || passThrough) return;
         int kb = insetIme;
-        if (fallback && kb == 0 && imeTop > 0 && input != null && input.hasFocus() && root.hasWindowFocus()) {
+        if (imeTop > 0 && input != null && input.hasFocus() && root.hasWindowFocus()) {
             int[] loc = new int[2];
             root.getLocationOnScreen(loc);
-            kb = Math.max(0, loc[1] + root.getHeight() - imeTop);
+            kb = Math.max(kb, loc[1] + root.getHeight() - imeTop);
         }
         int pad = kb > 0 ? kb + dp(8) : 0;
-        // keyboard closed while typing an answer, with nothing typed: show the answer buttons again
-        if (pad == 0 && root.getPaddingBottom() > 0 && changing && pendingConfirm != null
-                && input.getText().toString().trim().isEmpty()) {
-            endChange();
-        }
         if (root.getPaddingBottom() != pad) {
             root.setPadding(0, 0, 0, pad);
             scrollToEnd();
@@ -1880,52 +1876,24 @@ final class Bubble implements ChatHub.Listener {
         scrollToEnd();
     }
 
-    private LinearLayout editBar;
-    private final Runnable hideEditBar = () -> editBar.setVisibility(View.GONE);
+    private ImageButton paste;
 
-    /** Paste, Select all, Copy and Cut for the text field, as the system menu would offer them. */
-    private void showEditBar() {
-        editBar.removeAllViews();
+    /** Show Paste while the field is focused and text is copied (the clipboard is only readable then). */
+    private void updatePaste() {
         ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
-        int a = Math.min(input.getSelectionStart(), input.getSelectionEnd());
-        int b = Math.max(input.getSelectionStart(), input.getSelectionEnd());
-        boolean selected = a >= 0 && b > a;
-        if (cm.hasPrimaryClip()) editAction("Paste", () -> {
-            ClipData clip = cm.getPrimaryClip();
-            CharSequence t = clip == null || clip.getItemCount() == 0 ? null : clip.getItemAt(0).coerceToText(svc);
-            if (t == null) return;
-            int s = Math.max(0, Math.min(input.getSelectionStart(), input.getSelectionEnd()));
-            int e = Math.max(0, Math.max(input.getSelectionStart(), input.getSelectionEnd()));
-            input.getText().replace(s, e, t.toString());
-        });
-        if (input.length() > 0 && !(a == 0 && b == input.length())) editAction("Select all", input::selectAll);
-        if (selected) {
-            editAction("Copy", () -> cm.setPrimaryClip(ClipData.newPlainText("Buddy",
-                    input.getText().subSequence(a, b).toString())));
-            editAction("Cut", () -> {
-                cm.setPrimaryClip(ClipData.newPlainText("Buddy", input.getText().subSequence(a, b).toString()));
-                input.getText().delete(a, b);
-            });
-        }
-        if (editBar.getChildCount() == 0) return;
-        editBar.setVisibility(View.VISIBLE);
-        editBar.removeCallbacks(hideEditBar);
-        editBar.postDelayed(hideEditBar, 5000);
+        android.content.ClipDescription d = input.hasFocus() ? cm.getPrimaryClipDescription() : null;
+        boolean text = d != null && (d.hasMimeType("text/*") || d.hasMimeType("text/uri-list"));
+        paste.setVisibility(text ? View.VISIBLE : View.GONE);
     }
 
-    private void editAction(String label, Runnable r) {
-        Button btn = actionButton(label, Ui.CARD2);
-        btn.setPadding(dp(14), dp(7), dp(14), dp(7));
-        btn.setOnClickListener(v -> {
-            editBar.setVisibility(View.GONE);
-            r.run();
-            // "Select all" keeps the bar, now with Copy and Cut
-            if (label.equals("Select all")) showEditBar();
-        });
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        p.leftMargin = dp(6);
-        editBar.addView(btn, p);
+    private void pasteClip() {
+        ClipData clip = svc.getSystemService(ClipboardManager.class).getPrimaryClip();
+        CharSequence t = clip == null || clip.getItemCount() == 0 ? null : clip.getItemAt(0).coerceToText(svc);
+        if (t == null || t.length() == 0) return;
+        int a = Math.max(0, Math.min(input.getSelectionStart(), input.getSelectionEnd()));
+        int b = Math.max(0, Math.max(input.getSelectionStart(), input.getSelectionEnd()));
+        input.getText().replace(a, b, t);
+        input.setSelection(a + t.length());
     }
 
     private void copyOnLongPress(View v, String text) {

@@ -97,22 +97,35 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (bubble == null) return;
-        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            CharSequence pkg = event.getPackageName();
-            if (pkg != null && isLauncher(pkg.toString())) bubble.onLauncherShown();
-            return;
-        }
-        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOWS_CHANGED) return;
+        int type = event.getEventType();
+        if (type != AccessibilityEvent.TYPE_WINDOWS_CHANGED && type != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
         int top = 0;
+        AccessibilityWindowInfo app = null;
         for (AccessibilityWindowInfo w : getWindows()) {
             if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
                 Rect r = new Rect();
                 w.getBoundsInScreen(r);
                 if (!r.isEmpty()) top = r.top;
+            } else if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION
+                    && (app == null || w.getLayer() > app.getLayer())) {
+                app = w;
             }
         }
-        bubble.onKeyboardTop(top);
+        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED) bubble.onKeyboardTop(top);
+        // Opening Home or Recents folds the panel. Decided by the app actually in front changing: the home
+        // screen also reports changes while it's already there (e.g. the keyboard opening or closing over it).
+        android.view.accessibility.AccessibilityNodeInfo root = app == null ? null : app.getRoot();
+        CharSequence pkg = root == null ? null : root.getPackageName();
+        // Buddy's own windows don't count (the text cursor's handle over the bubble is one)
+        if (pkg == null || pkg.toString().equals(getPackageName())) return;
+        String front = pkg.toString();
+        // Recents may belong to another launcher than Home (e.g. the phone's own while Nova handles Home)
+        if (!front.equals(frontApp) && isLauncher(front)) bubble.onLauncherShown();
+        frontApp = front;
     }
+
+    /** The app in front (the home screen and Recents count as apps). */
+    private String frontApp;
 
     private java.util.Set<String> launchers;
 
