@@ -451,6 +451,19 @@ final class Bubble implements ChatHub.Listener {
                 paintSend.run();
             }
         });
+        // Android shows no Copy/Paste menu in an overlay window, so holding the field shows Buddy's own
+        editBar = new LinearLayout(svc);
+        editBar.setGravity(Gravity.END);
+        editBar.setVisibility(View.GONE);
+        LinearLayout.LayoutParams eblp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        eblp.bottomMargin = dp(6);
+        panel.addView(editBar, eblp);
+        input.setOnLongClickListener(v -> {
+            // after the field has selected the word under the finger
+            input.post(this::showEditBar);
+            return false;
+        });
         panel.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         composer = inputRow;
@@ -1865,6 +1878,54 @@ final class Bubble implements ChatHub.Listener {
         messages.addView(v, p);
         while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
         scrollToEnd();
+    }
+
+    private LinearLayout editBar;
+    private final Runnable hideEditBar = () -> editBar.setVisibility(View.GONE);
+
+    /** Paste, Select all, Copy and Cut for the text field, as the system menu would offer them. */
+    private void showEditBar() {
+        editBar.removeAllViews();
+        ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
+        int a = Math.min(input.getSelectionStart(), input.getSelectionEnd());
+        int b = Math.max(input.getSelectionStart(), input.getSelectionEnd());
+        boolean selected = a >= 0 && b > a;
+        if (cm.hasPrimaryClip()) editAction("Paste", () -> {
+            ClipData clip = cm.getPrimaryClip();
+            CharSequence t = clip == null || clip.getItemCount() == 0 ? null : clip.getItemAt(0).coerceToText(svc);
+            if (t == null) return;
+            int s = Math.max(0, Math.min(input.getSelectionStart(), input.getSelectionEnd()));
+            int e = Math.max(0, Math.max(input.getSelectionStart(), input.getSelectionEnd()));
+            input.getText().replace(s, e, t.toString());
+        });
+        if (input.length() > 0 && !(a == 0 && b == input.length())) editAction("Select all", input::selectAll);
+        if (selected) {
+            editAction("Copy", () -> cm.setPrimaryClip(ClipData.newPlainText("Buddy",
+                    input.getText().subSequence(a, b).toString())));
+            editAction("Cut", () -> {
+                cm.setPrimaryClip(ClipData.newPlainText("Buddy", input.getText().subSequence(a, b).toString()));
+                input.getText().delete(a, b);
+            });
+        }
+        if (editBar.getChildCount() == 0) return;
+        editBar.setVisibility(View.VISIBLE);
+        editBar.removeCallbacks(hideEditBar);
+        editBar.postDelayed(hideEditBar, 5000);
+    }
+
+    private void editAction(String label, Runnable r) {
+        Button btn = actionButton(label, Ui.CARD2);
+        btn.setPadding(dp(14), dp(7), dp(14), dp(7));
+        btn.setOnClickListener(v -> {
+            editBar.setVisibility(View.GONE);
+            r.run();
+            // "Select all" keeps the bar, now with Copy and Cut
+            if (label.equals("Select all")) showEditBar();
+        });
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        p.leftMargin = dp(6);
+        editBar.addView(btn, p);
     }
 
     private void copyOnLongPress(View v, String text) {
