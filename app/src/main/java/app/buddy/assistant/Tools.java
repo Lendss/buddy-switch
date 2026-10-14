@@ -206,7 +206,7 @@ final class Tools {
             }
             case "confirm": {
                 String answer = svc.askConfirm(a.getString("summary"));
-                if (answer.startsWith("APPROVED")) Guard.approved(); // covers the next risky tap
+                if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary")); // covers the next risky tap
                 return text(answer);
             }
             case "ask": {

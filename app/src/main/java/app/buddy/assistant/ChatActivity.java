@@ -210,6 +210,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         frame.addView(root);
         setContentView(frame);
 
+        showAll();
+        String draft = getIntent().getStringExtra("draft");
+        if (draft != null && state == null) {
+            input.setText(draft);
+            input.setSelection(draft.length());
+        }
+        // from the bubble's attach button
+        if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
+    }
+
+    /** The chat's messages from scratch. */
+    private void showAll() {
+        messages.removeAllViews();
+        log = null;
         if (ses.messages.isEmpty()) {
             TextView hint = text(this, "New " + ses.brainName() + " chat. Ask it to do something on your phone"
                     + (Prefs.devMode(this) ? ", or to build an app (developer mode is on)." : "."), 14, MUTED);
@@ -219,13 +233,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         }
         for (Sessions.Msg m : ses.messages) show(m);
         if (log != null && !ses.running) log.finish();
-        String draft = getIntent().getStringExtra("draft");
-        if (draft != null && state == null) {
-            input.setText(draft);
-            input.setSelection(draft.length());
-        }
-        // from the bubble's attach button
-        if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
+        lastShown = lastMsg();
+    }
+
+    /** The last message shown here: if the chat moved on while this screen was hidden, it's redrawn on return. */
+    private Sessions.Msg lastShown;
+
+    private Sessions.Msg lastMsg() {
+        return ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
     }
 
     @Override
@@ -236,6 +251,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         hub.setViewing(ses, true);
         hub.select(ses);
         Voice.prepare(this); // so the mic is quick
+        if (lastMsg() != lastShown) showAll(); // messages came in while this screen was hidden
         refresh();
         scrollToEnd();
     }
@@ -289,6 +305,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         if (s == ses) {
             if (ses.messages.size() == 1) messages.removeAllViews(); // drop the empty-chat hint
             show(msg);
+            lastShown = msg;
             scrollToEnd();
         }
     }

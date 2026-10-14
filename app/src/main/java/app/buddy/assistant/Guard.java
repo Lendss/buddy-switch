@@ -33,9 +33,12 @@ final class Guard {
             + ")(?![\\p{L}])");
     /** Resource ids of send buttons that only have an icon (e.g. WhatsApp's "send"). */
     private static final Pattern RISKY_ID = Pattern.compile("(?i)[:/_](send|send_button|sendbutton|btn_send|delete|pay|buy|post|submit|add-to-cart|add_to_cart|addtocart)\\b");
-    private static final long APPROVAL_VALID_MS = 120_000;
+    // long enough for a slow multi-step task between the plan's approval and its risky tap
+    private static final long APPROVAL_VALID_MS = 600_000;
 
-    private static long approvedAt;
+    private static long approvedAt, planAt;
+    /** The last approved confirm's text: the plan the user OK'd, for the smart reviewer. */
+    private static String plan;
 
     /** Apps that start on "hard limit": messaging, email, social, calls, shopping, payments, banking. */
     private static final java.util.Set<String> HARD_BY_DEFAULT = new java.util.HashSet<>(java.util.Arrays.asList(
@@ -239,8 +242,14 @@ final class Guard {
     }
 
     /** The agent's confirm was approved: that covers the next risky action. */
-    static synchronized void approved() {
-        approvedAt = System.currentTimeMillis();
+    static synchronized void approved(String summary) {
+        approvedAt = planAt = System.currentTimeMillis();
+        plan = summary;
+    }
+
+    /** What the user approved in the last 10 minutes (it stays known after the approval is used), or null. */
+    static synchronized String approvedPlan() {
+        return plan != null && System.currentTimeMillis() - planAt < APPROVAL_VALID_MS ? plan : null;
     }
 
     /** Use the pending approval, if any (one approval, one action). */
