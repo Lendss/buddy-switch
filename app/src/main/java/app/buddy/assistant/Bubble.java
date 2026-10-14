@@ -349,7 +349,9 @@ final class Bubble implements ChatHub.Listener {
         ScrollView cs = new ScrollView(svc) {
             @Override
             protected void onMeasure(int w, int h) {
-                super.onMeasure(w, MeasureSpec.makeMeasureSpec((int) (screen().height() * 0.3f), MeasureSpec.AT_MOST));
+                // smaller while the user types an answer or change, so the text field stays above the keyboard
+                float cap = changing ? 0.12f : 0.3f;
+                super.onMeasure(w, MeasureSpec.makeMeasureSpec((int) (screen().height() * cap), MeasureSpec.AT_MOST));
             }
         };
         cs.addView(confirmText);
@@ -548,6 +550,11 @@ final class Bubble implements ChatHub.Listener {
             kb = Math.max(0, loc[1] + root.getHeight() - imeTop);
         }
         int pad = kb > 0 ? kb + dp(8) : 0;
+        // keyboard closed while typing an answer, with nothing typed: show the answer buttons again
+        if (pad == 0 && root.getPaddingBottom() > 0 && changing && pendingConfirm != null
+                && input.getText().toString().trim().isEmpty()) {
+            endChange();
+        }
         if (root.getPaddingBottom() != pad) {
             root.setPadding(0, 0, 0, pad);
             scrollToEnd();
@@ -1559,6 +1566,9 @@ final class Bubble implements ChatHub.Listener {
     private void startChange() {
         if (pendingConfirm == null) return;
         changing = true;
+        // the answer buttons make the card too tall to leave the text field above the keyboard
+        confirmOptions.setVisibility(View.GONE);
+        confirmCard.requestLayout();
         input.setHint(asking ? "Your answer…" : "What should change?");
         input.requestFocus();
         input.postDelayed(() -> {
@@ -1571,6 +1581,8 @@ final class Bubble implements ChatHub.Listener {
         changing = false;
         input.setHint("Ask " + sessions.current.brainName() + "…");
         hideKeyboard();
+        if (asking) confirmOptions.setVisibility(View.VISIBLE);
+        confirmCard.requestLayout();
     }
 
     private void answerChange(String change) {
