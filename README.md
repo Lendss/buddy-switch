@@ -92,7 +92,7 @@ You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan
 
 ## Updating
 
-Buddy isn't on the Play Store (Google doesn't allow its accessibility use or the agents it downloads), so updates come from [GitHub Releases](https://github.com/ghorbelhamdi/buddy-android/releases). Every release is signed with the same key, so **installing a new APK over the old one keeps your chats, settings, sign-ins and Buddy's Linux**. Don't uninstall first: that deletes them.
+Buddy is in closed testing on Google Play; the full version (with self-updates and developer mode) comes from [GitHub Releases](https://github.com/ghorbelhamdi/buddy-android/releases). Every release is signed with the same key, so **installing a new APK over the old one keeps your chats, settings, sign-ins and Buddy's Linux**. Don't uninstall first: that deletes them.
 
 **Ask Buddy:** *"Is there a Buddy update?"* or *"Update yourself."* The agent checks the latest release, tells you what's new, and with your OK downloads `buddy.apk` from this repo's releases and opens Android's installer; you tap **Update**.
 
@@ -103,6 +103,8 @@ Buddy isn't on the Play Store (Google doesn't allow its accessibility use or the
 4. Obtainium now notifies you when a new version is out; tap **Update** and confirm Android's installer (the first time, allow Obtainium to install apps).
 
 **By hand:** open the [latest `buddy.apk`](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) on the phone and install it over the current one. To get an email for each new version, sign in to GitHub and choose **Watch → Custom → Releases** on the repository.
+
+**The agents** (Claude Code, Codex, OpenCode) update separately: Settings → the agent → **Check for updates**. An OpenCode 1.x install gets **Update to OpenCode 2** there; your connected providers are kept.
 
 ## Using Buddy
 
@@ -178,7 +180,7 @@ Found a security problem? Please open a private security advisory on GitHub rath
 
 **Which phones?** 64-bit Android 11 or newer. It's tested most on a OnePlus 12; on some brands you need to set Buddy's battery use to *Unrestricted* so Android doesn't stop it.
 
-**Why isn't it on Google Play?** Play's accessibility policy doesn't allow AI agents that operate other apps. Updates come from this repo: Buddy tells you when one is out (see [Updating](#updating)).
+**Is it on Google Play?** In closed testing. The Play version leaves out self-updates and developer mode, as Play requires; the GitHub version stays free and complete, and Buddy tells you when an update is out (see [Updating](#updating)).
 
 **Can it see my passwords or pay for things?** It never types passwords, codes or payment details; it hands those to you. Paying, sending and deleting need your OK, enforced by Buddy itself in the apps on a hard limit. See [Security](#security).
 
