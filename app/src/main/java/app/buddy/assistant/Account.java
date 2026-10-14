@@ -58,6 +58,13 @@ final class Account {
     volatile boolean remote;
     /** Codex's device code ("ABCD-12345") in remote mode. */
     volatile String userCode;
+    /** OpenCode 2 (npm @opencode/cli) rather than 1.x: its commands need --standalone, or it leaves a background service. */
+    volatile boolean opencode2;
+    /** The installed agent's version ("2.1.40"), or "" if unknown. */
+    volatile String version = "";
+    /** Updating rather than installing (same INSTALLING step), and what the last update did, for the screen. */
+    volatile boolean updating;
+    volatile String updateNote = "";
 
     private static final Handler main = new Handler(Looper.getMainLooper());
     private static volatile Context app;
@@ -128,11 +135,12 @@ final class Account {
                 }
                 if (claude()) {
                     String out = Linux.exec(app, "[ -x /root/.local/bin/claude ] || { echo NOTINSTALLED; exit 0; }; "
-                            + "claude auth status 2>/dev/null", 60);
+                            + "claude auth status 2>/dev/null; echo; echo VER=$(claude --version 2>/dev/null)", 60);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");
                         return;
                     }
+                    version = ver(out);
                     JSONObject j = new JSONObject(out.substring(out.indexOf('{'), out.lastIndexOf('}') + 1));
                     if (j.optBoolean("loggedIn")) {
                         email = j.optString("email", j.optString("emailAddress", ""));
@@ -143,17 +151,24 @@ final class Account {
                     }
                 } else if (opencode()) {
                     // no sign-in needed: installed means ready. Connected providers (if any) are shown as the plan.
+                    // 1.x keeps connected providers in auth.json; 2 in its database (it imports auth.json on upgrade)
                     String out = Linux.exec(app, "command -v opencode >/dev/null || { echo NOTINSTALLED; exit 0; }; "
-                            + "jq -r 'keys | join(\", \")' /root/.local/share/opencode/auth.json 2>/dev/null; echo OC_OK", 60);
+                            + "if readlink -f \"$(command -v opencode)\" | grep -q /@opencode/cli/; then echo OC_V2; "
+                            + "opencode auth list --standalone --format json 2>/dev/null | jq -r '[.[].name] | join(\", \")'; "
+                            + "else jq -r 'keys | join(\", \")' /root/.local/share/opencode/auth.json 2>/dev/null; fi; echo OC_OK; "
+                            + "echo VER=$(opencode --version 2>/dev/null)", 60);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");
                     } else {
-                        String providers = out.substring(0, out.indexOf("OC_OK")).trim();
+                        opencode2 = out.contains("OC_V2");
+                        version = ver(out);
+                        String providers = out.substring(0, out.indexOf("OC_OK")).replace("OC_V2", "").trim();
                         email = "";
                         plan = providers.isEmpty() ? "free models" : providers;
                         set(Step.SIGNED_IN, "");
                         // its model list (free ones plus connected providers), for the model picker
-                        String list = Linux.exec(app, "timeout 60 opencode models 2>/dev/null", 70);
+                        String list = Linux.exec(app, "timeout 60 opencode models" + (opencode2 ? " --standalone" : "")
+                                + " 2>/dev/null", 70);
                         org.json.JSONArray a = new org.json.JSONArray();
                         for (String line : list.split("\n")) {
                             String m = line.trim();
@@ -166,7 +181,8 @@ final class Account {
                     }
                 } else {
                     String out = Linux.exec(app, "command -v codex >/dev/null || { echo NOTINSTALLED; exit 0; }; "
-                            + "codex login status 2>&1", 60);
+                            + "codex login status 2>&1; echo VER=$(codex --version 2>/dev/null)", 60);
+                    version = ver(out);
                     String low = out.toLowerCase(Locale.ROOT);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");
@@ -208,9 +224,10 @@ final class Account {
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, "Downloading OpenCode…");
-                    // npm also fetches the glibc build; Buddy's Alpine only runs the musl one, so drop the other (~180 MB)
-                    String o = Linux.exec(app, "npm install -g opencode-ai >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
-                            + " rm -rf /usr/local/lib/node_modules/opencode-ai/node_modules/opencode-linux-arm64;"
+                    // OpenCode 2 (npm @opencode/cli). npm also fetches the glibc build; Buddy's Alpine only runs the
+                    // musl one, so drop the other (~200 MB)
+                    String o = Linux.exec(app, "npm install -g @opencode/cli >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
+                            + " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;"
                             + " opencode --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else {
@@ -224,6 +241,59 @@ final class Account {
             } catch (Exception e) {
                 set(Step.ERROR, "Install failed: " + e.getMessage());
             }
+        }).start();
+    }
+
+    private static String ver(String out) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("VER=\\D*(\\d+\\.\\d+\\.\\d+)").matcher(out);
+        return m.find() ? m.group(1) : "";
+    }
+
+    /** OpenCode 1.x is installed (npm opencode-ai): its update moves it to OpenCode 2. */
+    boolean oldOpencode() {
+        return opencode() && !opencode2 && !version.isEmpty();
+    }
+
+    /** Updates the agent to its latest version; {@link #updateNote} says what happened. */
+    void update(Context c) {
+        app = c.getApplicationContext();
+        if (busy()) return;
+        final Context app = c.getApplicationContext();
+        final String before = version;
+        final boolean toV2 = oldOpencode();
+        updating = true;
+        updateNote = "";
+        set(Step.INSTALLING, toV2 ? "Downloading OpenCode 2…" : "Checking for a new " + name() + "…");
+        new Thread(() -> {
+            String o;
+            try {
+                if (claude()) {
+                    o = Linux.exec(app, "/root/.local/bin/claude update 2>&1 | tail -3; echo VER=$(/root/.local/bin/claude --version)", 900);
+                } else if (opencode()) {
+                    // OpenCode 2 is a new npm package (it keeps 1.x's connected providers); if it fails, put 1.x back
+                    String glibc = " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;";
+                    o = Linux.exec(app, (toV2
+                            ? "npm rm -g opencode-ai >/tmp/npm.log 2>&1; npm install -g @opencode/cli >>/tmp/npm.log 2>&1"
+                            + " || { npm install -g opencode-ai >/dev/null 2>&1;"
+                            + " rm -rf /usr/local/lib/node_modules/opencode-ai/node_modules/opencode-linux-arm64; };"
+                            : "npm install -g @opencode/cli@latest >/tmp/npm.log 2>&1;")
+                            + glibc + " tail -3 /tmp/npm.log; echo VER=$(opencode --version)", 1800);
+                } else {
+                    o = Linux.exec(app, "npm install -g @openai/codex@latest >/tmp/npm.log 2>&1; tail -3 /tmp/npm.log;"
+                            + " echo VER=$(codex --version)", 1800);
+                }
+                String after = ver(o);
+                if (after.isEmpty()) throw new IOException(tail(o));
+                updateNote = after.equals(before) ? "You have the latest version (" + after + ")."
+                        : "Updated to " + after + (before.isEmpty() ? "." : " (was " + before + ").");
+                if (toV2 && !after.startsWith("2") && !after.matches("[3-9].*")) updateNote = "Couldn't update to OpenCode 2; "
+                        + "you still have " + after + ". Try again on Wi-Fi.";
+            } catch (Exception e) {
+                updateNote = "Update failed: " + e.getMessage();
+            }
+            updating = false;
+            set(Step.CHECKING, "");
+            refresh(app);
         }).start();
     }
 

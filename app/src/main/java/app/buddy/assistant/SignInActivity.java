@@ -111,7 +111,7 @@ public class SignInActivity extends Screen implements Account.Listener {
                 primary("Install " + acc.name(), v -> acc.install(this));
                 break;
             case INSTALLING:
-                header(R.drawable.ms_terminal, "Installing", acc.detail, false);
+                header(R.drawable.ms_terminal, acc.updating ? "Updating" : "Installing", acc.detail, false);
                 spinnerRow();
                 note("This takes a few minutes. You can leave this screen; it keeps going.");
                 break;
@@ -161,7 +161,9 @@ public class SignInActivity extends Screen implements Account.Listener {
                 }
                 header(R.drawable.ms_check, "Signed in", (acc.email.isEmpty() ? acc.name() + " is ready."
                         : acc.email) + (acc.plan.isEmpty() ? "" : " · " + acc.plan), true);
+                versionNote();
                 primary("Done", v -> finish());
+                updateButton();
                 secondary("Sign out", v -> confirmSheet(this, "Sign out of " + acc.name() + "?",
                         acc.name() + " in Buddy stops working until you sign in again.", "Sign out", true, () -> acc.logout(this)));
                 break;
@@ -184,9 +186,22 @@ public class SignInActivity extends Screen implements Account.Listener {
                 : "Connected: " + acc.plan + ". OpenCode's free models stay available too.", true);
         note("Connecting a provider opens Buddy's terminal with opencode auth login: pick a provider and follow its steps. "
                 + "To remove one later, run opencode auth logout there.");
+        versionNote();
         primary("Done", v -> finish());
+        updateButton();
         secondary("Connect a provider", v -> startActivity(new Intent(this, TerminalActivity.class)
-                .putExtra("run", "opencode auth login")));
+                .putExtra("run", acc.opencode2 ? "opencode auth login --standalone" : "opencode auth login")));
+    }
+
+    /** The installed version, and what the last update did. */
+    private void versionNote() {
+        if (!acc.updateNote.isEmpty()) note(acc.updateNote);
+        else if (!acc.version.isEmpty()) note(acc.name() + " " + acc.version + (acc.oldOpencode()
+                ? ". OpenCode 2 is out: update to keep getting new versions. Your connected providers are kept." : "."));
+    }
+
+    private void updateButton() {
+        secondary(acc.oldOpencode() ? "Update to OpenCode 2" : "Check for updates", v -> acc.update(this));
     }
 
     /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */
