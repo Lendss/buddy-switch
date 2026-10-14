@@ -206,7 +206,7 @@ final class Tools {
             }
             case "confirm": {
                 String answer = svc.askConfirm(a.getString("summary"));
-                if (answer.startsWith("APPROVED")) Guard.approved(); // covers the next risky tap
+                if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary")); // covers the next risky tap
                 return text(answer);
             }
             case "ask": {
@@ -350,7 +350,11 @@ final class Tools {
             if (id < 0 || id >= lastNodes.size())
                 throw new IllegalArgumentException("Unknown element " + id + ". Call read_screen again.");
             AccessibilityNodeInfo n = AccessibilityNodeInfo.obtain(lastNodes.get(id));
-            n.refresh();
+            // gone since read_screen (a dialog closed, the page changed): say so instead of acting on a stale
+            // node, which would also put a pointless approval card in front of the user
+            if (!n.refresh())
+                throw new IllegalArgumentException("Element " + id + " is no longer on screen; the screen changed. "
+                        + "Call read_screen again.");
             return n;
         }
     }

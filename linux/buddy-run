@@ -11,7 +11,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=11
+HELPER_VERSION=12
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -29,6 +29,8 @@ post() { # post one JSON event to the bubble
 }
 have() { command -v "$1" >/dev/null 2>&1; }
 valid_sid() { [[ "$1" =~ ^[A-Za-z0-9_-]{1,64}$ ]]; }
+# OpenCode 2 (npm @opencode/cli) rather than 1.x (opencode-ai)? 2 needs --standalone, or it leaves a background service
+oc2() { [[ "$(readlink -f "$(command -v opencode)" 2>/dev/null)" == */@opencode/cli/* ]]; }
 
 # Kill a process and everything it started (claude/codex run a few levels below buddy-run).
 kill_tree() {
@@ -51,7 +53,7 @@ agent_of() {
   case "${cmd%% *}" in
     */claude/versions/*) echo claude ;;
     */codex-linux-*/*|*/bin/codex) echo codex ;;
-    */opencode-ai/*|*/bin/opencode) echo opencode ;;
+    */opencode-ai/*|*/@opencode/cli*/*|*/bin/opencode) echo opencode ;;
     *) return 1 ;;
   esac
 }
@@ -65,7 +67,7 @@ case "$CMD" in
     cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
     # OpenCode's model list takes a few seconds: report the last one, refresh it in the background
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
-    have opencode && (timeout 60 opencode models >"$D/opencode-models.new" 2>/dev/null \
+    have opencode && (timeout 60 opencode models $(oc2 && echo --standalone) >"$D/opencode-models.new" 2>/dev/null \
       && mv "$D/opencode-models.new" "$D/opencode-models") >/dev/null 2>&1 &
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
       --argjson om "${om:-[]}" '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om}' | post
@@ -79,7 +81,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|/bin/opencode' 2>/dev/null); do
+      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -324,12 +326,17 @@ run_opencode() {
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
 phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
-  local cfg
-  cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" '
-    {mcp:{phone:{type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false, timeout:310000}},
-     instructions:[$sys], autoupdate:false, share:"disabled"}
+  local cfg v2=0
+  oc2 && v2=1
+  # OpenCode 2 only takes codemode under mcp.servers; without it the phone tools hide behind one "execute" tool
+  cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" --arg v2 "$v2" '
+    {type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false} as $phone
+    | (if $v2 == "1" then {mcp:{servers:{phone:($phone + {codemode:false, timeout:{execution:310000}})}}}
+       else {mcp:{phone:($phone + {timeout:310000})}} end)
+    + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} else {permission:{bash:"ask", edit:"ask"}} end)')
   local args=(run --format json)
+  [ "$v2" = 1 ] && args+=(--standalone)
   [ -s "$S/opencode-session" ] && args+=(-s "$(cat "$S/opencode-session")")
   [ -n "${MODEL:-}" ] && args+=(-m "$MODEL")
   local f
@@ -342,12 +349,13 @@ these exact names; they are available in every message of this chat." > "$S/syst
 # the model thinking out loud (free models even leak their reasoning, ending in </think>), and Buddy
 # doesn't show Claude Code's or Codex's thinking either. Tool calls still show as steps.
 stream_opencode() {
-  local pending="" line sid typ t
+  local pending="" failed="" line sid typ t
   while IFS= read -r line; do
     [ -z "$line" ] && continue
     sid=$(printf '%s' "$line" | jq -r '.sessionID // empty' 2>/dev/null)
     [ -n "$sid" ] && printf '%s' "$sid" > "$S/opencode-session"
     typ=$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)
+    [ "$typ" = error ] && failed=1
     case "$typ" in
       step_start) pending="" ;;
       text)
@@ -364,11 +372,12 @@ stream_opencode() {
       tool_use|error)
         printf '%s' "$line" | jq -c --arg s "$SID" '
           (if .type == "tool_use" and .part.tool == "invalid" then empty   # a mistyped tool name; the model retries
+          elif .type == "tool_use" and .part.tool == "execute" then empty  # OpenCode 2 code tool (the phone is not in it)
           elif .type == "tool_use" then
             (.part.tool // "") as $t
             | {type:"assistant", message:{content:[{type:"tool_use",
                 name:(if ($t | startswith("phone_")) then "mcp__phone__" + ($t | ltrimstr("phone_"))
-                      elif $t == "bash" then "Bash" elif ($t == "edit" or $t == "write" or $t == "patch") then "Edit"
+                      elif ($t == "bash" or $t == "shell") then "Bash" elif ($t == "edit" or $t == "write" or $t == "patch") then "Edit"
                       elif $t == "read" then "Read" else $t end),
                 input:((.part.state.input // {}) + (if ($t == "phone_confirm" or $t == "phone_ask")
                   then {_answer:(.part.state.output // "")} else {} end))}]}}
@@ -378,6 +387,11 @@ stream_opencode() {
           end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done ;;
     esac
   done
+  # OpenCode 2 sometimes ends without the last step_finish: still show the answer
+  if [ -n "$pending" ] && [ -z "$failed" ]; then
+    jq -cn --arg t "$pending" --arg s "$SID" '{type:"assistant", message:{content:[{type:"text", text:$t}]}, buddy_session:$s}' | post
+    jq -cn --arg s "$SID" '{type:"result", subtype:"success", result:"", buddy_session:$s}' | post
+  fi
 }
 
 # ------------------------------------------------------------------------ run

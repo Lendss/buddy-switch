@@ -17,23 +17,28 @@ import java.util.regex.Pattern;
  * own bubble or approval card, so it can't approve for the user.
  */
 final class Guard {
-    /** Words on buttons that send, pay, delete or otherwise can't be taken back (EN, FR, DE, ES, IT, AR). */
-    private static final Pattern RISKY = Pattern.compile("(?iu)^[^\\p{L}]*("
+    /** Words on buttons that send, pay, delete or otherwise can't be taken back, and add-to-cart buttons, so every
+     * agent asks the same way before shopping (EN, FR, DE, ES, IT, AR). */
+    private static final Pattern RISKY = Pattern.compile("(?iu)^[^\\p{L}]*(?:(?:proceed|continue|go) to |passer (?:à la|au) |weiter zur |zur )?("
             + "send|post|publish|share now|tweet|reply all|submit|confirm|pay|pay now|buy|buy now|purchase|"
-            + "order|place order|checkout|check out|subscribe|transfer|donate|delete|remove|erase|uninstall|"
+            + "order|place order|checkout|check out|payment|add to cart|add to basket|add to bag|add to trolley|subscribe|transfer|donate|delete|remove|erase|uninstall|"
             + "unfriend|block|report|unsubscribe|deactivate|factory reset|reset|sign out|log out|logout|call|"
             + "envoyer|envoi|publier|partager maintenant|répondre à tous|valider|confirmer|payer|acheter|commander|"
-            + "s'abonner|virement|transférer|supprimer|effacer|désinstaller|bloquer|signaler|se désabonner|"
+            + "ajouter au panier|passer la commande|passer commande|caisse|s'abonner|virement|transférer|supprimer|effacer|désinstaller|bloquer|signaler|se désabonner|"
             + "désactiver|réinitialiser|se déconnecter|déconnexion|appeler|"
-            + "senden|absenden|bezahlen|kaufen|bestellen|löschen|entfernen|"
-            + "enviar|pagar|comprar|eliminar|borrar|inviare|pagare|acquista|elimina|"
-            + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال"
+            + "senden|absenden|bezahlen|kaufen|bestellen|löschen|entfernen|in den einkaufswagen|in den warenkorb|kasse|"
+            + "enviar|pagar|comprar|eliminar|borrar|añadir al carrito|agregar al carrito|inviare|pagare|acquista|elimina|"
+            + "aggiungi al carrello|"
+            + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال|أضف إلى السلة|إضافة إلى السلة"
             + ")(?![\\p{L}])");
     /** Resource ids of send buttons that only have an icon (e.g. WhatsApp's "send"). */
-    private static final Pattern RISKY_ID = Pattern.compile("(?i)[:/_](send|send_button|sendbutton|btn_send|delete|pay|buy|post|submit)\\b");
-    private static final long APPROVAL_VALID_MS = 120_000;
+    private static final Pattern RISKY_ID = Pattern.compile("(?i)[:/_](send|send_button|sendbutton|btn_send|delete|pay|buy|post|submit|add-to-cart|add_to_cart|addtocart)\\b");
+    // long enough for a slow multi-step task between the plan's approval and its risky tap
+    private static final long APPROVAL_VALID_MS = 600_000;
 
-    private static long approvedAt;
+    private static long approvedAt, planAt;
+    /** The last approved confirm's text: the plan the user OK'd, for the smart reviewer. */
+    private static String plan;
 
     /** Apps that start on "hard limit": messaging, email, social, calls, shopping, payments, banking. */
     private static final java.util.Set<String> HARD_BY_DEFAULT = new java.util.HashSet<>(java.util.Arrays.asList(
@@ -146,8 +151,37 @@ final class Guard {
         return s == null ? "" : s.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 
-    /** A short name for what a tap would press: its own label, its button's, or an icon's id. */
+    /** Labels that say nothing about what a button does (web form buttons are often just "Submit"). */
+    private static final Pattern GENERIC = Pattern.compile("(?i)submit|button|btn|input|ok|go|enter|envoyer|absenden|enviar|invia");
+
+    /** A short name for what a tap would press. A generic one ("Submit") is replaced by the button's id
+     * ("add-to-cart-button" → "add to cart") or the visible text next to it, so the card says what it does. */
     static String buttonLabel(AccessibilityNodeInfo n) {
+        String l = rawButtonLabel(n);
+        if (l != null && !GENERIC.matcher(l.trim()).matches()) return l;
+        AccessibilityNodeInfo cur = n;
+        for (int i = 0; cur != null && i < 4; i++) {
+            String id = cur.getViewIdResourceName();
+            if (id != null) {
+                String w = id.substring(id.lastIndexOf('/') + 1).replaceAll("[-_.]+", " ")
+                        .replaceAll("(?i)\\b(submit|button|btn|input)\\b", " ").trim().replaceAll("\\s+", " ");
+                if (w.matches("[\\p{L} ]{3,}") && !w.contains("autoid")) return w; // not generated ids ("a-autoid-3")
+            }
+            if (cur.isClickable()) break;
+            cur = cur.getParent();
+        }
+        AccessibilityNodeInfo p = n.getParent(); // the visible text beside it (a form button and its label)
+        for (int up = 0; p != null && up < 2; up++, p = p.getParent()) {
+            for (int c = 0; c < Math.min(p.getChildCount(), 8); c++) {
+                AccessibilityNodeInfo ch = p.getChild(c);
+                String h = ch == null ? null : shortLabel(ch);
+                if (h != null && !GENERIC.matcher(h).matches()) return h;
+            }
+        }
+        return l;
+    }
+
+    private static String rawButtonLabel(AccessibilityNodeInfo n) {
         AccessibilityNodeInfo cur = n;
         for (int i = 0; cur != null && i < 4; i++) {
             String l = shortLabel(cur);
@@ -208,8 +242,14 @@ final class Guard {
     }
 
     /** The agent's confirm was approved: that covers the next risky action. */
-    static synchronized void approved() {
-        approvedAt = System.currentTimeMillis();
+    static synchronized void approved(String summary) {
+        approvedAt = planAt = System.currentTimeMillis();
+        plan = summary;
+    }
+
+    /** What the user approved in the last 10 minutes (it stays known after the approval is used), or null. */
+    static synchronized String approvedPlan() {
+        return plan != null && System.currentTimeMillis() - planAt < APPROVAL_VALID_MS ? plan : null;
     }
 
     /** Use the pending approval, if any (one approval, one action). */
