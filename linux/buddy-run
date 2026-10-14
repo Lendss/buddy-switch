@@ -372,7 +372,7 @@ stream_opencode() {
       tool_use|error)
         printf '%s' "$line" | jq -c --arg s "$SID" '
           (if .type == "tool_use" and .part.tool == "invalid" then empty   # a mistyped tool name; the model retries
-          elif .type == "tool_use" and .part.tool == "execute" then empty  # OpenCode 2's code tool; the phone isn't in it
+          elif .type == "tool_use" and .part.tool == "execute" then empty  # OpenCode 2 code tool (the phone is not in it)
           elif .type == "tool_use" then
             (.part.tool // "") as $t
             | {type:"assistant", message:{content:[{type:"tool_use",
