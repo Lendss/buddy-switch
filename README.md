@@ -193,7 +193,7 @@ Found a security problem? Please open a private security advisory on GitHub rath
 
 ## Contributing
 
-Bug reports and ideas are welcome in [Issues](https://github.com/ghorbelhamdi/buddy-android/issues), and pull requests too. If Buddy is useful to you, a ⭐ helps other people find it.
+Bug reports and ideas are welcome in [Issues](https://github.com/ghorbelhamdi/buddy-android/issues), and pull requests too: see [CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test on a phone and propose a change. If Buddy is useful to you, a ⭐ helps other people find it.
 
 ## For developers
 
@@ -245,4 +245,4 @@ The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 
 ## License
 
-[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0). Bundled proot (GPL-2.0), talloc (LGPL-3.0) and libandroid-shmem (BSD-3-Clause): see [third_party](third_party/README.md) for licences and source. Not on Google Play: Play's accessibility policy doesn't allow AI agents that operate other apps.
+[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0). Bundled proot (GPL-2.0), talloc (LGPL-3.0) and libandroid-shmem (BSD-3-Clause): see [third_party](third_party/README.md) for licences and source.
