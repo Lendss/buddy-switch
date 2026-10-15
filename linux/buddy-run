@@ -328,6 +328,15 @@ phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_upda
 these exact names; they are available in every message of this chat." > "$S/system.md"
   local cfg v2=0
   oc2 && v2=1
+  # OpenCode 2 ignores instructions given through OPENCODE_CONFIG_CONTENT (the model never saw this prompt),
+  # but reads its global AGENTS.md, next to the work folder's own. Buddy owns that file (marked on line 1)
+  # and leaves one the user wrote alone.
+  if [ "$v2" = 1 ]; then
+    local g=$HOME/.config/opencode/AGENTS.md
+    if [ ! -s "$g" ] || head -1 "$g" | grep -q '^<!-- buddy -->'; then
+      mkdir -p "${g%/*}" && { echo '<!-- buddy -->'; cat "$S/system.md"; } > "$g"
+    fi
+  fi
   # OpenCode 2 only takes codemode under mcp.servers; without it the phone tools hide behind one "execute" tool
   cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" --arg v2 "$v2" '
     {type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false} as $phone
