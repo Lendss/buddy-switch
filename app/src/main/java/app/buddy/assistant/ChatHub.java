@@ -20,6 +20,8 @@ final class ChatHub {
     }
 
     private static final long NO_RESPONSE_MS = 30000;
+    /** After this long with nothing from the agent, the run is given up on. */
+    private static final long GIVE_UP_MS = 180000;
     private static final String TOOL_PREFIX = "mcp__phone__";
     private static ChatHub instance;
 
@@ -120,7 +122,7 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.allowControl();
         try {
-            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, ses.model,
+            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, model(ses),
                     hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
@@ -132,13 +134,20 @@ final class ChatHub {
         ses.status = "Thinking…";
         changed();
         final int id = ses.runId;
+        // the agent is running but its model can be slow (free models especially): say so, keep waiting
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= NO_RESPONSE_MS - 100) {
-                ses.running = false;
-                add(ses, Bubble.Kind.ERROR, "No response from the agent. Open Buddy's Settings and check that it's installed and signed in.");
+                add(ses, Bubble.Kind.STEP, "Still waiting for the model to answer…");
                 changed();
             }
         }, NO_RESPONSE_MS);
+        main.postDelayed(() -> {
+            if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
+                ses.running = false;
+                add(ses, Bubble.Kind.ERROR, "The model didn't answer. It may be busy: try again, or pick another model at the top of the chat.");
+                changed();
+            }
+        }, GIVE_UP_MS);
         return null;
     }
 
@@ -320,11 +329,21 @@ final class ChatHub {
         return null;
     }
 
+    /**
+     * The model to run. OpenCode's own default free model can take over 30 seconds to answer, so without
+     * connected providers Buddy uses Big Pickle, which answers in seconds.
+     */
+    private static String model(Sessions.Session ses) {
+        if (!ses.model.isEmpty() || !"opencode".equals(ses.backend)) return ses.model;
+        String plan = Account.OPENCODE.plan;
+        return plan.isEmpty() || plan.equals("free models") ? "opencode/big-pickle" : "";
+    }
+
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         try {
             Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0",
-                    "(Added while you were working:) " + text, ses.model, "", ses.effort);
+                    "(Added while you were working:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;

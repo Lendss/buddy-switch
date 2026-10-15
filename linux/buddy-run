@@ -383,7 +383,9 @@ stream_opencode() {
                   then {_answer:(.part.state.output // "")} else {} end))}]}}
           else
             {type:"result", subtype:"error", is_error:true,
-             result:("OpenCode: " + (.error.data.message // .error.name // "error"))}
+             result:((.error.data.message // .error.message // .error.name // .error.type // "error") as $m
+               | if ($m | test("free tier"; "i")) then "OpenCode free models turned this request down (they sometimes do when busy). Try again in a moment, or pick another model."
+                 else "OpenCode: " + $m end)}
           end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done ;;
     esac
   done
