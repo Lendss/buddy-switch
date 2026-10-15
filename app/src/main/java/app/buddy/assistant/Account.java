@@ -224,11 +224,9 @@ final class Account {
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, "Downloading OpenCode…");
-                    // OpenCode 2 (npm @opencode/cli). npm also fetches the glibc build; Buddy's Alpine only runs the
-                    // musl one, so drop the other (~200 MB)
-                    String o = Linux.exec(app, "npm install -g @opencode/cli >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
-                            + " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;"
-                            + " opencode --version && echo AGENT_OK", 1800);
+                    // OpenCode 2 (npm @opencode/cli), always a fresh install (OC_REMOVE)
+                    String o = Linux.exec(app, OC_REMOVE + " npm install -g @opencode/cli >/tmp/npm.log 2>&1;"
+                            + " tail -5 /tmp/npm.log;" + OC_GLIBC + " opencode --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else {
                     set(Step.INSTALLING, "Downloading Codex…");
@@ -243,6 +241,19 @@ final class Account {
             }
         }).start();
     }
+
+    /**
+     * Removes OpenCode (2 or 1.x) before npm installs it again. Its install hard-links the binary, and Buddy's
+     * Linux fakes hard links with symlinks (proot --link2symlink): when npm replaces an installed copy and
+     * deletes the old links, the new binary goes with them ("opencode: not found"). A fresh install is fine.
+     * Twice: the first rm can leave the binary behind as a hidden .l2s file (~200 MB).
+     */
+    private static final String OC_REMOVE = " for i in 1 2; do rm -rf /usr/local/lib/node_modules/@opencode/cli"
+            + " /usr/local/lib/node_modules/@opencode/.cli-* /usr/local/lib/node_modules/opencode-ai"
+            + " /usr/local/bin/opencode /usr/local/bin/opencode2 2>/dev/null; done;";
+
+    /** npm also fetches OpenCode's glibc build; Buddy's Alpine only runs the musl one, so drop the other (~200 MB). */
+    private static final String OC_GLIBC = " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;";
 
     private static String ver(String out) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("VER=\\D*(\\d+\\.\\d+\\.\\d+)").matcher(out);
@@ -270,14 +281,16 @@ final class Account {
                 if (claude()) {
                     o = Linux.exec(app, "/root/.local/bin/claude update 2>&1 | tail -3; echo VER=$(/root/.local/bin/claude --version)", 900);
                 } else if (opencode()) {
-                    // OpenCode 2 is a new npm package (it keeps 1.x's connected providers); if it fails, put 1.x back
-                    String glibc = " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;";
-                    o = Linux.exec(app, (toV2
-                            ? "npm rm -g opencode-ai >/tmp/npm.log 2>&1; npm install -g @opencode/cli >>/tmp/npm.log 2>&1"
-                            + " || { npm install -g opencode-ai >/dev/null 2>&1;"
-                            + " rm -rf /usr/local/lib/node_modules/opencode-ai/node_modules/opencode-linux-arm64; };"
-                            : "npm install -g @opencode/cli@latest >/tmp/npm.log 2>&1;")
-                            + glibc + " tail -3 /tmp/npm.log; echo VER=$(opencode --version)", 1800);
+                    // Reinstalls only when npm has a newer version (1.x counts: OpenCode 2 is a new npm package that
+                    // keeps 1.x's connected providers). The install removes the old copy first (OC_REMOVE), so it
+                    // downloads into npm's cache before that: a failed download leaves the old one working.
+                    o = Linux.exec(app, ": >/tmp/npm.log; v=$(npm view @opencode/cli version 2>>/tmp/npm.log);"
+                            + " [ -n \"$v\" ] || { tail -3 /tmp/npm.log; exit 0; };"
+                            + " if [ \"$(opencode --version 2>/dev/null | grep -oE '[0-9]+[.][0-9]+[.][0-9]+' | head -1)\" != \"$v\" ]; then"
+                            + " npm cache add @opencode/cli@$v @opencode/cli-linux-arm64-musl@$v >>/tmp/npm.log 2>&1"
+                            + " || { tail -3 /tmp/npm.log; exit 0; };" + OC_REMOVE
+                            + " npm install -g @opencode/cli@$v >>/tmp/npm.log 2>&1; fi;"
+                            + OC_GLIBC + " tail -3 /tmp/npm.log; echo VER=$(opencode --version)", 1800);
                 } else {
                     o = Linux.exec(app, "npm install -g @openai/codex@latest >/tmp/npm.log 2>&1; tail -3 /tmp/npm.log;"
                             + " echo VER=$(codex --version)", 1800);
