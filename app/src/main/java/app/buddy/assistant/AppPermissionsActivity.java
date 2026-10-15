@@ -79,7 +79,7 @@ public class AppPermissionsActivity extends Screen {
 
     private void renderApps() {
         body.removeAllViews();
-        body.addView(text(this, "Trust: Buddy acts freely; the agent still asks before sending or paying, as it's told to.\n"
+        body.addView(text(this, "Trust: the agent works on its own here, with no approval popups.\n"
                 + "Hard: your button rules decide. Send, Pay, Delete… need your OK on a card.\n"
                 + "Smart: the rules, then a separate reviewer AI checks every other tap against your request.\n"
                 + "The agent can never tap Buddy's own bubble, cards or settings.", 13, MUTED), full());

@@ -26,7 +26,7 @@ import static app.buddy.assistant.Ui.*;
  * sign-in) are detected when the user comes back.
  */
 public class OnboardingActivity extends Screen implements Account.Listener {
-    static final int WELCOME = 0, BRAIN = 1, ACCESS = 2, AGENTS = 3, BACKGROUND = 4, TRY = 5;
+    static final int WELCOME = 0, BRAIN = 1, ACCESS = 2, AGENTS = 3, BACKGROUND = 4, SAFETY = 5, TRY = 6;
     private static final int LAST = TRY;
 
     private ScrollView scroll;
@@ -197,6 +197,9 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 break;
             case BACKGROUND:
                 background(ok);
+                break;
+            case SAFETY:
+                safety();
                 break;
             case TRY:
                 tryIt();
@@ -373,8 +376,40 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         if (!ok) {
             primary("Allow", v -> startActivity(new Intent(
                     Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))));
-            secondary("Skip for now", v -> go(TRY));
+            secondary("Skip for now", v -> go(SAFETY));
         }
+    }
+
+    private void safety() {
+        header(R.drawable.ms_shield_person, "How much should it ask?", "Messaging, social, shopping, payment and banking "
+                + "apps always need your OK before Buddy sends, posts, buys or deletes. For your other apps:", false);
+        boolean auto = Prefs.autonomousDefault(this);
+        String[][] opts = {
+                {"ask", "Ask me first", "The agent asks before anything risky, like changing a setting. Safer, but more popups."},
+                {"auto", "Work on its own", "No popups: the agent just does what you asked, like turning on a camera or a light."},
+        };
+        for (String[] o : opts) {
+            boolean on = "auto".equals(o[0]) == auto;
+            LinearLayout r = row(this);
+            r.setPadding(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
+            r.setBackground(outlined(this, CARD, 16, on ? ACCENT : OUTLINE, on ? 2 : 1));
+            LinearLayout t = column(this);
+            t.setPadding(0, 0, dp(this, 8), 0);
+            t.addView(title(this, o[1], 16));
+            t.addView(text(this, o[2], 13, MUTED));
+            r.addView(t, weight1());
+            r.addView(radio(on));
+            r.setOnClickListener(v -> {
+                Prefs.setAutonomousDefault(this, "auto".equals(o[0]));
+                render();
+            });
+            LinearLayout.LayoutParams p = full();
+            p.topMargin = dp(this, 10);
+            body.addView(r, p);
+        }
+        note("You can change this per app any time: Settings → App permissions. Set an app to Trust to let the agent "
+                + "work there without popups, or to Hard so Buddy itself asks you.");
+        primary("Continue", v -> go(TRY));
     }
 
     private void tryIt() {

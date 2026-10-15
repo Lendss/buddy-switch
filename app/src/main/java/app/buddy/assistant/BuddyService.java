@@ -257,18 +257,24 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     /** The name of the app on screen (for approval cards), or null. */
     String foregroundAppName() {
+        String pkg = foregroundPkg();
+        if (pkg == null) return null;
+        try {
+            android.content.pm.PackageManager pm = getPackageManager();
+            return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString();
+        } catch (Exception e) {
+            return pkg;
+        }
+    }
+
+    /** The package of the app on screen, or null. */
+    String foregroundPkg() {
         try {
             for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
                 if (w.getType() != android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION || !w.isActive()) continue;
                 android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
                 if (r == null || r.getPackageName() == null) continue;
-                String pkg = r.getPackageName().toString();
-                try {
-                    android.content.pm.PackageManager pm = getPackageManager();
-                    return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString();
-                } catch (Exception e) {
-                    return pkg;
-                }
+                return r.getPackageName().toString();
             }
         } catch (Exception ignored) {
         }

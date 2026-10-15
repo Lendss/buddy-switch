@@ -222,6 +222,10 @@ $(printf -- '- %s\n' "${ATT[@]}")]"
 fi
 
 SYSTEM=$(cat "$D/system-prompt.md" 2>/dev/null)
+PERMS=$(cat "$D/permissions.md" 2>/dev/null)
+[ -n "$PERMS" ] && SYSTEM="$SYSTEM
+
+$PERMS"
 if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 

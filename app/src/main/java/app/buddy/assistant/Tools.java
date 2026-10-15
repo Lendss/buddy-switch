@@ -205,6 +205,11 @@ final class Tools {
                 return text("Waited " + ms + " ms.");
             }
             case "confirm": {
+                if (Guard.autonomous(svc, svc.foregroundPkg())) {
+                    // no card in an app the user trusts; not counted as approval for a tap in another app
+                    return text("APPROVED automatically: the user trusts " + svc.foregroundAppName() + ", so work on "
+                            + "your own there without calling confirm. Apps on Hard or Smart still ask the user.");
+                }
                 String answer = svc.askConfirm(a.getString("summary"));
                 if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary")); // covers the next risky tap
                 return text(answer);

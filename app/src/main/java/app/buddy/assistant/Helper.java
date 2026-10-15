@@ -54,6 +54,7 @@ final class Helper {
         pool.execute(() -> {
             try {
                 sync(app);
+                writePermissions(app);
                 Process p = Linux.builder(app, cmd).start();
                 p.getOutputStream().close();
                 // the helper reports through the local server; its own output is only kept for debugging
@@ -68,6 +69,47 @@ final class Helper {
                 android.util.Log.w("Buddy", "helper failed", e);
             }
         });
+    }
+
+    /** The user's App permissions choices, which buddy-run appends to the agent's instructions. */
+    static void writePermissions(Context c) {
+        StringBuilder trusted = new StringBuilder();
+        for (java.util.Map.Entry<String, String> e : Prefs.appSafetyAll(c).entrySet()) {
+            if ("trust".equals(e.getValue())) trusted.append("- ").append(appName(c, e.getKey())).append(" (").append(e.getKey()).append(")\n");
+        }
+        String text = "";
+        if (trusted.length() > 0) text += "Apps the user set to Trust:\n" + trusted;
+        if (Prefs.autonomousDefault(c)) {
+            text += (text.isEmpty() ? "" : "\n") + "The user also trusts every app they haven't set, except messaging, "
+                    + "social, calls, email, shopping, payment and banking apps.\n";
+        }
+        StringBuilder never = new StringBuilder();
+        for (Guard.Rule r : Guard.rules(c, "allow")) never.append("- “").append(r.label).append("” in ")
+                .append(r.pkg == null ? "all apps" : appName(c, r.pkg)).append("\n");
+        if (never.length() > 0) {
+            text += (text.isEmpty() ? "" : "\n") + "Buttons the user marked \"Never ask\" (tap them without confirming "
+                    + "when the task calls for it):\n" + never;
+        }
+        File f = new File(Linux.root(c), "root/.buddy/permissions.md");
+        try {
+            if (text.isEmpty()) {
+                f.delete();
+            } else {
+                try (OutputStream o = new FileOutputStream(f)) {
+                    o.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+            }
+        } catch (IOException e) {
+            android.util.Log.w("Buddy", "permissions not written", e);
+        }
+    }
+
+    private static String appName(Context c, String pkg) {
+        try {
+            return c.getPackageManager().getApplicationLabel(c.getPackageManager().getApplicationInfo(pkg, 0)).toString();
+        } catch (Exception e) {
+            return pkg;
+        }
     }
 
     /** Copies the helper files from the APK into Linux once per app version. */

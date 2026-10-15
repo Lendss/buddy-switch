@@ -92,6 +92,26 @@ final class Prefs {
         sp(c).edit().putString("update_notified", v).apply();
     }
 
+    /** First-setup choice: apps the user hasn't set (and that aren't on Hard by default) start on Trust, else Hard. */
+    static boolean autonomousDefault(Context c) {
+        return sp(c).getBoolean("autonomous_default", false);
+    }
+
+    static void setAutonomousDefault(Context c, boolean on) {
+        sp(c).edit().putBoolean("autonomous_default", on).apply();
+    }
+
+    /** Every app the user set a mode for: package → "trust", "hard" or "smart". */
+    static java.util.Map<String, String> appSafetyAll(Context c) {
+        java.util.Map<String, String> out = new java.util.TreeMap<>();
+        for (java.util.Map.Entry<String, ?> e : sp(c).getAll().entrySet()) {
+            if (e.getKey().startsWith("app_safety_") && e.getValue() instanceof String) {
+                out.put(e.getKey().substring("app_safety_".length()), (String) e.getValue());
+            }
+        }
+        return out;
+    }
+
     static boolean devMode(Context c) {
         return !Flavor.PLAY && sp(c).getBoolean("dev", false);
     }

@@ -211,8 +211,13 @@ final class Guard {
         return null;
     }
 
+    /** Trust: the agent works on its own in this app, without asking the user. */
+    static boolean autonomous(android.content.Context c, String pkg) {
+        return pkg != null && "trust".equals(mode(c, pkg, null));
+    }
+
     /** "hard": Buddy enforces approval in this app; "smart": the lists, then a reviewer AI for every tap;
-     *  "trust": it leaves asking to the agent. */
+     *  "trust": the agent works on its own, without asking. */
     static String mode(android.content.Context c, String pkg, CharSequence label) {
         return modeWhy(c, pkg, label)[0];
     }
@@ -235,7 +240,8 @@ final class Guard {
             }
         } catch (Exception ignored) {
         }
-        return new String[]{"trust", "Suggested"};
+        // the rest follow the first-setup choice: work on its own, or ask first
+        return Prefs.autonomousDefault(c) ? new String[]{"trust", "Suggested"} : new String[]{"hard", "Your setup choice: ask first"};
     }
 
     private Guard() {

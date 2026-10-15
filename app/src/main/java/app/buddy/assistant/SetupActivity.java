@@ -444,8 +444,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         perms.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout pt = column(this);
         pt.addView(title(this, "App permissions", 15));
-        pt.addView(text(this, "Choose per app: trust it, or put it on a hard limit where Buddy itself asks you "
-                + "before Send, Pay, Delete…", 13, MUTED), topGap(2));
+        pt.addView(text(this, "Choose per app: Trust lets the agent work there without popups; Hard means Buddy "
+                + "itself asks you before Send, Pay, Delete…", 13, MUTED), topGap(2));
         perms.addView(pt, weight1());
         perms.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
         perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
