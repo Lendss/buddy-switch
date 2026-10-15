@@ -32,6 +32,33 @@ final class Voice {
         }
     }
 
+    /**
+     * Notices that the user stopped talking, from the microphone's loudness (Claude's and ChatGPT's dictation have no
+     * end-of-speech of their own; Android's recognizer does). Follows the room's noise so a car or a street works.
+     */
+    static final class EndOfSpeech {
+        private static final long PAUSE_MS = 1800, NOTHING_SAID_MS = 8000;
+        private final long start = System.currentTimeMillis();
+        private float floor = -1;
+        private boolean spoke;
+        private long quietSince;
+
+        /** A level (0..1); true once the user has spoken and then paused. */
+        boolean feed(float v) {
+            long now = System.currentTimeMillis();
+            // the noise floor: follows quiet levels at once, louder ones only slowly
+            floor = floor < 0 || v < floor ? v : floor + (v - floor) * 0.003f;
+            if (v > floor + 0.18f) {
+                spoke = true;
+                quietSince = 0;
+            } else if (v < floor + 0.10f) {
+                if (quietSince == 0) quietSince = now;
+            }
+            if (spoke) return quietSince != 0 && now - quietSince > PAUSE_MS;
+            return now - start > NOTHING_SAID_MS;
+        }
+    }
+
     private static SpeechRecognizer recognizer;
     private static Listener current;
     private static TextToSpeech tts;

@@ -46,8 +46,11 @@ final class ClaudeDictation {
         lastText = "";
         l.onPartial("");
         final String code = code(lang);
+        final Voice.EndOfSpeech eos = new Voice.EndOfSpeech();
         MicServer.levels = v -> main.post(() -> {
-            if (listener == l && !finishing) l.onLevel(v);
+            if (listener != l || finishing) return;
+            l.onLevel(v);
+            if (eos.feed(v)) finish(); // the user paused: send, like the phone's recognizer does
         });
         // recording starts now; Claude gets it all once its recorder is up
         l.onStatus(MicServer.startCapture(app) ? null : ready(code) ? "Starting…" : "Starting Claude…");

@@ -146,6 +146,15 @@ final class Prefs {
         sp(c).edit().putBoolean("bubble", on).apply();
     }
 
+    /** A tap on the bubble starts the microphone (when no task runs) instead of only opening the chat. */
+    static boolean tapToTalk(Context c) {
+        return sp(c).getBoolean("tap_to_talk", false);
+    }
+
+    static void setTapToTalk(Context c, boolean on) {
+        sp(c).edit().putBoolean("tap_to_talk", on).apply();
+    }
+
     /** Read replies aloud with text-to-speech. */
     static boolean speakReplies(Context c) {
         return sp(c).getBoolean("speak", false);

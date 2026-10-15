@@ -1139,6 +1139,100 @@ final class Bubble implements ChatHub.Listener {
         noteStatus("Listening… tap the bubble when done");
     }
 
+    // ------------------------------------------------- tap to talk, with the chat closed
+
+    private boolean talkListening;
+    private VoiceWaves waves;
+
+    /** Listen without opening the chat: waves under the bubble, the words beside it, sent when you pause. */
+    private void talk() {
+        if (!Voice.micAllowed(svc)) {
+            toast("Allow the microphone in Buddy, then tap the bubble again.");
+            svc.startActivity(new android.content.Intent(svc, MainActivity.class)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
+            return;
+        }
+        String err = Voice.listen(svc, new Voice.Listener() {
+            @Override
+            public void onPartial(String text) {
+                if (!text.isEmpty()) noteStatus("“" + text + "”");
+            }
+
+            @Override
+            public void onFinal(String text) {
+                talkDone();
+                Sessions.Session ses = sessions.current;
+                if (ses == null) {
+                    ses = hub.create(Prefs.backend(svc));
+                    hub.select(ses);
+                }
+                String e = hub.send(ses, text);
+                if (e != null) toast(e);
+            }
+
+            @Override
+            public void onEnd(String message) {
+                talkDone();
+                if (message != null) toast(message);
+            }
+
+            @Override
+            public void onLevel(float level) {
+                if (waves != null) waves.level(level);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                if (waves != null) waves.setLive(status == null);
+                noteStatus(status == null ? "Listening…" : status);
+            }
+        });
+        if (err != null) {
+            toast(err);
+            return;
+        }
+        talkListening = true;
+        noteListening = true; // the pill shows what's heard
+        noteStatus("Listening…");
+        showWaves(true);
+    }
+
+    private void talkDone() {
+        talkListening = false;
+        showWaves(false);
+        noteDone();
+    }
+
+    /** The waves' own small window, centred under the bubble's face; touches go through it. */
+    private void showWaves(boolean on) {
+        if (!on) {
+            if (waves != null) {
+                waves.setVisibility(View.GONE);
+                try {
+                    wm.removeView(waves);
+                } catch (Exception ignored) {
+                }
+                waves = null;
+            }
+            return;
+        }
+        showWaves(false);
+        waves = new VoiceWaves(svc);
+        waves.setLive(true);
+        int w = dp(150), h = dp(44);
+        int[] loc = new int[2];
+        face.getLocationOnScreen(loc);
+        WindowManager.LayoutParams p = new WindowManager.LayoutParams(w, h,
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                PixelFormat.TRANSLUCENT);
+        p.gravity = Gravity.TOP | Gravity.START;
+        p.x = Math.max(0, Math.min(screen().width() - w, loc[0] + face.getWidth() / 2 - w / 2));
+        p.y = loc[1] + face.getHeight() + dp(8);
+        wm.addView(waves, p);
+    }
+
     private void noteStatus(String s) {
         pill.setText(s);
         pill.setVisibility(View.VISIBLE);
@@ -2178,7 +2272,7 @@ final class Bubble implements ChatHub.Listener {
                         radial.release();
                         return true;
                     }
-                    if (noteListening && !dragging) { // dictating an instruction: a tap ends it
+                    if ((noteListening || talkListening) && !dragging) { // dictating: a tap ends it
                         Voice.finishListening();
                         return true;
                     }
@@ -2203,7 +2297,9 @@ final class Bubble implements ChatHub.Listener {
                         });
                     } else {
                         maybeTip();
-                        expand();
+                        // Tap to talk: listen with the chat closed (waves under the bubble), then send
+                        if (Prefs.tapToTalk(svc) && hub.runningCount() == 0) talk();
+                        else expand();
                     }
                     return true;
                 case MotionEvent.ACTION_CANCEL:

@@ -65,8 +65,11 @@ final class CodexDictation {
         partial = "";
         l.onPartial("");
         // Buddy records from now on (the WebView can't open the mic on some phones); ChatGPT hears it all once connected
+        final Voice.EndOfSpeech eos = new Voice.EndOfSpeech();
         MicServer.levels = v -> main.post(() -> {
-            if (listener == l && !finishing) l.onLevel(v);
+            if (listener != l || finishing) return;
+            l.onLevel(v);
+            if (eos.feed(v)) finish(); // the user paused: send, like the phone's recognizer does
         });
         if (!MicServer.startCapture(app)) {
             listener = null;

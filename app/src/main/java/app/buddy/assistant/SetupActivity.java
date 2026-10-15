@@ -259,7 +259,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         String engineNote = "claude".equals(engine)
                 ? "Claude Code's dictation on your Claude plan: very accurate. Supports English, French, German, Spanish, "
                 + "Italian, Portuguese, Dutch, Turkish, Russian, Japanese and more, but not Arabic: for Arabic, Buddy uses "
-                + "the phone's recognizer. Hold-to-talk; the words appear when you stop."
+                + "the phone's recognizer. The words appear when you pause."
                 : "chatgpt".equals(engine)
                 ? "ChatGPT's voice through Codex, on your ChatGPT plan. Understands any language, even mixed in one sentence. "
                 + "Only your words are used: ChatGPT's spoken replies are muted and it can't run anything."
@@ -413,6 +413,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             BuddyService svc = BuddyService.get();
             if (svc != null) svc.applyBubbleSetting();
         }), full());
+        ex.addView(divider(), lineParams());
+        ex.addView(switchRow(this, "Tap the bubble to talk", "One tap opens the mic: say what you want and it sends "
+                + "when you pause. Hold the bubble for the chat and more.", Prefs.tapToTalk(this), on -> Prefs.setTapToTalk(this, on)), full());
         ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, "Read replies aloud", "Talk with the mic in any chat; it sends when you stop speaking.",
                 Prefs.speakReplies(this), on -> {
