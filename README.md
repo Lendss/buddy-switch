@@ -22,9 +22,9 @@ It runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/d
 
 <div align="center">
 
-https://github.com/user-attachments/assets/6659a546-9bbd-4adf-bb42-d924cf58e98e
+https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 
-<sub>Turning on the lights, then a pizza order changed mid-task (sped up)</sub>
+<sub>Codex turns on the lights while OpenCode's free model adds a Switch 2 to the Amazon cart (real recordings, waiting sped up)</sub>
 </div>
 
 <table>
