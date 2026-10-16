@@ -133,7 +133,7 @@ Settings → **Remote Control → Claude Code session** keeps a Claude Code sess
 
 ### When an agent is using your phone
 
-As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill (hold the bubble for **Stop task**; it shows even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute.
+As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill (hold the bubble for **Pause** or **Stop task**; it shows even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute. **Pause** lets you use the phone in the middle of a task: the agent's next phone action waits until you hold the bubble and tap **Resume**, then it re-reads the screen before going on. Stop while paused ends the task without that action running, and a pause longer than 5 minutes stops the task.
 
 ### The bubble
 
@@ -141,7 +141,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 |---|---|
 | Tap the bubble | Open the chat panel |
 | Spinning ring | An agent is working |
-| **Hold the bubble** | Its actions fan out: **Stop task**, **Add instruction** (by voice), **Stop voice**, **Talk**, **Open chat**, **Hide**. Slide onto one and let go, or let go and tap |
+| **Hold the bubble** | Its actions fan out: **Stop task**, **Pause**/**Resume**, **Add instruction** (by voice), **Stop voice**, **Talk**, **Open chat**, **Hide**. Slide onto one and let go, or let go and tap |
 | Drag the bubble | Move it; it snaps to the nearest edge |
 | Drag it onto the ✕ | Hide it. A notification brings it back. It never shows on the lock screen. |
 | Back | Close the keyboard, then collapse the panel |

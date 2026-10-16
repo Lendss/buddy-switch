@@ -312,6 +312,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
     /** Pick this chat's model; the conversation continues with the new one. */
     private void chooseModel() {
+        Models.refresh(this);
         final String[][] options = Models.forBackend(ses.backend);
         LinearLayout c = column(this);
         TextView h = title(this, ses.brainName() + " model", 18);

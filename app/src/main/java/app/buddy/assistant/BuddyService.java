@@ -32,6 +32,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private ControlIndicator control;
     /** After the user taps Stop on the control indicator, phone actions are refused until then (elapsedRealtime). */
     private volatile long revokedUntil;
+    /** Pause from the hold menu: phone tools wait (see awaitResume) while the user uses the phone. */
+    private volatile boolean paused, rereadNeeded;
+    private final Object pauseLock = new Object();
+    private static final long PAUSE_MAX_MS = 5 * 60_000, PAUSE_WAIT_MS = 45_000;
+    private final Runnable pauseExpired = () -> {
+        if (!paused) return;
+        takeBackControl();
+        android.widget.Toast.makeText(this, "Paused for 5 minutes, so Buddy stopped the task.", android.widget.Toast.LENGTH_LONG).show();
+    };
     private Tools tools;
     private McpServer server;
 
@@ -349,16 +358,88 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     /** The user asked for something new: phone actions are allowed again. */
     void allowControl() {
         revokedUntil = 0;
+        rereadNeeded = false;
     }
 
     /** Stop from the indicator or its notification: stop Buddy's chats and refuse phone actions for a minute. */
     void takeBackControl() {
         main.post(() -> {
             revokedUntil = android.os.SystemClock.elapsedRealtime() + 60_000;
+            endPause(); // after revoking, so tool calls waiting in a pause get "stopped", not go ahead
             ChatHub.get(this).stopAll();
             control.end();
             android.widget.Toast.makeText(this, "Stopped. Your phone is yours again.", android.widget.Toast.LENGTH_SHORT).show();
         });
+    }
+
+    boolean paused() {
+        return paused;
+    }
+
+    /** Pause (main thread): the agent's next phone action waits until resume, so the user can use the phone. */
+    void pause() {
+        if (paused) return;
+        paused = true;
+        control.end();
+        main.postDelayed(pauseExpired, PAUSE_MAX_MS);
+        ChatHub hub = ChatHub.get(this);
+        Sessions.Session ses = hub.latestRunning();
+        if (ses != null) hub.note(ses, Bubble.Kind.STEP, "Paused: the phone is yours until you resume");
+        if (bubble != null) bubble.onPauseChanged();
+        android.widget.Toast.makeText(this, "Paused. Use your phone, then hold the bubble to resume.", android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    /** Resume (main thread): waiting phone actions go on, after the agent re-reads the screen. */
+    void resume() {
+        if (!paused) return;
+        rereadNeeded = true;
+        endPause();
+        ChatHub hub = ChatHub.get(this);
+        Sessions.Session ses = hub.latestRunning();
+        if (ses != null) hub.note(ses, Bubble.Kind.STEP, "Resumed");
+    }
+
+    /** A chat was stopped while paused (main thread): end the pause without letting waiting actions go ahead. */
+    void stopPaused() {
+        if (!paused) return;
+        revokedUntil = android.os.SystemClock.elapsedRealtime() + 60_000;
+        endPause();
+    }
+
+    private void endPause() {
+        if (!paused) return;
+        paused = false;
+        main.removeCallbacks(pauseExpired);
+        synchronized (pauseLock) {
+            pauseLock.notifyAll();
+        }
+        if (bubble != null) bubble.onPauseChanged();
+    }
+
+    /**
+     * For a phone tool (tool thread): while paused, wait for resume, at most PAUSE_WAIT_MS per call so agents
+     * with a short tool timeout (Codex) don't fail the call. Null to go ahead, else the tool's answer.
+     */
+    String awaitResume(String tool) throws InterruptedException {
+        long until = android.os.SystemClock.elapsedRealtime() + PAUSE_WAIT_MS;
+        synchronized (pauseLock) {
+            long left;
+            while (paused && (left = until - android.os.SystemClock.elapsedRealtime()) > 0) pauseLock.wait(left);
+        }
+        if (paused) {
+            return "PAUSED: the user paused you to use the phone themselves. Nothing was done. Don't use other phone "
+                    + "tools; call " + tool + " again to keep waiting until they resume.";
+        }
+        String revoked = controlRevoked();
+        if (revoked != null) return revoked;
+        if (rereadNeeded) {
+            if ("read_screen".equals(tool) || "screenshot".equals(tool)) rereadNeeded = false;
+            else if (!"wait".equals(tool) && !"list_apps".equals(tool)) {
+                return "RESUMED: the user paused you and used the phone, so the screen may have changed and element "
+                        + "ids are stale. Nothing was done. Call read_screen, then continue the task.";
+            }
+        }
+        return null;
     }
 
     /** Short vibration to get the user's attention (e.g. "tap Update"). */

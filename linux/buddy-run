@@ -65,10 +65,11 @@ case "$CMD" in
     signed=$({ [ -s "$HOME/.claude/.credentials.json" ] && echo claude; [ -s "$HOME/.codex/auth.json" ] && echo codex
       have opencode && echo opencode; } | paste -sd, -)
     cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
-    # OpenCode's model list takes a few seconds: report the last one, refresh it in the background
+    # OpenCode's model list (a second or two; a background refresh got killed when the helper exited, so the list
+    # never updated and new free models didn't show). On failure the last good list is kept.
+    have opencode && timeout 30 opencode models $(oc2 && echo --standalone) >"$D/opencode-models.new" 2>/dev/null \
+      && [ -s "$D/opencode-models.new" ] && mv "$D/opencode-models.new" "$D/opencode-models"
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
-    have opencode && (timeout 60 opencode models $(oc2 && echo --standalone) >"$D/opencode-models.new" 2>/dev/null \
-      && mv "$D/opencode-models.new" "$D/opencode-models") >/dev/null 2>&1 &
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
       --argjson om "${om:-[]}" '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om}' | post
     exit 0 ;;

@@ -670,7 +670,7 @@ final class Bubble implements ChatHub.Listener {
     /** The bubble can be turned off in the app; it then only appears for approval cards. */
     void applyEnabled() {
         if (locked && expanded && pendingConfirm == null) collapse();
-        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling);
+        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling || svc.paused());
         boolean wasHidden = root.getVisibility() != View.VISIBLE;
         root.setVisibility(show ? View.VISIBLE : View.GONE);
         if (show && wasHidden && !expanded) popIn();
@@ -683,6 +683,12 @@ final class Bubble implements ChatHub.Listener {
     void setControlling(boolean on) {
         if (controlling == on) return;
         controlling = on;
+        applyEnabled();
+        refreshStatus();
+    }
+
+    /** Paused or resumed from the hold menu: the pill says so, and the bubble stays up while paused. */
+    void onPauseChanged() {
         applyEnabled();
         refreshStatus();
     }
@@ -838,7 +844,7 @@ final class Bubble implements ChatHub.Listener {
                     head.setScaleY(1f);
                     head.setRotation(0f);
                     head.setAlpha(1f);
-                    setWorking(running || controlling, true);
+                    setWorking(!svc.paused() && (running || controlling), true);
                 }).start();
         dismissCircle.animate().scaleX(1.45f).scaleY(1.45f).setDuration(110)
                 .setInterpolator(new DecelerateInterpolator())
@@ -1058,7 +1064,7 @@ final class Bubble implements ChatHub.Listener {
         boolean speaking = Voice.isSpeaking(), working = running || controlling;
         if (!speaking && !working) return;
         Prefs.addTip(svc);
-        toast(speaking ? "Tip: hold the bubble to stop the voice" : "Tip: hold the bubble to stop the task or add an instruction");
+        toast(speaking ? "Tip: hold the bubble to stop the voice" : "Tip: hold the bubble to pause, stop or add an instruction");
     }
 
     /** Hold the bubble: what can be done right now, fanned out around it. */
@@ -1066,20 +1072,20 @@ final class Bubble implements ChatHub.Listener {
         vibrate(30);
         Prefs.setMenuHinted(svc);
         java.util.List<RadialMenu.Action> acts = new java.util.ArrayList<>();
-        boolean working = running || controlling;
+        boolean paused = svc.paused(), working = running || controlling || paused;
         if (working) acts.add(new RadialMenu.Action(R.drawable.ic_stop, "Stop task", true, () -> {
-            if (controlling) svc.takeBackControl();
+            if (controlling || paused) svc.takeBackControl();
             else {
                 hub.stopAll();
                 toast("Stopping…");
             }
         }));
+        if (paused) acts.add(new RadialMenu.Action(R.drawable.ic_play, "Resume", false, svc::resume));
+        else if (working) acts.add(new RadialMenu.Action(R.drawable.ic_pause, "Pause", false, svc::pause));
         if (hub.runningCount() > 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Add instruction", false, this::dictateNote));
         if (Voice.isSpeaking()) acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, "Stop voice", false, Voice::stopSpeaking));
-        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Talk", false, () -> {
-            expand();
-            face.post(this::toggleMic);
-        }));
+        // listens with the chat closed, like Tap the bubble to talk (opening the chat first lost the mic)
+        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Talk", false, this::talk));
         acts.add(new RadialMenu.Action(R.drawable.ms_forum, "Open chat", false, this::expand));
         acts.add(new RadialMenu.Action(R.drawable.ms_close, "Hide", false, this::dismissToNotification));
         int[] loc = new int[2];
@@ -1376,6 +1382,7 @@ final class Bubble implements ChatHub.Listener {
         TextView ml = Ui.sectionLabel(svc, "Model");
         ml.setPadding(dp(8), dp(16), 0, dp(4));
         sessionList.addView(ml);
+        Models.refresh(svc);
         for (final String[] o : Models.forBackend(ses.backend)) {
             boolean on = o[0].equals(ses.model);
             LinearLayout r = Ui.listRow(svc);
@@ -1835,11 +1842,14 @@ final class Bubble implements ChatHub.Listener {
         boolean working = running || controlling;
         if (working && !wasWorking) maybePeek();
         wasWorking = working;
+        boolean paused = svc.paused();
         String text = pendingConfirm != null ? (asking ? "Waiting for your answer" : "Waiting for your approval") : hub.pillText();
-        if (controlling && pendingConfirm == null) {
+        if (paused && pendingConfirm == null) {
+            text = "Paused · hold the bubble to resume";
+        } else if (controlling && pendingConfirm == null) {
             text = "Using your phone" + (text == null || text.isEmpty() ? "" : " · " + text);
         }
-        if ((controlling || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
+        if (!paused && (controlling || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
             text = (text == null ? "" : text + " · ") + "hold the bubble for Stop and more";
         }
         if (!noteListening) { // while dictating a note the pill shows what's heard
@@ -1850,7 +1860,7 @@ final class Bubble implements ChatHub.Listener {
         pill.setTextColor(controlling ? Ui.ON_ACCENT : Ui.TEXT);
         pill.setBackground(rounded(controlling ? Ui.ACCENT : Ui.BG, 18, Ui.ACCENT, 1));
         badge.setVisibility(!expanded && hub.anyUnread() ? View.VISIBLE : View.GONE);
-        setWorking(running || controlling);
+        setWorking(!paused && (running || controlling));
         updateHeader();
         if (!expanded) {
             try {
@@ -2285,7 +2295,7 @@ final class Bubble implements ChatHub.Listener {
                         }
                         endArcs(false);
                         showDismissTarget(false);
-                        setWorking(running || controlling, true);
+                        setWorking(!svc.paused() && (running || controlling), true);
                         // fling to the nearest edge with a little bounce
                         final boolean right = lp.x + faceOffX > screen().width() / 2;
                         int edgeX = right ? screen().width() - root.getWidth() - dp(6) : dp(6);
@@ -2308,7 +2318,7 @@ final class Bubble implements ChatHub.Listener {
                     if (menu) return true;
                     endArcs(false);
                     showDismissTarget(false);
-                    setWorking(running || controlling, true);
+                    setWorking(!svc.paused() && (running || controlling), true);
                     return true;
                 default:
                     return false;

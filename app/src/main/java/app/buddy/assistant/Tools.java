@@ -186,6 +186,11 @@ final class Tools {
     private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
+        // asking the user and posting a note go on while paused; operating the phone waits
+        if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name)) {
+            String held = svc.awaitResume(name);
+            if (held != null) return text(held);
+        }
         svc.onToolActivity(name);
         switch (name) {
             case "read_screen": return text(readScreen());

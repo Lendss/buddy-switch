@@ -27,6 +27,20 @@ final class Models {
     private Models() {
     }
 
+    private static long refreshedAt;
+
+    /** Re-reads the agents' model lists (new free OpenCode models appear often) when the picker opens, at most every
+     *  10 minutes; the helper's answer updates the lists. */
+    static void refresh(android.content.Context c) {
+        long now = System.currentTimeMillis();
+        if (now - refreshedAt < 600_000 || !Linux.installed(c)) return;
+        refreshedAt = now;
+        try {
+            Helper.run(c, "ping");
+        } catch (Exception ignored) {
+        }
+    }
+
     static String[][] forBackend(String backend) {
         if ("opencode".equals(backend)) return opencodeLive != null ? opencodeLive : OPENCODE;
         if (!"codex".equals(backend)) return CLAUDE;

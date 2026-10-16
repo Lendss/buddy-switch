@@ -172,6 +172,8 @@ final class ChatHub {
 
     void stop(Sessions.Session ses) {
         if (!ses.running) return;
+        BuddyService svc = BuddyService.get();
+        if (svc != null) svc.stopPaused();
         try {
             Helper.run(app, "stop", ses.id);
             ses.status = "Stopping…";
