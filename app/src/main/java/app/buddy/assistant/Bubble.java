@@ -311,12 +311,15 @@ final class Bubble implements ChatHub.Listener {
         stp.topMargin = dp(8);
         panel.addView(strip, stp);
 
-        scroll = new ScrollView(svc);
-        // Tapping the conversation hides the keyboard.
-        scroll.setOnTouchListener((v, e) -> {
-            if (e.getAction() == MotionEvent.ACTION_DOWN && keyboardVisible()) hideKeyboard();
-            return false;
-        });
+        // Tapping the conversation hides the keyboard, messages included: they take the touch themselves (a
+        // listener on the scroll view only saw taps between them), so it's checked before they get it.
+        scroll = new ScrollView(svc) {
+            @Override
+            public boolean dispatchTouchEvent(MotionEvent e) {
+                if (e.getActionMasked() == MotionEvent.ACTION_DOWN && keyboardVisible()) hideKeyboard();
+                return super.dispatchTouchEvent(e);
+            }
+        };
         messages = new LinearLayout(svc);
         messages.setOrientation(LinearLayout.VERTICAL);
         messages.setPadding(0, dp(8), 0, dp(8));
@@ -577,12 +580,13 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void applyExpandedParams() {
-        Rect screen = screen();
-        lp.width = screen.width() - dp(20);
-        // make room for the keyboard only when it's for Buddy's own text field (not another app's, e.g. while
-        // the agent types in Messenger: the panel would shrink to half the screen for nothing)
-        // full height; the keyboard is made room for by padding (fitKeyboard)
-        lp.height = Math.max(dp(220), screen.height() - dp(24) - dp(8) - dp(10));
+        // between the status bar and the navigation bar: an accessibility overlay is drawn above the navigation
+        // bar, so a panel reaching into it hid Back, Home and Recents with 3-button navigation (issue #1)
+        Rect usable = usable();
+        lp.width = usable.width() - dp(20);
+        // full height; the keyboard is made room for by padding (fitKeyboard), only when it's for Buddy's own
+        // text field (not another app's, e.g. while the agent types in Messenger)
+        lp.height = Math.max(dp(220), usable.height() - dp(8) - dp(8));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
         lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
@@ -614,7 +618,9 @@ final class Bubble implements ChatHub.Listener {
         scrollToEnd();
         root.post(this::registerBack);
         updateViewing();
-        if (pendingConfirm == null && !sessions.current.running && !showingList) {
+        // with Back/Home/Recents buttons the keyboard would cover them (it's layered above Buddy's overlay, so
+        // above the navigation bar): open it only when the text field is tapped
+        if (pendingConfirm == null && !sessions.current.running && !showingList && !navButtons()) {
             input.requestFocus();
             input.postDelayed(() -> {
                 InputMethodManager imm = svc.getSystemService(InputMethodManager.class);
@@ -2177,6 +2183,26 @@ final class Bubble implements ChatHub.Listener {
 
     private Rect screen() {
         return wm.getCurrentWindowMetrics().getBounds();
+    }
+
+    /** Navigation with Back/Home/Recents buttons (3- or 2-button), not gestures: the bar is a full button row. */
+    private boolean navButtons() {
+        android.graphics.Insets nav = wm.getCurrentWindowMetrics().getWindowInsets()
+                .getInsetsIgnoringVisibility(android.view.WindowInsets.Type.navigationBars());
+        return Math.max(nav.bottom, Math.max(nav.left, nav.right)) >= dp(40);
+    }
+
+    /** The screen without the status bar (or camera cutout) and the navigation bar, wherever they are. */
+    private Rect usable() {
+        android.view.WindowMetrics m = wm.getCurrentWindowMetrics();
+        android.graphics.Insets in = m.getWindowInsets().getInsetsIgnoringVisibility(
+                android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+        Rect r = new Rect(m.getBounds());
+        r.left += in.left;
+        r.top += in.top;
+        r.right -= in.right;
+        r.bottom -= in.bottom;
+        return r;
     }
 
     private int dp(int v) {
