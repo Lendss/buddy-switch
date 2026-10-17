@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every text Buddy shows, in Korean (해요체). Source of truth: res/values/strings.xml. -->
+<resources>
+    <string name="service_label">Buddy 어시스턴트</string>
+    <string name="service_description">Buddy 채팅 버블을 표시하고, 이 휴대전화의 Buddy 안에서 실행되는 Claude Code 또는 Codex가 화면을 읽고 대신 탭, 입력, 스크롤할 수 있게 해요. 에이전트가 직접 Anthropic 또는 OpenAI로 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요.</string>
+
+    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
+
+    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
+    <string name="onboarding_skip_setup">건너뛰기</string>
+    <string name="onboarding_skip_title">초기 설정 가이드를 건너뛸까요?</string>
+    <string name="onboarding_skip_text">초기 설정은 언제든지 ‘설정’ 탭에서 마칠 수 있어요. 마치기 전에는 채팅이 실행되지 않아요.</string>
+    <string name="onboarding_skip_action">건너뛰기</string>
+    <string name="onboarding_progress">%1$d/%2$d단계</string>
+    <string name="onboarding_continue">다음</string>
+    <string name="onboarding_stuck">잘 안 되나요?</string>
+
+    <!-- Guide, welcome screen. -->
+    <string name="onboarding_welcome_title">Buddy를 만나 보세요</string>
+    <string name="onboarding_welcome_text">휴대전화를 대신 사용해 주는 채팅 버블이에요.</string>
+    <string name="onboarding_welcome_ask_title">평소 말투로 부탁하세요</string>
+    <string name="onboarding_welcome_ask_text">“민수에게 늦는다고 답장해 줘”, “장바구니에 우유 담아 줘”처럼요.</string>
+    <string name="onboarding_welcome_plan_title">API 키 없이 내 플랜으로</string>
+    <string name="onboarding_welcome_plan_text">Claude 구독으로 Claude Code를 실행해요. ChatGPT 플랜이 있으면 Codex도 쓸 수 있어요.</string>
+    <string name="onboarding_welcome_control_title">언제나 직접 결정해요</string>
+    <string name="onboarding_welcome_control_text">보내기, 게시, 구매, 삭제는 항상 먼저 물어봐요.</string>
+    <string name="onboarding_welcome_time">초기 설정은 5분 정도 걸려요</string>
+    <string name="onboarding_get_started">시작하기</string>
+
+    <!-- Guide, step: choose the agent. Agent names next to each option stay in English. -->
+    <string name="onboarding_brain_title">에이전트를 고르세요</string>
+    <string name="onboarding_brain_text">채팅에 답할 에이전트예요. 다른 에이전트는 나중에 ‘설정’에서 추가할 수 있어요.</string>
+    <string name="onboarding_brain_claude">Claude 구독(Pro 또는 Max)을 사용해요.</string>
+    <string name="onboarding_brain_codex">ChatGPT 플랜을 사용해요.</string>
+    <string name="onboarding_brain_opencode">무료 모델을 쓸 수 있고 계정이 필요 없어요. 원하는 제공업체는 나중에 연결하세요.</string>
+    <string name="onboarding_brain_both">둘 다 설치하고 채팅마다 골라요. 기본값은 Claude Code예요.</string>
+    <string name="onboarding_recommended">추천</string>
+
+    <!-- Guide, step: turn on Buddy's accessibility service. -->
+    <string name="onboarding_access_title">Buddy가 보고 탭할 수 있게 하기</string>
+    <string name="onboarding_access_done">접근성이 켜져 있어요.</string>
+    <string name="onboarding_access_text">Buddy의 접근성 서비스는 버블을 표시하고, 무언가를 요청했을 때만 에이전트가 화면을 읽고 탭하고 입력할 수 있게 해요.</string>
+    <string name="onboarding_access_privacy">%1$s가 답하기 위해 %2$s에 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요. 보내기, 게시, 구매, 삭제는 항상 먼저 승인을 요청해요.</string>
+    <string name="onboarding_access_privacy_both">Claude Code와 Codex가 답하기 위해 Anthropic과 OpenAI에 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요. 보내기, 게시, 구매, 삭제는 항상 먼저 승인을 요청해요.</string>
+    <string name="onboarding_access_privacy_opencode">%1$s가 답하기 위해 모델 제공업체에 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요. 보내기, 게시, 구매, 삭제는 항상 먼저 승인을 요청해요.</string>
+    <string name="onboarding_access_list_hint">목록에서 ‘다운로드한 앱’(또는 ‘설치된 앱’) → ‘Buddy 어시스턴트’로 이동해 켜세요.</string>
+    <string name="onboarding_access_open">접근성 설정 열기</string>
+    <string name="onboarding_access_greyed_title">스위치가 회색인가요?</string>
+    <string name="onboarding_access_greyed_text">Android는 파일로 설치한 앱에서 이 설정을 차단해요. 아래의 ‘앱 정보’를 탭한 다음 오른쪽 위 ⋮ → ‘제한된 설정 허용’을 탭하고 다시 시도하세요.</string>
+    <string name="onboarding_access_restricted_steps">1. 아래의 ‘앱 정보’를 탭하세요.\n2. 오른쪽 위 ⋮ → ‘제한된 설정 허용’을 탭하세요.\n3. 돌아와서 접근성 설정을 다시 여세요.</string>
+    <string name="onboarding_app_info">앱 정보</string>
+
+    <!-- Guide, step: install the agent inside Buddy and sign in. -->
+    <string name="onboarding_agents_title">설치 및 로그인</string>
+    <string name="onboarding_agents_done_title">준비 완료</string>
+    <string name="onboarding_agents_done">%1$s의 설치와 로그인을 마쳤어요.</string>
+    <string name="onboarding_agents_done_both">Claude Code와 Codex의 설치와 로그인을 마쳤어요.</string>
+    <string name="onboarding_agents_text">Buddy가 앱 안에 %1$s를 설치해요. 그다음 한 번만 로그인하면 돼요. Termux는 필요 없어요.</string>
+    <string name="onboarding_agent_names_both">Claude Code와 Codex</string>
+    <!-- Agent card status lines: small lowercase mono text, one line. -->
+    <string name="onboarding_agent_ready">준비됨 · %1$s</string>
+    <string name="onboarding_agent_free_models">무료 모델</string>
+    <string name="onboarding_agent_signed_in">로그인됨</string>
+    <string name="onboarding_agent_signed_in_as">로그인됨 · %1$s</string>
+    <string name="onboarding_agent_installing">설치 중…</string>
+    <string name="onboarding_agent_installed">설치됨 · 로그인 안 됨</string>
+    <string name="onboarding_agent_not_installed">설치 안 됨</string>
+    <string name="onboarding_agent_sign_in_claude">Claude 계정으로 로그인하세요. 브라우저가 열리면 ‘승인’(Authorize)을 탭하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="onboarding_agent_checking_opencode">OpenCode 확인 중…</string>
+    <string name="onboarding_agent_sign_in_codex">브라우저에서 ChatGPT 계정으로 로그인한 다음 돌아오세요.</string>
+    <string name="onboarding_agent_download_claude">처음 한 번만 약 235MB를 다운로드해요(Buddy의 Linux와 Anthropic의 Claude Code).</string>
+    <string name="onboarding_agent_download_opencode">처음 한 번만 약 230MB를 다운로드해요(Buddy의 Linux, Node.js, OpenCode). 계정은 필요 없어요.</string>
+    <string name="onboarding_agent_download_codex">처음 한 번만 약 150MB를 다운로드해요(Buddy의 Linux, Node.js, OpenAI의 Codex).</string>
+    <string name="onboarding_sign_in_claude">Claude로 로그인</string>
+    <string name="onboarding_sign_in_chatgpt">ChatGPT로 로그인</string>
+    <string name="onboarding_install_agent">%1$s 설치</string>
+    <string name="onboarding_agents_wifi">가능하면 Wi-Fi를 사용하세요. 설치하는 동안 이 화면을 나가도 돼요.</string>
+    <string name="onboarding_stuck_sign_in_q">로그인 후 돌아오지 않나요?</string>
+    <string name="onboarding_stuck_sign_in_a">Claude: Claude 페이지에서 ‘코드 복사’(Copy Code)를 탭한 다음 Buddy로 돌아오세요. 클립보드에서 코드를 자동으로 가져와요.</string>
+    <string name="onboarding_stuck_install_q">설치에 실패했나요?</string>
+    <string name="onboarding_stuck_install_a">연결을 확인하고 ‘설치’를 다시 탭하세요. 멈춘 곳부터 이어서 진행해요.</string>
+
+    <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
+    <string name="onboarding_background_title">계속 실행되게 하기</string>
+    <string name="onboarding_background_done">Buddy가 백그라운드에서 실행될 수 있어요.</string>
+    <string name="onboarding_background_text">에이전트가 작업하는 동안 휴대전화가 배터리를 아끼려고 Buddy를 멈추지 않게 해요.</string>
+    <string name="onboarding_allow">허용</string>
+    <string name="onboarding_skip_for_now">나중에 하기</string>
+
+    <!-- Guide, step: how much the agent asks before acting. -->
+    <string name="onboarding_safety_title">얼마나 물어볼까요?</string>
+    <string name="onboarding_safety_text">메시지, 소셜, 쇼핑, 결제, 은행 앱에서는 Buddy가 보내기, 게시, 구매, 삭제를 하기 전에 항상 승인이 필요해요. 그 외 앱에서는:</string>
+    <string name="onboarding_safety_ask_title">먼저 물어보기</string>
+    <string name="onboarding_safety_ask_text">설정 변경처럼 위험할 수 있는 작업 전에 에이전트가 물어봐요. 더 안전하지만 팝업이 많아져요.</string>
+    <string name="onboarding_safety_auto_title">알아서 하기</string>
+    <string name="onboarding_safety_auto_text">팝업 없이, 카메라나 조명 켜기처럼 요청한 일을 에이전트가 바로 해요.</string>
+    <string name="onboarding_safety_note">앱별로 언제든지 바꿀 수 있어요(설정 → 앱 권한). 앱을 ‘신뢰’로 설정하면 에이전트가 팝업 없이 작업하고, ‘엄격’으로 설정하면 Buddy가 직접 물어봐요.</string>
+
+    <!-- Guide, last step: try a first task. -->
+    <string name="onboarding_try_title">준비가 끝났어요</string>
+    <string name="onboarding_try_text">첫 작업을 해 보세요. Buddy가 설정 앱을 열고 대신 읽어 줄 거예요.</string>
+    <string name="onboarding_try_prompt">설정 열고 내 Android 버전 알려 줘</string>
+    <string name="onboarding_try_prompt_quoted">“%1$s”</string>
+    <string name="onboarding_try_tip">팁: 버블은 다른 앱 위에 떠 있어요. ✕로 끌어다 놓으면 숨길 수 있어요.</string>
+    <string name="onboarding_try_now">지금 해 보기</string>
+    <string name="onboarding_go_to_chats">내 채팅으로 이동</string>
+
+    <!-- Home screen: the chat list. -->
+    <string name="main_new_chat">새 채팅</string>
+    <string name="main_status_ready">준비됨 · %1$s</string>
+    <string name="main_status_setup">초기 설정 %1$d/%2$d</string>
+    <string name="main_setup_title">채팅을 사용하려면 초기 설정을 마치세요</string>
+    <string name="main_setup_next">다음: %1$s</string>
+    <string name="main_setup_next_accessibility">다음: Buddy 접근성 서비스 열기</string>
+    <string name="main_section_working">작업 중</string>
+    <string name="main_section_recent">최근</string>
+    <string name="main_empty_title">아직 채팅이 없어요</string>
+    <string name="main_empty_text">‘새 채팅’을 탭해 Claude Code 또는 Codex와 채팅을 시작하세요. 채팅을 길게 누르면 삭제할 수 있어요.</string>
+    <string name="main_chat_working">작업 중…</string>
+    <string name="main_chat_last_you">나: %1$s</string>
+    <string name="main_delete_title">이 채팅을 삭제할까요?</string>
+    <string name="main_delete_action">삭제</string>
+    <string name="main_new_chat_default">기본</string>
+    <string name="main_new_chat_not_signed_in">로그인 안 됨 · 탭하여 설정</string>
+    <string name="main_new_chat_not_installed">설치 안 됨 · 탭하여 설정</string>
+    <string name="main_ago_now">방금</string>
+    <plurals name="main_ago_minutes">
+        <item quantity="other">%1$d분</item>
+    </plurals>
+    <plurals name="main_ago_hours">
+        <item quantity="other">%1$d시간</item>
+    </plurals>
+    <plurals name="main_ago_days">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+
+    <!-- Notification shown after the bubble is dragged away to hide it. -->
+    <string name="notice_channel_name">숨긴 버블</string>
+    <string name="notice_hidden_title">Buddy가 숨겨져 있어요</string>
+    <string name="notice_hidden_text">탭하면 버블이 다시 표시돼요.</string>
+    <string name="notice_open_chats">채팅 열기</string>
+
+    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
+    <string name="update_channel_name">Buddy 업데이트</string>
+    <string name="update_available_title">Buddy %1$s 버전이 나왔어요</string>
+    <string name="update_notification_text">현재 버전: %1$s. 탭하면 새로운 기능을 확인하고 업데이트할 수 있어요. 채팅은 그대로 남아요.</string>
+    <string name="update_action">업데이트</string>
+    <string name="update_mute">알리지 않기</string>
+    <string name="update_muted">더 이상 업데이트 알림을 보내지 않아요. ‘설정’의 ‘업데이트 알림’에서 다시 켤 수 있어요.</string>
+    <string name="update_checking">업데이트 확인 중…</string>
+    <string name="update_check_failed">GitHub에 연결할 수 없어요. 나중에 다시 시도하세요.</string>
+    <string name="update_up_to_date">최신 버전(Buddy %1$s)을 사용 중이에요.</string>
+    <string name="update_sheet_text">현재 버전: %1$s. 업데이트해도 채팅, 설정, 로그인 정보는 그대로 유지돼요.</string>
+    <string name="update_later">나중에</string>
+    <string name="update_downloading">다운로드 중…</string>
+    <string name="update_needs_permission">Buddy가 앱을 설치할 수 있도록 ‘알 수 없는 앱 설치’를 허용한 다음 ‘업데이트’를 다시 탭하세요.</string>
+    <string name="update_error_no_apk">이 릴리스에는 아직 buddy.apk가 없어요.</string>
+    <string name="update_error_download">다운로드에 실패했어요(%1$s).</string>
+    <string name="update_error_not_newer">다운로드한 파일이 더 새로운 Buddy가 아니라서 열지 않았어요.</string>
+    <string name="update_failed_manual">%1$s %2$s에서 직접 받거나(buddy.apk), Obtainium으로 자동 업데이트를 받을 수도 있어요(%3$s 참고).</string>
+
+    <!-- Settings, Appearance: option names. -->
+    <string name="prefs_theme_system">시스템</string>
+    <string name="prefs_theme_light">라이트</string>
+    <string name="prefs_theme_dark">다크</string>
+    <string name="prefs_surface_warm">웜</string>
+    <string name="prefs_surface_neutral">뉴트럴</string>
+    <string name="prefs_surface_black">블랙</string>
+    <!-- Accent colour names, read aloud by TalkBack for the colour swatches. -->
+    <string name="prefs_accent_coral">코랄</string>
+    <string name="prefs_accent_ocean">오션</string>
+    <string name="prefs_accent_mint">민트</string>
+    <string name="prefs_accent_violet">바이올렛</string>
+    <string name="prefs_accent_rose">로즈</string>
+    <string name="prefs_accent_amber">앰버</string>
+
+    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
+
+    <!-- Floating bubble, read by TalkBack. -->
+    <string name="bubble_face_description">Buddy. 탭하면 열리고, 길게 누르면 메뉴가 나와요</string>
+    <string name="bubble_show_actions">메뉴 표시</string>
+
+    <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…". -->
+    <string name="bubble_pill_waiting_answer">답변을 기다리고 있어요</string>
+    <string name="bubble_pill_waiting_approval">승인을 기다리고 있어요</string>
+    <string name="bubble_pill_paused">일시중지됨 · 버블을 길게 눌러 재개하세요</string>
+    <string name="bubble_using_phone">휴대전화 사용 중</string>
+    <string name="bubble_using_phone_status">휴대전화 사용 중 · %1$s</string>
+    <string name="bubble_pill_hold_hint">‘작업 중지’ 등은 버블을 길게 누르세요</string>
+    <string name="bubble_pill_status_hold_hint">%1$s · ‘작업 중지’ 등은 버블을 길게 누르세요</string>
+
+    <!-- Hold menu: actions fanned out around the bubble while it is held. Very little room: one line, 72dp wide. -->
+    <string name="menu_stop_task">작업 중지</string>
+    <string name="menu_resume">재개</string>
+    <string name="menu_pause">일시중지</string>
+    <string name="menu_add_instruction">지시 추가</string>
+    <string name="menu_stop_voice">음성 중지</string>
+    <string name="bubble_talk">말하기</string>
+    <string name="menu_open_chat">채팅 열기</string>
+    <string name="menu_hide">숨기기</string>
+
+    <!-- Hold-menu preview: the first few times a task starts, three actions peek out of the bubble for a moment. -->
+    <string name="menu_peek_stop">중지</string>
+    <string name="menu_peek_add">추가</string>
+    <string name="menu_peek_voice">음성</string>
+    <string name="menu_peek_hint">길게 눌러 보세요</string>
+
+    <!-- Toasts from the bubble. "hold" = long-press. -->
+    <string name="bubble_tip_stop_voice">팁: 버블을 길게 누르면 음성을 멈출 수 있어요</string>
+    <string name="bubble_tip_hold_menu">팁: 버블을 길게 누르면 일시중지, 중지, 지시 추가를 할 수 있어요</string>
+    <string name="bubble_stopping">중지하는 중…</string>
+    <string name="bubble_nothing_running">Buddy 채팅에서 실행 중인 작업이 없어요.</string>
+    <string name="bubble_nothing_running_chat">이 채팅에서 실행 중인 작업이 없어요.</string>
+    <string name="bubble_allow_mic_tap_mic">Buddy에서 마이크를 허용한 다음 마이크를 다시 탭하세요.</string>
+    <string name="bubble_allow_mic_tap_bubble">Buddy에서 마이크를 허용한 다음 버블을 다시 탭하세요.</string>
+    <string name="bubble_note_added">알겠어요. %1$s가 참고할 거예요</string>
+    <string name="bubble_copied">복사했어요</string>
+
+    <!-- Voice input, shown in the status pill beside the bubble. -->
+    <string name="bubble_listening">듣는 중…</string>
+    <string name="bubble_listening_tap_done">듣는 중… 다 말했으면 버블을 탭하세요</string>
+    <string name="bubble_heard">“%1$s”</string>
+
+    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
+    <string name="bubble_new_chat">새 채팅</string>
+    <string name="bubble_open_in_app">앱에서 열기</string>
+    <string name="bubble_close">닫기</string>
+    <string name="bubble_chats_title">채팅</string>
+    <string name="bubble_model_effort_title">모델 및 추론 강도</string>
+    <string name="bubble_summary_dev">%1$s · 개발자</string>
+
+    <!-- Strip at the top of the chat panel while the agent works. -->
+    <string name="bubble_working">작업 중…</string>
+    <string name="bubble_stop">중지</string>
+
+    <!-- Composer at the bottom of the chat panel. -->
+    <string name="bubble_attach">사진 또는 파일 첨부</string>
+    <string name="bubble_input_hint">%1$s에게 요청…</string>
+    <string name="bubble_paste">붙여넣기</string>
+    <string name="bubble_send">보내기</string>
+    <string name="bubble_empty_chat">새 %1$s 채팅이에요. 휴대전화에서 할 일을 부탁해 보세요.</string>
+    <plurals name="bubble_tool_calls">
+        <item quantity="other">도구 호출 %1$d회</item>
+    </plurals>
+
+    <!-- List of chats in the panel. -->
+    <string name="bubble_chat_row_working">작업 중…</string>
+    <string name="bubble_chat_row_you">나: %1$s</string>
+    <string name="bubble_delete_chat">이 채팅을 삭제할까요?</string>
+    <string name="bubble_delete">삭제</string>
+
+    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
+    <string name="bubble_agent_default">기본</string>
+    <string name="bubble_agent_not_signed_in">로그인 안 됨 · 탭하여 설정</string>
+    <string name="bubble_agent_not_installed">설치 안 됨 · 탭하여 설정</string>
+
+    <!-- Model and effort picker for the current chat. -->
+    <string name="bubble_model_note">이 채팅에만 적용돼요. 대화는 그대로 이어지고, 다음 메시지부터 새 선택이 적용돼요.</string>
+    <string name="bubble_effort">추론 강도</string>
+    <string name="bubble_effort_note">‘자동’은 에이전트가 알아서 정해요. 높을수록 더 오래 생각하고 플랜 사용량도 늘어나요.</string>
+    <string name="bubble_model">모델</string>
+
+    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
+    <string name="card_label_approval">승인 필요</string>
+    <string name="card_label_question">질문</string>
+    <string name="card_label_other_session">%1$s · 다른 세션에서</string>
+    <string name="card_deny">거부</string>
+    <string name="card_change">변경</string>
+    <string name="card_approve">승인</string>
+    <string name="card_skip">건너뛰기</string>
+    <string name="card_type_own_answer">직접 답변 입력…</string>
+    <string name="card_change_hint">무엇을 바꿀까요?</string>
+    <string name="card_answer_hint">답변 입력…</string>
+
+    <!-- Notes posted into the chat after the user answers a card. -->
+    <string name="card_note_answered">✓ 답변 완료: %1$s</string>
+    <string name="card_note_change_requested">✎ 변경 요청: %1$s</string>
+    <string name="card_note_approved">✓ 승인됨: %1$s</string>
+    <string name="card_note_denied">✗ 거부됨</string>
+    <string name="card_note_skipped">질문을 건너뛰었어요</string>
+
+    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
+    <string name="control_channel_name">Buddy가 휴대전화를 사용 중</string>
+    <string name="control_channel_description">에이전트가 휴대전화를 조작하는 동안 상태 표시줄에 표시돼요.</string>
+    <string name="control_title">Buddy가 휴대전화를 사용 중</string>
+    <string name="control_text">끝날 때까지 화면을 만지지 마세요. 직접 조작하려면 ‘중지’를 탭하세요.</string>
+    <string name="control_stop">중지</string>
+
+    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
+
+    <!-- Chat screen: app bar -->
+    <string name="chat_back">뒤로</string>
+    <string name="chat_read_aloud">답변 읽어 주기</string>
+    <string name="chat_read_aloud_on">답변을 읽어 줄게요</string>
+    <string name="chat_read_aloud_off">답변을 읽어 주지 않아요</string>
+    <string name="chat_chip_dev">%1$s · 개발자</string>
+
+    <!-- Chat screen: the strip shown while the agent works -->
+    <string name="chat_stop">중지</string>
+    <string name="chat_working">작업 중…</string>
+
+    <!-- Chat screen: composer and empty chat -->
+    <string name="chat_attach_description">사진 또는 파일 첨부</string>
+    <string name="chat_input_hint">%1$s에게 요청…</string>
+    <string name="chat_input_hint_running">작업 중에 지시 추가…</string>
+    <string name="chat_talk">말하기</string>
+    <string name="chat_send">보내기</string>
+    <string name="chat_empty_hint">새 %1$s 채팅이에요. 휴대전화에서 할 일을 부탁해 보세요.</string>
+    <string name="chat_empty_hint_dev">새 %1$s 채팅이에요. 휴대전화에서 할 일이나 앱 만들기를 부탁해 보세요(개발자 모드 켜짐).</string>
+
+    <!-- Model sheet (tap the model chip under the chat title) -->
+    <string name="chat_model_title">%1$s 모델</string>
+    <string name="chat_model_subtitle">이 채팅에만 적용돼요. 대화는 새 모델로 이어져요.</string>
+    <string name="chat_effort">추론 강도</string>
+    <string name="chat_effort_help">‘자동’은 에이전트가 알아서 정해요. 높을수록 더 오래 생각하고 플랜 사용량도 늘어나요.</string>
+    <string name="chat_model">모델</string>
+    <string name="chat_model_other_hint">기타… 예: %1$s</string>
+    <string name="chat_model_use">사용</string>
+
+    <!-- Language sheet (long-press the mic) -->
+    <string name="chat_speak_in">말할 언어</string>
+    <string name="chat_speak_in_help">언어는 ‘설정’ → ‘음성’에서 고를 수 있어요.</string>
+    <string name="chat_phone_voice">휴대전화 음성</string>
+
+    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
+    <string name="chat_card_question">질문</string>
+    <string name="chat_card_needs_ok">승인 필요</string>
+    <string name="chat_deny">거부</string>
+    <string name="chat_change">변경</string>
+    <string name="chat_approve">승인</string>
+    <string name="chat_skip">건너뛰기</string>
+    <string name="chat_type_own_answer">직접 답변 입력</string>
+    <string name="chat_answer_hint">답변 입력</string>
+    <string name="chat_change_hint">무엇을 바꿀까요?</string>
+    <string name="chat_send_answer">답변 보내기</string>
+    <string name="chat_send_change">변경 사항 보내기</string>
+
+    <!-- Attachments -->
+    <string name="chat_attach">첨부</string>
+    <string name="chat_attach_camera">사진 찍기</string>
+    <string name="chat_attach_camera_sub">카메라 사용</string>
+    <string name="chat_attach_photos">사진</string>
+    <string name="chat_attach_photos_sub">갤러리에서 선택</string>
+    <string name="chat_attach_files">파일</string>
+    <string name="chat_attach_files_sub">PDF, 문서 등 25MB 이하의 모든 파일</string>
+    <string name="chat_no_app_for_action">이 휴대전화에는 이 작업을 할 수 있는 앱이 없어요.</string>
+    <string name="chat_adding">추가하는 중…</string>
+    <plurals name="chat_adding_files">
+        <item quantity="other">파일 %1$d개 추가하는 중…</item>
+    </plurals>
+    <string name="chat_attachment_remove">삭제</string>
+    <string name="chat_no_app_for_file">%1$s 파일을 열 수 있는 앱이 없어요.</string>
+
+    <!-- Chat messages -->
+    <string name="chat_copied">복사했어요</string>
+    <plurals name="chat_tool_calls">
+        <item quantity="other">도구 호출 %1$d회</item>
+    </plurals>
+
+    <!-- Notes Buddy posts into a chat, and the chat's status line -->
+    <string name="hub_continuing">이전 %1$s 세션을 이어서 진행해요. 터미널에서 아직 열려 있다면 먼저 거기서 닫으세요.</string>
+    <string name="hub_still_working_attachments">이 채팅은 아직 작업 중이에요. 끝난 뒤에 첨부 파일을 보내세요.</string>
+    <string name="hub_thinking">생각하는 중…</string>
+    <string name="hub_still_waiting">아직 모델의 답변을 기다리는 중…</string>
+    <string name="hub_no_answer">모델이 답하지 않았어요. 바쁠 수 있으니 다시 시도하거나 채팅 상단에서 다른 모델을 고르세요.</string>
+    <string name="hub_model_set">모델: %1$s</string>
+    <string name="hub_effort_set">추론 강도: %1$s</string>
+    <string name="hub_effort_default">추론 강도: 기본값</string>
+    <string name="hub_stopping">중지하는 중…</string>
+    <string name="hub_stopped">중지했어요.</string>
+    <string name="hub_agent_stopped">%1$s가 멈췄어요.</string>
+    <string name="hub_something_wrong">문제가 발생했어요.</string>
+    <string name="hub_note_added">작업 중에 추가됨: %1$s가 다음 단계에서 받아요</string>
+    <string name="hub_note_passed">추가한 내용을 전달했어요</string>
+    <plurals name="hub_pill_chats">
+        <item quantity="other">채팅 %1$d개 · %2$s</item>
+    </plurals>
+
+    <!-- The agent's steps, one line each, shown in the chat and the bubble while it works. -->
+    <string name="hub_tool_read_screen">화면 읽는 중</string>
+    <string name="hub_tool_screenshot">스크린샷 찍는 중</string>
+    <string name="hub_tool_tap_element">요소 %1$d 탭하는 중</string>
+    <string name="hub_tool_tap_point">좌표 %1$d,%2$d 탭하는 중</string>
+    <string name="hub_tool_long_press">길게 누르는 중</string>
+    <string name="hub_tool_type">“%1$s” 입력하는 중</string>
+    <string name="hub_tool_scroll_up">위로 스크롤하는 중</string>
+    <string name="hub_tool_scroll_down">아래로 스크롤하는 중</string>
+    <string name="hub_tool_scroll_left">왼쪽으로 스크롤하는 중</string>
+    <string name="hub_tool_scroll_right">오른쪽으로 스크롤하는 중</string>
+    <string name="hub_tool_scroll">스크롤하는 중(%1$s)</string>
+    <string name="hub_tool_swipe">스와이프하는 중</string>
+    <string name="hub_tool_press_back">뒤로 버튼 누르는 중</string>
+    <string name="hub_tool_press_home">홈 버튼 누르는 중</string>
+    <string name="hub_tool_press_recents">최근 앱 버튼 누르는 중</string>
+    <string name="hub_tool_press_notifications">알림창 여는 중</string>
+    <string name="hub_tool_press_quick_settings">빠른 설정 여는 중</string>
+    <string name="hub_tool_press">%1$s 버튼 누르는 중</string>
+    <string name="hub_tool_open_app">%1$s 여는 중</string>
+    <string name="hub_tool_open_url">%1$s 여는 중</string>
+    <string name="hub_tool_list_apps">앱 목록 가져오는 중</string>
+    <string name="hub_tool_approved">✓ 승인됨: %1$s</string>
+    <string name="hub_tool_change_requested">✎ 변경 요청</string>
+    <string name="hub_tool_change_requested_text">✎ 변경 요청: %1$s</string>
+    <string name="hub_tool_denied">✗ 거부됨</string>
+    <string name="hub_tool_asking_approval">승인 요청하는 중</string>
+    <string name="hub_tool_answered">✓ 답변 완료</string>
+    <string name="hub_tool_answered_text">✓ 답변 완료: %1$s</string>
+    <string name="hub_tool_question_skipped">질문을 건너뛰었어요</string>
+    <string name="hub_tool_asking">질문하는 중: %1$s</string>
+    <string name="hub_tool_update_download">Buddy 업데이트 다운로드 중</string>
+    <string name="hub_tool_update_check">Buddy 업데이트 확인 중</string>
+    <string name="hub_tool_web_search">웹 검색 중: %1$s</string>
+    <string name="hub_tool_web_fetch">%1$s 읽는 중</string>
+    <string name="hub_tool_command">실행 중: %1$s</string>
+    <string name="hub_tool_command_any">명령어 실행 중</string>
+    <string name="hub_tool_edit">%1$s 편집 중</string>
+    <string name="hub_tool_edit_any">파일 편집 중</string>
+    <string name="hub_tool_read_file">%1$s 읽는 중</string>
+    <string name="hub_tool_other">%1$s 사용 중</string>
+
+    <!-- Transcript of an earlier agent session that isn't a Buddy chat (read-only) -->
+    <string name="transcript_loading">불러오는 중…</string>
+    <string name="transcript_continue">Buddy에서 계속하기</string>
+    <string name="transcript_empty">이 세션에는 읽을 수 있는 메시지가 없어요.</string>
+    <plurals name="transcript_last_messages">
+        <item quantity="other">최근 메시지 %1$d개 · 읽기 전용</item>
+    </plurals>
+
+    <!-- Shared screens: links -->
+    <string name="ui_no_app_for_link">이 링크를 열 수 있는 앱이 없어요</string>
+
+    <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
+    <string name="ui_a11y_title">Buddy가 접근성을 사용하는 방식</string>
+    <string name="ui_a11y_what">Buddy는 Android 접근성 서비스를 사용해 다른 앱에서 요청한 작업을 수행해요. 화면에 표시된 내용을 읽고, 대신 탭하고 입력하고 스크롤해요. 플로팅 버블을 표시하는 데에도 사용해요.</string>
+    <string name="ui_a11y_data">작업이 실행되는 동안 화면 내용(메시지, 이름, 주소 같은 개인 정보가 포함될 수 있음)은 요청을 수행하기 위한 목적으로만, 선택한 에이전트의 AI 서비스(Claude Code는 Anthropic, Codex는 OpenAI, OpenCode는 선택한 모델의 제공업체)로 전송돼요.</string>
+    <string name="ui_a11y_no_servers">Buddy에는 자체 서버가 없어요. 이 데이터를 수집, 판매, 공유하지 않으며 광고에도 사용하지 않아요.</string>
+    <string name="ui_a11y_asks">보내기, 게시, 구매, 삭제를 하기 전에는 Buddy가 승인을 요청해요. 이 서비스는 Android 접근성 설정에서 언제든지 끌 수 있어요.</string>
+    <string name="ui_privacy_policy">개인정보처리방침</string>
+    <string name="ui_no_thanks">동의 안 함</string>
+    <string name="ui_agree_continue">동의하고 계속하기</string>
+
+    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
+    <string name="ui_nav_chats">채팅</string>
+    <string name="ui_nav_sessions">세션</string>
+    <string name="ui_nav_settings">설정</string>
+
+    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
+    <string name="service_pause_expired">5분 동안 일시중지되어 Buddy가 작업을 중지했어요.</string>
+    <string name="service_stopped_toast">중지했어요. 이제 휴대전화를 직접 쓸 수 있어요.</string>
+    <string name="service_paused_note">일시중지됨: 재개할 때까지 휴대전화를 직접 쓸 수 있어요</string>
+    <string name="service_paused_toast">일시중지했어요. 휴대전화를 쓴 다음 버블을 길게 눌러 재개하세요.</string>
+    <string name="service_resumed_note">재개했어요</string>
+
+    <!-- Voice input and output -->
+    <string name="voice_mic_needed">Buddy에 마이크 권한이 필요해요. Buddy 앱을 열고 🎙를 한 번 탭해 허용하세요.</string>
+    <string name="voice_no_recognizer">이 휴대전화에는 음성 인식 서비스가 없어요.</string>
+    <string name="voice_starting">시작하는 중…</string>
+    <string name="voice_finishing">마무리하는 중…</string>
+    <string name="voice_didnt_catch">잘 못 들었어요.</string>
+    <string name="voice_error">음성 인식 오류가 발생했어요(%1$d).</string>
+    <string name="voice_code_omitted">코드는 생략할게요.</string>
+    <string name="voice_link">링크</string>
+    <string name="voice_stop_and_send">중지하고 보내기</string>
+
+    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
+
+    <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). -->
+    <string name="signin_back">뒤로</string>
+    <string name="signin_checking">확인 중…</string>
+
+    <!-- Sign-in screen: the agent isn't installed yet. -->
+    <string name="signin_install">%1$s 설치</string>
+    <string name="signin_install_sub_claude">Claude 구독으로 Buddy 안에서 Claude Code를 실행해요.</string>
+    <string name="signin_install_sub_opencode">Buddy 안에서 OpenCode를 실행해요. 무료 모델은 계정 없이 바로 쓸 수 있고, 원하는 제공업체(Anthropic, OpenAI, GitHub Copilot 등)도 언제든지 연결할 수 있어요.</string>
+    <string name="signin_install_sub_codex">ChatGPT 플랜으로 Buddy 안에서 Codex를 실행해요.</string>
+    <string name="signin_install_size_claude">Buddy의 Linux와 Anthropic의 Claude Code를 처음 한 번만 다운로드해요(약 235MB). 가능하면 Wi-Fi를 사용하세요.</string>
+    <string name="signin_install_size_opencode">Buddy의 Linux, Node.js, OpenCode를 처음 한 번만 다운로드해요(약 230MB). 가능하면 Wi-Fi를 사용하세요.</string>
+    <string name="signin_install_size_codex">Buddy의 Linux, Node.js, OpenAI의 Codex를 처음 한 번만 다운로드해요(약 150MB). 가능하면 Wi-Fi를 사용하세요.</string>
+
+    <!-- Sign-in screen: install or update in progress (screen titles). -->
+    <string name="signin_installing">설치 중</string>
+    <string name="signin_updating">업데이트 중</string>
+    <string name="signin_install_wait">몇 분 정도 걸려요. 이 화면을 나가도 계속 진행돼요.</string>
+
+    <!-- Sign-in screen: installed, not signed in. -->
+    <string name="signin_title_claude">Claude에 로그인</string>
+    <string name="signin_title_chatgpt">ChatGPT에 로그인</string>
+    <string name="signin_sub_claude">Claude 계정(Pro 또는 Max)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="signin_sub_chatgpt">ChatGPT 계정(Plus, Pro 또는 Business)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="signin_with_claude">Claude로 로그인</string>
+    <string name="signin_with_chatgpt">ChatGPT로 로그인</string>
+    <string name="signin_other_device">다른 기기에서 로그인</string>
+    <string name="signin_with_code">코드로 로그인</string>
+
+    <!-- Sign-in screen: sign-in in progress. -->
+    <string name="signin_sign_in">로그인</string>
+    <string name="signin_starting">로그인 시작하는 중…</string>
+    <string name="signin_approve_title">브라우저에서 승인하세요</string>
+    <string name="signin_approve_claude">Claude 페이지에서 ‘승인’(Authorize)을 탭하세요. Buddy가 코드를 받아 자동으로 돌아와요.</string>
+    <string name="signin_approve_codex">로그인하고 Codex를 허용하세요. 그런 다음 Buddy로 돌아오면 자동으로 마무리돼요.</string>
+    <string name="signin_open_again">로그인 페이지 다시 열기</string>
+    <string name="signin_signing_in">로그인 중</string>
+    <string name="signin_finishing">로그인 마무리하는 중…</string>
+    <string name="signin_not_finished">로그인이 완료되지 않았어요. %1$s</string>
+
+    <!-- Sign-in screen: signing in from another device. -->
+    <string name="signin_remote_claude">아무 기기에서나 이 링크를 열고 승인하세요. 그런 다음 페이지에 표시된 코드를 복사해 아래에 붙여넣으세요.</string>
+    <string name="signin_enter_code">이 코드를 입력하세요</string>
+    <string name="signin_remote_codex">아무 기기에서나 아래 링크를 열고 ChatGPT에 로그인한 다음 코드를 입력하세요. 나머지는 Buddy가 알아서 마무리해요.</string>
+    <string name="signin_copy_code">코드 복사</string>
+    <string name="signin_code_copied">코드를 복사했어요</string>
+    <string name="signin_code_expiry">코드는 15분 동안 유효해요.</string>
+    <string name="signin_copy_link">링크 복사</string>
+    <string name="signin_link_copied">링크를 복사했어요</string>
+    <string name="signin_share">공유</string>
+    <string name="signin_open_here">여기서 열기</string>
+    <string name="signin_no_browser">브라우저를 찾을 수 없어요.</string>
+    <string name="signin_no_browser_page">로그인 페이지를 열 브라우저를 찾을 수 없어요.</string>
+    <string name="signin_clip_label">로그인</string>
+
+    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
+    <string name="signin_paste_instead">대신 코드 붙여넣기</string>
+    <string name="signin_paste_help">Buddy로 자동으로 돌아오지 않으면 Claude 페이지에서 ‘코드 복사’(Copy Code)를 탭한 다음 여기에 붙여넣으세요.</string>
+    <string name="signin_code_hint">코드</string>
+    <string name="signin_use_code">사용</string>
+    <string name="signin_start_again">먼저 로그인을 다시 시작하세요.</string>
+
+    <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
+    <string name="signin_signed_in">로그인 완료</string>
+    <string name="signin_agent_ready">%1$s 사용 준비가 됐어요.</string>
+    <string name="signin_done">완료</string>
+    <string name="signin_sign_out">로그아웃</string>
+    <string name="signin_sign_out_title">%1$s에서 로그아웃할까요?</string>
+    <string name="signin_sign_out_text">다시 로그인할 때까지 Buddy의 %1$s를 사용할 수 없어요.</string>
+    <string name="signin_opencode_ready">OpenCode 준비 완료</string>
+    <string name="signin_opencode_free">OpenCode의 무료 모델을 사용 중이에요. 채팅 상단의 모델 버튼으로 채팅마다 고르거나, 원하는 제공업체를 연결하세요.</string>
+    <string name="signin_opencode_connected">연결됨: %1$s. OpenCode의 무료 모델도 계속 쓸 수 있어요.</string>
+    <string name="signin_opencode_connect_note">제공업체를 연결하면 Buddy 터미널이 %1$s 명령으로 열려요. 제공업체를 고르고 안내를 따르세요. 나중에 제거하려면 거기서 %2$s 명령을 실행하세요.</string>
+    <string name="signin_connect_provider">제공업체 연결</string>
+    <string name="signin_version">%1$s 버전 %2$s</string>
+    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2가 나왔어요. 계속 새 버전을 받으려면 업데이트하세요. 연결된 제공업체는 그대로 유지돼요.</string>
+    <string name="signin_update_opencode2">OpenCode 2로 업데이트</string>
+    <string name="signin_check_updates">업데이트 확인</string>
+
+    <!-- Sign-in screen: error. -->
+    <string name="signin_error_title">문제가 발생했어요</string>
+    <string name="signin_try_again">다시 시도</string>
+
+    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
+    <string name="account_tagline_claude">Claude 플랜 사용</string>
+    <string name="account_tagline_opencode">무료 모델 또는 원하는 제공업체</string>
+    <string name="account_tagline_codex">ChatGPT 플랜 사용</string>
+    <string name="account_setting_up_linux">Buddy의 Linux 설정 중…</string>
+    <string name="account_installing_tools">도구 설치 중…</string>
+    <string name="account_downloading_claude">Claude Code 다운로드 중(약 230MB)…</string>
+    <string name="account_downloading">%1$s 다운로드 중…</string>
+    <string name="account_check_failed">%1$s를 확인하지 못했어요: %2$s</string>
+    <string name="account_install_failed">설치 실패: %1$s</string>
+    <string name="account_update_checking">%1$s 새 버전 확인 중…</string>
+    <string name="account_update_latest">최신 버전(%1$s)을 사용 중이에요.</string>
+    <string name="account_updated">%1$s 버전으로 업데이트했어요.</string>
+    <string name="account_updated_from">%1$s 버전으로 업데이트했어요(이전: %2$s).</string>
+    <string name="account_update_opencode2_failed">OpenCode 2로 업데이트하지 못해 %1$s 버전이 그대로 유지돼요. Wi-Fi에서 다시 시도하세요.</string>
+    <string name="account_update_failed">업데이트 실패: %1$s</string>
+
+    <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort"). -->
+    <string name="models_default">기본값</string>
+    <string name="models_name_default">%1$s(기본값)</string>
+    <string name="models_default_model">기본 모델</string>
+    <string name="models_default_now">현재 %1$s</string>
+    <string name="models_default_claude">Claude Code가 플랜에 맞춰 골라요. 첫 메시지 후에 여기에 표시돼요</string>
+    <string name="models_default_codex">Codex가 골라요. 다음 답변 후에 여기에 표시돼요</string>
+    <string name="models_default_opencode">OpenCode 기본 모델</string>
+    <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
+    <string name="models_effort_auto">자동</string>
+    <string name="models_effort_low">낮음</string>
+    <string name="models_effort_medium">중간</string>
+    <string name="models_effort_high">높음</string>
+    <string name="models_effort_xhigh">매우 높음</string>
+    <string name="models_effort_max">최대</string>
+    <string name="models_chip_effort">추론 강도 %1$s</string>
+
+    <!-- Chats. -->
+    <string name="session_new_chat">새 %1$s 채팅</string>
+    <plurals name="attach_count">
+        <item quantity="other">📎 첨부 파일 %1$d개</item>
+    </plurals>
+
+    <!-- Attaching a photo or file to a chat message (toasts). -->
+    <string name="attach_cant_open">%1$s 파일을 열 수 없어요</string>
+    <string name="attach_too_large">%1$s 파일이 25MB를 넘어요.</string>
+
+    <!-- Remote Control session in Settings: a Claude Code session that can be continued from the Claude app. -->
+    <string name="remote_sign_in_first">먼저 Claude Code에 로그인하세요.</string>
+    <string name="remote_starting">시작하는 중…</string>
+    <string name="remote_restarting">다시 시작하는 중…</string>
+    <string name="remote_start_failed">시작하지 못했어요: %1$s</string>
+    <string name="remote_keeps_stopping">세션이 계속 멈춰요. 껐다가 다시 켜거나 Claude Code 로그인 상태를 확인하세요.</string>
+
+    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
+
+    <!-- Settings screen: header. -->
+    <string name="setup_settings_title">설정</string>
+    <string name="setup_settings_subtitle">Buddy는 내 구독(또는 OpenCode의 무료 모델)으로 앱 안에서 Claude Code, Codex, OpenCode를 실행해요.</string>
+
+    <!-- Settings screen: the setup checklist card (5 steps). -->
+    <string name="setup_card_title">초기 설정</string>
+    <string name="setup_open_guide">단계별 가이드 열기</string>
+    <string name="setup_all_set">모두 끝났어요. Buddy를 사용할 준비가 됐어요.</string>
+    <string name="setup_next_step">다음: %1$s</string>
+    <string name="setup_step_a11y_title">Buddy 접근성 서비스 켜기</string>
+    <string name="setup_step_a11y_body">버블을 표시하고, Buddy가 대신 화면을 읽고 탭하고 입력할 수 있게 해요.</string>
+    <string name="setup_step_a11y_restricted">스위치가 회색(‘제한된 설정’)인가요? Android는 파일로 설치한 앱에서 이 설정을 차단해요. ‘앱 정보’를 탭한 다음 오른쪽 위 ⋮ → ‘제한된 설정 허용’을 탭하고 다시 시도하세요.</string>
+    <string name="setup_open_settings">설정 열기</string>
+    <string name="setup_app_info">앱 정보</string>
+    <string name="setup_step_install_title">%1$s 설치</string>
+    <string name="setup_step_install_done">%1$s가 Buddy에 설치되어 있어요.</string>
+    <string name="setup_step_install_claude">Buddy가 자체 소형 Linux와 Anthropic의 %1$s를 다운로드해요(약 235MB).</string>
+    <string name="setup_step_install_opencode">Buddy가 자체 소형 Linux와 %1$s를 다운로드해요(Node.js 포함 약 230MB).</string>
+    <string name="setup_step_install_codex">Buddy가 자체 소형 Linux와 OpenAI의 %1$s를 다운로드해요(약 150MB).</string>
+    <string name="setup_install">설치</string>
+    <string name="setup_step_signin_title">로그인</string>
+    <string name="setup_step_signin_opencode_done">로그인이 필요 없어요. OpenCode의 무료 모델은 바로 쓸 수 있어요. 원하는 제공업체는 언제든지 연결할 수 있어요.</string>
+    <string name="setup_step_signin_opencode">OpenCode의 무료 모델은 로그인이 필요 없어요.</string>
+    <string name="setup_step_signin_done">로그인했어요.</string>
+    <string name="setup_step_signin_done_email">%1$s 계정으로 로그인했어요.</string>
+    <string name="setup_step_signin_claude">Claude 계정(Pro 또는 Max)으로 로그인해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="setup_step_signin_codex">ChatGPT 계정으로 로그인해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="setup_sign_in">로그인</string>
+    <string name="setup_step_background_title">Buddy 백그라운드 실행 허용</string>
+    <string name="setup_step_background_done">허용했어요.</string>
+    <string name="setup_step_background_body">에이전트가 작업하는 동안 휴대전화가 배터리를 아끼려고 Buddy를 멈추지 않게 해요.</string>
+    <string name="setup_allow">허용</string>
+    <string name="setup_step_try_title">사용해 보기</string>
+    <string name="setup_step_try_done">Buddy가 답했어요. 더 부탁할 일이 있으면 언제든지 버블을 탭하세요.</string>
+    <string name="setup_step_try_body">화면 가장자리의 버블을 탭하고 “카카오톡 열어 줘”처럼 말하거나, 여기서 채팅을 시작하세요.</string>
+    <string name="setup_step_try_wait">먼저 위 단계를 마치세요.</string>
+    <!-- Short names of the setup steps, shown after "Next:" in the Chats header. -->
+    <string name="setup_step_name_a11y">접근성 서비스 켜기</string>
+    <string name="setup_step_name_install">에이전트 설치</string>
+    <string name="setup_step_name_background">백그라운드 실행 허용</string>
+
+    <!-- Settings screen: Appearance. -->
+    <string name="setup_appearance">테마</string>
+    <string name="setup_theme_mode">모드</string>
+    <string name="setup_accent">강조 색상</string>
+    <string name="setup_surface">배경 톤</string>
+    <string name="setup_surface_note">‘웜’은 Buddy 고유의 톤이에요. ‘블랙’(완전한 검정)은 다크 모드에서만 적용돼요.</string>
+    <string name="setup_custom_colour">맞춤 색상</string>
+    <string name="setup_custom_accent_title">맞춤 강조 색상</string>
+    <string name="setup_custom_accent_hint">#4F8BFF처럼 16진수 코드로 원하는 색상을 입력하세요.</string>
+    <string name="setup_apply">적용</string>
+
+    <!-- Settings screen: Agent. -->
+    <string name="setup_agent">에이전트</string>
+    <string name="setup_default_brain">기본 에이전트</string>
+    <string name="setup_default_brain_info">버블이나 ‘새 채팅’ 버튼으로 시작한 채팅에 답할 에이전트예요. Claude Code는 Claude 플랜을, Codex는 ChatGPT 플랜을, OpenCode는 무료 모델이나 원하는 제공업체를 사용해요. 설정을 마친 에이전트만 고를 수 있어요.</string>
+    <string name="setup_default_brain_set">이제 새 채팅에서 %1$s를 사용해요. ‘새 채팅’ 버튼으로 채팅마다 고를 수도 있어요.</string>
+    <string name="setup_set_up_first">먼저 %1$s를 설정하세요.</string>
+    <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
+    <string name="setup_agent_installing">설치 중…</string>
+    <string name="setup_agent_not_installed">설치 안 됨</string>
+    <string name="setup_agent_ready">준비됨</string>
+    <string name="setup_agent_ready_plan">준비됨 · %1$s</string>
+    <string name="setup_agent_signed_in">로그인됨</string>
+    <string name="setup_agent_signed_in_email">로그인됨 · %1$s</string>
+    <string name="setup_agent_not_signed_in">로그인 안 됨</string>
+
+    <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
+    <string name="setup_phone_tools">내 세션에서 휴대전화 도구 사용</string>
+    <string name="setup_phone_tools_info">Buddy의 휴대전화 도구는 이 휴대전화에서 동작하는 일반 MCP 서버예요. 휴대전화의 터미널(예: Termux)에서 이 명령을 한 번 실행하면, 그 에이전트는 버블 없이도 모든 세션에서 휴대전화 도구를 쓸 수 있어요.</string>
+    <string name="setup_copy_command">명령어 복사</string>
+    <string name="setup_command_copied">복사했어요. 터미널에 붙여넣으세요.</string>
+
+    <!-- Settings screen: Voice. -->
+    <string name="setup_voice">음성</string>
+    <string name="setup_voice_input">음성 입력</string>
+    <string name="setup_voice_phone">휴대전화</string>
+    <string name="setup_voice_input_claude">Claude 플랜으로 쓰는 Claude Code의 받아쓰기예요. 매우 정확해요. 영어, 프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 네덜란드어, 터키어, 러시아어, 일본어 등을 지원하지만 아랍어는 지원하지 않아요. 아랍어는 Buddy가 휴대전화의 음성 인식을 사용해요. 말을 잠시 멈추면 글자가 나타나요.</string>
+    <string name="setup_voice_input_chatgpt">ChatGPT 플랜으로 Codex를 통해 ChatGPT 음성을 써요. 한 문장에 여러 언어가 섞여 있어도 어떤 언어든 알아들어요. 내 말만 사용되며, ChatGPT의 음성 답변은 음소거되고 ChatGPT는 아무것도 실행할 수 없어요.</string>
+    <string name="setup_voice_input_phone">휴대전화의 음성 인식이에요(대부분 Google). 말하는 동안 실시간으로 글자가 나타나고, 설정한 언어 중 어떤 언어로 말하는지 감지해요.</string>
+    <string name="setup_voice_output">음성 출력</string>
+    <string name="setup_voice_output_chatgpt">답변을 ChatGPT의 자연스러운 음성으로 읽어 줘요(ChatGPT 플랜, Codex 경유). ChatGPT 음성 사용량에 포함되며, 사용할 수 없을 때는 휴대전화 음성이 대신 읽어요.</string>
+    <string name="setup_voice_output_phone">답변 언어에 맞춰 휴대전화의 텍스트 음성 변환(TTS) 음성을 사용해요.</string>
+    <string name="setup_voice_sample">Bonjour ! 안녕하세요, Buddy예요. 제 목소리는 이래요.</string>
+    <string name="setup_languages">언어</string>
+    <string name="setup_languages_hint">탭해서 사용하는 언어를 고르세요. 길게 누르면 기본 언어로 설정돼요. 채팅에서는 마이크를 길게 눌러 언어를 바꿀 수 있어요.</string>
+    <string name="setup_sign_in_first">먼저 %1$s에 로그인하세요</string>
+    <string name="setup_needs_claude">Claude 받아쓰기는 %1$s를 통해 Claude 플랜으로 작동해요.</string>
+    <string name="setup_needs_chatgpt">ChatGPT 음성은 %1$s를 통해 ChatGPT 플랜으로 작동해요.</string>
+    <string name="setup_set_up_agent">%1$s 설정</string>
+
+    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
+    <string name="setup_remote_control">원격 제어</string>
+    <string name="setup_remote_session">Claude Code 세션</string>
+    <string name="setup_remote_session_info">휴대전화 도구와 함께 Buddy 안에서 실행되는 Claude Code 세션이에요. 이 휴대전화나 다른 어디서든 Claude 앱(Code)에서 이어서 쓸 수 있어요.</string>
+    <string name="setup_remote_sign_in_first">먼저 Claude Code에 로그인하세요.</string>
+    <string name="setup_remote_active">활성 · Claude 앱의 “%1$s”</string>
+    <string name="setup_remote_starting">시작하는 중…</string>
+    <string name="setup_remote_stopped">중지됨</string>
+    <string name="setup_remote_open">Claude 앱에서 열기</string>
+    <string name="setup_remote_open_failed">열지 못했어요.</string>
+
+    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
+    <string name="setup_old_chats_title">이전 Termux 채팅 삭제</string>
+    <plurals name="setup_old_chats_body">
+        <item quantity="other">Buddy에 자체 Linux가 생기기 전의 채팅 %1$d개예요. 에이전트가 이어서 진행할 수 없어요.</item>
+    </plurals>
+    <plurals name="setup_old_chats_remove">
+        <item quantity="other">이전 채팅 %1$d개를 삭제할까요?</item>
+    </plurals>
+    <string name="setup_old_chats_remove_body">Buddy의 채팅 목록에서 삭제해요. 이 작업은 되돌릴 수 없어요.</string>
+    <string name="setup_remove">삭제</string>
+    <string name="setup_removed">삭제했어요.</string>
+
+    <!-- Settings screen: Experience. -->
+    <string name="setup_experience">사용 환경</string>
+    <string name="setup_chat_bubble">채팅 버블</string>
+    <string name="setup_chat_bubble_info">다른 앱 위에 떠 있어요. ✕로 끌어다 놓으면 숨길 수 있지만, 에이전트가 승인을 받아야 할 때는 승인 카드가 계속 나타나요.</string>
+    <string name="setup_tap_to_talk">버블을 탭해서 말하기</string>
+    <string name="setup_tap_to_talk_info">한 번 탭하면 마이크가 켜져요. 원하는 걸 말하고 잠시 멈추면 전송돼요. 채팅 등은 버블을 길게 누르세요.</string>
+    <string name="setup_read_aloud">답변 읽어 주기</string>
+    <string name="setup_read_aloud_info">어느 채팅에서든 마이크로 말할 수 있어요. 말을 멈추면 전송돼요.</string>
+    <string name="setup_update_notices">업데이트 알림</string>
+    <string name="setup_update_notices_info">Buddy가 하루에 한 번 GitHub를 확인하고 새 버전이 나오면 알려 줘요.</string>
+    <string name="setup_check_updates">업데이트 확인</string>
+    <string name="setup_check_updates_info">현재 버전: Buddy %1$s. 아무 에이전트에게나 “업데이트해 줘”라고 말해도 돼요.</string>
+    <string name="setup_app_permissions">앱 권한</string>
+    <string name="setup_app_permissions_info">앱별로 고를 수 있어요. ‘신뢰’는 에이전트가 팝업 없이 작업하고, ‘엄격’은 보내기, 결제, 삭제 등을 하기 전에 Buddy가 직접 물어봐요.</string>
+    <string name="setup_dev_mode">개발자 모드</string>
+    <string name="setup_dev_mode_info">버블의 에이전트가 ~/.buddy/work에서 명령을 실행하고 파일을 편집할 수 있어서, 앱을 빌드하고 설치할 수 있어요.</string>
+    <string name="setup_agents_tap">에이전트가 Buddy 화면을 탭하도록 허용</string>
+    <string name="setup_agents_tap_info">에이전트로 Buddy를 테스트할 때 사용해요(예: 휴대전화 도구를 쓰는 Termux의 Claude Code). 버블, 승인 카드, ‘앱 권한’, 이 스위치들은 계속 조작할 수 없어요.</string>
+    <string name="setup_dev_mode_warning">평소에는 꺼 두세요. 켜 두면 화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
+
+    <!-- Settings screen: footer links. -->
+    <string name="setup_licences">오픈소스 라이선스</string>
+    <string name="setup_privacy_policy">개인정보처리방침</string>
+
+    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
+    <string name="linux_download_corrupt">Alpine 다운로드 파일이 손상됨(sha256 %1$s)</string>
+    <string name="linux_move_failed">Alpine을 설치 위치로 옮기지 못함</string>
+    <string name="linux_download_failed_http">다운로드 실패: HTTP %1$d</string>
+    <string name="linux_unsafe_path">압축 파일에 안전하지 않은 경로가 있음: %1$s</string>
+    <string name="linux_symlink_failed">심볼릭 링크 생성 실패(%1$s): %2$s</string>
+    <string name="linux_truncated_archive">압축 파일이 불완전함</string>
+
+    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
+    <string name="terminal_title">터미널</string>
+    <string name="terminal_back">뒤로</string>
+    <string name="terminal_hide_keyboard">키보드 숨기기</string>
+    <string name="terminal_menu">메뉴</string>
+    <plurals name="terminal_sessions_count">
+        <item quantity="other">세션 %1$d개 · buddy linux</item>
+    </plurals>
+    <string name="terminal_listening">듣는 중 · 마이크 켜짐</string>
+    <string name="terminal_session_ended">세션 종료됨</string>
+    <string name="terminal_session_ended_code">세션 종료됨 · 종료 코드 %1$d</string>
+    <string name="terminal_close">닫기</string>
+    <string name="terminal_restart">다시 시작</string>
+    <string name="terminal_needs_linux">먼저 ‘설정’에서 Claude Code, Codex, OpenCode 중 하나를 설치하세요. 그러면 Buddy의 Linux가 설정돼요.</string>
+    <string name="terminal_start_failed">터미널을 시작하지 못했어요: %1$s</string>
+    <string name="terminal_close_title">%1$s 탭을 닫을까요?</string>
+    <string name="terminal_close_running">아직 실행 중이에요. 닫으면 이 세션과 여기서 시작한 모든 작업이 멈춰요.</string>
+    <string name="terminal_shell_name">셸 %1$d</string>
+    <string name="terminal_new_session">새 세션</string>
+    <string name="terminal_paste">붙여넣기</string>
+    <string name="terminal_select_all">모두 선택</string>
+    <string name="terminal_larger_text">글자 크게</string>
+    <string name="terminal_smaller_text">글자 작게</string>
+    <string name="terminal_screen_sleep">화면 자동 꺼짐 허용</string>
+    <string name="terminal_keep_screen_on">화면 켜짐 유지</string>
+    <string name="terminal_close_session">이 세션 닫기</string>
+    <string name="terminal_tips">길게 눌러 텍스트나 링크를 선택하세요. 두 손가락으로 확대/축소하고, 드래그해 이전 내용으로 스크롤할 수 있어요. 탭을 길게 누르면 닫을 수 있어요.</string>
+
+    <!-- Terminal: floating toolbar over selected text. Keep short. -->
+    <string name="terminal_copy">복사</string>
+    <string name="terminal_open_link">링크 열기</string>
+    <string name="terminal_share">공유</string>
+
+    <!-- Sessions screen: every agent session running on the phone, and recent history. -->
+    <string name="monitor_title">세션</string>
+    <string name="monitor_subtitle">이 휴대전화의 모든 Claude Code 및 Codex 세션이에요.</string>
+    <string name="monitor_terminal_running">셸 실행 중 · 탭하여 돌아가기</string>
+    <string name="monitor_terminal_idle">Buddy의 Linux 셸</string>
+    <string name="monitor_running_now">실행 중</string>
+    <string name="monitor_refresh">3초마다 새로고침</string>
+    <string name="monitor_checking">확인 중…</string>
+    <string name="monitor_recent">최근</string>
+    <string name="monitor_loading">불러오는 중…</string>
+    <string name="monitor_service_off">Buddy 접근성 서비스가 꺼져 있어서 세션을 확인할 수 없어요. ‘설정’에서 켜세요.</string>
+    <string name="monitor_nothing_running">실행 중인 항목이 없어요.</string>
+    <string name="monitor_deleted_chat">삭제된 Buddy 채팅</string>
+    <string name="monitor_background_session">백그라운드 세션</string>
+    <string name="monitor_terminal_session">터미널 세션</string>
+    <string name="monitor_tag_background">백그라운드</string>
+    <string name="monitor_tag_terminal">터미널</string>
+    <string name="monitor_proc_meta">%1$s · pid %2$d · %3$s</string>
+    <string name="monitor_background_hint">Claude Code 백그라운드 서비스에서 실행돼요(예: Claude 앱에서 이어서 하는 채팅).</string>
+    <string name="monitor_open_chat">채팅 열기</string>
+    <string name="monitor_stop">중지</string>
+    <string name="monitor_stop_title">이 %1$s 세션을 중지할까요?</string>
+    <string name="monitor_stop_background_body">백그라운드에서 실행 중인 세션이에요(예: Claude 앱에서 이어서 하는 채팅). Buddy를 조작하고 있는 세션일 수도 있어요. 중지하면 그 대화에서 진행 중인 작업이 끝나요.</string>
+    <string name="monitor_stop_terminal_body">지금 터미널에서 사용 중인 세션일 수 있어요. Buddy를 조작하고 있는 세션일 수도 있어요. 중지하면 그 대화에서 진행 중인 작업이 끝나요.</string>
+    <string name="monitor_stopping">중지하는 중…</string>
+    <string name="monitor_service_title">Claude Code 백그라운드 서비스</string>
+    <string name="monitor_service_meta">pid %1$d · 실행 시간 %2$s · 백그라운드 세션 호스팅</string>
+    <string name="monitor_no_history">기록이 없어요.</string>
+    <string name="monitor_no_messages">(메시지 없음)</string>
+
+    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
+
+    <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app. -->
+    <string name="perms_title">앱 권한</string>
+    <string name="perms_back">뒤로</string>
+    <string name="perms_mode_trust">신뢰</string>
+    <string name="perms_mode_hard">엄격</string>
+    <string name="perms_mode_smart">스마트</string>
+    <string name="perms_modes_intro">신뢰: 이 앱에서는 에이전트가 승인 팝업 없이 알아서 작업해요.\n엄격: 버튼 규칙에 따라요. 보내기, 결제, 삭제 등의 버튼은 카드에서 승인해야 해요.\n스마트: 규칙을 적용한 뒤, 별도의 검토 AI가 나머지 모든 탭을 요청 내용과 비교해 확인해요.\n에이전트는 Buddy의 버블, 카드, 설정을 절대 탭할 수 없어요.</string>
+    <string name="perms_smart_reviewer">스마트 검토 AI</string>
+    <string name="perms_reviewer_same">채팅과 동일</string>
+    <string name="perms_reviewer_sign_in">먼저 %1$s에 로그인하세요(설정).</string>
+    <string name="perms_reviewer_about">탭마다 도구 없는 임시 세션을 사용해요. 요청 내용, 에이전트의 메모, 화면을 보고 ‘허용’, ‘사용자에게 확인’, ‘권하지 않음’ 중 하나로 답해요. 탭 한 번에 약 3초 걸려요. OpenCode 채팅은 Claude Code(또는 Codex)가 검토해요.</string>
+    <string name="perms_button_rules">버튼 규칙</string>
+    <string name="perms_rules_summary">물어보기 %1$d개 · 묻지 않기 %2$d개</string>
+    <string name="perms_apps">앱</string>
+    <string name="perms_all_apps">모든 앱</string>
+    <string name="perms_reset_suggested">추천 설정으로 재설정</string>
+
+    <!-- Button rules screen: buttons that always or never need the user's OK. -->
+    <string name="perms_rules_intro">‘엄격’ 또는 ‘스마트’ 앱에 적용돼요. 추천 목록에서 고른 규칙은 해당 앱에, 직접 입력한 텍스트는 모든 앱에 적용돼요. 규칙을 탭하면 삭제돼요.</string>
+    <string name="perms_builtin_title">기본 위험 단어</string>
+    <string name="perms_builtin_sub">보내기, 게시, 결제, 구매, 주문, 삭제, 전화 걸기, 로그아웃 등은 Buddy의 모든 언어에서 항상 물어봐요.</string>
+    <string name="perms_always_ask">항상 물어보기</string>
+    <string name="perms_never_ask">묻지 않기</string>
+    <string name="perms_ask">물어보기</string>
+    <string name="perms_add_hint">버튼 추가(예: 보내기)</string>
+    <string name="perms_add">추가</string>
+    <string name="perms_seen_title">최근 본 버튼</string>
+    <string name="perms_seen_empty">‘엄격’ 및 ‘스마트’ 앱에서 에이전트가 탭한 버튼이 여기에 표시돼요.</string>
+
+    <!-- Button rules and modes, as App permissions shows them. -->
+    <string name="guard_rule_all_apps">%1$s · 모든 앱</string>
+    <string name="guard_why_choice">직접 선택</string>
+    <string name="guard_why_category">추천: 메시지, 소셜, 통화, 금융</string>
+    <string name="guard_why_name">추천: 이름에 “%1$s” 포함</string>
+    <string name="guard_why_social">추천: 소셜 앱</string>
+    <string name="guard_why_suggested">추천</string>
+    <string name="guard_why_setup">초기 설정 선택: 먼저 물어보기</string>
+
+    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
+    <string name="tools_card_tap">“%1$s” 탭하기</string>
+    <string name="tools_card_tap_in">%2$s에서 “%1$s” 탭하기</string>
+    <string name="tools_card_tap_this">이 버튼 탭하기</string>
+    <string name="tools_card_tap_this_in">%1$s에서 이 버튼 탭하기</string>
+    <string name="tools_card_enter">Enter 키를 눌러 보내기</string>
+    <string name="tools_card_enter_in">%1$s에서 Enter 키를 눌러 보내기</string>
+    <string name="tools_card_detail">%1$s:\n%2$s</string>
+    <string name="tools_card_quote">“%1$s”</string>
+    <string name="tools_card_no_reviewer">검토할 에이전트가 로그인되어 있지 않아 Buddy가 직접 물어봐요.</string>
+    <string name="tools_card_reviewer_block">%1$s가 권하지 않아요: %2$s</string>
+    <string name="tools_card_reviewer_ask">%1$s가 사용자에게 확인하라고 해요: %2$s</string>
+
+    <!-- Status line in the bubble while the agent works. -->
+    <string name="tools_status_checking_tap">이 탭을 확인하는 중…</string>
+    <string name="tools_status_tap_install">‘설치’를 탭한 다음 확인하세요</string>
+    <string name="tools_status_tap_update">‘업데이트’를 탭한 다음 확인하세요</string>
+    <string name="tools_status_installed">설치됨</string>
+    <string name="tools_status_downloading">Buddy %1$s 다운로드 중…</string>
+
+    <!-- Smart reviewer: its reason when it fails, shown on the approval card after "Claude says ask you:". -->
+    <string name="reviewer_failed">검토 AI가 답하지 못했어요(%1$s)</string>
+    <string name="reviewer_no_answer">응답 없음</string>
+    <string name="reviewer_timed_out">시간 초과</string>
+
+    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_linux_missing">Buddy의 Linux가 아직 설치되지 않았어요. ‘설정’을 열어 설치하세요.</string>
+
+    <!-- Voice input (dictation): Claude voice and ChatGPT voice. Status lines show in the voice bar, errors as toasts. -->
+    <string name="dictation_claude_sign_in">Claude 음성을 사용하려면 ‘설정’에서 Claude Code에 로그인하세요.</string>
+    <string name="dictation_codex_sign_in">ChatGPT 음성을 사용하려면 ‘설정’에서 Codex에 로그인하세요.</string>
+    <string name="dictation_starting">시작하는 중…</string>
+    <string name="dictation_starting_claude">Claude 시작하는 중…</string>
+    <string name="dictation_transcribing">텍스트로 변환하는 중…</string>
+    <string name="dictation_no_speech">잘 못 들었어요.</string>
+    <string name="dictation_mic_failed">마이크를 켜지 못했어요.</string>
+    <string name="dictation_claude_start_failed">Claude 음성을 시작하지 못했어요: %1$s</string>
+    <string name="dictation_claude_no_start">Claude 음성이 시작되지 않았어요.</string>
+    <string name="dictation_claude_code_no_start">Claude Code가 시작되지 않음</string>
+    <string name="dictation_chatgpt_start_failed">ChatGPT 음성을 시작하지 못했어요: %1$s</string>
+    <string name="dictation_chatgpt_no_connect">ChatGPT 음성에 연결하지 못했어요(%1$s).</string>
+    <string name="dictation_chatgpt_error">ChatGPT 음성: %1$s</string>
+    <string name="dictation_connection_failed">연결 실패</string>
+    <string name="dictation_stage_page">페이지 시작 중</string>
+    <string name="dictation_stage_codex">Codex 기다리는 중</string>
+    <string name="dictation_stage_call">통화 연결 중</string>
+    <string name="dictation_stage_answer">ChatGPT 응답 기다리는 중</string>
+    <string name="dictation_stage_connecting">연결 중</string>
+    <string name="dictation_codex_no_start">Codex가 시작되지 않음</string>
+    <string name="dictation_request_timed_out">%1$s 시간 초과</string>
+    <string name="dictation_codex_stopped">Codex 중지됨: %1$s</string>
+    <string name="dictation_no_details">세부 정보 없음</string>
+</resources>

@@ -39,6 +39,7 @@ import static app.buddy.assistant.Ui.*;
  */
 public final class Updates extends BroadcastReceiver {
     static final String REPO = "https://github.com/ghorbelhamdi/buddy-android";
+    /** For the agent (update_buddy), so English; the sheet shows R.string.update_failed_manual instead. */
     static final String MANUAL = "You can also get it at " + REPO + "/releases/latest (buddy.apk), or with Obtainium "
             + "for automatic updates (see " + REPO + "#updating).";
     private static final String API = "https://api.github.com/repos/ghorbelhamdi/buddy-android/releases/latest";
@@ -81,10 +82,15 @@ public final class Updates extends BroadcastReceiver {
 
     /**
      * Downloads the release's buddy.apk, checks it's a newer Buddy, and opens Android's installer (network: off the
-     * main thread). Returns OPENED, NEEDS_PERMISSION, or what went wrong.
+     * main thread). Returns OPENED, NEEDS_PERMISSION, or what went wrong (in English, for the agent).
      */
     static String install(Context c, Release r) {
-        if (r.apkUrl == null) return "The release has no buddy.apk yet.";
+        return install(c, r, false);
+    }
+
+    /** {@link #install(Context, Release)}; with user, what went wrong is in the user's language (for the sheet). */
+    private static String install(Context c, Release r, boolean user) {
+        if (r.apkUrl == null) return user ? c.getString(R.string.update_error_no_apk) : "The release has no buddy.apk yet.";
         File out = FilesProvider.apkFile(c);
         try {
             HttpURLConnection h = (HttpURLConnection) new URL(r.apkUrl).openConnection();
@@ -96,11 +102,13 @@ public final class Updates extends BroadcastReceiver {
                 h.disconnect();
             }
         } catch (IOException e) {
-            return "The download failed (" + e.getMessage() + ").";
+            return user ? c.getString(R.string.update_error_download, e.getMessage())
+                    : "The download failed (" + e.getMessage() + ").";
         }
         android.content.pm.PackageInfo pi = c.getPackageManager().getPackageArchiveInfo(out.getPath(), 0);
         if (pi == null || !c.getPackageName().equals(pi.packageName) || pi.getLongVersionCode() <= BuildInfo.VERSION_CODE) {
-            return "The downloaded file isn't a newer Buddy, so it wasn't opened.";
+            return user ? c.getString(R.string.update_error_not_newer)
+                    : "The downloaded file isn't a newer Buddy, so it wasn't opened.";
         }
         if (!c.getPackageManager().canRequestPackageInstalls()) {
             c.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
@@ -137,7 +145,7 @@ public final class Updates extends BroadcastReceiver {
 
     private static void notify(Context c, Release r) {
         NotificationManager nm = c.getSystemService(NotificationManager.class);
-        nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Buddy updates",
+        nm.createNotificationChannel(new NotificationChannel(CHANNEL, c.getString(R.string.update_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT));
         PendingIntent open = PendingIntent.getActivity(c, 30,
                 new Intent(c, MainActivity.class).putExtra("update", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
@@ -145,15 +153,15 @@ public final class Updates extends BroadcastReceiver {
         PendingIntent mute = PendingIntent.getBroadcast(c, 31,
                 new Intent(c, Updates.class).setAction(ACTION_MUTE),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        String text = "You have " + BuildInfo.VERSION + ". Tap to see what's new and update; your chats stay.";
+        String text = c.getString(R.string.update_notification_text, BuildInfo.VERSION);
         Notification n = new Notification.Builder(c, CHANNEL)
                 .setSmallIcon(R.drawable.ic_launcher_monochrome)
-                .setContentTitle("Buddy " + r.version + " is available")
+                .setContentTitle(c.getString(R.string.update_available_title, r.version))
                 .setContentText(text)
                 .setStyle(new Notification.BigTextStyle().bigText(text))
                 .setContentIntent(open)
-                .addAction(new Notification.Action.Builder(null, "Update", open).build())
-                .addAction(new Notification.Action.Builder(null, "Don't notify me", mute).build())
+                .addAction(new Notification.Action.Builder(null, c.getString(R.string.update_action), open).build())
+                .addAction(new Notification.Action.Builder(null, c.getString(R.string.update_mute), mute).build())
                 .setAutoCancel(true)
                 .build();
         try {
@@ -172,7 +180,7 @@ public final class Updates extends BroadcastReceiver {
         if (!ACTION_MUTE.equals(intent.getAction())) return;
         Prefs.setUpdateNotices(c, false);
         cancel(c);
-        Toast.makeText(c, "No more update notices. Turn them back on in Settings.", Toast.LENGTH_LONG).show();
+        Toast.makeText(c, R.string.update_muted, Toast.LENGTH_LONG).show();
     }
 
     // ------------------------------------------------------------ the sheet
@@ -180,21 +188,21 @@ public final class Updates extends BroadcastReceiver {
     /** "Buddy X is available": what's new, and Update. Checks GitHub first; says so if Buddy is up to date. */
     static void showSheet(Activity a) {
         Handler main = new Handler(Looper.getMainLooper());
-        Toast checking = Toast.makeText(a, "Checking for updates…", Toast.LENGTH_SHORT);
+        Toast checking = Toast.makeText(a, R.string.update_checking, Toast.LENGTH_SHORT);
         checking.show();
         new Thread(() -> {
             Release r;
             try {
                 r = latest();
             } catch (Exception e) {
-                main.post(() -> Toast.makeText(a, "Couldn't reach GitHub. Try again later.", Toast.LENGTH_LONG).show());
+                main.post(() -> Toast.makeText(a, R.string.update_check_failed, Toast.LENGTH_LONG).show());
                 return;
             }
             main.post(() -> {
                 checking.cancel();
                 if (a.isFinishing() || a.isDestroyed()) return;
                 if (!r.newer()) {
-                    Toast.makeText(a, "Buddy " + BuildInfo.VERSION + " is up to date.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(a, a.getString(R.string.update_up_to_date, BuildInfo.VERSION), Toast.LENGTH_LONG).show();
                     cancel(a);
                     return;
                 }
@@ -205,25 +213,25 @@ public final class Updates extends BroadcastReceiver {
 
     private static void sheet(Activity a, Release r) {
         LinearLayout c = column(a);
-        c.addView(title(a, "Buddy " + r.version + " is available", 18));
-        TextView sub = text(a, "You have " + BuildInfo.VERSION + ". Updating keeps your chats, settings and sign-ins.", 13, MUTED);
-        sub.setPadding(0, dp(a, 4), 0, dp(a, 12));
+        c.addView(title(a, a.getString(R.string.update_available_title, r.version), 18));
+        TextView sub = text(a, a.getString(R.string.update_sheet_text, BuildInfo.VERSION), 13, MUTED);
+        sub.setPaddingRelative(0, dp(a, 4), 0, dp(a, 12));
         c.addView(sub);
         if (!r.notes.isEmpty()) {
             ScrollView sv = new ScrollView(a);
             TextView notes = text(a, r.notes.replace("**", "").replace("## ", "").replace("### ", ""), 14, TEXT);
-            notes.setPadding(dp(a, 12), dp(a, 10), dp(a, 12), dp(a, 10));
+            notes.setPaddingRelative(dp(a, 12), dp(a, 10), dp(a, 12), dp(a, 10));
             sv.addView(notes);
             sv.setBackground(rounded(a, BG, 12));
             c.addView(sv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     Math.min(dp(a, 280), (int) (a.getResources().getDisplayMetrics().heightPixels * 0.4f))));
         }
         LinearLayout btns = row(a);
-        Button later = button(a, "Later", false);
-        Button update = button(a, "Update", true);
+        Button later = button(a, a.getString(R.string.update_later), false);
+        Button update = button(a, a.getString(R.string.update_action), true);
         btns.addView(later, new LinearLayout.LayoutParams(0, dp(a, 44), 1));
         LinearLayout.LayoutParams up = new LinearLayout.LayoutParams(0, dp(a, 44), 1);
-        up.leftMargin = dp(a, 10);
+        up.setMarginStart(dp(a, 10));
         btns.addView(update, up);
         LinearLayout.LayoutParams bp = full();
         bp.topMargin = dp(a, 14);
@@ -233,20 +241,21 @@ public final class Updates extends BroadcastReceiver {
         Handler main = new Handler(Looper.getMainLooper());
         update.setOnClickListener(v -> {
             update.setEnabled(false);
-            update.setText("Downloading…");
+            update.setText(R.string.update_downloading);
             new Thread(() -> {
-                String res = install(a, r);
+                String res = install(a, r, true);
                 main.post(() -> {
                     if (OPENED.equals(res)) {
                         d.dismiss();
                     } else if (NEEDS_PERMISSION.equals(res)) {
-                        Toast.makeText(a, "Allow Buddy to install apps, then tap Update again.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(a, R.string.update_needs_permission, Toast.LENGTH_LONG).show();
                         update.setEnabled(true);
-                        update.setText("Update");
+                        update.setText(R.string.update_action);
                     } else {
-                        Toast.makeText(a, res + " " + MANUAL, Toast.LENGTH_LONG).show();
+                        Toast.makeText(a, a.getString(R.string.update_failed_manual, res, REPO + "/releases/latest",
+                                REPO + "#updating"), Toast.LENGTH_LONG).show();
                         update.setEnabled(true);
-                        update.setText("Update");
+                        update.setText(R.string.update_action);
                     }
                 });
             }).start();

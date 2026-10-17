@@ -48,7 +48,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         root.setFitsSystemWindows(true);
         ScrollView scroll = new ScrollView(this);
         LinearLayout list = column(this);
-        list.setPadding(0, dp(this, 12), 0, dp(this, 24));
+        list.setPaddingRelative(0, dp(this, 12), 0, dp(this, 24));
         scroll.addView(list);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         navSlot = new FrameLayout(this);
@@ -57,16 +57,16 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         setContentView(root);
 
         LinearLayout head = column(this);
-        head.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
-        head.addView(title(this, "Sessions", 28));
-        TextView sub = text(this, "Every Claude Code and Codex session on this phone.", 14, MUTED);
-        sub.setPadding(0, dp(this, 4), 0, 0);
+        head.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
+        head.addView(title(this, getString(R.string.monitor_title), 28));
+        TextView sub = text(this, getString(R.string.monitor_subtitle), 14, MUTED);
+        sub.setPaddingRelative(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
 
         // a shell in Buddy's Linux
         LinearLayout tc = row(this);
-        tc.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+        tc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
         tc.setBackground(rounded(this, CARD, 16));
         tc.setForeground(getDrawable(ripple(this, false)));
         android.widget.FrameLayout ti = new android.widget.FrameLayout(this);
@@ -76,10 +76,10 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
                 android.view.Gravity.CENTER));
         tc.addView(ti, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         LinearLayout tt = column(this);
-        tt.setPadding(dp(this, 14), 0, dp(this, 8), 0);
-        tt.addView(title(this, "Terminal", 15));
-        tt.addView(text(this, TermSession.current != null && !TermSession.current.exited
-                ? "A shell is running · tap to return" : "A shell in Buddy's Linux", 13, MUTED));
+        tt.setPaddingRelative(dp(this, 14), 0, dp(this, 8), 0);
+        tt.addView(title(this, getString(R.string.terminal_title), 15));
+        tt.addView(text(this, getString(TermSession.current != null && !TermSession.current.exited
+                ? R.string.monitor_terminal_running : R.string.monitor_terminal_idle), 13, MUTED));
         tc.addView(tt, weight1());
         tc.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         tc.setOnClickListener(v -> startActivity(new Intent(this, TerminalActivity.class)));
@@ -88,12 +88,12 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         list.addView(tc, tp);
 
         LinearLayout rh = row(this);
-        TextView rl = sectionLabel(this, "Running now");
-        rl.setPadding(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));
+        TextView rl = sectionLabel(this, getString(R.string.monitor_running_now));
+        rl.setPaddingRelative(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));
         rh.addView(rl);
         runCount = monoText(this, "", 12, OK);
         runCount.setTypeface(mono(this, 600));
-        runCount.setPadding(0, dp(this, 12), 0, 0);
+        runCount.setPaddingRelative(0, dp(this, 12), 0, 0);
         rh.addView(runCount, weight1());
         View pd = dot(this, OK, 6);
         ((LinearLayout.LayoutParams) pd.getLayoutParams()).topMargin = dp(this, 12);
@@ -102,27 +102,27 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         pulse.setDuration(900);
         pulse.setRepeatMode(ValueAnimator.REVERSE);
         pulse.setRepeatCount(ValueAnimator.INFINITE);
-        TextView rs = monoText(this, "refresh 3s", 12, MUTED);
-        rs.setPadding(dp(this, 6), dp(this, 12), dp(this, 20), 0);
+        TextView rs = monoText(this, getString(R.string.monitor_refresh), 12, MUTED);
+        rs.setPaddingRelative(dp(this, 6), dp(this, 12), dp(this, 20), 0);
         rh.addView(rs);
         list.addView(rh, full());
 
         running = column(this);
-        running.setPadding(dp(this, 16), 0, dp(this, 16), 0);
+        running.setPaddingRelative(dp(this, 16), 0, dp(this, 16), 0);
         list.addView(running, full());
-        runningEmpty = empty("Checking…");
+        runningEmpty = empty(getString(R.string.monitor_checking));
         running.addView(runningEmpty);
 
-        list.addView(sectionLabel(this, "Recent"));
+        list.addView(sectionLabel(this, getString(R.string.monitor_recent)));
         recent = column(this);
         list.addView(recent, full());
-        recentEmpty = empty("Loading…");
+        recentEmpty = empty(getString(R.string.monitor_loading));
         recent.addView(recentEmpty);
     }
 
     private TextView empty(String s) {
         TextView t = text(this, s, 14, MUTED);
-        t.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 8));
+        t.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 8));
         return t;
     }
 
@@ -134,7 +134,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         hub.monitor = this;
         pulse.start();
         if (BuddyService.get() == null) {
-            runningEmpty.setText("Buddy's accessibility service is off, so sessions can't be checked. Turn it on in Settings.");
+            runningEmpty.setText(R.string.monitor_service_off);
             return;
         }
         request("recent");
@@ -186,7 +186,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         navSlot.removeAllViews();
         navSlot.addView(bottomNav(this, NAV_SESSIONS, n));
         if (n == 0) {
-            runningEmpty.setText("Nothing running.");
+            runningEmpty.setText(R.string.monitor_nothing_running);
             running.addView(runningEmpty);
         }
         for (final JSONObject p : sessions) {
@@ -197,63 +197,61 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
             final boolean background = "background".equals(kind);
             String title = p.optString("title").trim();
             final String where = chat != null ? chat.label()
-                    : !p.optString("buddy").isEmpty() ? "Deleted Buddy chat"
+                    : !p.optString("buddy").isEmpty() ? getString(R.string.monitor_deleted_chat)
                     : !title.isEmpty() ? title
-                    : background ? "Background session" : "Terminal session";
+                    : getString(background ? R.string.monitor_background_session : R.string.monitor_terminal_session);
 
             LinearLayout card = column(this);
-            card.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+            card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
             card.setBackground(rounded(this, CARD, 16));
             LinearLayout first = row(this);
             first.addView(single(title(this, where, 15)), weight1());
             TextView el = monoText(this, DateUtils.formatElapsedTime(p.optLong("seconds")), 12, MUTED);
-            el.setPadding(dp(this, 8), 0, 0, 0);
+            el.setPaddingRelative(dp(this, 8), 0, 0, 0);
             first.addView(el);
             card.addView(first, full());
 
             LinearLayout tags = row(this);
-            tags.setPadding(0, dp(this, 6), 0, 0);
-            tags.addView(tag(chat != null ? "buddy" : background ? "background" : "terminal", chat != null || background));
+            tags.setPaddingRelative(0, dp(this, 6), 0, 0);
+            tags.addView(tag(chat != null ? "buddy" : getString(background ? R.string.monitor_tag_background
+                    : R.string.monitor_tag_terminal), chat != null || background));
             String ses = p.optString("session");
             if (ses.length() >= 8) {
                 TextView id = monoText(this, "#" + ses.substring(0, 8), 12, MUTED);
-                id.setPadding(dp(this, 8), 0, 0, 0);
+                id.setPaddingRelative(dp(this, 8), 0, 0, 0);
                 tags.addView(id);
             }
             card.addView(tags, full());
-            TextView meta = single(monoText(this, Account.cliOf(backend) + " · pid "
-                    + p.optLong("pid") + " · " + shortPath(p.optString("cwd")), 12, MUTED));
-            meta.setPadding(0, dp(this, 4), 0, 0);
+            TextView meta = single(monoText(this, getString(R.string.monitor_proc_meta, Account.cliOf(backend),
+                    p.optLong("pid"), shortPath(p.optString("cwd"))), 12, MUTED));
+            meta.setPaddingRelative(0, dp(this, 4), 0, 0);
             card.addView(meta);
             if (background && chat == null) {
-                TextView hint = text(this, "Runs in Claude Code's background service, e.g. a chat you continue from the Claude app.",
-                        13, MUTED);
-                hint.setPadding(0, dp(this, 4), 0, 0);
+                TextView hint = text(this, getString(R.string.monitor_background_hint), 13, MUTED);
+                hint.setPaddingRelative(0, dp(this, 4), 0, 0);
                 card.addView(hint);
             }
             if (chat != null && !chat.status.isEmpty()) {
                 TextView st = single(monoText(this, chat.status, 12, ACCENT_TEXT));
-                st.setPadding(0, dp(this, 3), 0, 0);
+                st.setPaddingRelative(0, dp(this, 3), 0, 0);
                 card.addView(st);
             }
             LinearLayout btns = row(this);
             if (chat != null) {
-                Button open = button(this, "Open chat", false);
+                Button open = button(this, getString(R.string.monitor_open_chat), false);
                 open.setOnClickListener(v -> openChat(chat));
                 LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40));
-                op.rightMargin = dp(this, 8);
+                op.setMarginEnd(dp(this, 8));
                 btns.addView(open, op);
             }
-            Button stop = outlinedButton(this, "Stop", ERR);
-            stop.setOnClickListener(v -> confirmSheet(this, "Stop this " + agent + " session?",
-                    chat != null ? where
-                            : (background ? "It runs in the background, for example a chat you're continuing from the Claude app. "
-                            : "It may be a session you're using in a terminal right now. ")
-                            + "It could even be the one controlling Buddy. Stopping it ends that conversation's current work.",
-                    "Stop", true, () -> {
+            Button stop = outlinedButton(this, getString(R.string.monitor_stop), ERR);
+            stop.setOnClickListener(v -> confirmSheet(this, getString(R.string.monitor_stop_title, agent),
+                    chat != null ? where : getString(background ? R.string.monitor_stop_background_body
+                            : R.string.monitor_stop_terminal_body),
+                    getString(R.string.monitor_stop), true, () -> {
                         if (chat != null) hub.stop(chat);
                         else request("kill", String.valueOf(p.optLong("pid")));
-                        Toast.makeText(this, "Stopping…", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.monitor_stopping, Toast.LENGTH_SHORT).show();
                     }));
             btns.addView(stop, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
             LinearLayout.LayoutParams bp = full();
@@ -267,13 +265,13 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         for (JSONObject d : services) {
             LinearLayout r = row(this);
             r.setGravity(android.view.Gravity.TOP);
-            r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), 0);
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), 0);
             r.addView(icon(this, R.drawable.ms_terminal, MUTED, 18));
             LinearLayout col = column(this);
-            col.setPadding(dp(this, 10), 0, 0, 0);
-            col.addView(text(this, "Claude Code background service", 14, TEXT));
-            col.addView(single(monoText(this, "pid " + d.optLong("pid") + " · up "
-                    + DateUtils.formatElapsedTime(d.optLong("seconds")) + " · hosts background sessions", 12, MUTED)));
+            col.setPaddingRelative(dp(this, 10), 0, 0, 0);
+            col.addView(text(this, getString(R.string.monitor_service_title), 14, TEXT));
+            col.addView(single(monoText(this, getString(R.string.monitor_service_meta, d.optLong("pid"),
+                    DateUtils.formatElapsedTime(d.optLong("seconds"))), 12, MUTED)));
             r.addView(col, weight1());
             running.addView(r, full());
         }
@@ -281,7 +279,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
 
     private TextView tag(String s, boolean accent) {
         TextView t = monoText(this, s, 11, accent ? ACCENT_TEXT : MUTED);
-        t.setPadding(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
+        t.setPaddingRelative(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
         t.setBackground(accent ? rounded(this, ACCENT_SOFT, 6) : outlined(this, 0x00000000, 6, OUTLINE, 1));
         return t;
     }
@@ -289,7 +287,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
     private void showRecent(JSONArray list) {
         recent.removeAllViews();
         if (list == null || list.length() == 0) {
-            recentEmpty.setText("No history found.");
+            recentEmpty.setText(R.string.monitor_no_history);
             recent.addView(recentEmpty);
             return;
         }
@@ -299,7 +297,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
             final String backend = s.optString("agent");
             final Sessions.Session chat = hub.sessions.find(s.optString("buddy"));
             String title = s.optString("title");
-            final String t = title.isEmpty() ? "(no messages)" : title;
+            final String t = title.isEmpty() ? getString(R.string.monitor_no_messages) : title;
 
             LinearLayout r = listRow(this);
             r.setGravity(android.view.Gravity.CENTER_VERTICAL);
@@ -311,16 +309,16 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
             first.addView(tt, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             if (chat != null) {
                 TextView tag = monoText(this, "buddy", 11, ACCENT_TEXT);
-                tag.setPadding(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
+                tag.setPaddingRelative(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
                 tag.setBackground(rounded(this, ACCENT_SOFT, 6));
                 LinearLayout.LayoutParams tp = wrap();
-                tp.leftMargin = dp(this, 8);
+                tp.setMarginStart(dp(this, 8));
                 first.addView(tag, tp);
             }
             col.addView(first, full());
             TextView meta = single(monoText(this, Account.cliOf(backend) + " · "
                     + MainActivity.ago(s.optLong("mtime") * 1000) + " · " + shortPath(s.optString("cwd")), 12, MUTED));
-            meta.setPadding(0, dp(this, 3), 0, 0);
+            meta.setPaddingRelative(0, dp(this, 3), 0, 0);
             col.addView(meta);
             r.addView(col, weight1());
             r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));

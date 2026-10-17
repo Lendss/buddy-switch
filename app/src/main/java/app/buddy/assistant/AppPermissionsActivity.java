@@ -28,7 +28,11 @@ import static app.buddy.assistant.Ui.*;
  * button rules: always ask / never ask, with the buttons the agent has tapped as suggestions.
  */
 public class AppPermissionsActivity extends Screen {
-    private static final String[][] MODES = {{"trust", "Trust"}, {"hard", "Hard"}, {"smart", "Smart"}};
+    /** {mode, label} for the per-app segmented controls. */
+    private String[][] modes() {
+        return new String[][]{{"trust", getString(R.string.perms_mode_trust)}, {"hard", getString(R.string.perms_mode_hard)},
+                {"smart", getString(R.string.perms_mode_smart)}};
+    }
 
     private LinearLayout body;
     private boolean rulesPage;
@@ -47,18 +51,18 @@ public class AppPermissionsActivity extends Screen {
         root.setBackgroundColor(BG);
         LinearLayout top = row(this);
         top.setGravity(Gravity.CENTER_VERTICAL);
-        top.setPadding(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
-        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, "Back");
+        top.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
+        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.perms_back));
         back.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         back.setOnClickListener(v -> finish());
         top.addView(back);
-        TextView t = title(this, rulesPage ? "Button rules" : "App permissions", 18);
-        t.setPadding(dp(this, 6), 0, 0, 0);
+        TextView t = title(this, getString(rulesPage ? R.string.perms_button_rules : R.string.perms_title), 18);
+        t.setPaddingRelative(dp(this, 6), 0, 0, 0);
         top.addView(t, weight1());
         root.addView(top, full());
         ScrollView sv = new ScrollView(this);
         body = column(this);
-        body.setPadding(dp(this, 20), dp(this, 4), dp(this, 20), dp(this, 32));
+        body.setPaddingRelative(dp(this, 20), dp(this, 4), dp(this, 20), dp(this, 32));
         sv.addView(body);
         root.addView(sv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         FrameLayout frame = new FrameLayout(this);
@@ -79,36 +83,31 @@ public class AppPermissionsActivity extends Screen {
 
     private void renderApps() {
         body.removeAllViews();
-        body.addView(text(this, "Trust: the agent works on its own here, with no approval popups.\n"
-                + "Hard: your button rules decide. Send, Pay, Delete… need your OK on a card.\n"
-                + "Smart: the rules, then a separate reviewer AI checks every other tap against your request.\n"
-                + "The agent can never tap Buddy's own bubble, cards or settings.", 13, MUTED), full());
+        body.addView(text(this, getString(R.string.perms_modes_intro), 13, MUTED), full());
 
-        body.addView(label("Smart reviewer"), gap(18));
+        body.addView(label(getString(R.string.perms_smart_reviewer)), gap(18));
         // a reviewer that isn't signed in is greyed out
         java.util.Set<String> noReviewer = new java.util.HashSet<>();
         for (String r : new String[]{"claude", "codex"}) if (!SetupState.signedIn(this, r)) noReviewer.add(r);
-        body.addView(segmented(this, new String[][]{{"same", "Same as chat"}, {"claude", "Claude Code"}, {"codex", "Codex"}},
+        body.addView(segmented(this, new String[][]{{"same", getString(R.string.perms_reviewer_same)}, {"claude", "Claude Code"}, {"codex", "Codex"}},
                 Prefs.reviewer(this), false, v -> {
                     Prefs.setReviewer(this, v);
                     renderApps();
-                }, noReviewer, v -> Toast.makeText(this, "Sign in to " + Account.nameOf(v) + " first (Settings).",
+                }, noReviewer, v -> Toast.makeText(this, getString(R.string.perms_reviewer_sign_in, Account.nameOf(v)),
                         Toast.LENGTH_LONG).show()), gap(8));
-        body.addView(text(this, "A temporary session per tap, without tools: it sees your request, the agent's note and "
-                + "the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode chats are "
-                + "reviewed by Claude Code (or Codex).", 12, MUTED), gap(6));
+        body.addView(text(this, getString(R.string.perms_reviewer_about), 12, MUTED), gap(6));
 
         LinearLayout rules = row(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);
-        rules.setPadding(0, dp(this, 12), 0, dp(this, 12));
+        rules.setPaddingRelative(0, dp(this, 12), 0, dp(this, 12));
         rules.setBackgroundResource(ripple(this, false));
-        rules.addView(title(this, "Button rules", 15), weight1());
-        rules.addView(text(this, Guard.rules(this, "ask").size() + " ask · " + Guard.rules(this, "allow").size() + " never ask", 13, MUTED));
+        rules.addView(title(this, getString(R.string.perms_button_rules), 15), weight1());
+        rules.addView(text(this, getString(R.string.perms_rules_summary, Guard.rules(this, "ask").size(), Guard.rules(this, "allow").size()), 13, MUTED));
         rules.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
         rules.setOnClickListener(v -> startActivity(new Intent(this, AppPermissionsActivity.class).putExtra("page", "rules")));
         body.addView(rules, gap(8));
 
-        body.addView(label("Apps"), gap(12));
+        body.addView(label(getString(R.string.perms_apps)), gap(12));
         final LinearLayout list = column(this);
         body.addView(list, full());
         list.addView(spinner(this, 28), gap(16));
@@ -143,18 +142,18 @@ public class AppPermissionsActivity extends Screen {
         // all apps at once
         LinearLayout all = row(this);
         all.setGravity(Gravity.CENTER_VERTICAL);
-        all.setPadding(0, dp(this, 6), 0, dp(this, 6));
+        all.setPaddingRelative(0, dp(this, 6), 0, dp(this, 6));
         LinearLayout at = column(this);
-        at.addView(title(this, "All apps", 15));
-        TextView reset = text(this, "Reset to suggested", 12, ACCENT_TEXT);
-        reset.setPadding(0, dp(this, 4), 0, dp(this, 4));
+        at.addView(title(this, getString(R.string.perms_all_apps), 15));
+        TextView reset = text(this, getString(R.string.perms_reset_suggested), 12, ACCENT_TEXT);
+        reset.setPaddingRelative(0, dp(this, 4), 0, dp(this, 4));
         reset.setOnClickListener(v -> {
             for (App a : apps) Prefs.setAppSafety(this, a.pkg, null);
             renderApps();
         });
         at.addView(reset);
         all.addView(at, weight1());
-        all.addView(compact(MODES, commonMode(apps), m -> {
+        all.addView(compact(modes(), commonMode(apps), m -> {
             for (App a : apps) Prefs.setAppSafety(this, a.pkg, m);
             renderApps();
         }));
@@ -178,7 +177,7 @@ public class AppPermissionsActivity extends Screen {
     private View appRow(final App a) {
         final LinearLayout r = row(this);
         r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setPadding(0, dp(this, 6), 0, dp(this, 6));
+        r.setPaddingRelative(0, dp(this, 6), 0, dp(this, 6));
         ImageView ic = new ImageView(this);
         ic.setImageDrawable(a.icon);
         r.addView(ic, new LinearLayout.LayoutParams(dp(this, 32), dp(this, 32)));
@@ -195,7 +194,7 @@ public class AppPermissionsActivity extends Screen {
             holder.removeAllViews();
             String[] mw = Guard.modeWhy(this, a.pkg, a.label);
             why.setText(mw[1]);
-            holder.addView(compact(MODES, mw[0], m -> {
+            holder.addView(compact(modes(), mw[0], m -> {
                 Prefs.setAppSafety(this, a.pkg, m);
                 paint[0].run();
             }));
@@ -219,7 +218,7 @@ public class AppPermissionsActivity extends Screen {
     /** A small one-line segmented control (fits next to an app name). */
     private LinearLayout compact(String[][] options, String selected, Pick l) {
         LinearLayout box = row(this);
-        box.setPadding(dp(this, 2), dp(this, 2), dp(this, 2), dp(this, 2));
+        box.setPaddingRelative(dp(this, 2), dp(this, 2), dp(this, 2), dp(this, 2));
         box.setBackground(rounded(this, BG2(), 10));
         for (String[] o : options) {
             boolean on = o[0].equals(selected);
@@ -227,7 +226,7 @@ public class AppPermissionsActivity extends Screen {
             t.setSingleLine(true);
             t.setTypeface(sans(this, on ? 600 : 500));
             t.setGravity(Gravity.CENTER);
-            t.setPadding(dp(this, 9), dp(this, 6), dp(this, 9), dp(this, 6));
+            t.setPaddingRelative(dp(this, 9), dp(this, 6), dp(this, 9), dp(this, 6));
             if (on) t.setBackground(rounded(this, CARD2, 8));
             else t.setBackgroundResource(ripple(this, false));
             t.setOnClickListener(v -> {
@@ -246,18 +245,16 @@ public class AppPermissionsActivity extends Screen {
 
     private void renderRules() {
         body.removeAllViews();
-        body.addView(text(this, "For apps on Hard or Smart. A rule picked from the suggestions applies to that app; "
-                + "typed text applies to all apps. Tap a rule to remove it.", 13, MUTED), full());
-        body.addView(switchRow(this, "Built-in risky words", "Send, Post, Pay, Buy, Order, Delete, Call, Log out… "
-                + "in English, French, German, Spanish, Italian and Arabic always ask.", Prefs.guardBuiltin(this),
-                on -> Prefs.setGuardBuiltin(this, on)), gap(8));
+        body.addView(text(this, getString(R.string.perms_rules_intro), 13, MUTED), full());
+        body.addView(switchRow(this, getString(R.string.perms_builtin_title), getString(R.string.perms_builtin_sub),
+                Prefs.guardBuiltin(this), on -> Prefs.setGuardBuiltin(this, on)), gap(8));
         List<Guard.Rule> seen = Guard.rules(this, "seen");
-        for (String[] l : new String[][]{{"ask", "Always ask"}, {"allow", "Never ask"}}) {
+        for (String[] l : new String[][]{{"ask", getString(R.string.perms_always_ask)}, {"allow", getString(R.string.perms_never_ask)}}) {
             final String list = l[0];
             body.addView(label(l[1]), gap(18));
             for (final Guard.Rule r : Guard.rules(this, list)) {
                 TextView chip = text(this, r.describe() + "   ✕", 14, TEXT);
-                chip.setPadding(dp(this, 12), dp(this, 8), dp(this, 12), dp(this, 8));
+                chip.setPaddingRelative(dp(this, 12), dp(this, 8), dp(this, 12), dp(this, 8));
                 chip.setBackground(rounded(this, CARD2, 10));
                 chip.setOnClickListener(v -> {
                     List<Guard.Rule> rs = Guard.rules(this, list);
@@ -271,14 +268,14 @@ public class AppPermissionsActivity extends Screen {
             LinearLayout add = row(this);
             add.setGravity(Gravity.CENTER_VERTICAL);
             final AutoCompleteTextView et = new AutoCompleteTextView(this);
-            et.setHint("Add a button, e.g. Send");
+            et.setHint(R.string.perms_add_hint);
             et.setHintTextColor(MUTED);
             et.setTextColor(TEXT);
             et.setTextSize(14);
             et.setSingleLine(true);
             et.setThreshold(1);
             et.setBackground(outlined(this, CARD, 10, OUTLINE, 1));
-            et.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+            et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
             final List<String> labels = new ArrayList<>();
             final java.util.Map<String, Guard.Rule> bySuggestion = new java.util.HashMap<>();
             for (Guard.Rule r : seen) {
@@ -291,9 +288,9 @@ public class AppPermissionsActivity extends Screen {
             final Guard.Rule[] picked = new Guard.Rule[1];
             et.setOnItemClickListener((parent, view, pos, id) -> picked[0] = bySuggestion.get(String.valueOf(parent.getItemAtPosition(pos))));
             add.addView(et, weight1());
-            Button plus = button(this, "Add", true);
+            Button plus = button(this, getString(R.string.perms_add), true);
             LinearLayout.LayoutParams pl = wrap();
-            pl.leftMargin = dp(this, 8);
+            pl.setMarginStart(dp(this, 8));
             add.addView(plus, pl);
             plus.setOnClickListener(v -> {
                 String typed = et.getText().toString().trim();
@@ -305,9 +302,9 @@ public class AppPermissionsActivity extends Screen {
             body.addView(add, gap(6));
         }
         // buttons the agent tapped lately: one tap to put them on a list
-        body.addView(label("Buttons seen recently"), gap(20));
+        body.addView(label(getString(R.string.perms_seen_title)), gap(20));
         if (seen.isEmpty()) {
-            body.addView(text(this, "Buttons the agent taps in Hard and Smart apps show up here.", 13, MUTED), gap(4));
+            body.addView(text(this, getString(R.string.perms_seen_empty), 13, MUTED), gap(4));
             return;
         }
         int n = 0;
@@ -316,14 +313,14 @@ public class AppPermissionsActivity extends Screen {
             String now = Guard.listed(this, "allow", r.label, r.pkg) ? "allow" : Guard.listed(this, "ask", r.label, r.pkg) ? "ask" : "";
             LinearLayout row = row(this);
             row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding(0, dp(this, 5), 0, dp(this, 5));
+            row.setPaddingRelative(0, dp(this, 5), 0, dp(this, 5));
             LinearLayout names = column(this);
             names.addView(single(text(this, r.label, 14, TEXT)));
             names.addView(single(text(this, r.app == null || r.app.isEmpty() ? r.pkg : r.app, 11, MUTED)));
             LinearLayout.LayoutParams np = weight1();
-            np.rightMargin = dp(this, 10);
+            np.setMarginEnd(dp(this, 10));
             row.addView(names, np);
-            row.addView(compact(new String[][]{{"allow", "Never ask"}, {"ask", "Ask"}}, now, m -> {
+            row.addView(compact(new String[][]{{"allow", getString(R.string.perms_never_ask)}, {"ask", getString(R.string.perms_ask)}}, now, m -> {
                 Guard.addRule(this, m, r);
                 renderRules();
             }));

@@ -72,7 +72,7 @@ final class RadialMenu {
         close(false);
         actions = list;
         onClosed = closed;
-        size = dp(320);
+        size = dp(344); // the lowest action's two-line label must stay inside the window
         originX = cx - size / 2;
         originY = cy - size / 2;
         win = new FrameLayout(c);
@@ -92,7 +92,7 @@ final class RadialMenu {
             float tx = size / 2f + (float) (Math.cos(rad) * radius), ty = size / 2f + (float) (Math.sin(rad) * radius);
             targets.add(new float[]{tx, ty});
             View item = item(list.get(i));
-            int w = dp(72), h = dp(78);
+            int w = dp(72), h = dp(92); // room for a label on two lines
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(w, h);
             win.addView(item, lp);
             item.setX(size / 2f - w / 2f);
@@ -144,10 +144,14 @@ final class RadialMenu {
         t.setTextColor(0xFFF4EFE6);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         t.setTypeface(Ui.sans(c, 600));
-        t.setSingleLine(true);
+        // two short lines at most: longer labels (and most translations) don't fit one line in 72dp
+        t.setMaxLines(2);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        t.setGravity(Gravity.CENTER_HORIZONTAL);
+        t.setLineSpacing(0, 0.9f);
         t.setShadowLayer(dp(4), 0, 0, 0xFF000000);
-        t.setPadding(0, dp(4), 0, 0);
-        box.addView(t);
+        t.setPaddingRelative(0, dp(4), 0, 0);
+        box.addView(t, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         return box;
     }
 
@@ -173,11 +177,11 @@ final class RadialMenu {
                     .setUpdateListener(an -> glow.invalidate()).start();
         }
         TextView hint = new TextView(c);
-        hint.setText("Hold me");
+        hint.setText(R.string.menu_peek_hint);
         hint.setTextColor(0xFFF4EFE6);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         hint.setTypeface(Ui.sans(c, 700));
-        hint.setPadding(dp(10), dp(4), dp(10), dp(4));
+        hint.setPaddingRelative(dp(10), dp(4), dp(10), dp(4));
         GradientDrawable hb = new GradientDrawable();
         hb.setCornerRadius(dp(12));
         hb.setColor(Ui.ACCENT);

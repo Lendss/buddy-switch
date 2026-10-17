@@ -38,7 +38,7 @@ final class ClaudeDictation {
 
     /** Start listening (the hidden session starts first if needed: a few seconds the first time). */
     static String listen(Context c, String lang, Voice.Listener l) {
-        if (!SetupState.signedIn(c, "claude")) return "Sign in to Claude Code in Settings to use Claude voice.";
+        if (!SetupState.signedIn(c, "claude")) return c.getString(R.string.dictation_claude_sign_in);
         final Context app = c.getApplicationContext();
         listener = l;
         holding = false;
@@ -53,7 +53,8 @@ final class ClaudeDictation {
             if (eos.feed(v)) finish(); // the user paused: send, like the phone's recognizer does
         });
         // recording starts now; Claude gets it all once its recorder is up
-        l.onStatus(MicServer.startCapture(app) ? null : ready(code) ? "Starting…" : "Starting Claude…");
+        l.onStatus(MicServer.startCapture(app) ? null
+                : app.getString(ready(code) ? R.string.dictation_starting : R.string.dictation_starting_claude));
         new Thread(() -> {
             try {
                 MicServer.start(app, null); // before voice mode: Claude Code tests the microphone when it turns on
@@ -61,7 +62,7 @@ final class ClaudeDictation {
                 if (listener != l) return;
                 main.post(() -> startHolding(l));
             } catch (Exception e) {
-                main.post(() -> end(l, "Claude voice couldn't start: " + e.getMessage()));
+                main.post(() -> end(l, app.getString(R.string.dictation_claude_start_failed, e.getMessage())));
             }
         }, "claude-dictation").start();
         return null;
@@ -96,7 +97,7 @@ final class ClaudeDictation {
         finishing = true;
         MicServer.stopCapture();
         final Voice.Listener l = listener;
-        l.onStatus("Transcribing…");
+        l.onStatus(BuddyApp.str(R.string.dictation_transcribing));
         final long asked = System.currentTimeMillis();
         main.post(new Runnable() {
             @Override
@@ -104,7 +105,7 @@ final class ClaudeDictation {
                 if (listener != l) return;
                 long now = System.currentTimeMillis();
                 if (!holding) { // Claude is still starting; the audio waits for it
-                    if (now - asked > 45_000) end(l, "Claude voice didn't start.");
+                    if (now - asked > 45_000) end(l, BuddyApp.str(R.string.dictation_claude_no_start));
                     else main.postDelayed(this, 100);
                     return;
                 }
@@ -140,7 +141,7 @@ final class ClaudeDictation {
                     stopMic();
                     listener = null;
                     finishing = false;
-                    if (t.isEmpty()) l.onEnd("Didn't catch that.");
+                    if (t.isEmpty()) l.onEnd(BuddyApp.str(R.string.dictation_no_speech));
                     else l.onFinal(t);
                     return;
                 }
@@ -196,7 +197,7 @@ final class ClaudeDictation {
         while (System.currentTimeMillis() < until && !session.exited && !session.emulator.screenText().contains("❯")) {
             Thread.sleep(300);
         }
-        if (session.exited || !session.emulator.screenText().contains("❯")) throw new Exception("Claude Code didn't start");
+        if (session.exited || !session.emulator.screenText().contains("❯")) throw new Exception(c.getString(R.string.dictation_claude_code_no_start));
         Thread.sleep(400);
         session.write("/voice hold\r");
         Thread.sleep(1500);

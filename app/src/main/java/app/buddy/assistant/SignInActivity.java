@@ -36,18 +36,18 @@ public class SignInActivity extends Screen implements Account.Listener {
         root.setBackgroundColor(BG);
         root.setFitsSystemWindows(true);
         LinearLayout top = row(this);
-        top.setPadding(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
-        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, "Back");
+        top.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
+        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.signin_back));
         back.setOnClickListener(v -> finish());
         top.addView(back);
         root.addView(top, full());
         ScrollView scroll = new ScrollView(this);
         body = column(this);
-        body.setPadding(dp(this, 24), dp(this, 8), dp(this, 24), dp(this, 24));
+        body.setPaddingRelative(dp(this, 24), dp(this, 8), dp(this, 24), dp(this, 24));
         scroll.addView(body);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         bottom = column(this);
-        bottom.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 16));
+        bottom.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 16));
         root.addView(bottom, full());
         setContentView(root);
     }
@@ -96,42 +96,41 @@ public class SignInActivity extends Screen implements Account.Listener {
         bottom.removeAllViews();
         switch (acc.step) {
             case CHECKING:
-                header(R.drawable.ms_terminal, acc.name(), "Checking…", false);
+                header(R.drawable.ms_terminal, acc.name(), getString(R.string.signin_checking), false);
                 spinnerRow();
                 break;
             case NEED_INSTALL:
-                header(R.drawable.ms_terminal, "Install " + acc.name(), acc.claude()
-                        ? "Runs Claude Code inside Buddy on your Claude subscription."
-                        : acc.opencode() ? "Runs OpenCode inside Buddy. Its free models work right away, no account needed; "
-                        + "connect your own providers (Anthropic, OpenAI, GitHub Copilot…) anytime."
-                        : "Runs Codex inside Buddy on your ChatGPT plan.", false);
-                note(acc.claude() ? "Downloads about 235 MB once: Buddy's Linux and Claude Code from Anthropic. Use Wi-Fi if you can."
-                        : acc.opencode() ? "Downloads about 230 MB once: Buddy's Linux, Node.js and OpenCode. Use Wi-Fi if you can."
-                        : "Downloads about 150 MB once: Buddy's Linux, Node.js and Codex from OpenAI. Use Wi-Fi if you can.");
-                primary("Install " + acc.name(), v -> acc.install(this));
+                header(R.drawable.ms_terminal, getString(R.string.signin_install, acc.name()), getString(acc.claude()
+                        ? R.string.signin_install_sub_claude
+                        : acc.opencode() ? R.string.signin_install_sub_opencode
+                        : R.string.signin_install_sub_codex), false);
+                note(getString(acc.claude() ? R.string.signin_install_size_claude
+                        : acc.opencode() ? R.string.signin_install_size_opencode
+                        : R.string.signin_install_size_codex));
+                primary(getString(R.string.signin_install, acc.name()), v -> acc.install(this));
                 break;
             case INSTALLING:
-                header(R.drawable.ms_terminal, acc.updating ? "Updating" : "Installing", acc.detail, false);
+                header(R.drawable.ms_terminal, getString(acc.updating ? R.string.signin_updating : R.string.signin_installing),
+                        acc.detail, false);
                 spinnerRow();
-                note("This takes a few minutes. You can leave this screen; it keeps going.");
+                note(getString(R.string.signin_install_wait));
                 break;
             case SIGNED_OUT:
                 if (acc.opencode()) {
                     openCodeReady();
                     break;
                 }
-                header(R.drawable.ms_shield_person, acc.claude() ? "Sign in to Claude" : "Sign in to ChatGPT",
-                        (acc.claude() ? "Use your Claude account (Pro or Max)." : "Use your ChatGPT account (Plus, Pro or Business).")
-                                + " Your browser opens; approve there and Buddy comes back by itself.", false);
-                primary(acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT", v -> acc.startLogin(this));
-                secondary(acc.claude() ? "Sign in on another device" : "Sign in with a code", v -> {
+                header(R.drawable.ms_shield_person, getString(acc.claude() ? R.string.signin_title_claude : R.string.signin_title_chatgpt),
+                        getString(acc.claude() ? R.string.signin_sub_claude : R.string.signin_sub_chatgpt), false);
+                primary(getString(acc.claude() ? R.string.signin_with_claude : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
+                secondary(getString(acc.claude() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
                 break;
             case WAITING_BROWSER:
                 if (acc.url == null) {
-                    header(R.drawable.ms_shield_person, "Sign in", "Starting sign-in…", false);
+                    header(R.drawable.ms_shield_person, getString(R.string.signin_sign_in), getString(R.string.signin_starting), false);
                     spinnerRow();
                     break;
                 }
@@ -140,18 +139,17 @@ public class SignInActivity extends Screen implements Account.Listener {
                     break;
                 }
                 openBrowserOnce();
-                header(R.drawable.ms_shield_person, "Approve in your browser", acc.claude()
-                        ? "Tap Authorize on the Claude page. Buddy picks up the code and comes back by itself."
-                        : "Sign in and allow Codex. Then come back to Buddy; it finishes by itself.", false);
-                primary("Open the sign-in page again", v -> {
+                header(R.drawable.ms_shield_person, getString(R.string.signin_approve_title), getString(acc.claude()
+                        ? R.string.signin_approve_claude : R.string.signin_approve_codex), false);
+                primary(getString(R.string.signin_open_again), v -> {
                     openedUrl = null;
                     openBrowserOnce();
                 });
                 if (acc.claude()) pasteBox();
-                secondary("Cancel", v -> acc.cancelLogin());
+                secondary(getString(android.R.string.cancel), v -> acc.cancelLogin());
                 break;
             case FINISHING:
-                header(R.drawable.ms_shield_person, "Signing in", "Finishing sign-in…", false);
+                header(R.drawable.ms_shield_person, getString(R.string.signin_signing_in), getString(R.string.signin_finishing), false);
                 spinnerRow();
                 break;
             case SIGNED_IN:
@@ -159,17 +157,19 @@ public class SignInActivity extends Screen implements Account.Listener {
                     openCodeReady();
                     break;
                 }
-                header(R.drawable.ms_check, "Signed in", (acc.email.isEmpty() ? acc.name() + " is ready."
-                        : acc.email) + (acc.plan.isEmpty() ? "" : " · " + acc.plan), true);
+                header(R.drawable.ms_check, getString(R.string.signin_signed_in), (acc.email.isEmpty()
+                        ? getString(R.string.signin_agent_ready, acc.name()) : acc.email)
+                        + (acc.plan.isEmpty() ? "" : " · " + acc.planLabel()), true);
                 versionNote();
-                primary("Done", v -> finish());
+                primary(getString(R.string.signin_done), v -> finish());
                 updateButton();
-                secondary("Sign out", v -> confirmSheet(this, "Sign out of " + acc.name() + "?",
-                        acc.name() + " in Buddy stops working until you sign in again.", "Sign out", true, () -> acc.logout(this)));
+                secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
+                        getString(R.string.signin_sign_out_text, acc.name()), getString(R.string.signin_sign_out), true,
+                        () -> acc.logout(this)));
                 break;
             case ERROR:
-                header(R.drawable.ms_error, "Something went wrong", acc.detail, false);
-                primary("Try again", v -> {
+                header(R.drawable.ms_error, getString(R.string.signin_error_title), acc.detail, false);
+                primary(getString(R.string.signin_try_again), v -> {
                     acc.step = Account.Step.CHECKING;
                     acc.refresh(this);
                     render();
@@ -180,98 +180,98 @@ public class SignInActivity extends Screen implements Account.Listener {
 
     /** OpenCode is installed: nothing to sign in to. Providers are connected with `opencode auth login` in the terminal. */
     private void openCodeReady() {
-        boolean free = acc.plan.isEmpty() || "free models".equals(acc.plan);
-        header(R.drawable.ms_check, "OpenCode is ready", free
-                ? "Using OpenCode's free models. Pick one per chat with the model chip, or connect your own provider."
-                : "Connected: " + acc.plan + ". OpenCode's free models stay available too.", true);
-        note("Connecting a provider opens Buddy's terminal with opencode auth login: pick a provider and follow its steps. "
-                + "To remove one later, run opencode auth logout there.");
+        boolean free = acc.plan.isEmpty() || "free models".equals(acc.plan); // Account's marker, not display text
+        header(R.drawable.ms_check, getString(R.string.signin_opencode_ready), free
+                ? getString(R.string.signin_opencode_free)
+                : getString(R.string.signin_opencode_connected, acc.plan), true);
+        note(getString(R.string.signin_opencode_connect_note, "opencode auth login", "opencode auth logout"));
         versionNote();
-        primary("Done", v -> finish());
+        primary(getString(R.string.signin_done), v -> finish());
         updateButton();
-        secondary("Connect a provider", v -> startActivity(new Intent(this, TerminalActivity.class)
+        secondary(getString(R.string.signin_connect_provider), v -> startActivity(new Intent(this, TerminalActivity.class)
                 .putExtra("run", acc.opencode2 ? "opencode auth login --standalone" : "opencode auth login")));
     }
 
     /** The installed version, and what the last update did. */
     private void versionNote() {
         if (!acc.updateNote.isEmpty()) note(acc.updateNote);
-        else if (!acc.version.isEmpty()) note(acc.name() + " " + acc.version + (acc.oldOpencode()
-                ? ". OpenCode 2 is out: update to keep getting new versions. Your connected providers are kept." : "."));
+        else if (!acc.version.isEmpty()) note(acc.oldOpencode() ? getString(R.string.signin_version_old_opencode, acc.version)
+                : getString(R.string.signin_version, acc.name(), acc.version));
     }
 
     private void updateButton() {
-        secondary(acc.oldOpencode() ? "Update to OpenCode 2" : "Check for updates", v -> acc.update(this));
+        secondary(getString(acc.oldOpencode() ? R.string.signin_update_opencode2 : R.string.signin_check_updates),
+                v -> acc.update(this));
     }
 
     /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */
     private void remoteSignIn() {
         final String link = acc.url;
         if (acc.claude()) {
-            header(R.drawable.ms_shield_person, "Sign in on another device",
-                    "Open this link on any device and approve. Then copy the code the page shows and paste it below.", false);
+            header(R.drawable.ms_shield_person, getString(R.string.signin_other_device),
+                    getString(R.string.signin_remote_claude), false);
         } else {
-            header(R.drawable.ms_shield_person, "Enter this code",
-                    "On any device, open the link below, sign in to ChatGPT and enter the code. Buddy finishes by itself.", false);
+            header(R.drawable.ms_shield_person, getString(R.string.signin_enter_code),
+                    getString(R.string.signin_remote_codex), false);
             TextView code = monoText(this, acc.userCode == null ? "…" : acc.userCode, 34, TEXT);
             code.setTypeface(mono(this, 600));
             code.setLetterSpacing(0.08f);
             code.setTextIsSelectable(true);
             code.setGravity(Gravity.CENTER);
-            code.setPadding(dp(this, 12), dp(this, 18), dp(this, 12), dp(this, 18));
+            code.setPaddingRelative(dp(this, 12), dp(this, 18), dp(this, 12), dp(this, 18));
             code.setBackground(rounded(this, CARD, 16));
             LinearLayout.LayoutParams cp = full();
             cp.topMargin = dp(this, 20);
             body.addView(code, cp);
-            Button copyCode = button(this, "Copy code", false);
-            copyCode.setOnClickListener(v -> copy(acc.userCode, "Code copied"));
+            Button copyCode = button(this, getString(R.string.signin_copy_code), false);
+            copyCode.setOnClickListener(v -> copy(acc.userCode, getString(R.string.signin_code_copied)));
             LinearLayout.LayoutParams ccp = wrap();
             ccp.topMargin = dp(this, 8);
             body.addView(copyCode, ccp);
-            TextView exp = text(this, "The code works for 15 minutes.", 13, MUTED);
-            exp.setPadding(0, dp(this, 6), 0, 0);
+            TextView exp = text(this, getString(R.string.signin_code_expiry), 13, MUTED);
+            exp.setPaddingRelative(0, dp(this, 6), 0, 0);
             body.addView(exp);
         }
         TextView l = monoText(this, link, 13, ACCENT_TEXT);
         l.setTextIsSelectable(true);
         l.setMaxLines(acc.claude() ? 3 : 2);
         l.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        l.setPadding(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        l.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
         l.setBackground(outlined(this, BG, 12, OUTLINE, 1));
         LinearLayout.LayoutParams lp = full();
         lp.topMargin = dp(this, 20);
         body.addView(l, lp);
         LinearLayout btns = row(this);
-        Button copyLink = button(this, "Copy link", false);
-        copyLink.setOnClickListener(v -> copy(link, "Link copied"));
+        Button copyLink = button(this, getString(R.string.signin_copy_link), false);
+        copyLink.setOnClickListener(v -> copy(link, getString(R.string.signin_link_copied)));
         btns.addView(copyLink, wrap());
-        Button share = button(this, "Share", false);
+        Button share = button(this, getString(R.string.signin_share), false);
         share.setOnClickListener(v -> startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND)
                 .setType("text/plain").putExtra(Intent.EXTRA_TEXT, link), null)));
         LinearLayout.LayoutParams sp = wrap();
-        sp.leftMargin = dp(this, 8);
+        sp.setMarginStart(dp(this, 8));
         btns.addView(share, sp);
-        Button here = button(this, "Open here", false);
+        Button here = button(this, getString(R.string.signin_open_here), false);
         here.setOnClickListener(v -> {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
             } catch (Exception e) {
-                Toast.makeText(this, "No browser found.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.signin_no_browser, Toast.LENGTH_SHORT).show();
             }
         });
         LinearLayout.LayoutParams hp = wrap();
-        hp.leftMargin = dp(this, 8);
+        hp.setMarginStart(dp(this, 8));
         btns.addView(here, hp);
         LinearLayout.LayoutParams bp = full();
         bp.topMargin = dp(this, 10);
         body.addView(btns, bp);
         if (acc.claude()) pasteBox();
-        secondary("Cancel", v -> acc.cancelLogin());
+        secondary(getString(android.R.string.cancel), v -> acc.cancelLogin());
     }
 
     private void copy(String s, String toast) {
         if (s == null) return;
-        getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Sign-in", s));
+        getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText(getString(R.string.signin_clip_label), s));
         Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
     }
 
@@ -284,16 +284,16 @@ public class SignInActivity extends Screen implements Account.Listener {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(u)));
         } catch (Exception e) {
-            Toast.makeText(this, "No browser found to open the sign-in page.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.signin_no_browser_page, Toast.LENGTH_LONG).show();
         }
     }
 
     private void pasteBox() {
         LinearLayout c = column(this);
         LinearLayout head = row(this);
-        head.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        head.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
         head.setBackgroundResource(ripple(this, false));
-        TextView h = title(this, "Paste the code instead", 14);
+        TextView h = title(this, getString(R.string.signin_paste_instead), 14);
         h.setTextColor(ACCENT_TEXT);
         head.addView(h, weight1());
         head.addView(icon(this, pasteOpen ? R.drawable.ms_expand_less : R.drawable.ms_expand_more, ACCENT_TEXT, 20));
@@ -303,27 +303,26 @@ public class SignInActivity extends Screen implements Account.Listener {
         });
         c.addView(head, full());
         if (pasteOpen) {
-            c.addView(text(this, "If Buddy doesn't come back by itself: tap Copy Code on the Claude page, then paste it here.",
-                    14, MUTED));
+            c.addView(text(this, getString(R.string.signin_paste_help), 14, MUTED));
             LinearLayout r = row(this);
-            r.setPadding(0, dp(this, 10), 0, 0);
+            r.setPaddingRelative(0, dp(this, 10), 0, 0);
             EditText et = new EditText(this);
-            et.setHint("code");
+            et.setHint(R.string.signin_code_hint);
             et.setHintTextColor(MUTED);
             et.setTextColor(TEXT);
             et.setTypeface(mono(this, 400));
             et.setTextSize(14);
             et.setSingleLine(true);
-            et.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+            et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
             et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
             r.addView(et, weight1());
-            Button go = button(this, "Use", true);
+            Button go = button(this, getString(R.string.signin_use_code), true);
             LinearLayout.LayoutParams gp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-            gp.leftMargin = dp(this, 8);
+            gp.setMarginStart(dp(this, 8));
             r.addView(go, gp);
             go.setOnClickListener(v -> {
                 if (!acc.submit(et.getText().toString())) {
-                    Toast.makeText(this, "Start the sign-in again first.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.signin_start_again, Toast.LENGTH_SHORT).show();
                 }
             });
             c.addView(r, full());
@@ -344,14 +343,14 @@ public class SignInActivity extends Screen implements Account.Listener {
         ip.topMargin = dp(this, 8);
         body.addView(ic, ip);
         TextView t = title(this, title, 26);
-        t.setPadding(0, dp(this, 18), 0, dp(this, 6));
+        t.setPaddingRelative(0, dp(this, 18), 0, dp(this, 6));
         body.addView(t);
         body.addView(text(this, sub, 16, MUTED));
     }
 
     private void spinnerRow() {
         LinearLayout r = row(this);
-        r.setPadding(0, dp(this, 20), 0, 0);
+        r.setPaddingRelative(0, dp(this, 20), 0, 0);
         r.addView(spinner(this, 22));
         body.addView(r, full());
     }

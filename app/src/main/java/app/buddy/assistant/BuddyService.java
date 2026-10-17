@@ -39,7 +39,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private final Runnable pauseExpired = () -> {
         if (!paused) return;
         takeBackControl();
-        android.widget.Toast.makeText(this, "Paused for 5 minutes, so Buddy stopped the task.", android.widget.Toast.LENGTH_LONG).show();
+        android.widget.Toast.makeText(this, R.string.service_pause_expired, android.widget.Toast.LENGTH_LONG).show();
     };
     private Tools tools;
     private McpServer server;
@@ -368,7 +368,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             endPause(); // after revoking, so tool calls waiting in a pause get "stopped", not go ahead
             ChatHub.get(this).stopAll();
             control.end();
-            android.widget.Toast.makeText(this, "Stopped. Your phone is yours again.", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(this, R.string.service_stopped_toast, android.widget.Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -384,9 +384,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.postDelayed(pauseExpired, PAUSE_MAX_MS);
         ChatHub hub = ChatHub.get(this);
         Sessions.Session ses = hub.latestRunning();
-        if (ses != null) hub.note(ses, Bubble.Kind.STEP, "Paused: the phone is yours until you resume");
+        if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(R.string.service_paused_note));
         if (bubble != null) bubble.onPauseChanged();
-        android.widget.Toast.makeText(this, "Paused. Use your phone, then hold the bubble to resume.", android.widget.Toast.LENGTH_SHORT).show();
+        android.widget.Toast.makeText(this, R.string.service_paused_toast, android.widget.Toast.LENGTH_SHORT).show();
     }
 
     /** Resume (main thread): waiting phone actions go on, after the agent re-reads the screen. */
@@ -396,7 +396,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         endPause();
         ChatHub hub = ChatHub.get(this);
         Sessions.Session ses = hub.latestRunning();
-        if (ses != null) hub.note(ses, Bubble.Kind.STEP, "Resumed");
+        if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(R.string.service_resumed_note));
     }
 
     /** A chat was stopped while paused (main thread): end the pause without letting waiting actions go ahead. */
@@ -468,6 +468,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
     }
 
+    /**
+     * Waits up to 5 minutes for the card's answer. Gives up sooner when the agent stops waiting (its tool call timed
+     * out or it was stopped): a card nobody waits for would keep blocking every tap.
+     */
+    private static boolean awaitAnswer(CountDownLatch done) throws InterruptedException {
+        java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
+        long end = System.currentTimeMillis() + 5 * 60_000;
+        while (System.currentTimeMillis() < end) {
+            if (done.await(1, TimeUnit.SECONDS)) return true;
+            if (gone != null && gone.getAsBoolean()) return false;
+        }
+        return false;
+    }
+
     /** Blocks the calling (tool) thread until the user answers in the bubble. */
     String askConfirm(final String summary) throws InterruptedException {
         final CountDownLatch done = new CountDownLatch(1);
@@ -479,7 +493,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             change.set(wanted);
             done.countDown();
         }));
-        if (!done.await(5, TimeUnit.MINUTES)) {
+        if (!awaitAnswer(done)) {
             main.post(() -> bubble.cancelConfirm());
             return "DENIED: the user did not answer within 5 minutes. Do not do it.";
         }
@@ -504,7 +518,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             answer.set(text);
             done.countDown();
         }));
-        if (!done.await(5, TimeUnit.MINUTES)) {
+        if (!awaitAnswer(done)) {
             main.post(() -> bubble.cancelConfirm());
             return "NO ANSWER: the user did not answer within 5 minutes. Don't guess; stop and ask in your reply.";
         }

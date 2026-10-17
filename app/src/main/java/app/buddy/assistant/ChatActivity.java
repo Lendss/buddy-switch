@@ -60,13 +60,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
         // app bar
         LinearLayout top = row(this);
-        top.setPadding(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
-        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, "Back");
+        top.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
+        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.chat_back));
         back.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         back.setOnClickListener(v -> finish());
         top.addView(back);
         LinearLayout titles = column(this);
-        titles.setPadding(dp(this, 4), 0, dp(this, 4), 0);
+        titles.setPaddingRelative(dp(this, 4), 0, dp(this, 4), 0);
         title = single(title(this, ses.label(), 16));
         titles.addView(title);
         LinearLayout chip = chip(this, "");
@@ -76,12 +76,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         cp.topMargin = dp(this, 3);
         titles.addView(chip, cp);
         top.addView(titles, weight1());
-        speaker = iconButton(this, R.drawable.ms_volume_off, "Read replies aloud", MUTED);
+        speaker = iconButton(this, R.drawable.ms_volume_off, getString(R.string.chat_read_aloud), MUTED);
         speaker.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         speaker.setOnClickListener(v -> {
             Prefs.setSpeakReplies(this, !Prefs.speakReplies(this));
             if (!Prefs.speakReplies(this)) Voice.stopSpeaking();
-            Toast.makeText(this, Prefs.speakReplies(this) ? "Replies will be read aloud" : "Replies won't be read aloud",
+            Toast.makeText(this, Prefs.speakReplies(this) ? R.string.chat_read_aloud_on : R.string.chat_read_aloud_off,
                     Toast.LENGTH_SHORT).show();
             refresh();
         });
@@ -91,19 +91,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
         // running strip
         strip = row(this);
-        strip.setPadding(dp(this, 12), dp(this, 6), dp(this, 6), dp(this, 6));
+        strip.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 6), dp(this, 6));
         strip.setBackground(rounded(this, CARD, 12));
         ProgressBar sp = spinner(this, 16);
         strip.addView(sp);
         stripText = single(monoText(this, "", 12, ACCENT_TEXT));
-        stripText.setPadding(dp(this, 10), 0, dp(this, 8), 0);
+        stripText.setPaddingRelative(dp(this, 10), 0, dp(this, 8), 0);
         strip.addView(stripText, weight1());
-        Button stop = button(this, "Stop", false);
+        Button stop = button(this, getString(R.string.chat_stop), false);
         stop.setTextColor(ERR);
         stop.setBackground(rounded(this, ERR_SOFT, 10));
         stop.setMinHeight(dp(this, 34));
         stop.setMinimumHeight(dp(this, 34));
-        stop.setPadding(dp(this, 14), 0, dp(this, 14), 0);
+        stop.setPaddingRelative(dp(this, 14), 0, dp(this, 14), 0);
         stop.setOnClickListener(v -> hub.stop(ses));
         strip.addView(stop, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 34)));
         LinearLayout.LayoutParams stp = full();
@@ -113,7 +113,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
         scroll = new ScrollView(this);
         messages = column(this);
-        messages.setPadding(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
+        messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         scroll.addView(messages);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
@@ -128,32 +128,32 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         trayScroll = new android.widget.HorizontalScrollView(this);
         trayScroll.setHorizontalScrollBarEnabled(false);
         tray = row(this);
-        tray.setPadding(dp(this, 12), 0, dp(this, 12), dp(this, 6));
+        tray.setPaddingRelative(dp(this, 12), 0, dp(this, 12), dp(this, 6));
         trayScroll.addView(tray);
         trayScroll.setVisibility(View.GONE);
         root.addView(trayScroll, full());
 
         pill = row(this);
-        pill.setPadding(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
-        ImageButton attach = iconButton(this, R.drawable.ms_attach_file, "Attach a photo or file", MUTED);
+        pill.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
+        ImageButton attach = iconButton(this, R.drawable.ms_attach_file, getString(R.string.chat_attach_description), MUTED);
         attach.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         attach.setOnClickListener(v -> attachSheet());
         pill.addView(attach);
         pill.setBackground(outlined(this, CARD, 26, OUTLINE, 1));
         input = new EditText(this);
-        input.setHint("Ask " + ses.brainName() + "…");
+        input.setHint(getString(R.string.chat_input_hint, ses.brainName()));
         input.setHintTextColor(MUTED);
         input.setTextColor(TEXT);
         input.setTextSize(15);
         input.setTypeface(sans(this, 400));
         input.setMaxLines(6);
         input.setBackground(null);
-        input.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        input.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         pill.addView(input, weight1());
         mic = button(this, "", false);
-        mic.setContentDescription("Talk");
+        mic.setContentDescription(getString(R.string.chat_talk));
         mic.setOnClickListener(v -> toggleMic());
         mic.setOnLongClickListener(v -> {
             languageSheet();
@@ -163,11 +163,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         micIdle();
         send = new ImageButton(this);
         send.setImageResource(R.drawable.ms_arrow_upward);
-        send.setContentDescription("Send");
+        send.setContentDescription(getString(R.string.chat_send));
         send.setScaleType(ImageView.ScaleType.CENTER);
         send.setOnClickListener(v -> send());
         LinearLayout.LayoutParams snp = new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40));
-        snp.leftMargin = dp(this, 4);
+        snp.setMarginStart(dp(this, 4));
         pill.addView(send, snp);
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -225,10 +225,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         messages.removeAllViews();
         log = null;
         if (ses.messages.isEmpty()) {
-            TextView hint = text(this, "New " + ses.brainName() + " chat. Ask it to do something on your phone"
-                    + (Prefs.devMode(this) ? ", or to build an app (developer mode is on)." : "."), 14, MUTED);
+            TextView hint = text(this, getString(Prefs.devMode(this) ? R.string.chat_empty_hint_dev : R.string.chat_empty_hint,
+                    ses.brainName()), 14, MUTED);
             hint.setGravity(Gravity.CENTER);
-            hint.setPadding(dp(this, 24), dp(this, 40), dp(this, 24), 0);
+            hint.setPaddingRelative(dp(this, 24), dp(this, 40), dp(this, 24), 0);
             messages.addView(hint, full());
         }
         for (Sessions.Msg m : ses.messages) show(m);
@@ -315,24 +315,24 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         Models.refresh(this);
         final String[][] options = Models.forBackend(ses.backend);
         LinearLayout c = column(this);
-        TextView h = title(this, ses.brainName() + " model", 18);
+        TextView h = title(this, getString(R.string.chat_model_title, ses.brainName()), 18);
         c.addView(h);
-        TextView sub = text(this, "For this chat. The conversation continues with the new model.", 13, MUTED);
-        sub.setPadding(0, dp(this, 2), 0, dp(this, 10));
+        TextView sub = text(this, getString(R.string.chat_model_subtitle), 13, MUTED);
+        sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 10));
         c.addView(sub);
         final Dialog[] d = new Dialog[1];
         String[][] efforts = Models.efforts(ses.backend);
         if (efforts != null) {
-            c.addView(sectionLabel(this, "Effort"));
-            TextView es = text(this, "Auto lets the agent decide. Higher thinks longer and uses more of your plan.", 13, MUTED);
-            es.setPadding(0, dp(this, 2), 0, dp(this, 8));
+            c.addView(sectionLabel(this, getString(R.string.chat_effort)));
+            TextView es = text(this, getString(R.string.chat_effort_help), 13, MUTED);
+            es.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
             c.addView(es);
             c.addView(segmented(this, efforts, ses.effort, false, v -> {
                 d[0].dismiss();
                 hub.setEffort(ses, v);
             }), full());
-            TextView ml = sectionLabel(this, "Model");
-            ml.setPadding(0, dp(this, 16), 0, dp(this, 4));
+            TextView ml = sectionLabel(this, getString(R.string.chat_model));
+            ml.setPaddingRelative(0, dp(this, 16), 0, dp(this, 4));
             c.addView(ml);
         }
         boolean known = false;
@@ -340,11 +340,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             boolean on = o[0].equals(ses.model);
             known |= on;
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+            r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
             r.setBackgroundResource(ripple(this, false));
             r.addView(radio(on));
             LinearLayout t = column(this);
-            t.setPadding(dp(this, 14), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             t.addView(title(this, o[1], 15));
             t.addView(single(monoText(this, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, MUTED)));
             r.addView(t, weight1());
@@ -355,9 +355,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             c.addView(r, full());
         }
         LinearLayout other = row(this);
-        other.setPadding(0, dp(this, 10), 0, 0);
+        other.setPaddingRelative(0, dp(this, 10), 0, 0);
         final EditText et = new EditText(this);
-        et.setHint("other… e.g. " + ("claude".equals(ses.backend) ? "claude-opus-5-5"
+        et.setHint(getString(R.string.chat_model_other_hint, "claude".equals(ses.backend) ? "claude-opus-5-5"
                 : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
@@ -365,12 +365,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         et.setTypeface(mono(this, 400));
         et.setSingleLine(true);
         if (!known) et.setText(ses.model);
-        et.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
         et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
         other.addView(et, weight1());
-        Button use = button(this, "Use", true);
+        Button use = button(this, getString(R.string.chat_model_use), true);
         LinearLayout.LayoutParams up = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-        up.leftMargin = dp(this, 8);
+        up.setMarginStart(dp(this, 8));
         other.addView(use, up);
         use.setOnClickListener(v -> {
             d[0].dismiss();
@@ -454,22 +454,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     /** Long-press the mic: which of your languages to listen for. */
     private void languageSheet() {
         LinearLayout c = column(this);
-        c.addView(title(this, "Speak in", 18));
-        TextView sub = text(this, "Choose your languages in Settings → Voice.", 13, MUTED);
-        sub.setPadding(0, dp(this, 2), 0, dp(this, 8));
+        c.addView(title(this, getString(R.string.chat_speak_in), 18));
+        TextView sub = text(this, getString(R.string.chat_speak_in_help), 13, MUTED);
+        sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
         c.addView(sub);
         final Dialog[] d = new Dialog[1];
         String cur = Prefs.voiceLang(this);
         for (String tag : Prefs.voiceLangs(this).split(",")) {
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             r.setBackgroundResource(ripple(this, false));
             r.addView(radio(tag.equals(cur)));
             TextView t = title(this, Voice.languageName(tag), 15);
-            t.setPadding(dp(this, 14), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             r.addView(t, weight1());
             if ("claude".equals(Prefs.voiceEngine(this)) && !ClaudeDictation.supports(tag)) {
-                r.addView(monoText(this, "phone voice", 11, MUTED));
+                r.addView(monoText(this, getString(R.string.chat_phone_voice), 11, MUTED));
             }
             r.setOnClickListener(v -> {
                 Prefs.setVoiceLang(this, tag);
@@ -493,18 +493,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             mic.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_mic, 0, 0, 0);
             mic.setCompoundDrawableTintList(ColorStateList.valueOf(MUTED));
             mic.setCompoundDrawablePadding(dp(this, 2));
-            mic.setPadding(dp(this, 6), 0, dp(this, 8), 0);
+            mic.setPaddingRelative(dp(this, 6), 0, dp(this, 8), 0);
             mic.setBackgroundResource(ripple(this, true));
-            input.setHint("Ask " + ses.brainName() + "…");
+            input.setHint(getString(R.string.chat_input_hint, ses.brainName()));
             return;
         }
         mic.setText("");
         mic.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_mic, 0, 0, 0);
         mic.setCompoundDrawableTintList(ColorStateList.valueOf(MUTED));
         mic.setCompoundDrawablePadding(0);
-        mic.setPadding(dp(this, 8), 0, dp(this, 8), 0);
+        mic.setPaddingRelative(dp(this, 8), 0, dp(this, 8), 0);
         mic.setBackgroundResource(ripple(this, true));
-        input.setHint("Ask " + ses.brainName() + "…");
+        input.setHint(getString(R.string.chat_input_hint, ses.brainName()));
     }
 
     private static String join(String a, String b) {
@@ -522,10 +522,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
-        chipText.setText(Models.summary(ses) + (Prefs.devMode(this) ? " · dev" : ""));
+        chipText.setText(Prefs.devMode(this) ? getString(R.string.chat_chip_dev, Models.summary(ses)) : Models.summary(ses));
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
-        input.setHint(ses.running ? "Add an instruction while it works…" : "Ask " + ses.brainName() + "…");
-        stripText.setText(ses.status.isEmpty() ? "Working…" : ses.status);
+        input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));
+        stripText.setText(ses.status.isEmpty() ? getString(R.string.chat_working) : ses.status);
         if (log != null) {
             if (ses.running) log.setLive(true);
             else log.finish();
@@ -545,18 +545,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         approval.removeAllViews();
         if (ask == null) return;
         LinearLayout card = column(this);
-        card.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
         card.setBackground(outlined(this, CARD, 18, Theme.withAlpha(ACCENT, 0x73), 1));
         LinearLayout hr = row(this);
         hr.addView(icon(this, R.drawable.ms_shield_person, ACCENT_TEXT, 18));
-        TextView lab = text(this, options != null ? "QUESTION" : "NEEDS YOUR OK", 12, ACCENT_TEXT);
+        TextView lab = text(this, getString(options != null ? R.string.chat_card_question : R.string.chat_card_needs_ok), 12, ACCENT_TEXT);
         lab.setTypeface(sans(this, 600));
         lab.setLetterSpacing(0.06f);
-        lab.setPadding(dp(this, 8), 0, 0, 0);
+        lab.setPaddingRelative(dp(this, 8), 0, 0, 0);
         hr.addView(lab);
         card.addView(hr);
         TextView well = text(this, ask, 14, TEXT);
-        well.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        well.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
         // long texts scroll inside the card, so its buttons always stay on screen
         final int maxH = (int) (getResources().getDisplayMetrics().heightPixels * 0.3f);
         ScrollView ws = new ScrollView(this) {
@@ -577,17 +577,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             return;
         }
         LinearLayout btns = row(this);
-        Button deny = button(this, "Deny", false);
+        Button deny = button(this, getString(R.string.chat_deny), false);
         deny.setTextColor(ERR);
         deny.setBackground(rounded(this, ERR_SOFT, 12));
-        Button change = button(this, "Change", false);
-        Button ok = button(this, "Approve", true);
+        Button change = button(this, getString(R.string.chat_change), false);
+        Button ok = button(this, getString(R.string.chat_approve), true);
         btns.addView(deny, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
         LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
-        cp.leftMargin = dp(this, 10);
+        cp.setMarginStart(dp(this, 10));
         btns.addView(change, cp);
         LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
-        op.leftMargin = dp(this, 10);
+        op.setMarginStart(dp(this, 10));
         btns.addView(ok, op);
         card.addView(btns, full());
         deny.setOnClickListener(v -> answer(false));
@@ -615,11 +615,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         }
         card.addView(opts, full());
         LinearLayout btns = row(this);
-        Button skip = button(this, "Skip", false);
-        Button own = button(this, "Type my own answer", false);
+        Button skip = button(this, getString(R.string.chat_skip), false);
+        Button own = button(this, getString(R.string.chat_type_own_answer), false);
         btns.addView(skip, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
         LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(0, dp(this, 44), 2);
-        op.leftMargin = dp(this, 10);
+        op.setMarginStart(dp(this, 10));
         btns.addView(own, op);
         LinearLayout.LayoutParams rp = full();
         rp.topMargin = dp(this, 4);
@@ -640,7 +640,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private void askChange(LinearLayout card, LinearLayout btns, boolean answering) {
         btns.setVisibility(View.GONE);
         EditText what = new EditText(this);
-        what.setHint(answering ? "Your answer" : "What should change?");
+        what.setHint(answering ? R.string.chat_answer_hint : R.string.chat_change_hint);
         what.setHintTextColor(MUTED);
         what.setTextColor(TEXT);
         what.setTextSize(15);
@@ -648,15 +648,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         what.setMaxLines(6);
         what.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
-        what.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        what.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
         what.setBackground(rounded(this, BG, 12));
         card.addView(what, full());
         LinearLayout row = row(this);
-        Button back = button(this, "Back", false);
-        Button send = button(this, answering ? "Send answer" : "Send change", true);
+        Button back = button(this, getString(R.string.chat_back), false);
+        Button send = button(this, getString(answering ? R.string.chat_send_answer : R.string.chat_send_change), true);
         row.addView(back, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
-        sp.leftMargin = dp(this, 10);
+        sp.setMarginStart(dp(this, 10));
         row.addView(send, sp);
         LinearLayout.LayoutParams rp = full();
         rp.topMargin = dp(this, 10);
@@ -710,7 +710,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 links(tv);
                 tv.setMaxWidth(maxBubble);
                 tv.setBackground(corners(this, USER, 20, 20, 6, 20));
-                tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
                 copyOnLongPress(tv, m.text);
                 LinearLayout.LayoutParams tp = wrap();
                 tp.gravity = Gravity.END;
@@ -728,19 +728,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
     private void attachSheet() {
         LinearLayout c = column(this);
-        TextView h = title(this, "Attach", 18);
-        h.setPadding(0, 0, 0, dp(this, 8));
+        TextView h = title(this, getString(R.string.chat_attach), 18);
+        h.setPaddingRelative(0, 0, 0, dp(this, 8));
         c.addView(h);
         final Dialog[] d = new Dialog[1];
         Object[][] opts = {
-                {R.drawable.ms_photo_camera, "Take a photo", "Use the camera"},
-                {R.drawable.ms_image, "Photos", "Pick from your gallery"},
-                {R.drawable.ms_description, "Files", "PDFs, documents, anything up to 25 MB"},
+                {R.drawable.ms_photo_camera, getString(R.string.chat_attach_camera), getString(R.string.chat_attach_camera_sub)},
+                {R.drawable.ms_image, getString(R.string.chat_attach_photos), getString(R.string.chat_attach_photos_sub)},
+                {R.drawable.ms_description, getString(R.string.chat_attach_files), getString(R.string.chat_attach_files_sub)},
         };
         for (int i = 0; i < opts.length; i++) {
             final int which = i;
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             r.setBackgroundResource(ripple(this, false));
             FrameLayout ic = new FrameLayout(this);
             ic.setBackground(rounded(this, ACCENT_SOFT, 12));
@@ -748,7 +748,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                     new FrameLayout.LayoutParams(dp(this, 22), dp(this, 22), Gravity.CENTER));
             r.addView(ic, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
             LinearLayout t = column(this);
-            t.setPadding(dp(this, 14), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             t.addView(title(this, (String) opts[i][1], 15));
             t.addView(text(this, (String) opts[i][2], 13, MUTED));
             r.addView(t, weight1());
@@ -789,7 +789,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 startActivityForResult(i, REQ_FILES);
             }
         } catch (android.content.ActivityNotFoundException e) {
-            Toast.makeText(this, "No app on this phone can do that.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.chat_no_app_for_action, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -808,7 +808,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             }
         }
         if (uris.isEmpty()) return;
-        Toast.makeText(this, uris.size() == 1 ? "Adding…" : "Adding " + uris.size() + " files…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, uris.size() == 1 ? getString(R.string.chat_adding)
+                : getResources().getQuantityString(R.plurals.chat_adding_files, uris.size(), uris.size()), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             java.util.List<String> ids = new java.util.ArrayList<>();
             String err = null;
@@ -839,9 +840,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             x.setImageResource(R.drawable.ms_close);
             x.setImageTintList(ColorStateList.valueOf(0xFFFFFFFF));
             x.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            x.setPadding(dp(this, 3), dp(this, 3), dp(this, 3), dp(this, 3));
+            x.setPaddingRelative(dp(this, 3), dp(this, 3), dp(this, 3), dp(this, 3));
             x.setBackground(oval(0xB3000000));
-            x.setContentDescription("Remove");
+            x.setContentDescription(getString(R.string.chat_attachment_remove));
             x.setOnClickListener(v -> {
                 pending.remove(id);
                 renderTray();
@@ -850,7 +851,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             xp.setMargins(0, dp(this, 4), dp(this, 4), 0);
             f.addView(x, xp);
             LinearLayout.LayoutParams p = wrap();
-            p.rightMargin = dp(this, 8);
+            p.setMarginEnd(dp(this, 8));
             tray.addView(f, p);
         }
         paintSend();
@@ -879,12 +880,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             v = iv;
         } else {
             LinearLayout chip = row(this);
-            chip.setPadding(dp(this, 10), dp(this, 8), dp(this, 12), dp(this, 8));
+            chip.setPaddingRelative(dp(this, 10), dp(this, 8), dp(this, 12), dp(this, 8));
             chip.setBackground(inThread ? corners(this, USER, 16, 16, 6, 16) : outlined(this, CARD, 14, OUTLINE, 1));
             chip.addView(icon(this, R.drawable.ms_description, inThread ? TEXT : ACCENT_TEXT, 20));
             TextView t = single(text(this, Attachments.name(id), 14, TEXT));
             t.setMaxWidth(dp(this, 200));
-            t.setPadding(dp(this, 8), 0, inThread ? 0 : dp(this, 18), 0);
+            t.setPaddingRelative(dp(this, 8), 0, inThread ? 0 : dp(this, 18), 0);
             chip.addView(t);
             chip.setMinimumHeight(dp(this, inThread ? 0 : 64));
             v = chip;
@@ -901,7 +902,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         try {
             startActivity(i);
         } catch (Exception e) {
-            Toast.makeText(this, "No app can open " + Attachments.name(id) + ".", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.chat_no_app_for_file, Attachments.name(id)), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -931,7 +932,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 links(tv);
                 tv.setMaxWidth(maxBubble);
                 tv.setBackground(corners(this, USER, 20, 20, 6, 20));
-                tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
                 copyOnLongPress(tv, text);
                 p.gravity = Gravity.END;
                 v = tv;
@@ -946,7 +947,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 face.setImageResource(R.drawable.bubble_face);
                 av.addView(face, new FrameLayout.LayoutParams(dp(this, 20), dp(this, 20), Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
-                avp.rightMargin = dp(this, 8);
+                avp.setMarginEnd(dp(this, 8));
                 r.addView(av, avp);
                 TextView tv = text(this, text, 15, TEXT);
                 tv.setTextIsSelectable(true);
@@ -954,7 +955,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 tv.setLineSpacing(0, 1.15f);
                 tv.setMaxWidth(maxBubble - dp(this, 32));
                 tv.setBackground(corners(this, CARD, 20, 20, 20, 6));
-                tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
                 r.addView(tv);
                 v = r;
                 break;
@@ -964,7 +965,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 r.setGravity(Gravity.TOP);
                 r.addView(icon(this, R.drawable.ms_error, ERR, 18));
                 TextView tv = text(this, text, 13, ERR);
-                tv.setPadding(dp(this, 8), 0, 0, 0);
+                tv.setPaddingRelative(dp(this, 8), 0, 0, 0);
                 r.addView(tv, weight1());
                 copyOnLongPress(r, text);
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -985,7 +986,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private void copyOnLongPress(View v, String text) {
         v.setOnLongClickListener(x -> {
             getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy", text));
-            Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.chat_copied, Toast.LENGTH_SHORT).show();
             return true;
         });
     }
@@ -1007,11 +1008,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         ToolLog() {
             view.setBackground(outlined(ChatActivity.this, 0x00000000, 14, LINE, 1));
             LinearLayout head = row(ChatActivity.this);
-            head.setPadding(dp(ChatActivity.this, 12), dp(ChatActivity.this, 10), dp(ChatActivity.this, 8), dp(ChatActivity.this, 10));
+            head.setPaddingRelative(dp(ChatActivity.this, 12), dp(ChatActivity.this, 10), dp(ChatActivity.this, 8), dp(ChatActivity.this, 10));
             head.setBackgroundResource(ripple(ChatActivity.this, false));
             head.addView(icon(ChatActivity.this, R.drawable.ms_terminal, MUTED, 16));
             count = monoText(ChatActivity.this, "", 12, MUTED);
-            count.setPadding(dp(ChatActivity.this, 8), 0, 0, 0);
+            count.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
             head.addView(count, weight1());
             chevron = icon(ChatActivity.this, R.drawable.ms_expand_more, MUTED, 18);
             head.addView(chevron);
@@ -1020,14 +1021,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 setOpen(!open);
             });
             view.addView(head, full());
-            rows.setPadding(dp(ChatActivity.this, 12), 0, dp(ChatActivity.this, 12), dp(ChatActivity.this, 10));
+            rows.setPaddingRelative(dp(ChatActivity.this, 12), 0, dp(ChatActivity.this, 12), dp(ChatActivity.this, 10));
             view.addView(rows, full());
             setOpen(false);
         }
 
         void add(String step) {
             n++;
-            count.setText(n + (n == 1 ? " tool call" : " tool calls"));
+            count.setText(getResources().getQuantityString(R.plurals.chat_tool_calls, n, n));
             if (lastMark != null) swapToCheck(lastMark);
             String s = step.trim();
             if (s.startsWith("✓ ")) s = s.substring(2); // the row gets its own check mark
@@ -1042,7 +1043,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             String name = cut > 0 ? s.substring(0, cut) : s, arg = cut > 0 ? s.substring(cut) : "";
             LinearLayout r = row(ChatActivity.this);
             r.setGravity(Gravity.TOP);
-            r.setPadding(0, dp(ChatActivity.this, 4), 0, dp(ChatActivity.this, 4));
+            r.setPaddingRelative(0, dp(ChatActivity.this, 4), 0, dp(ChatActivity.this, 4));
             FrameLayout mark = new FrameLayout(ChatActivity.this);
             r.addView(mark, new LinearLayout.LayoutParams(dp(ChatActivity.this, 16), dp(ChatActivity.this, 16)));
             TextView t = monoText(ChatActivity.this, "", 12, MUTED);
@@ -1052,7 +1053,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             t.setText(sb);
             t.setMaxLines(3);
             t.setEllipsize(android.text.TextUtils.TruncateAt.END);
-            t.setPadding(dp(ChatActivity.this, 8), 0, 0, 0);
+            t.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
             r.addView(t, weight1());
             copyOnLongPress(r, step);
             rows.addView(r, full());

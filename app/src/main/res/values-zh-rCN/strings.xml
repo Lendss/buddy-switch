@@ -1,0 +1,1331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every text Buddy shows, in Simplified Chinese (zh-CN). English source: res/values/strings.xml. -->
+<resources>
+    <string name="service_label">Buddy 助手</string>
+    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的 Claude Code 或 Codex 替你读取屏幕、点按、输入和滚动。除了智能体自身发送给 Anthropic 或 OpenAI 的内容外，任何数据都不会离开手机。</string>
+
+    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
+
+    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
+    <!-- Button at the top right of every step. Keep short. -->
+    <string name="onboarding_skip_setup">跳过设置</string>
+    <string name="onboarding_skip_title">要跳过设置向导吗？</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_skip_text">你随时可以在“设置”中完成设置。完成之前，对话无法运行。</string>
+    <!-- Verb. Confirm button of the "Skip the setup guide?" sheet. -->
+    <string name="onboarding_skip_action">跳过</string>
+    <!-- Progress at the top of the guide, small lowercase mono text. %1$d = this step, %2$d = number of steps. -->
+    <string name="onboarding_progress">第 %1$d 步，共 %2$d 步</string>
+    <!-- Button: go to the next step. -->
+    <string name="onboarding_continue">继续</string>
+    <!-- Title of the expandable help section at the bottom of a step. -->
+    <string name="onboarding_stuck">遇到问题？</string>
+
+    <!-- Guide, welcome screen. -->
+    <string name="onboarding_welcome_title">认识一下 Buddy</string>
+    <string name="onboarding_welcome_text">一个能替你操作手机的聊天气泡。</string>
+    <string name="onboarding_welcome_ask_title">像聊天一样提要求</string>
+    <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
+    <string name="onboarding_welcome_ask_text">“回复小王说我要迟到了”、“把牛奶加入购物车”。</string>
+    <string name="onboarding_welcome_plan_title">用你自己的套餐，无需 API 密钥</string>
+    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex。</string>
+    <string name="onboarding_welcome_control_title">一切由你掌控</string>
+    <string name="onboarding_welcome_control_text">发送、发布、购买和删除之前，总会先问你。</string>
+    <!-- Small lowercase mono line under the list. -->
+    <string name="onboarding_welcome_time">设置大约需要 5 分钟</string>
+    <string name="onboarding_get_started">开始使用</string>
+
+    <!-- Guide, step: choose the agent. Agent names next to each option stay in English. -->
+    <string name="onboarding_brain_title">选择你的智能体</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_brain_text">由它来回复你的对话。之后可以在“设置”中添加其他智能体。</string>
+    <string name="onboarding_brain_claude">使用你的 Claude 订阅（Pro 或 Max）。</string>
+    <string name="onboarding_brain_codex">使用你的 ChatGPT 套餐。</string>
+    <string name="onboarding_brain_opencode">免费模型，无需账号。之后可以连接你自己的模型提供商。</string>
+    <!-- The option that installs both Claude Code and Codex. -->
+    <string name="onboarding_brain_both">两个都安装，每个对话可单独选择。默认仍为 Claude Code。</string>
+    <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
+    <string name="onboarding_recommended">推荐</string>
+
+    <!-- Guide, step: turn on Buddy's accessibility service. -->
+    <string name="onboarding_access_title">让 Buddy 能看、能点</string>
+    <string name="onboarding_access_done">无障碍服务已开启。</string>
+    <string name="onboarding_access_text">Buddy 的无障碍服务用于显示气泡，并且只在你让它做事时，才允许智能体读取屏幕、点按和输入。</string>
+    <!-- %1$s = the agent's name (Claude Code or Codex); %2$s = the company it sends to (Anthropic or OpenAI). -->
+    <string name="onboarding_access_privacy">除了 %1$s 为回复你而发送给 %2$s 的内容外，任何数据都不会离开手机。发送、发布、购买和删除之前，总会先请你确认。</string>
+    <!-- Same as onboarding_access_privacy, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_access_privacy_both">除了 Claude Code 和 Codex 为回复你而发送给 Anthropic 和 OpenAI 的内容外，任何数据都不会离开手机。发送、发布、购买和删除之前，总会先请你确认。</string>
+    <!-- Same as onboarding_access_privacy, for OpenCode. %1$s = OpenCode. The model's provider = whichever AI company runs the chosen model. -->
+    <string name="onboarding_access_privacy_opencode">除了 %1$s 为回复你而发送给所选模型提供商的内容外，任何数据都不会离开手机。发送、发布、购买和删除之前，总会先请你确认。</string>
+    <!-- Path in Android's Accessibility settings. "Downloaded apps" = that section's name on Android (use Android's wording in your language); "Buddy assistant" = Buddy's service name (service_label). -->
+    <string name="onboarding_access_list_hint">在列表中：已下载的应用 → Buddy 助手 → 开启。</string>
+    <string name="onboarding_access_open">打开无障碍设置</string>
+    <!-- Android 13+ greys out the switch for apps installed from a file. Title of a help box and a help question. -->
+    <string name="onboarding_access_greyed_title">开关呈灰色？</string>
+    <!-- "App info" = the button below (onboarding_app_info). "Allow restricted settings" = Android's own menu item; ⋮ = the three-dot menu. -->
+    <string name="onboarding_access_greyed_text">对于通过文件安装的应用，Android 会阻止此操作。请点按下方的“应用信息”，然后点按右上角的 ⋮ →“允许受限制的设置”，再重试。</string>
+    <!-- Numbered steps, one per line. Same names as in onboarding_access_greyed_text. -->
+    <string name="onboarding_access_restricted_steps">1. 点按下方的“应用信息”。\n2. 点按右上角的 ⋮ →“允许受限制的设置”。\n3. 返回这里，再次打开无障碍设置。</string>
+    <!-- Button: opens Android's App info page for Buddy. Use Android's name for that page. -->
+    <string name="onboarding_app_info">应用信息</string>
+
+    <!-- Guide, step: install the agent inside Buddy and sign in. -->
+    <string name="onboarding_agents_title">安装并登录</string>
+    <!-- Title once every chosen agent is installed and signed in. -->
+    <string name="onboarding_agents_done_title">准备就绪</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="onboarding_agents_done">%1$s 已安装并登录。</string>
+    <!-- Same as onboarding_agents_done, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_agents_done_both">Claude Code 和 Codex 已安装并登录。</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode) or onboarding_agent_names_both. -->
+    <string name="onboarding_agents_text">Buddy 会在应用内安装 %1$s，之后你只需登录一次。无需 Termux。</string>
+    <!-- Both agents together, inserted as %1$s into onboarding_agents_text. -->
+    <string name="onboarding_agent_names_both">Claude Code 和 Codex</string>
+    <!-- Agent card status lines: small lowercase mono text, one line. -->
+    <!-- OpenCode is ready. %1$s = its model providers, or onboarding_agent_free_models. -->
+    <string name="onboarding_agent_ready">就绪 · %1$s</string>
+    <string name="onboarding_agent_free_models">免费模型</string>
+    <string name="onboarding_agent_signed_in">已登录</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="onboarding_agent_signed_in_as">已登录 · %1$s</string>
+    <string name="onboarding_agent_installing">正在安装…</string>
+    <string name="onboarding_agent_installed">已安装 · 未登录</string>
+    <string name="onboarding_agent_not_installed">未安装</string>
+    <!-- Agent card help text. "Authorize" = the button on Claude's sign-in web page (the page may be in English). -->
+    <string name="onboarding_agent_sign_in_claude">使用你的 Claude 账号登录。浏览器会打开，点按“Authorize”（授权）后，Buddy 会自动返回。</string>
+    <string name="onboarding_agent_checking_opencode">正在检查 OpenCode…</string>
+    <string name="onboarding_agent_sign_in_codex">在浏览器中使用你的 ChatGPT 账号登录，然后返回这里。</string>
+    <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
+    <string name="onboarding_agent_download_claude">需一次性下载约 235 MB（Buddy 的 Linux，以及来自 Anthropic 的 Claude Code）。</string>
+    <string name="onboarding_agent_download_opencode">需一次性下载约 230 MB（Buddy 的 Linux、Node.js 和 OpenCode）。无需账号。</string>
+    <string name="onboarding_agent_download_codex">需一次性下载约 150 MB（Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex）。</string>
+    <!-- Buttons on the agent card. -->
+    <string name="onboarding_sign_in_claude">使用 Claude 登录</string>
+    <string name="onboarding_sign_in_chatgpt">使用 ChatGPT 登录</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="onboarding_install_agent">安装 %1$s</string>
+    <string name="onboarding_agents_wifi">建议使用 WLAN。安装期间可以离开此屏幕。</string>
+    <!-- Help questions and answers under "Stuck?". "Copy Code" = a button on Claude's web page. -->
+    <string name="onboarding_stuck_sign_in_q">登录后没有自动返回？</string>
+    <string name="onboarding_stuck_sign_in_a">Claude：在 Claude 页面上点按“Copy Code”（复制代码），然后返回 Buddy，它会自动从剪贴板获取代码。</string>
+    <string name="onboarding_stuck_install_q">安装失败？</string>
+    <!-- "Install" = the Install button on the agent card (onboarding_install_agent). -->
+    <string name="onboarding_stuck_install_a">请检查网络连接，然后再次点按“安装”，它会从中断的地方继续。</string>
+
+    <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
+    <string name="onboarding_background_title">保持后台运行</string>
+    <string name="onboarding_background_done">Buddy 可以在后台运行。</string>
+    <string name="onboarding_background_text">这样在智能体工作时，手机就不会为了省电而停止 Buddy。</string>
+    <!-- Button: opens Android's dialog to let Buddy run in the background. -->
+    <string name="onboarding_allow">允许</string>
+    <string name="onboarding_skip_for_now">暂时跳过</string>
+
+    <!-- Guide, step: how much the agent asks before acting. -->
+    <string name="onboarding_safety_title">操作前要先问你吗？</string>
+    <!-- Ends with a colon: the two options follow. -->
+    <string name="onboarding_safety_text">在通讯、社交、购物、支付和银行类应用中，Buddy 发送、发布、购买或删除之前总是需要你确认。对于其他应用：</string>
+    <string name="onboarding_safety_ask_title">先问我</string>
+    <string name="onboarding_safety_ask_text">智能体在执行有风险的操作（例如更改设置）前会先问你。更安全，但弹窗更多。</string>
+    <string name="onboarding_safety_auto_title">自主操作</string>
+    <string name="onboarding_safety_auto_text">没有弹窗：智能体会直接完成你的要求，比如打开摄像头或开灯。</string>
+    <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
+    <string name="onboarding_safety_note">你可以随时按应用更改：设置 → 应用权限。将应用设为“信任”，智能体就能在其中直接操作、不弹窗；设为“严格”，则由 Buddy 亲自询问你。</string>
+
+    <!-- Guide, last step: try a first task. -->
+    <string name="onboarding_try_title">一切就绪</string>
+    <!-- "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_text">试试第一个任务吧。Buddy 会打开“设置”并替你读取内容。</string>
+    <!-- Example request: shown on this screen and put in the chat's input box, ready to send to the agent. "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_prompt">打开设置，告诉我手机的 Android 版本</string>
+    <!-- onboarding_try_prompt in quotation marks (%1$s). Use your language's quotation marks. -->
+    <string name="onboarding_try_prompt_quoted">“%1$s”</string>
+    <!-- ✕ = the close target that appears while dragging the bubble. -->
+    <string name="onboarding_try_tip">提示：气泡会悬浮在其他应用上方。将它拖到 ✕ 上即可隐藏。</string>
+    <string name="onboarding_try_now">立即试试</string>
+    <string name="onboarding_go_to_chats">前往我的对话</string>
+
+    <!-- Home screen: the chat list. -->
+    <!-- Floating button that starts a chat, and the title of the sheet that picks its agent. Keep short. -->
+    <string name="main_new_chat">新对话</string>
+    <!-- Small lowercase mono status under the app name when Buddy is ready. %1$s = Buddy's local server address (127.0.0.1:8765). -->
+    <string name="main_status_ready">就绪 · %1$s</string>
+    <!-- Small lowercase mono status while setup isn't finished: %1$d steps done out of %2$d. -->
+    <string name="main_status_setup">设置 %1$d/%2$d</string>
+    <string name="main_setup_title">完成设置后即可运行对话</string>
+    <!-- %1$s = the name of the next setup step, e.g. Turn on the accessibility service. -->
+    <string name="main_setup_next">下一步：%1$s</string>
+    <string name="main_setup_next_accessibility">下一步：开启 Buddy 的无障碍服务</string>
+    <!-- Section header, shown in capitals: chats whose task is running now. The count follows it. -->
+    <string name="main_section_working">进行中</string>
+    <!-- Section header, shown in capitals. -->
+    <string name="main_section_recent">最近</string>
+    <string name="main_empty_title">还没有对话</string>
+    <!-- "New chat" = the button (main_new_chat). -->
+    <string name="main_empty_text">点按“新对话”，即可与 Claude Code 或 Codex 开始对话。长按对话可将其删除。</string>
+    <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
+    <string name="main_chat_working">处理中…</string>
+    <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
+    <string name="main_chat_last_you">你：%1$s</string>
+    <string name="main_delete_title">删除此对话？</string>
+    <!-- Verb. Confirm button. -->
+    <string name="main_delete_action">删除</string>
+    <!-- New chat sheet: small lowercase tag next to the default agent's name. Keep very short. -->
+    <string name="main_new_chat_default">默认</string>
+    <!-- New chat sheet: shown under an agent that isn't ready yet. -->
+    <string name="main_new_chat_not_signed_in">未登录 · 点按进行设置</string>
+    <string name="main_new_chat_not_installed">未安装 · 点按进行设置</string>
+    <!-- How long ago a chat changed, next to it in the chat lists. Very little room: keep as short as the English (m = minutes, h = hours, d = days). -->
+    <string name="main_ago_now">刚刚</string>
+    <plurals name="main_ago_minutes">
+        <item quantity="other">%1$d分钟</item>
+    </plurals>
+    <plurals name="main_ago_hours">
+        <item quantity="other">%1$d小时</item>
+    </plurals>
+    <plurals name="main_ago_days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
+
+    <!-- Notification shown after the bubble is dragged away to hide it. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="notice_channel_name">隐藏的气泡</string>
+    <string name="notice_hidden_title">Buddy 已隐藏</string>
+    <string name="notice_hidden_text">点按即可重新显示气泡。</string>
+    <!-- Notification button: opens Buddy's chat list. Keep short. -->
+    <string name="notice_open_chats">打开对话</string>
+
+    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="update_channel_name">Buddy 更新</string>
+    <!-- Notification and sheet title. %1$s = the new version number, e.g. 2.1.14. -->
+    <string name="update_available_title">Buddy %1$s 现已推出</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_notification_text">当前版本为 %1$s。点按即可查看新功能并更新，你的对话会保留。</string>
+    <!-- Verb: download and install the new version. Notification button and sheet button (half width). Keep short. -->
+    <string name="update_action">更新</string>
+    <!-- Notification button: stop update notifications. Keep short. -->
+    <string name="update_mute">不再通知</string>
+    <!-- "Settings" = Buddy's own Settings tab (its Update notices switch). -->
+    <string name="update_muted">不会再发送更新通知。可在“设置”中重新开启。</string>
+    <string name="update_checking">正在检查更新…</string>
+    <string name="update_check_failed">无法连接到 GitHub，请稍后再试。</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_up_to_date">Buddy %1$s 已是最新版本。</string>
+    <!-- Under the sheet title. %1$s = the installed version number. -->
+    <string name="update_sheet_text">当前版本为 %1$s。更新后，你的对话、设置和登录状态都会保留。</string>
+    <!-- Sheet button (half width): close without updating. -->
+    <string name="update_later">稍后</string>
+    <!-- On the Update button while the new version downloads. -->
+    <string name="update_downloading">正在下载…</string>
+    <!-- "Update" = the button (update_action). -->
+    <string name="update_needs_permission">请允许 Buddy 安装应用，然后再次点按“更新”。</string>
+    <!-- Why an update failed (%1$s of update_failed_manual). buddy.apk is a file name. -->
+    <string name="update_error_no_apk">此版本尚未提供 buddy.apk。</string>
+    <!-- %1$s = the system's technical error message (usually English). -->
+    <string name="update_error_download">下载失败（%1$s）。</string>
+    <string name="update_error_not_newer">下载的文件不是更新版本的 Buddy，因此没有打开。</string>
+    <!-- Message after a failed update. %1$s = what went wrong (an update_error_ sentence); %2$s = the web address of the latest release; %3$s = the web address of the update instructions. Obtainium is an app name. -->
+    <string name="update_failed_manual">%1$s你也可以从 %2$s 获取（buddy.apk），或使用 Obtainium 自动更新（参见 %3$s）。</string>
+
+    <!-- Settings, Appearance: option names. -->
+    <!-- Light/dark mode, segmented control: keep short. System = follow the phone's setting. -->
+    <string name="prefs_theme_system">跟随系统</string>
+    <string name="prefs_theme_light">浅色</string>
+    <string name="prefs_theme_dark">深色</string>
+    <!-- Surface (background) tone, segmented control: keep short. Warm = Buddy's original warm greys; Black = true black, in dark mode only. -->
+    <string name="prefs_surface_warm">暖色</string>
+    <string name="prefs_surface_neutral">中性</string>
+    <string name="prefs_surface_black">纯黑</string>
+    <!-- Accent colour names, read aloud by TalkBack for the colour swatches. -->
+    <string name="prefs_accent_coral">珊瑚色</string>
+    <string name="prefs_accent_ocean">海洋蓝</string>
+    <string name="prefs_accent_mint">薄荷绿</string>
+    <string name="prefs_accent_violet">紫罗兰</string>
+    <string name="prefs_accent_rose">玫瑰红</string>
+    <string name="prefs_accent_amber">琥珀色</string>
+
+    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
+
+    <!-- Floating bubble, read by TalkBack. -->
+    <string name="bubble_face_description">Buddy。点按可打开，长按可查看操作</string>
+    <!-- TalkBack action on the bubble, read as "Double-tap and hold to show actions". Lowercase. -->
+    <string name="bubble_show_actions">显示操作</string>
+
+    <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…".
+         "hold" = long-press the bubble, which opens the hold menu. -->
+    <string name="bubble_pill_waiting_answer">等待你的回答</string>
+    <string name="bubble_pill_waiting_approval">等待你批准</string>
+    <string name="bubble_pill_paused">已暂停 · 长按气泡可继续</string>
+    <!-- The agent is operating the phone. Also the chat panel's running strip. -->
+    <string name="bubble_using_phone">正在操作你的手机</string>
+    <!-- %1$s: what the agent is doing right now (its own status text). -->
+    <string name="bubble_using_phone_status">正在操作你的手机 · %1$s</string>
+    <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
+         next string. "Stop" is the hold menu's Stop task action. -->
+    <string name="bubble_pill_hold_hint">长按气泡可停止任务等</string>
+    <!-- %1$s: the current status text. -->
+    <string name="bubble_pill_status_hold_hint">%1$s · 长按气泡可停止任务等</string>
+
+    <!-- Hold menu: actions fanned out around the bubble while it is held. Very little room: one line, 72dp wide
+         (about 12 characters); longer labels are cut off. -->
+    <string name="menu_stop_task">停止任务</string>
+    <string name="menu_resume">继续</string>
+    <string name="menu_pause">暂停</string>
+    <!-- Dictate an extra instruction for the agent while it works. -->
+    <string name="menu_add_instruction">补充指令</string>
+    <!-- Stops Buddy reading a reply aloud. -->
+    <string name="menu_stop_voice">停止朗读</string>
+    <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
+         mic button (read by TalkBack). -->
+    <string name="bubble_talk">说话</string>
+    <string name="menu_open_chat">打开对话</string>
+    <!-- Hides the bubble; a notification brings it back. -->
+    <string name="menu_hide">隐藏</string>
+
+    <!-- Hold-menu preview: the first few times a task starts, three actions peek out of the bubble for a moment.
+         Short forms of Stop task, Add instruction and Stop voice; keep them very short. -->
+    <string name="menu_peek_stop">停止</string>
+    <!-- Verb. -->
+    <string name="menu_peek_add">补充</string>
+    <!-- Noun: Buddy's spoken voice (the action silences it). -->
+    <string name="menu_peek_voice">朗读</string>
+    <!-- Badge under the preview: long-press the bubble; "me" is the bubble. -->
+    <string name="menu_peek_hint">长按我</string>
+
+    <!-- Toasts from the bubble. "hold" = long-press. -->
+    <string name="bubble_tip_stop_voice">提示：长按气泡可停止朗读</string>
+    <string name="bubble_tip_hold_menu">提示：长按气泡可暂停、停止或补充指令</string>
+    <string name="bubble_stopping">正在停止…</string>
+    <string name="bubble_nothing_running">Buddy 的对话中没有正在运行的任务。</string>
+    <string name="bubble_nothing_running_chat">此对话中没有正在运行的任务。</string>
+    <string name="bubble_allow_mic_tap_mic">请在 Buddy 中允许使用麦克风，然后再次点按麦克风。</string>
+    <string name="bubble_allow_mic_tap_bubble">请在 Buddy 中允许使用麦克风，然后再次点按气泡。</string>
+    <!-- After dictating an instruction while the agent works. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="bubble_note_added">收到，%1$s 会参考这条指令</string>
+    <!-- A message was copied to the clipboard. -->
+    <string name="bubble_copied">已复制</string>
+
+    <!-- Voice input, shown in the status pill beside the bubble. -->
+    <string name="bubble_listening">正在聆听…</string>
+    <string name="bubble_listening_tap_done">正在聆听…说完请点按气泡</string>
+    <!-- The words heard so far. %1$s: the words. Use your language's quotation marks. -->
+    <string name="bubble_heard">“%1$s”</string>
+
+    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
+    <!-- Starts a new chat: the + button, and the title of the agent picker it opens. -->
+    <string name="bubble_new_chat">新对话</string>
+    <string name="bubble_open_in_app">在应用中打开</string>
+    <!-- Closes the chat panel. -->
+    <string name="bubble_close">关闭</string>
+    <!-- Panel title while the list of chats shows. -->
+    <string name="bubble_chats_title">对话</string>
+    <!-- Panel title while picking this chat's model and effort (how hard the agent thinks). -->
+    <string name="bubble_model_effort_title">模型与思考强度</string>
+    <!-- Under the title. %1$s: the agent · model · effort summary; "dev" marks that developer mode is on. -->
+    <string name="bubble_summary_dev">%1$s · 开发</string>
+
+    <!-- Strip at the top of the chat panel while the agent works. -->
+    <string name="bubble_working">正在处理…</string>
+    <!-- Verb: stops this chat's task. -->
+    <string name="bubble_stop">停止</string>
+
+    <!-- Composer at the bottom of the chat panel. -->
+    <string name="bubble_attach">添加照片或文件</string>
+    <!-- Hint in the empty text field. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="bubble_input_hint">问问 %1$s…</string>
+    <!-- Verb: pastes copied text into the field. -->
+    <string name="bubble_paste">粘贴</string>
+    <!-- Verb: sends the message (read by TalkBack). -->
+    <string name="bubble_send">发送</string>
+    <!-- A chat with no messages yet. %1$s: the agent's name (Claude Code, Codex or OpenCode); "me" is Buddy. -->
+    <string name="bubble_empty_chat">新的 %1$s 对话。告诉我你想在手机上做什么。</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="bubble_tool_calls">
+        <item quantity="other">%1$d 次工具调用</item>
+    </plurals>
+
+    <!-- List of chats in the panel. -->
+    <!-- Status of a running chat, under its title. Lowercase. -->
+    <string name="bubble_chat_row_working">处理中…</string>
+    <!-- Preview of the last message when the user wrote it. %1$s: the message. -->
+    <string name="bubble_chat_row_you">你：%1$s</string>
+    <!-- Asked in the chat's row after a long press, next to Cancel and Delete buttons. -->
+    <string name="bubble_delete_chat">删除此对话？</string>
+    <!-- Button: deletes the chat. -->
+    <string name="bubble_delete">删除</string>
+
+    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
+    <!-- Small tag next to the agent that new chats use by default. Lowercase. -->
+    <string name="bubble_agent_default">默认</string>
+    <string name="bubble_agent_not_signed_in">未登录 · 点按进行设置</string>
+    <string name="bubble_agent_not_installed">未安装 · 点按进行设置</string>
+
+    <!-- Model and effort picker for the current chat. -->
+    <string name="bubble_model_note">仅对此对话生效。对话会继续，下一条消息将使用新的选择。</string>
+    <!-- Section heading, shown in capitals: how hard the agent thinks. -->
+    <string name="bubble_effort">思考强度</string>
+    <!-- "Auto" is the name of the first effort choice below it; "Higher" = the higher effort levels; "plan" = the
+         user's subscription plan. -->
+    <string name="bubble_effort_note">“自动”由智能体自行决定。强度越高，思考越久，消耗的套餐额度也越多。</string>
+    <!-- Section heading, shown in capitals: the AI model. -->
+    <string name="bubble_model">模型</string>
+
+    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
+    <!-- Small all-caps label at the top of an approval card. -->
+    <string name="card_label_approval">需要你确认</string>
+    <!-- Small all-caps label at the top of a question card. -->
+    <string name="card_label_question">问题</string>
+    <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
+         %1$s: card_label_approval or card_label_question. All caps. -->
+    <string name="card_label_other_session">%1$s · 来自其他会话</string>
+    <!-- Buttons side by side at the bottom of the card: keep them short. -->
+    <string name="card_deny">拒绝</string>
+    <!-- Verb: the user says what the agent should change instead of approving. -->
+    <string name="card_change">修改</string>
+    <string name="card_approve">批准</string>
+    <!-- Verb: skips the question without answering. -->
+    <string name="card_skip">跳过</string>
+    <!-- Last button under a question's answers: type an answer instead of picking one. -->
+    <string name="card_type_own_answer">自己输入答案…</string>
+    <!-- Hint in the text field after tapping Change. -->
+    <string name="card_change_hint">需要修改什么？</string>
+    <!-- Hint in the text field when typing an answer to a question. -->
+    <string name="card_answer_hint">你的回答…</string>
+
+    <!-- Notes posted into the chat after the user answers a card. Keep the mark at the start (✓ ✎ ✗) and the space
+         after it. %1$s: the answer, the requested change or what was approved (shortened). -->
+    <string name="card_note_answered">✓ 已回答：%1$s</string>
+    <string name="card_note_change_requested">✎ 已要求修改：%1$s</string>
+    <string name="card_note_approved">✓ 已批准：%1$s</string>
+    <string name="card_note_denied">✗ 已拒绝</string>
+    <string name="card_note_skipped">已跳过问题</string>
+
+    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
+    <!-- Name of this notification category in Android's notification settings. -->
+    <string name="control_channel_name">Buddy 正在操作你的手机</string>
+    <string name="control_channel_description">智能体操作手机时显示在状态栏中。</string>
+    <string name="control_title">Buddy 正在操作你的手机</string>
+    <!-- "Stop" is the notification's button (control_stop): use the same word. -->
+    <string name="control_text">完成前请不要触碰屏幕，或点按“停止”来接管。</string>
+    <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
+    <string name="control_stop">停止</string>
+
+    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
+
+    <!-- Chat screen: app bar -->
+    <!-- Verb, go back. Read by TalkBack for the back arrow at the top of the chat and transcript screens; also a
+         button on the approval card that leaves the text box. Keep short. -->
+    <string name="chat_back">返回</string>
+    <!-- Read by TalkBack for the speaker button at the top of the chat (turns reading replies aloud on or off). -->
+    <string name="chat_read_aloud">朗读回复</string>
+    <string name="chat_read_aloud_on">将朗读回复</string>
+    <string name="chat_read_aloud_off">不再朗读回复</string>
+    <!-- Model chip under the chat title when developer mode is on. %1$s = agent · model · effort.
+         "dev" = developer mode. Keep very short. -->
+    <string name="chat_chip_dev">%1$s · 开发</string>
+
+    <!-- Chat screen: the strip shown while the agent works -->
+    <!-- Button, verb: stops the agent's task. Keep short. -->
+    <string name="chat_stop">停止</string>
+    <!-- Status while an agent works and has no step to show yet (chat strip, the bubble's status pill). -->
+    <string name="chat_working">正在处理…</string>
+
+    <!-- Chat screen: composer and empty chat -->
+    <!-- Read by TalkBack for the paperclip button. -->
+    <string name="chat_attach_description">添加照片或文件</string>
+    <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <string name="chat_input_hint">问问 %1$s…</string>
+    <!-- Hint in the message box while the agent works: what you type now reaches it at its next step. -->
+    <string name="chat_input_hint_running">在它工作时补充指令…</string>
+    <!-- Read by TalkBack for the mic button. Verb: starts voice input. -->
+    <string name="chat_talk">说话</string>
+    <!-- Read by TalkBack for the send button. Verb. -->
+    <string name="chat_send">发送</string>
+    <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <string name="chat_empty_hint">新的 %1$s 对话。让它在你的手机上做点什么吧。</string>
+    <!-- Same, when developer mode is on. %1$s = agent name. -->
+    <string name="chat_empty_hint_dev">新的 %1$s 对话。让它在你的手机上做点什么，或者开发一个应用（开发者模式已开启）。</string>
+
+    <!-- Model sheet (tap the model chip under the chat title) -->
+    <!-- %1$s = agent name, e.g. "Claude Code model". -->
+    <string name="chat_model_title">%1$s 模型</string>
+    <string name="chat_model_subtitle">仅对此对话生效。对话将使用新模型继续。</string>
+    <!-- Section label, shown in capitals: how hard the model thinks (reasoning effort). -->
+    <string name="chat_effort">思考强度</string>
+    <!-- "Auto" is the first effort option below it; "Higher" means the higher options. -->
+    <string name="chat_effort_help">“自动”由智能体自行决定。强度越高，思考越久，消耗的套餐额度也越多。</string>
+    <!-- Section label, shown in capitals, above the list of models. -->
+    <string name="chat_model">模型</string>
+    <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
+    <string name="chat_model_other_hint">其他…例如 %1$s</string>
+    <!-- Button, verb: use the model typed in the box. Keep short. -->
+    <string name="chat_model_use">使用</string>
+
+    <!-- Language sheet (long-press the mic) -->
+    <!-- Title, followed by a list of languages to speak in. -->
+    <string name="chat_speak_in">说话语言</string>
+    <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
+    <string name="chat_speak_in_help">可在“设置”→“语音”中选择你的语言。</string>
+    <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
+    <string name="chat_phone_voice">手机语音</string>
+
+    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_question">问题</string>
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_needs_ok">需要你确认</string>
+    <!-- Buttons, verbs. Deny, Change and Approve sit three in a row: keep short. -->
+    <string name="chat_deny">拒绝</string>
+    <!-- Verb: ask the agent to change what it wants to do. -->
+    <string name="chat_change">修改</string>
+    <string name="chat_approve">批准</string>
+    <!-- Verb: skip the agent's question without answering. -->
+    <string name="chat_skip">跳过</string>
+    <string name="chat_type_own_answer">自己输入答案</string>
+    <string name="chat_answer_hint">你的回答</string>
+    <string name="chat_change_hint">需要修改什么？</string>
+    <string name="chat_send_answer">发送回答</string>
+    <string name="chat_send_change">发送修改</string>
+
+    <!-- Attachments -->
+    <!-- Title of the sheet behind the paperclip button. Verb. -->
+    <string name="chat_attach">添加附件</string>
+    <string name="chat_attach_camera">拍照</string>
+    <string name="chat_attach_camera_sub">使用相机</string>
+    <string name="chat_attach_photos">照片</string>
+    <string name="chat_attach_photos_sub">从图库中选择</string>
+    <string name="chat_attach_files">文件</string>
+    <string name="chat_attach_files_sub">PDF、文档等，最大 25 MB</string>
+    <string name="chat_no_app_for_action">这部手机上没有可执行此操作的应用。</string>
+    <!-- Toast while one picked photo or file is added. -->
+    <string name="chat_adding">正在添加…</string>
+    <!-- Toast while several picked photos or files are added (always 2 or more). -->
+    <plurals name="chat_adding_files">
+        <item quantity="other">正在添加 %1$d 个文件…</item>
+    </plurals>
+    <!-- Read by TalkBack for the × on an attachment waiting to be sent. Verb. -->
+    <string name="chat_attachment_remove">移除</string>
+    <!-- %1$s = file name. -->
+    <string name="chat_no_app_for_file">没有可打开 %1$s 的应用。</string>
+
+    <!-- Chat messages -->
+    <!-- Toast after a long press copies a message. -->
+    <string name="chat_copied">已复制</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="chat_tool_calls">
+        <item quantity="other">%1$d 次工具调用</item>
+    </plurals>
+
+    <!-- Notes Buddy posts into a chat, and the chat's status line -->
+    <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
+    <string name="hub_continuing">正在继续之前的 %1$s 会话。如果它仍在终端中打开，请先在那里关闭。</string>
+    <string name="hub_still_working_attachments">此对话仍在处理中。请等它完成后再发送附件。</string>
+    <!-- Status right after a message is sent, until the agent's first step. -->
+    <string name="hub_thinking">正在思考…</string>
+    <string name="hub_still_waiting">仍在等待模型回复…</string>
+    <!-- "the top of the chat" = the model chip under the chat title. -->
+    <string name="hub_no_answer">模型没有回复，可能正忙。请重试，或在对话顶部选择其他模型。</string>
+    <!-- After picking a model for the chat. %1$s = model name. -->
+    <string name="hub_model_set">模型：%1$s</string>
+    <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
+    <string name="hub_effort_set">思考强度：%1$s</string>
+    <!-- After picking Auto effort: the agent's default effort. -->
+    <string name="hub_effort_default">思考强度：默认</string>
+    <!-- Status after the user taps Stop. -->
+    <string name="hub_stopping">正在停止…</string>
+    <!-- Note after the task was stopped. -->
+    <string name="hub_stopped">已停止。</string>
+    <!-- The agent ended with an error and gave no message. %1$s = agent name. -->
+    <string name="hub_agent_stopped">%1$s 已停止。</string>
+    <string name="hub_something_wrong">出了点问题。</string>
+    <!-- After the user adds something while the agent works. %1$s = agent name. -->
+    <string name="hub_note_added">已补充：%1$s 会在下一步收到</string>
+    <!-- The agent received what the user added while it worked. -->
+    <string name="hub_note_passed">已转达你补充的内容</string>
+    <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
+         %2$s = the newest chat's status. -->
+    <plurals name="hub_pill_chats">
+        <item quantity="other">%1$d 个对话 · %2$s</item>
+    </plurals>
+
+    <!-- The agent's steps, one line each, shown in the chat and the bubble while it works. Arguments come from
+         the agent and are not translated. -->
+    <string name="hub_tool_read_screen">正在读取屏幕</string>
+    <string name="hub_tool_screenshot">正在截图</string>
+    <!-- %1$d = number of an element on the screen. -->
+    <string name="hub_tool_tap_element">正在点按元素 %1$d</string>
+    <!-- %1$d,%2$d = x,y position on the screen. -->
+    <string name="hub_tool_tap_point">正在点按 %1$d,%2$d</string>
+    <string name="hub_tool_long_press">正在长按</string>
+    <!-- %1$s = the text being typed. -->
+    <string name="hub_tool_type">正在输入“%1$s”</string>
+    <string name="hub_tool_scroll_up">正在向上滚动</string>
+    <string name="hub_tool_scroll_down">正在向下滚动</string>
+    <string name="hub_tool_scroll_left">正在向左滚动</string>
+    <string name="hub_tool_scroll_right">正在向右滚动</string>
+    <!-- Any other direction. %1$s = the direction as the agent wrote it, not translated. -->
+    <string name="hub_tool_scroll">正在滚动（%1$s）</string>
+    <string name="hub_tool_swipe">正在滑动</string>
+    <!-- Pressing the phone's Back button. -->
+    <string name="hub_tool_press_back">正在按返回键</string>
+    <!-- Pressing the phone's Home button. -->
+    <string name="hub_tool_press_home">正在回到主屏幕</string>
+    <!-- Pressing the phone's Recents button (recent apps). -->
+    <string name="hub_tool_press_recents">正在打开最近任务</string>
+    <!-- Opening the notification shade. -->
+    <string name="hub_tool_press_notifications">正在打开通知栏</string>
+    <!-- Opening Quick Settings ("quick_settings" is how the agent names it). -->
+    <string name="hub_tool_press_quick_settings">正在打开快捷设置</string>
+    <!-- Any other button. %1$s = the button as the agent named it, not translated. -->
+    <string name="hub_tool_press">正在按 %1$s</string>
+    <!-- %1$s = app name. -->
+    <string name="hub_tool_open_app">正在打开 %1$s</string>
+    <!-- %1$s = web address. -->
+    <string name="hub_tool_open_url">正在打开 %1$s</string>
+    <string name="hub_tool_list_apps">正在列出应用</string>
+    <!-- The user's answer to an approval request. Keep the mark (✓ ✎ ✗) and the space after it at the start.
+         %1$s = what was approved. -->
+    <string name="hub_tool_approved">✓ 已批准：%1$s</string>
+    <string name="hub_tool_change_requested">✎ 已要求修改</string>
+    <!-- %1$s = the change the user asked for. -->
+    <string name="hub_tool_change_requested_text">✎ 已要求修改：%1$s</string>
+    <string name="hub_tool_denied">✗ 已拒绝</string>
+    <string name="hub_tool_asking_approval">正在请你批准</string>
+    <!-- The user answered the agent's question. Keep the ✓ and the space after it at the start. -->
+    <string name="hub_tool_answered">✓ 已回答</string>
+    <!-- %1$s = the user's answer. -->
+    <string name="hub_tool_answered_text">✓ 已回答：%1$s</string>
+    <string name="hub_tool_question_skipped">已跳过问题</string>
+    <!-- %1$s = the agent's question. -->
+    <string name="hub_tool_asking">正在提问：%1$s</string>
+    <string name="hub_tool_update_download">正在下载 Buddy 更新</string>
+    <string name="hub_tool_update_check">正在检查 Buddy 更新</string>
+    <!-- %1$s = what is searched for. -->
+    <string name="hub_tool_web_search">正在搜索网页：%1$s</string>
+    <!-- Reading a web page. %1$s = web address. -->
+    <string name="hub_tool_web_fetch">正在读取 %1$s</string>
+    <!-- %1$s = a shell command. -->
+    <string name="hub_tool_command">正在运行：%1$s</string>
+    <string name="hub_tool_command_any">正在运行命令</string>
+    <!-- %1$s = file name. -->
+    <string name="hub_tool_edit">正在编辑 %1$s</string>
+    <string name="hub_tool_edit_any">正在编辑文件</string>
+    <!-- Reading a file. %1$s = file name. -->
+    <string name="hub_tool_read_file">正在读取 %1$s</string>
+    <!-- Any other tool. %1$s = the tool's name, not translated. -->
+    <string name="hub_tool_other">正在使用 %1$s</string>
+
+    <!-- Transcript of an earlier agent session that isn't a Buddy chat (read-only) -->
+    <string name="transcript_loading">正在加载…</string>
+    <!-- Button: continue this earlier session as a Buddy chat. -->
+    <string name="transcript_continue">在 Buddy 中继续</string>
+    <string name="transcript_empty">此会话中没有可读取的消息。</string>
+    <!-- Above the messages. %1$d = how many of the session's last messages are shown. -->
+    <plurals name="transcript_last_messages">
+        <item quantity="other">最近 %1$d 条消息 · 只读</item>
+    </plurals>
+
+    <!-- Shared screens: links -->
+    <!-- Toast when a tapped link can't be opened. -->
+    <string name="ui_no_app_for_link">没有可打开此链接的应用</string>
+
+    <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
+    <string name="ui_a11y_title">Buddy 如何使用无障碍功能</string>
+    <string name="ui_a11y_what">Buddy 使用 Android 的无障碍服务在其他应用中完成你的要求：它会读取屏幕上的内容，并替你点按、输入和滚动。它还会显示悬浮气泡。</string>
+    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
+    <string name="ui_a11y_no_servers">Buddy 没有自己的服务器。它不会收集、出售或分享这些数据，也不会将其用于广告。</string>
+    <string name="ui_a11y_asks">在执行任何发送、发布、购买或删除操作之前，Buddy 都会先请你确认。你可以随时在 Android 的无障碍设置中关闭此服务。</string>
+    <string name="ui_privacy_policy">隐私政策</string>
+    <!-- Button: close the disclosure without opening the settings. -->
+    <string name="ui_no_thanks">不用了</string>
+    <!-- Button: agree to the disclosure and open Android's accessibility settings. -->
+    <string name="ui_agree_continue">同意并继续</string>
+
+    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
+    <!-- Tab: the list of Buddy chats. -->
+    <string name="ui_nav_chats">对话</string>
+    <!-- Tab: every agent session on the phone (running and recent). -->
+    <string name="ui_nav_sessions">会话</string>
+    <!-- Tab: Buddy's settings. -->
+    <string name="ui_nav_settings">设置</string>
+
+    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
+    <!-- Toast when a pause runs out after 5 minutes. -->
+    <string name="service_pause_expired">已暂停 5 分钟，因此 Buddy 停止了任务。</string>
+    <!-- Toast after the user stops the task to use the phone. -->
+    <string name="service_stopped_toast">已停止。手机重新交给你了。</string>
+    <!-- Note in the chat when the user pauses the agent. -->
+    <string name="service_paused_note">已暂停：在你继续之前，手机由你使用</string>
+    <string name="service_paused_toast">已暂停。你可以使用手机，之后长按气泡即可继续。</string>
+    <!-- Note in the chat when the user resumes the agent. -->
+    <string name="service_resumed_note">已继续</string>
+
+    <!-- Voice input and output -->
+    <!-- 🎙 = the mic button. -->
+    <string name="voice_mic_needed">Buddy 需要使用麦克风。请打开 Buddy 应用，点按一次 🎙 以授予权限。</string>
+    <string name="voice_no_recognizer">这部手机上没有语音识别服务。</string>
+    <!-- Status in the recording bar while speech recognition starts. Keep short. -->
+    <string name="voice_starting">正在启动…</string>
+    <!-- Status in the recording bar after the user stopped talking. Keep short. -->
+    <string name="voice_finishing">正在完成…</string>
+    <!-- Nothing was understood. -->
+    <string name="voice_didnt_catch">没听清。</string>
+    <!-- %1$d = Android's error number. -->
+    <string name="voice_error">语音识别出错（%1$d）。</string>
+    <!-- Spoken aloud by text-to-speech in place of a block of code in a reply. -->
+    <string name="voice_code_omitted">代码已省略。</string>
+    <!-- Spoken aloud by text-to-speech in place of a web address in a reply. Noun. -->
+    <string name="voice_link">链接</string>
+    <!-- Read by TalkBack for the send button of the recording bar: stops recording and sends. -->
+    <string name="voice_stop_and_send">停止并发送</string>
+
+    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
+
+    <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). Product and plan names
+         (Claude, ChatGPT, Codex, OpenCode, Anthropic, OpenAI, Pro, Max, Plus, Business) stay as they are. -->
+    <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
+    <string name="signin_back">返回</string>
+    <!-- Subtitle while Buddy checks whether the agent is installed and signed in. -->
+    <string name="signin_checking">正在检查…</string>
+
+    <!-- Sign-in screen: the agent isn't installed yet. -->
+    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="signin_install">安装 %1$s</string>
+    <string name="signin_install_sub_claude">在 Buddy 中通过你的 Claude 订阅运行 Claude Code。</string>
+    <string name="signin_install_sub_opencode">在 Buddy 中运行 OpenCode。免费模型立即可用，无需账号；也可以随时连接你自己的模型提供商（Anthropic、OpenAI、GitHub Copilot…）。</string>
+    <string name="signin_install_sub_codex">在 Buddy 中通过你的 ChatGPT 套餐运行 Codex。</string>
+    <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
+    <string name="signin_install_size_claude">需一次性下载约 235 MB：Buddy 的 Linux，以及来自 Anthropic 的 Claude Code。建议使用 WLAN。</string>
+    <string name="signin_install_size_opencode">需一次性下载约 230 MB：Buddy 的 Linux、Node.js 和 OpenCode。建议使用 WLAN。</string>
+    <string name="signin_install_size_codex">需一次性下载约 150 MB：Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex。建议使用 WLAN。</string>
+
+    <!-- Sign-in screen: install or update in progress (screen titles). -->
+    <string name="signin_installing">正在安装</string>
+    <string name="signin_updating">正在更新</string>
+    <string name="signin_install_wait">这需要几分钟。你可以离开此屏幕，安装会继续进行。</string>
+
+    <!-- Sign-in screen: installed, not signed in. -->
+    <string name="signin_title_claude">登录 Claude</string>
+    <string name="signin_title_chatgpt">登录 ChatGPT</string>
+    <string name="signin_sub_claude">使用你的 Claude 账号（Pro 或 Max）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <string name="signin_sub_chatgpt">使用你的 ChatGPT 账号（Plus、Pro 或 Business）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <!-- Main button. -->
+    <string name="signin_with_claude">使用 Claude 登录</string>
+    <string name="signin_with_chatgpt">使用 ChatGPT 登录</string>
+    <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
+    <string name="signin_other_device">在其他设备上登录</string>
+    <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
+    <string name="signin_with_code">使用代码登录</string>
+
+    <!-- Sign-in screen: sign-in in progress. -->
+    <!-- Screen title while the sign-in starts. -->
+    <string name="signin_sign_in">登录</string>
+    <!-- Also shown as status text elsewhere while the sign-in starts. -->
+    <string name="signin_starting">正在开始登录…</string>
+    <string name="signin_approve_title">在浏览器中授权</string>
+    <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_approve_claude">在 Claude 页面上点按“Authorize”（授权）。Buddy 会自动获取代码并返回。</string>
+    <string name="signin_approve_codex">登录并允许 Codex 访问，然后返回 Buddy，它会自动完成。</string>
+    <!-- Button. -->
+    <string name="signin_open_again">重新打开登录页面</string>
+    <!-- Screen title after the code was handed over. -->
+    <string name="signin_signing_in">正在登录</string>
+    <!-- Also shown as status text elsewhere after the code was handed over. -->
+    <string name="signin_finishing">正在完成登录…</string>
+    <!-- Error status. %1$s = the agent's last output (English, technical); may be empty. -->
+    <string name="signin_not_finished">登录未完成。%1$s</string>
+
+    <!-- Sign-in screen: signing in from another device. -->
+    <string name="signin_remote_claude">在任意设备上打开此链接并授权，然后复制页面上显示的代码，粘贴到下方。</string>
+    <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
+    <string name="signin_enter_code">输入此代码</string>
+    <string name="signin_remote_codex">在任意设备上打开下方链接，登录 ChatGPT 并输入代码。Buddy 会自动完成。</string>
+    <!-- Buttons and the toasts after them. -->
+    <string name="signin_copy_code">复制代码</string>
+    <string name="signin_code_copied">代码已复制</string>
+    <string name="signin_code_expiry">代码在 15 分钟内有效。</string>
+    <string name="signin_copy_link">复制链接</string>
+    <string name="signin_link_copied">链接已复制</string>
+    <!-- Button: share the sign-in link with another app. Verb. -->
+    <string name="signin_share">分享</string>
+    <!-- Button: open the sign-in link on this phone. -->
+    <string name="signin_open_here">在此打开</string>
+    <!-- Toasts. -->
+    <string name="signin_no_browser">未找到浏览器。</string>
+    <string name="signin_no_browser_page">未找到可打开登录页面的浏览器。</string>
+    <!-- Label of the copied code or link on the clipboard (rarely shown). -->
+    <string name="signin_clip_label">登录</string>
+
+    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
+    <string name="signin_paste_instead">改为粘贴代码</string>
+    <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_paste_help">如果 Buddy 没有自动返回：请在 Claude 页面上点按“Copy Code”（复制代码），然后粘贴到这里。</string>
+    <!-- Hint inside the empty text box for the code. Lowercase in English. -->
+    <string name="signin_code_hint">代码</string>
+    <!-- Short button next to the text box: use the pasted code. Verb. -->
+    <string name="signin_use_code">使用</string>
+    <!-- Toast when there is no sign-in waiting for a code. -->
+    <string name="signin_start_again">请先重新开始登录。</string>
+
+    <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
+    <string name="signin_signed_in">已登录</string>
+    <!-- %1$s = agent name (Claude Code or Codex). -->
+    <string name="signin_agent_ready">%1$s 已就绪。</string>
+    <!-- Button that closes the screen. -->
+    <string name="signin_done">完成</string>
+    <!-- Button, and the button of the confirmation sheet. -->
+    <string name="signin_sign_out">退出登录</string>
+    <!-- Confirmation sheet. %1$s = agent name. -->
+    <string name="signin_sign_out_title">要退出 %1$s 账号吗？</string>
+    <string name="signin_sign_out_text">在你重新登录之前，Buddy 中的 %1$s 将无法使用。</string>
+    <string name="signin_opencode_ready">OpenCode 已就绪</string>
+    <!-- "model chip" = the button at the top of a chat that shows the agent and model. -->
+    <string name="signin_opencode_free">正在使用 OpenCode 的免费模型。可通过对话顶部的模型按钮为每个对话选择模型，也可以连接你自己的提供商。</string>
+    <!-- %1$s = connected providers, comma-separated (e.g. "anthropic, openai"). -->
+    <string name="signin_opencode_connected">已连接：%1$s。OpenCode 的免费模型也仍可使用。</string>
+    <!-- %1$s = the command "opencode auth login", %2$s = the command "opencode auth logout" (both stay as they are). -->
+    <string name="signin_opencode_connect_note">连接提供商时会打开 Buddy 的终端并运行 %1$s：选择一个提供商并按步骤操作。之后如需移除，在终端中运行 %2$s 即可。</string>
+    <!-- Button. -->
+    <string name="signin_connect_provider">连接提供商</string>
+    <!-- Installed version. %1$s = agent name, %2$s = version number (e.g. "Claude Code 2.1.40."). -->
+    <string name="signin_version">%1$s %2$s。</string>
+    <!-- %1$s = the installed OpenCode 1.x version number. -->
+    <string name="signin_version_old_opencode">OpenCode %1$s。OpenCode 2 已发布：更新后才能继续获得新版本。已连接的提供商会保留。</string>
+    <!-- Buttons. -->
+    <string name="signin_update_opencode2">更新到 OpenCode 2</string>
+    <string name="signin_check_updates">检查更新</string>
+
+    <!-- Sign-in screen: error. -->
+    <string name="signin_error_title">出了点问题</string>
+    <!-- Button. -->
+    <string name="signin_try_again">重试</string>
+
+    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
+    <!-- One line under the agent's name in the agent pickers. -->
+    <string name="account_tagline_claude">使用你的 Claude 套餐</string>
+    <string name="account_tagline_opencode">免费模型，或你自己的提供商</string>
+    <string name="account_tagline_codex">使用你的 ChatGPT 套餐</string>
+    <!-- Install progress. -->
+    <string name="account_setting_up_linux">正在设置 Buddy 的 Linux…</string>
+    <string name="account_installing_tools">正在安装工具…</string>
+    <string name="account_downloading_claude">正在下载 Claude Code（约 230 MB）…</string>
+    <!-- %1$s = what is downloaded: an agent name (Codex, OpenCode) or "OpenCode 2". -->
+    <string name="account_downloading">正在下载 %1$s…</string>
+    <!-- Error. %1$s = agent name, %2$s = technical detail in English. -->
+    <string name="account_check_failed">无法检查 %1$s：%2$s</string>
+    <!-- Error. %1$s = technical detail in English. -->
+    <string name="account_install_failed">安装失败：%1$s</string>
+    <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
+    <string name="account_update_checking">正在检查新版 %1$s…</string>
+    <!-- %1$s = version number. -->
+    <string name="account_update_latest">已是最新版本（%1$s）。</string>
+    <!-- %1$s = new version number. -->
+    <string name="account_updated">已更新到 %1$s。</string>
+    <!-- %1$s = new version number, %2$s = previous version number. -->
+    <string name="account_updated_from">已从 %2$s 更新到 %1$s。</string>
+    <!-- %1$s = the OpenCode version that is still installed. -->
+    <string name="account_update_opencode2_failed">无法更新到 OpenCode 2，当前仍为 %1$s。请连接 WLAN 后重试。</string>
+    <string name="account_update_failed">更新失败：%1$s</string>
+
+    <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort").
+         Model names (Opus 5.5, GPT-6.1-Sol…) stay as they are. -->
+    <!-- Model picker row: the agent's own default model. Also shown in a chat note "Model: Default". -->
+    <string name="models_default">默认</string>
+    <!-- Chip: the agent's default model, now known. %1$s = model name (e.g. "Opus 5.5"). -->
+    <string name="models_name_default">%1$s（默认）</string>
+    <!-- Chip: the default model, not known yet. Lowercase in English. -->
+    <string name="models_default_model">默认模型</string>
+    <!-- Small grey line under "Default" in the model picker. Lowercase in English.
+         %1$s = the model the agent uses by default (e.g. "Opus 5.5"). -->
+    <string name="models_default_now">当前为 %1$s</string>
+    <string name="models_default_claude">由 Claude Code 根据你的套餐选择；发送第一条消息后会显示在这里</string>
+    <string name="models_default_codex">由 Codex 选择；下次回复后会显示在这里</string>
+    <string name="models_default_opencode">OpenCode 的默认模型</string>
+    <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
+         "Auto" = the agent decides how much to think. -->
+    <string name="models_effort_auto">自动</string>
+    <string name="models_effort_low">低</string>
+    <!-- Short for "Medium". -->
+    <string name="models_effort_medium">中</string>
+    <string name="models_effort_high">高</string>
+    <!-- Extra high. -->
+    <string name="models_effort_xhigh">超高</string>
+    <!-- Maximum. -->
+    <string name="models_effort_max">最高</string>
+    <!-- Chip, after the model. %1$s = effort level as the agent names it (low, medium, high, xhigh or max); not translated. -->
+    <string name="models_chip_effort">强度 %1$s</string>
+
+    <!-- Chats. -->
+    <!-- Title of a chat before its first message. %1$s = agent name (e.g. "New Claude Code chat"). -->
+    <string name="session_new_chat">新的 %1$s 对话</string>
+    <!-- Preview of a message with several photos or files (a single one shows its file name instead). -->
+    <plurals name="attach_count">
+        <item quantity="other">📎 %1$d 个附件</item>
+    </plurals>
+
+    <!-- Attaching a photo or file to a chat message (toasts). %1$s = file name. -->
+    <string name="attach_cant_open">无法打开 %1$s</string>
+    <string name="attach_too_large">%1$s 超过 25 MB。</string>
+
+    <!-- Remote Control session in Settings: a Claude Code session that can be continued from the Claude app. -->
+    <string name="remote_sign_in_first">请先登录 Claude Code。</string>
+    <string name="remote_starting">正在启动…</string>
+    <string name="remote_restarting">正在重启…</string>
+    <!-- %1$s = technical detail in English. -->
+    <string name="remote_start_failed">无法启动：%1$s</string>
+    <string name="remote_keeps_stopping">会话不断停止。请将其关闭后重新开启，或检查 Claude Code 的登录状态。</string>
+
+    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
+
+    <!-- Settings screen: header. -->
+    <string name="setup_settings_title">设置</string>
+    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex 或 OpenCode，使用你自己的订阅（或 OpenCode 的免费模型）。</string>
+
+    <!-- Settings screen: the setup checklist card (5 steps). -->
+    <!-- Title of the setup checklist card (noun). -->
+    <string name="setup_card_title">初始设置</string>
+    <string name="setup_open_guide">打开分步指南</string>
+    <string name="setup_all_set">一切就绪，Buddy 已可使用。</string>
+    <!-- %1$s = name of the next unfinished setup step, e.g. "Install Claude Code". -->
+    <string name="setup_next_step">下一步：%1$s</string>
+    <string name="setup_step_a11y_title">开启 Buddy 无障碍服务</string>
+    <string name="setup_step_a11y_body">用于显示气泡，并让 Buddy 替你读取屏幕、点按和输入。</string>
+    <!-- Second paragraph of the accessibility step on Android 13+. "Restricted setting", "App info" and "Allow restricted settings" are Android's own labels: use the wording Android uses in your language. ⋮ is the three-dot menu icon. -->
+    <string name="setup_step_a11y_restricted">开关呈灰色（“受限制的设置”）？对于通过文件安装的应用，Android 会阻止此操作。请点按“应用信息”，然后点按右上角的 ⋮ →“允许受限制的设置”，再重试。</string>
+    <!-- Button: opens Android's accessibility settings. -->
+    <string name="setup_open_settings">打开设置</string>
+    <!-- Button: opens Android's App info page for Buddy (Android's own label). -->
+    <string name="setup_app_info">应用信息</string>
+    <!-- %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="setup_step_install_title">安装 %1$s</string>
+    <!-- %1$s = agent name. -->
+    <string name="setup_step_install_done">%1$s 已安装到 Buddy 中。</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_step_install_claude">Buddy 会下载自带的小型 Linux 和来自 Anthropic 的 %1$s（约 235 MB）。</string>
+    <!-- %1$s = OpenCode. -->
+    <string name="setup_step_install_opencode">Buddy 会下载自带的小型 Linux 和 %1$s（含 Node.js 约 230 MB）。</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_step_install_codex">Buddy 会下载自带的小型 Linux 和来自 OpenAI 的 %1$s（约 150 MB）。</string>
+    <!-- Button (verb). -->
+    <string name="setup_install">安装</string>
+    <!-- Name of the sign-in setup step. -->
+    <string name="setup_step_signin_title">登录</string>
+    <string name="setup_step_signin_opencode_done">无需登录：OpenCode 的免费模型立即可用。你可以随时连接自己的提供商。</string>
+    <string name="setup_step_signin_opencode">使用 OpenCode 的免费模型无需登录。</string>
+    <string name="setup_step_signin_done">已登录。</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_step_signin_done_email">已使用 %1$s 登录。</string>
+    <string name="setup_step_signin_claude">使用你的 Claude 账号（Pro 或 Max）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <string name="setup_step_signin_codex">使用你的 ChatGPT 账号。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <!-- Button (verb). -->
+    <string name="setup_sign_in">登录</string>
+    <string name="setup_step_background_title">允许 Buddy 在后台运行</string>
+    <string name="setup_step_background_done">已允许。</string>
+    <string name="setup_step_background_body">这样在智能体工作时，手机就不会为了省电而停止 Buddy。</string>
+    <!-- Button (verb): lets Buddy ignore battery optimization. -->
+    <string name="setup_allow">允许</string>
+    <!-- Name of the last setup step: try Buddy out. -->
+    <string name="setup_step_try_title">试一试</string>
+    <string name="setup_step_try_done">Buddy 已回复你。随时点按气泡，提出更多要求。</string>
+    <!-- "open Messenger" is an example of what to say to Buddy: translate it. -->
+    <string name="setup_step_try_body">点按屏幕边缘的气泡，说出类似“打开微信”的请求，或者在这里开始对话。</string>
+    <string name="setup_step_try_wait">请先完成上面的步骤。</string>
+    <!-- Short names of the setup steps, shown after "Next:" in the Chats header. -->
+    <string name="setup_step_name_a11y">开启无障碍服务</string>
+    <string name="setup_step_name_install">安装智能体</string>
+    <string name="setup_step_name_background">允许后台运行</string>
+
+    <!-- Settings screen: Appearance. Section labels are shown in ALL CAPS. -->
+    <string name="setup_appearance">外观</string>
+    <!-- Label of the light / dark mode picker. -->
+    <string name="setup_theme_mode">模式</string>
+    <!-- Label of the accent colour picker. -->
+    <string name="setup_accent">强调色</string>
+    <!-- Label of the background tone picker. -->
+    <string name="setup_surface">背景色调</string>
+    <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
+    <string name="setup_surface_note">“暖色”是 Buddy 的原始色调。“纯黑”仅在深色模式下生效。</string>
+    <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
+    <string name="setup_custom_colour">自定义颜色</string>
+    <string name="setup_custom_accent_title">自定义强调色</string>
+    <string name="setup_custom_accent_hint">以十六进制代码输入任意颜色，例如 #4F8BFF。</string>
+    <!-- Button (verb). -->
+    <string name="setup_apply">应用</string>
+
+    <!-- Settings screen: Agent. -->
+    <string name="setup_agent">智能体</string>
+    <!-- Which AI agent answers new chats. -->
+    <string name="setup_default_brain">默认智能体</string>
+    <!-- "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
+    <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_set">新对话将使用 %1$s。你也可以通过“新对话”按钮为每个对话单独选择。</string>
+    <!-- Toast. %1$s = agent name. -->
+    <string name="setup_set_up_first">请先设置 %1$s。</string>
+    <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
+    <string name="setup_agent_installing">正在安装…</string>
+    <string name="setup_agent_not_installed">未安装</string>
+    <string name="setup_agent_ready">就绪</string>
+    <!-- %1$s = the agent's plan or models. -->
+    <string name="setup_agent_ready_plan">就绪 · %1$s</string>
+    <string name="setup_agent_signed_in">已登录</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_agent_signed_in_email">已登录 · %1$s</string>
+    <string name="setup_agent_not_signed_in">未登录</string>
+
+    <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
+    <string name="setup_phone_tools">在你自己的会话中使用手机工具</string>
+    <string name="setup_phone_tools_info">Buddy 的手机工具是这部手机上的一个标准 MCP 服务器。在手机上的终端（例如 Termux）中运行一次此命令，该智能体就能在每个会话中使用手机工具，即使不通过气泡也可以。</string>
+    <!-- Button. -->
+    <string name="setup_copy_command">复制命令</string>
+    <string name="setup_command_copied">已复制。请粘贴到你的终端中。</string>
+
+    <!-- Settings screen: Voice. -->
+    <string name="setup_voice">语音</string>
+    <string name="setup_voice_input">语音输入</string>
+    <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
+    <string name="setup_voice_phone">手机</string>
+    <string name="setup_voice_input_claude">Claude Code 的听写功能，使用你的 Claude 套餐：非常准确。支持英语、法语、德语、西班牙语、意大利语、葡萄牙语、荷兰语、土耳其语、俄语、日语等，但不支持阿拉伯语：说阿拉伯语时，Buddy 会使用手机的语音识别。文字会在你停顿时出现。</string>
+    <string name="setup_voice_input_chatgpt">通过 Codex 使用 ChatGPT 语音，使用你的 ChatGPT 套餐。能听懂任何语言，即使一句话中混用多种语言也没问题。只会使用你说的话：ChatGPT 的语音回复会被静音，而且它无法运行任何操作。</string>
+    <string name="setup_voice_input_phone">手机自带的语音识别（大多数手机上为 Google）。说话时实时显示文字，并能识别你正在说的是哪种语言。</string>
+    <string name="setup_voice_output">语音输出</string>
+    <string name="setup_voice_output_chatgpt">使用 ChatGPT 的自然语音朗读回复（通过 Codex，使用你的 ChatGPT 套餐）。这会计入你的 ChatGPT 语音用量；如果不可用，则改用手机的语音朗读。</string>
+    <string name="setup_voice_output_phone">使用手机的文字转语音声音，以回复所用的语言朗读。</string>
+    <!-- Spoken aloud to preview the chosen ChatGPT voice. Mixing two languages is on purpose (it shows the voice switches languages): keep a greeting in another language. -->
+    <string name="setup_voice_sample">Bonjour ! 你好，我是 Buddy。这就是我的声音。</string>
+    <string name="setup_languages">语言</string>
+    <string name="setup_languages_hint">点按选择你说的语言。长按某个语言可将其设为默认。在对话中，长按麦克风可切换语言。</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code or Codex). -->
+    <string name="setup_sign_in_first">请先登录 %1$s</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_needs_claude">Claude 听写通过 %1$s 运行，使用你的 Claude 套餐。</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_needs_chatgpt">ChatGPT 语音通过 %1$s 运行，使用你的 ChatGPT 套餐。</string>
+    <!-- Button. %1$s = agent name. -->
+    <string name="setup_set_up_agent">设置 %1$s</string>
+
+    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
+    <!-- Section label: Remote Control is the name of a Claude Code feature. -->
+    <string name="setup_remote_control">远程控制</string>
+    <string name="setup_remote_session">Claude Code 会话</string>
+    <!-- "Code" is the name of a section of the Claude app. -->
+    <string name="setup_remote_session_info">在 Buddy 中运行的 Claude Code 会话，可使用手机工具。你可以在这部手机或任何地方通过 Claude 应用（Code）继续该会话。</string>
+    <string name="setup_remote_sign_in_first">请先登录 Claude Code。</string>
+    <!-- Status, lowercase. %1$s = the session's name as shown in the Claude app. -->
+    <string name="setup_remote_active">运行中 · Claude 应用中的“%1$s”</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_starting">正在启动…</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_stopped">已停止</string>
+    <string name="setup_remote_open">在 Claude 应用中打开</string>
+    <string name="setup_remote_open_failed">无法打开。</string>
+
+    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
+    <string name="setup_old_chats_title">移除旧的 Termux 对话</string>
+    <plurals name="setup_old_chats_body">
+        <item quantity="other">有 %1$d 个对话创建于 Buddy 内置 Linux 之前，智能体无法继续这些对话。</item>
+    </plurals>
+    <plurals name="setup_old_chats_remove">
+        <item quantity="other">要移除 %1$d 个旧对话吗？</item>
+    </plurals>
+    <string name="setup_old_chats_remove_body">这会将它们从 Buddy 的对话列表中移除，且无法撤消。</string>
+    <!-- Button (verb). -->
+    <string name="setup_remove">移除</string>
+    <string name="setup_removed">已移除。</string>
+
+    <!-- Settings screen: Experience. -->
+    <string name="setup_experience">使用体验</string>
+    <string name="setup_chat_bubble">聊天气泡</string>
+    <!-- ✕ is the close target that appears while dragging the bubble. -->
+    <string name="setup_chat_bubble_info">悬浮在其他应用上方。将它拖到 ✕ 上即可隐藏；当智能体需要你确认时，确认卡片仍会弹出。</string>
+    <string name="setup_tap_to_talk">点按气泡即可说话</string>
+    <string name="setup_tap_to_talk_info">点按一下即可打开麦克风：说出你的需求，停顿时就会发送。长按气泡可打开对话及更多操作。</string>
+    <string name="setup_read_aloud">朗读回复</string>
+    <string name="setup_read_aloud_info">在任意对话中用麦克风说话，停止说话后会自动发送。</string>
+    <string name="setup_update_notices">更新通知</string>
+    <string name="setup_update_notices_info">Buddy 每天检查一次 GitHub，有新版本时会通知你。</string>
+    <string name="setup_check_updates">检查更新</string>
+    <!-- %1$s = Buddy's version number. "update yourself" is what you can say to an agent: translate it. -->
+    <string name="setup_check_updates_info">当前为 Buddy %1$s。你也可以对任一智能体说：“更新你自己”。</string>
+    <!-- Name of the App permissions screen. -->
+    <string name="setup_app_permissions">应用权限</string>
+    <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
+    <string name="setup_app_permissions_info">按应用选择：“信任”让智能体在其中直接操作、不弹窗；“严格”表示 Buddy 会在点按发送、支付、删除等按钮前亲自询问你。</string>
+    <string name="setup_dev_mode">开发者模式</string>
+    <string name="setup_dev_mode_info">气泡中的智能体可以在 ~/.buddy/work 中运行命令和编辑文件，从而能够开发和安装应用。</string>
+    <string name="setup_agents_tap">允许智能体点按 Buddy 的界面</string>
+    <!-- "App permissions" is the name of a screen in Buddy. -->
+    <string name="setup_agents_tap_info">用于借助智能体测试 Buddy（例如在 Termux 中使用带手机工具的 Claude Code）。气泡、确认卡片、“应用权限”和这些开关仍禁止智能体点按。</string>
+    <!-- Warning shown while Developer mode is on. -->
+    <string name="setup_dev_mode_warning">日常使用时请保持关闭：开启后，屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
+
+    <!-- Settings screen: footer links. -->
+    <!-- Link and sheet title. -->
+    <string name="setup_licences">开源许可</string>
+    <string name="setup_privacy_policy">隐私政策</string>
+
+    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
+    <!-- %1$s = SHA-256 checksum of the download. -->
+    <string name="linux_download_corrupt">Alpine 下载文件已损坏（sha256 %1$s）</string>
+    <string name="linux_move_failed">无法将 Alpine 移动到目标位置</string>
+    <!-- %1$d = HTTP status code, e.g. 404. -->
+    <string name="linux_download_failed_http">下载失败：HTTP %1$d</string>
+    <!-- %1$s = a file path inside the downloaded archive. -->
+    <string name="linux_unsafe_path">压缩包中有不安全的路径：%1$s</string>
+    <!-- Creating a symbolic link failed. %1$s = file path, %2$s = the system's error message. -->
+    <string name="linux_symlink_failed">创建符号链接 %1$s 失败：%2$s</string>
+    <string name="linux_truncated_archive">压缩包不完整</string>
+
+    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
+    <!-- Name of Buddy's built-in terminal: title of the Terminal screen and its menu, and of the Terminal card on the Sessions screen. -->
+    <string name="terminal_title">终端</string>
+    <!-- Read by TalkBack: back button. -->
+    <string name="terminal_back">返回</string>
+    <!-- Read by TalkBack: button that hides the on-screen keyboard. -->
+    <string name="terminal_hide_keyboard">隐藏键盘</string>
+    <!-- Read by TalkBack: button that opens the terminal menu. -->
+    <string name="terminal_menu">菜单</string>
+    <!-- Status line under the title, lowercase. "buddy linux" is the name of Buddy's Linux: keep it. Only shown for 2 or more. -->
+    <plurals name="terminal_sessions_count">
+        <item quantity="other">%1$d 个会话 · buddy linux</item>
+    </plurals>
+    <!-- Status line under the title while the microphone is in use, lowercase. -->
+    <string name="terminal_listening">正在聆听 · 麦克风已开启</string>
+    <string name="terminal_session_ended">会话已结束</string>
+    <!-- %1$d = the shell's exit code. -->
+    <string name="terminal_session_ended_code">会话已结束 · 退出码 %1$d</string>
+    <!-- Button (verb): closes the terminal tab. -->
+    <string name="terminal_close">关闭</string>
+    <!-- Button (verb): starts a new shell. -->
+    <string name="terminal_restart">重新启动</string>
+    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex 或 OpenCode，这会同时设置好 Buddy 的 Linux。</string>
+    <!-- %1$s = error message. -->
+    <string name="terminal_start_failed">无法启动终端：%1$s</string>
+    <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
+    <string name="terminal_close_title">关闭 %1$s？</string>
+    <string name="terminal_close_running">它仍在运行。关闭后，它及其启动的所有程序都会停止。</string>
+    <!-- Default name of a terminal tab until the program in it sets a title. Lowercase. %1$d = tab number. -->
+    <string name="terminal_shell_name">shell %1$d</string>
+    <!-- Menu item and "+" tab button: opens a new shell tab. -->
+    <string name="terminal_new_session">新建会话</string>
+    <!-- Menu item, selection toolbar item and paste key: pastes the clipboard into the terminal. -->
+    <string name="terminal_paste">粘贴</string>
+    <!-- Menu item and selection toolbar item. -->
+    <string name="terminal_select_all">全选</string>
+    <string name="terminal_larger_text">放大文字</string>
+    <string name="terminal_smaller_text">缩小文字</string>
+    <string name="terminal_screen_sleep">允许屏幕休眠</string>
+    <string name="terminal_keep_screen_on">保持屏幕常亮</string>
+    <string name="terminal_close_session">关闭此会话</string>
+    <string name="terminal_tips">长按可选择文字或链接。双指张合可缩放，拖动可回看之前的输出。长按标签页可将其关闭。</string>
+
+    <!-- Terminal: floating toolbar over selected text. Keep short. -->
+    <string name="terminal_copy">复制</string>
+    <string name="terminal_open_link">打开链接</string>
+    <string name="terminal_share">分享</string>
+
+    <!-- Sessions screen: every agent session running on the phone, and recent history. -->
+    <string name="monitor_title">会话</string>
+    <string name="monitor_subtitle">这部手机上的所有 Claude Code 和 Codex 会话。</string>
+    <string name="monitor_terminal_running">有 shell 正在运行 · 点按返回</string>
+    <string name="monitor_terminal_idle">Buddy 的 Linux 中的 shell</string>
+    <string name="monitor_running_now">正在运行</string>
+    <!-- Next to "Running now": the list refreshes every 3 seconds. Lowercase, monospace, keep short. -->
+    <string name="monitor_refresh">每 3 秒刷新</string>
+    <string name="monitor_checking">正在检查…</string>
+    <string name="monitor_recent">最近</string>
+    <string name="monitor_loading">正在加载…</string>
+    <string name="monitor_service_off">Buddy 的无障碍服务已关闭，无法检查会话。请在“设置”中开启。</string>
+    <string name="monitor_nothing_running">没有正在运行的会话。</string>
+    <!-- Title of a running session whose Buddy chat was deleted. -->
+    <string name="monitor_deleted_chat">已删除的 Buddy 对话</string>
+    <string name="monitor_background_session">后台会话</string>
+    <string name="monitor_terminal_session">终端会话</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_background">后台</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_terminal">终端</string>
+    <!-- Monospace details line. %1$s = command name (claude-code, codex, opencode), %2$d = process id, %3$s = working folder. -->
+    <string name="monitor_proc_meta">%1$s · pid %2$d · %3$s</string>
+    <string name="monitor_background_hint">在 Claude Code 的后台服务中运行，例如你在 Claude 应用中继续的对话。</string>
+    <!-- Button. -->
+    <string name="monitor_open_chat">打开对话</string>
+    <!-- Button (verb): stops the session. -->
+    <string name="monitor_stop">停止</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="monitor_stop_title">要停止此 %1$s 会话吗？</string>
+    <string name="monitor_stop_background_body">它在后台运行，例如你正在 Claude 应用中继续的对话，甚至可能就是正在控制 Buddy 的那个会话。停止它会终止该对话当前的工作。</string>
+    <string name="monitor_stop_terminal_body">它可能是你此刻正在终端中使用的会话，甚至可能就是正在控制 Buddy 的那个会话。停止它会终止该对话当前的工作。</string>
+    <string name="monitor_stopping">正在停止…</string>
+    <string name="monitor_service_title">Claude Code 后台服务</string>
+    <!-- Monospace details line. %1$d = process id, %2$s = how long it has been running (e.g. 1:02:03). -->
+    <string name="monitor_service_meta">pid %1$d · 已运行 %2$s · 承载后台会话</string>
+    <string name="monitor_no_history">未找到历史记录。</string>
+    <!-- Title of a past session that has no messages. -->
+    <string name="monitor_no_messages">（无消息）</string>
+
+    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
+
+    <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app.
+         The three approval modes are named Trust, Hard and Smart (perms_mode_*): use the same names wherever they appear. -->
+    <string name="perms_title">应用权限</string>
+    <!-- Content description of the back arrow at the top of the screen (read by TalkBack). -->
+    <string name="perms_back">返回</string>
+    <!-- Approval mode name, in a small one-line segmented control next to each app's name: keep it short (about 6 characters).
+         Trust = the agent works on its own in this app, without asking. -->
+    <string name="perms_mode_trust">信任</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Hard = the button rules decide: risky buttons need the user's OK. -->
+    <string name="perms_mode_hard">严格</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Smart = the button rules, then a reviewer AI checks every other tap. -->
+    <string name="perms_mode_smart">智能</string>
+    <!-- Explains the three modes, one per line. Trust, Hard and Smart are the mode names above; Send, Pay, Delete are example button labels. -->
+    <string name="perms_modes_intro">信任：智能体在此应用中自主操作，不弹出确认窗口。\n严格：由你的按钮规则决定。发送、支付、删除等需要你在卡片上确认。\n智能：先按规则判断，再由另一个审核 AI 对照你的请求检查其余每次点按。\n智能体永远无法点按 Buddy 自己的气泡、卡片或设置。</string>
+    <!-- Section title: which AI reviews the taps in apps set to Smart. -->
+    <string name="perms_smart_reviewer">智能审核者</string>
+    <!-- Reviewer choice in a segmented control, next to “Claude Code” and “Codex”: the same agent as the chat. Keep it short. -->
+    <string name="perms_reviewer_same">与对话相同</string>
+    <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
+    <string name="perms_reviewer_sign_in">请先登录 %1$s（在“设置”中）。</string>
+    <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
+    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode 对话由 Claude Code（或 Codex）审核。</string>
+    <!-- Title of the button rules screen, and of the row that opens it. -->
+    <string name="perms_button_rules">按钮规则</string>
+    <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
+    <string name="perms_rules_summary">询问 %1$d · 无需询问 %2$d</string>
+    <!-- Section title above the list of installed apps. -->
+    <string name="perms_apps">应用</string>
+    <!-- Row that sets the mode of every app at once. -->
+    <string name="perms_all_apps">所有应用</string>
+    <!-- Link under “All apps”: puts every app back on the mode Buddy suggests for it. -->
+    <string name="perms_reset_suggested">恢复为建议设置</string>
+
+    <!-- Button rules screen: buttons that always or never need the user's OK. Hard and Smart are approval mode names (perms_mode_*). -->
+    <string name="perms_rules_intro">适用于设为“严格”或“智能”的应用。从建议中选择的规则仅适用于该应用；手动输入的规则适用于所有应用。点按规则即可将其移除。</string>
+    <!-- Switch title: Buddy's own list of risky button words. -->
+    <string name="perms_builtin_title">内置风险词</string>
+    <!-- Switch description. The words are examples from the built-in list, which only covers the languages named here:
+         if your language isn't one of them, keep the example words in English. -->
+    <string name="perms_builtin_sub">发送、发布、支付、购买、下单、删除、拨打、退出登录等按钮，在 Buddy 的所有语言中都会先询问。</string>
+    <!-- List title: buttons that always need the user's OK. -->
+    <string name="perms_always_ask">始终询问</string>
+    <!-- List title, and an option in a small segmented control (keep it short): buttons the agent may tap without asking. -->
+    <string name="perms_never_ask">无需询问</string>
+    <!-- Option in a small segmented control next to “Never ask” (keep it short): put this button on the “Always ask” list. Verb. -->
+    <string name="perms_ask">询问</string>
+    <!-- Hint in the field where the user types a button's label, as their apps show it. -->
+    <string name="perms_add_hint">添加按钮，例如“发送”</string>
+    <!-- Button: adds the typed button to the list. Verb. -->
+    <string name="perms_add">添加</string>
+    <!-- Section title: buttons the agent tapped lately, to put them on a list with one tap. -->
+    <string name="perms_seen_title">最近遇到的按钮</string>
+    <!-- Shown while no buttons were seen yet. Hard and Smart are approval mode names. -->
+    <string name="perms_seen_empty">智能体在“严格”和“智能”模式的应用中点按的按钮会显示在这里。</string>
+
+    <!-- Button rules and modes, as App permissions shows them. -->
+    <!-- A button rule that applies in every app, on a chip and in the suggestions. %1$s = the button's label, e.g. Send. -->
+    <string name="guard_rule_all_apps">%1$s · 所有应用</string>
+    <!-- Why an app has its mode, in small text under the app's name. Here: the user picked it. -->
+    <string name="guard_why_choice">你的选择</string>
+    <!-- Buddy suggests Hard for this app because of the kind of app it is. -->
+    <string name="guard_why_category">建议：通讯、社交、通话或金融类</string>
+    <!-- Buddy suggests Hard because the app's name contains a word like bank or pay. %1$s = that word, as found (usually English). -->
+    <string name="guard_why_name">建议：名称包含“%1$s”</string>
+    <!-- Buddy suggests Hard because Android lists the app as a social app. -->
+    <string name="guard_why_social">建议：社交应用</string>
+    <!-- The mode is Buddy's suggestion. -->
+    <string name="guard_why_suggested">建议</string>
+    <!-- The mode comes from the first setup, where the user chose that the agent asks first. -->
+    <string name="guard_why_setup">初始设置中的选择：先问我</string>
+
+    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
+    <!-- %1$s = the button's label, e.g. Send. -->
+    <string name="tools_card_tap">点按“%1$s”</string>
+    <!-- %1$s = the button's label, e.g. Send; %2$s = the app's name, e.g. WhatsApp. -->
+    <string name="tools_card_tap_in">在 %2$s 中点按“%1$s”</string>
+    <!-- For a button without a label: “this” stands for the button. -->
+    <string name="tools_card_tap_this">点按“此按钮”</string>
+    <!-- For a button without a label: “this” stands for the button. %1$s = the app's name. -->
+    <string name="tools_card_tap_this_in">在 %1$s 中点按“此按钮”</string>
+    <!-- The agent typed text and wants to press the keyboard's Enter key to send it. -->
+    <string name="tools_card_enter">按 Enter 键发送</string>
+    <!-- Same, %1$s = the app's name. -->
+    <string name="tools_card_enter_in">在 %1$s 中按 Enter 键发送</string>
+    <!-- %1$s = the action (e.g. Tap “Send” in WhatsApp); on the next line, %2$s = what it would send, or why Buddy asks. -->
+    <string name="tools_card_detail">%1$s：\n%2$s</string>
+    <!-- Quotation marks around text on the card (a draft message, a reason). Use your language's quotation marks. -->
+    <string name="tools_card_quote">“%1$s”</string>
+    <!-- In an app set to Smart, when neither Claude Code nor Codex is signed in to review the tap. -->
+    <string name="tools_card_no_reviewer">没有已登录的审核者，因此由 Buddy 询问你。</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_block">%1$s 建议不要这样做：%2$s</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_ask">%1$s 建议询问你：%2$s</string>
+
+    <!-- Status line in the bubble while the agent works. -->
+    <!-- The smart reviewer is checking a tap. -->
+    <string name="tools_status_checking_tap">正在检查此次点按…</string>
+    <!-- Android's installer is open. Install is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_install">点按“安装”，然后确认</string>
+    <!-- Android's installer is open. Update is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_update">点按“更新”，然后确认</string>
+    <!-- An app the agent opened the installer for is now installed (adjective). -->
+    <string name="tools_status_installed">已安装</string>
+    <!-- Downloading Buddy's update. %1$s = version number, e.g. 2.1.13 -->
+    <string name="tools_status_downloading">正在下载 Buddy %1$s…</string>
+
+    <!-- Smart reviewer: its reason when it fails, shown on the approval card after “Claude says ask you:”, so it starts lowercase.
+         %1$s = the technical reason (reviewer_no_answer, reviewer_timed_out, or an error in English). -->
+    <string name="reviewer_failed">审核者无法回答（%1$s）</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer's reply had no decision in it. -->
+    <string name="reviewer_no_answer">无回答</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer took too long. -->
+    <string name="reviewer_timed_out">超时</string>
+
+    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_linux_missing">Buddy 的 Linux 尚未安装。请打开“设置”进行设置。</string>
+
+    <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
+         speech-to-text and ChatGPT's voice (through Codex). Status lines show in the voice bar, errors as toasts. -->
+    <string name="dictation_claude_sign_in">请在“设置”中登录 Claude Code 以使用 Claude 语音。</string>
+    <string name="dictation_codex_sign_in">请在“设置”中登录 Codex 以使用 ChatGPT 语音。</string>
+    <!-- Status: voice input is starting. -->
+    <string name="dictation_starting">正在启动…</string>
+    <!-- Status: Claude Code, which does the voice input, is starting. -->
+    <string name="dictation_starting_claude">正在启动 Claude…</string>
+    <!-- Status: the recorded speech is being turned into text. -->
+    <string name="dictation_transcribing">正在转写…</string>
+    <!-- Voice input ended without any words recognized. -->
+    <string name="dictation_no_speech">没听清。</string>
+    <string name="dictation_mic_failed">无法打开麦克风。</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_claude_start_failed">Claude 语音无法启动：%1$s</string>
+    <string name="dictation_claude_no_start">Claude 语音未能启动。</string>
+    <!-- A reason after “Claude voice couldn't start:”. -->
+    <string name="dictation_claude_code_no_start">Claude Code 未能启动</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_chatgpt_start_failed">ChatGPT 语音无法启动：%1$s</string>
+    <!-- %1$s = how far it got, one of dictation_stage_* below. -->
+    <string name="dictation_chatgpt_no_connect">ChatGPT 语音未能连接（%1$s）。</string>
+    <!-- %1$s = what went wrong: dictation_connection_failed, or an error from ChatGPT (often in English). -->
+    <string name="dictation_chatgpt_error">ChatGPT 语音：%1$s</string>
+    <!-- After “ChatGPT voice:”, so it starts lowercase. -->
+    <string name="dictation_connection_failed">连接失败</string>
+    <!-- How far ChatGPT voice got, in the parentheses of dictation_chatgpt_no_connect, so lowercase. -->
+    <string name="dictation_stage_page">正在启动页面</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_codex">正在等待 Codex</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_call">正在发起通话</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_answer">正在等待 ChatGPT 应答</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_connecting">正在连接</string>
+    <!-- A reason after “ChatGPT voice couldn't start:”. -->
+    <string name="dictation_codex_no_start">Codex 未能启动</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = a technical request name, e.g. thread/start. -->
+    <string name="dictation_request_timed_out">%1$s 超时</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = the end of Codex's error log (technical, English), or dictation_no_details. -->
+    <string name="dictation_codex_stopped">Codex 已停止：%1$s</string>
+    <!-- After “Codex stopped:” when its log says nothing. -->
+    <string name="dictation_no_details">无详细信息</string>
+</resources>

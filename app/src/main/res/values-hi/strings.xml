@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Buddy's UI text in Hindi. English source: res/values/strings.xml. -->
+<resources>
+    <string name="service_label">Buddy असिस्टेंट</string>
+    <string name="service_description">Buddy चैट बबल दिखाता है और इस फ़ोन पर Buddy के अंदर चल रहे Claude Code या Codex को आपके लिए स्क्रीन पढ़ने, टैप करने, टाइप करने और स्क्रोल करने देता है. एजेंट खुद Anthropic या OpenAI को जो भेजता है, उसके अलावा कुछ भी फ़ोन से बाहर नहीं जाता.</string>
+
+    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
+
+    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
+    <string name="onboarding_skip_setup">सेटअप छोड़ें</string>
+    <string name="onboarding_skip_title">सेटअप गाइड छोड़ें?</string>
+    <string name="onboarding_skip_text">आप किसी भी समय सेटिंग में जाकर सेटअप पूरा कर सकते हैं. सेटअप पूरा होने तक चैट काम नहीं करेंगी.</string>
+    <string name="onboarding_skip_action">छोड़ें</string>
+    <string name="onboarding_progress">%2$d में से चरण %1$d</string>
+    <string name="onboarding_continue">जारी रखें</string>
+    <string name="onboarding_stuck">कहीं अटक गए?</string>
+
+    <!-- Guide, welcome screen. -->
+    <string name="onboarding_welcome_title">Buddy से मिलें</string>
+    <string name="onboarding_welcome_text">एक चैट बबल, जो आपके लिए आपका फ़ोन चला सकता है.</string>
+    <string name="onboarding_welcome_ask_title">आसान शब्दों में कहें</string>
+    <string name="onboarding_welcome_ask_text">“राहुल को जवाब दें कि मुझे देर हो जाएगी”, “मेरी बास्केट में दूध जोड़ें”.</string>
+    <string name="onboarding_welcome_plan_title">आपका अपना प्लान, API कुंजी की ज़रूरत नहीं</string>
+    <string name="onboarding_welcome_plan_text">आपकी Claude सदस्यता से Claude Code चलाता है. ChatGPT प्लान के साथ Codex भी काम करता है.</string>
+    <string name="onboarding_welcome_control_title">कंट्रोल आपके हाथ में</string>
+    <string name="onboarding_welcome_control_text">कुछ भी भेजने, पोस्ट करने, खरीदने या मिटाने से पहले हमेशा आपसे पूछा जाता है.</string>
+    <string name="onboarding_welcome_time">सेटअप में करीब 5 मिनट लगते हैं</string>
+    <string name="onboarding_get_started">शुरू करें</string>
+
+    <!-- Guide, step: choose the agent. -->
+    <string name="onboarding_brain_title">अपना एजेंट चुनें</string>
+    <string name="onboarding_brain_text">यही आपकी चैट के जवाब देगा. आप बाद में सेटिंग में दूसरे एजेंट भी जोड़ सकते हैं.</string>
+    <string name="onboarding_brain_claude">आपकी Claude सदस्यता (Pro या Max) इस्तेमाल करता है.</string>
+    <string name="onboarding_brain_codex">आपका ChatGPT प्लान इस्तेमाल करता है.</string>
+    <string name="onboarding_brain_opencode">मुफ़्त मॉडल, किसी खाते की ज़रूरत नहीं. अपने प्रोवाइडर बाद में जोड़ें.</string>
+    <string name="onboarding_brain_both">दोनों इंस्टॉल करें और हर चैट के लिए इनमें से एक चुनें. Claude Code डिफ़ॉल्ट रहेगा.</string>
+    <string name="onboarding_recommended">सुझाया गया</string>
+
+    <!-- Guide, step: turn on Buddy's accessibility service. -->
+    <string name="onboarding_access_title">Buddy को देखने और टैप करने दें</string>
+    <string name="onboarding_access_done">सुलभता सेवा चालू है.</string>
+    <string name="onboarding_access_text">Buddy की सुलभता सेवा बबल दिखाती है और एजेंट को स्क्रीन पढ़ने, टैप करने और टाइप करने देती है. ऐसा सिर्फ़ तब होता है, जब आप उससे कुछ करने को कहते हैं.</string>
+    <string name="onboarding_access_privacy">आपको जवाब देने के लिए %1$s जो कुछ %2$s को भेजता है, उसके अलावा कुछ भी फ़ोन से बाहर नहीं जाता. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले हमेशा आपकी मंज़ूरी ली जाती है.</string>
+    <string name="onboarding_access_privacy_both">आपको जवाब देने के लिए Claude Code और Codex जो कुछ Anthropic और OpenAI को भेजते हैं, उसके अलावा कुछ भी फ़ोन से बाहर नहीं जाता. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले हमेशा आपकी मंज़ूरी ली जाती है.</string>
+    <string name="onboarding_access_privacy_opencode">आपको जवाब देने के लिए %1$s जो कुछ मॉडल के प्रोवाइडर को भेजता है, उसके अलावा कुछ भी फ़ोन से बाहर नहीं जाता. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले हमेशा आपकी मंज़ूरी ली जाती है.</string>
+    <string name="onboarding_access_list_hint">सूची में: डाउनलोड किए गए ऐप्लिकेशन → Buddy असिस्टेंट → इसे चालू करें.</string>
+    <string name="onboarding_access_open">सुलभता सेटिंग खोलें</string>
+    <string name="onboarding_access_greyed_title">स्विच धूसर है?</string>
+    <string name="onboarding_access_greyed_text">Android, फ़ाइल से इंस्टॉल किए गए ऐप के लिए इसे ब्लॉक करता है. “ऐप्लिकेशन की जानकारी” (नीचे) पर टैप करें. इसके बाद सबसे ऊपर दाईं ओर ⋮ → “पाबंदी वाली सेटिंग को अनुमति दें” पर टैप करें और फिर से कोशिश करें.</string>
+    <string name="onboarding_access_restricted_steps">1. नीचे “ऐप्लिकेशन की जानकारी” पर टैप करें.\n2. सबसे ऊपर दाईं ओर ⋮ → “पाबंदी वाली सेटिंग को अनुमति दें” पर टैप करें.\n3. वापस आएं और सुलभता सेटिंग फिर से खोलें.</string>
+    <string name="onboarding_app_info">ऐप्लिकेशन की जानकारी</string>
+
+    <!-- Guide, step: install the agent inside Buddy and sign in. -->
+    <string name="onboarding_agents_title">इंस्टॉल करें और साइन इन करें</string>
+    <string name="onboarding_agents_done_title">तैयार है</string>
+    <string name="onboarding_agents_done">%1$s इंस्टॉल है और उसमें साइन इन हो चुका है.</string>
+    <string name="onboarding_agents_done_both">Claude Code और Codex इंस्टॉल हैं और दोनों में साइन इन हो चुका है.</string>
+    <string name="onboarding_agents_text">Buddy, ऐप के अंदर ही %1$s इंस्टॉल करता है. इसके बाद आपको सिर्फ़ एक बार साइन इन करना होगा. Termux की ज़रूरत नहीं.</string>
+    <string name="onboarding_agent_names_both">Claude Code और Codex</string>
+    <string name="onboarding_agent_ready">तैयार · %1$s</string>
+    <string name="onboarding_agent_free_models">मुफ़्त मॉडल</string>
+    <string name="onboarding_agent_signed_in">साइन इन है</string>
+    <string name="onboarding_agent_signed_in_as">साइन इन है · %1$s</string>
+    <string name="onboarding_agent_installing">इंस्टॉल हो रहा है…</string>
+    <string name="onboarding_agent_installed">इंस्टॉल है · साइन इन नहीं है</string>
+    <string name="onboarding_agent_not_installed">इंस्टॉल नहीं है</string>
+    <string name="onboarding_agent_sign_in_claude">अपने Claude खाते से साइन इन करें. आपका ब्राउज़र खुलेगा; Authorize पर टैप करें और Buddy अपने-आप वापस आ जाएगा.</string>
+    <string name="onboarding_agent_checking_opencode">OpenCode की जांच की जा रही है…</string>
+    <string name="onboarding_agent_sign_in_codex">ब्राउज़र में अपने ChatGPT खाते से साइन इन करें, फिर वापस आएं.</string>
+    <string name="onboarding_agent_download_claude">एक बार करीब 235 एमबी डाउनलोड होगा (Buddy का Linux और Anthropic से Claude Code).</string>
+    <string name="onboarding_agent_download_opencode">एक बार करीब 230 एमबी डाउनलोड होगा (Buddy का Linux, Node.js और OpenCode). किसी खाते की ज़रूरत नहीं.</string>
+    <string name="onboarding_agent_download_codex">एक बार करीब 150 एमबी डाउनलोड होगा (Buddy का Linux, Node.js और OpenAI से Codex).</string>
+    <string name="onboarding_sign_in_claude">Claude से साइन इन करें</string>
+    <string name="onboarding_sign_in_chatgpt">ChatGPT से साइन इन करें</string>
+    <string name="onboarding_install_agent">%1$s इंस्टॉल करें</string>
+    <string name="onboarding_agents_wifi">हो सके तो वाई-फ़ाई इस्तेमाल करें. इंस्टॉल होने के दौरान आप यह स्क्रीन छोड़ सकते हैं.</string>
+    <string name="onboarding_stuck_sign_in_q">साइन इन के बाद Buddy पर वापस नहीं आए?</string>
+    <string name="onboarding_stuck_sign_in_a">Claude के लिए: Claude पेज पर Copy Code पर टैप करें, फिर Buddy पर वापस आएं; वह क्लिपबोर्ड से कोड ले लेगा.</string>
+    <string name="onboarding_stuck_install_q">इंस्टॉल नहीं हुआ?</string>
+    <string name="onboarding_stuck_install_a">अपना इंटरनेट कनेक्शन देखें और “इंस्टॉल करें” पर फिर से टैप करें; इंस्टॉल वहीं से आगे बढ़ेगा, जहां रुका था.</string>
+
+    <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
+    <string name="onboarding_background_title">Buddy को चालू रखें</string>
+    <string name="onboarding_background_done">Buddy बैकग्राउंड में चल सकता है.</string>
+    <string name="onboarding_background_text">ताकि एजेंट के काम करते समय, बैटरी बचाने के लिए आपका फ़ोन Buddy को बंद न कर दे.</string>
+    <string name="onboarding_allow">अनुमति दें</string>
+    <string name="onboarding_skip_for_now">अभी के लिए छोड़ें</string>
+
+    <!-- Guide, step: how much the agent asks before acting. -->
+    <string name="onboarding_safety_title">एजेंट आपसे कितना पूछे?</string>
+    <string name="onboarding_safety_text">मैसेज, सोशल मीडिया, शॉपिंग, पेमेंट और बैंकिंग ऐप में, Buddy के कुछ भेजने, पोस्ट करने, खरीदने या मिटाने से पहले हमेशा आपकी मंज़ूरी ज़रूरी होती है. आपके दूसरे ऐप के लिए:</string>
+    <string name="onboarding_safety_ask_title">पहले मुझसे पूछें</string>
+    <string name="onboarding_safety_ask_text">एजेंट कोई भी जोखिम वाला काम करने से पहले पूछता है, जैसे कोई सेटिंग बदलना. ज़्यादा सुरक्षित, लेकिन पॉप-अप भी ज़्यादा.</string>
+    <string name="onboarding_safety_auto_title">खुद काम करे</string>
+    <string name="onboarding_safety_auto_text">कोई पॉप-अप नहीं: एजेंट बस वही करता है जो आपने कहा है, जैसे कैमरा या लाइट चालू करना.</string>
+    <string name="onboarding_safety_note">आप इसे किसी भी समय हर ऐप के लिए बदल सकते हैं: सेटिंग → ऐप अनुमतियां. किसी ऐप को “भरोसा” पर सेट करें, ताकि एजेंट वहां बिना पॉप-अप के काम करे. या “सख़्त” पर सेट करें, ताकि Buddy खुद आपसे पूछे.</string>
+
+    <!-- Guide, last step: try a first task. -->
+    <string name="onboarding_try_title">आप पूरी तरह तैयार हैं</string>
+    <string name="onboarding_try_text">पहला टास्क आज़माएं. Buddy सेटिंग खोलेगा और आपके लिए उसे पढ़ेगा.</string>
+    <string name="onboarding_try_prompt">सेटिंग खोलें और मुझे मेरा Android वर्शन बताएं</string>
+    <string name="onboarding_try_prompt_quoted">“%1$s”</string>
+    <string name="onboarding_try_tip">सलाह: बबल दूसरे ऐप के ऊपर तैरता रहता है. इसे छिपाने के लिए ✕ पर खींचें.</string>
+    <string name="onboarding_try_now">अभी आज़माएं</string>
+    <string name="onboarding_go_to_chats">मेरी चैट पर जाएं</string>
+
+    <!-- Home screen: the chat list. -->
+    <string name="main_new_chat">नई चैट</string>
+    <string name="main_status_ready">तैयार · %1$s</string>
+    <string name="main_status_setup">सेटअप %1$d/%2$d</string>
+    <string name="main_setup_title">चैट चलाने के लिए सेटअप पूरा करें</string>
+    <string name="main_setup_next">अगला: %1$s</string>
+    <string name="main_setup_next_accessibility">अगला: Buddy की सुलभता सेवा खोलें</string>
+    <string name="main_section_working">काम जारी</string>
+    <string name="main_section_recent">हाल ही में</string>
+    <string name="main_empty_title">अभी कोई चैट नहीं है</string>
+    <string name="main_empty_text">Claude Code या Codex के साथ चैट शुरू करने के लिए “नई चैट” पर टैप करें. किसी चैट को मिटाने के लिए उसे दबाकर रखें.</string>
+    <string name="main_chat_working">काम जारी है…</string>
+    <string name="main_chat_last_you">आप: %1$s</string>
+    <string name="main_delete_title">यह चैट मिटाएं?</string>
+    <string name="main_delete_action">मिटाएं</string>
+    <string name="main_new_chat_default">डिफ़ॉल्ट</string>
+    <string name="main_new_chat_not_signed_in">साइन इन नहीं है · सेट अप करने के लिए टैप करें</string>
+    <string name="main_new_chat_not_installed">इंस्टॉल नहीं है · सेट अप करने के लिए टैप करें</string>
+    <string name="main_ago_now">अभी</string>
+    <plurals name="main_ago_minutes">
+        <item quantity="one">%1$d मि॰</item>
+        <item quantity="other">%1$d मि॰</item>
+    </plurals>
+    <plurals name="main_ago_hours">
+        <item quantity="one">%1$d घं॰</item>
+        <item quantity="other">%1$d घं॰</item>
+    </plurals>
+    <plurals name="main_ago_days">
+        <item quantity="one">%1$d दिन</item>
+        <item quantity="other">%1$d दिन</item>
+    </plurals>
+
+    <!-- Notification shown after the bubble is dragged away to hide it. -->
+    <string name="notice_channel_name">छिपा हुआ बबल</string>
+    <string name="notice_hidden_title">Buddy छिपा हुआ है</string>
+    <string name="notice_hidden_text">बबल को फिर से दिखाने के लिए टैप करें.</string>
+    <string name="notice_open_chats">चैट खोलें</string>
+
+    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
+    <string name="update_channel_name">Buddy के अपडेट</string>
+    <string name="update_available_title">Buddy %1$s उपलब्ध है</string>
+    <string name="update_notification_text">आपके पास %1$s है. नया क्या है, यह देखने और अपडेट करने के लिए टैप करें; आपकी चैट बनी रहेंगी.</string>
+    <string name="update_action">अपडेट करें</string>
+    <string name="update_mute">सूचना न दें</string>
+    <string name="update_muted">अब अपडेट की सूचनाएं नहीं मिलेंगी. इन्हें सेटिंग में फिर से चालू करें.</string>
+    <string name="update_checking">अपडेट की जांच की जा रही है…</string>
+    <string name="update_check_failed">GitHub से कनेक्ट नहीं हो सका. बाद में फिर से कोशिश करें.</string>
+    <string name="update_up_to_date">Buddy %1$s अप-टू-डेट है.</string>
+    <string name="update_sheet_text">आपके पास %1$s है. अपडेट करने पर आपकी चैट, सेटिंग और साइन-इन बने रहते हैं.</string>
+    <string name="update_later">बाद में</string>
+    <string name="update_downloading">डाउनलोड हो रहा है…</string>
+    <string name="update_needs_permission">Buddy को ऐप इंस्टॉल करने की अनुमति दें, फिर “अपडेट करें” पर दोबारा टैप करें.</string>
+    <string name="update_error_no_apk">इस रिलीज़ में अभी buddy.apk नहीं है.</string>
+    <string name="update_error_download">डाउनलोड नहीं हो सका (%1$s).</string>
+    <string name="update_error_not_newer">डाउनलोड की गई फ़ाइल Buddy का नया वर्शन नहीं है, इसलिए उसे नहीं खोला गया.</string>
+    <string name="update_failed_manual">%1$s आप इसे %2$s (buddy.apk) से भी पा सकते हैं या अपने-आप अपडेट पाने के लिए Obtainium का इस्तेमाल कर सकते हैं (%3$s देखें).</string>
+
+    <!-- Settings, Appearance: option names. -->
+    <string name="prefs_theme_system">सिस्टम</string>
+    <string name="prefs_theme_light">लाइट</string>
+    <string name="prefs_theme_dark">डार्क</string>
+    <string name="prefs_surface_warm">गर्म</string>
+    <string name="prefs_surface_neutral">न्यूट्रल</string>
+    <string name="prefs_surface_black">काला</string>
+    <string name="prefs_accent_coral">कोरल</string>
+    <string name="prefs_accent_ocean">समुद्री नीला</string>
+    <string name="prefs_accent_mint">मिंट</string>
+    <string name="prefs_accent_violet">बैंगनी</string>
+    <string name="prefs_accent_rose">गुलाबी</string>
+    <string name="prefs_accent_amber">एम्बर</string>
+
+    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
+
+    <!-- Floating bubble, read by TalkBack. -->
+    <string name="bubble_face_description">Buddy. खोलने के लिए टैप करें, कार्रवाइयों के लिए दबाकर रखें</string>
+    <string name="bubble_show_actions">कार्रवाइयां दिखाएं</string>
+
+    <!-- Status pill beside the bubble: at most two lines, about 250dp wide. -->
+    <string name="bubble_pill_waiting_answer">आपके जवाब का इंतज़ार है</string>
+    <string name="bubble_pill_waiting_approval">आपकी मंज़ूरी का इंतज़ार है</string>
+    <string name="bubble_pill_paused">पॉज़ है · फिर शुरू करने के लिए बबल को दबाकर रखें</string>
+    <string name="bubble_using_phone">आपका फ़ोन इस्तेमाल कर रहा है</string>
+    <string name="bubble_using_phone_status">आपका फ़ोन इस्तेमाल कर रहा है · %1$s</string>
+    <string name="bubble_pill_hold_hint">रोकने और दूसरे विकल्पों के लिए बबल को दबाकर रखें</string>
+    <string name="bubble_pill_status_hold_hint">%1$s · रोकने और दूसरे विकल्पों के लिए बबल को दबाकर रखें</string>
+
+    <!-- Hold menu: actions fanned out around the bubble while it is held (about 12 characters). -->
+    <string name="menu_stop_task">टास्क रोकें</string>
+    <string name="menu_resume">फिर शुरू करें</string>
+    <string name="menu_pause">पॉज़ करें</string>
+    <string name="menu_add_instruction">निर्देश जोड़ें</string>
+    <string name="menu_stop_voice">आवाज़ रोकें</string>
+    <string name="bubble_talk">बोलें</string>
+    <string name="menu_open_chat">चैट खोलें</string>
+    <string name="menu_hide">छिपाएं</string>
+
+    <!-- Hold-menu preview: the first few times a task starts, three actions peek out of the bubble for a moment. -->
+    <string name="menu_peek_stop">रोकें</string>
+    <string name="menu_peek_add">जोड़ें</string>
+    <string name="menu_peek_voice">आवाज़</string>
+    <string name="menu_peek_hint">दबाकर रखें</string>
+
+    <!-- Toasts from the bubble. -->
+    <string name="bubble_tip_stop_voice">सलाह: आवाज़ रोकने के लिए बबल को दबाकर रखें</string>
+    <string name="bubble_tip_hold_menu">सलाह: पॉज़ करने, रोकने या निर्देश जोड़ने के लिए बबल को दबाकर रखें</string>
+    <string name="bubble_stopping">रोका जा रहा है…</string>
+    <string name="bubble_nothing_running">Buddy की चैट में अभी कुछ नहीं चल रहा है.</string>
+    <string name="bubble_nothing_running_chat">इस चैट में अभी कुछ नहीं चल रहा है.</string>
+    <string name="bubble_allow_mic_tap_mic">Buddy में माइक्रोफ़ोन की अनुमति दें, फिर माइक पर दोबारा टैप करें.</string>
+    <string name="bubble_allow_mic_tap_bubble">Buddy में माइक्रोफ़ोन की अनुमति दें, फिर बबल पर दोबारा टैप करें.</string>
+    <string name="bubble_note_added">समझ गया: %1$s इसका ध्यान रखेगा</string>
+    <string name="bubble_copied">कॉपी किया गया</string>
+
+    <!-- Voice input, shown in the status pill beside the bubble. -->
+    <string name="bubble_listening">सुन रहा है…</string>
+    <string name="bubble_listening_tap_done">सुन रहा है… बोलने के बाद बबल पर टैप करें</string>
+    <string name="bubble_heard">“%1$s”</string>
+
+    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
+    <string name="bubble_new_chat">नई चैट</string>
+    <string name="bubble_open_in_app">ऐप में खोलें</string>
+    <string name="bubble_close">बंद करें</string>
+    <string name="bubble_chats_title">चैट</string>
+    <string name="bubble_model_effort_title">मॉडल और प्रयास</string>
+    <string name="bubble_summary_dev">%1$s · डेवलपर</string>
+
+    <!-- Strip at the top of the chat panel while the agent works. -->
+    <string name="bubble_working">काम जारी है…</string>
+    <string name="bubble_stop">रोकें</string>
+
+    <!-- Composer at the bottom of the chat panel. -->
+    <string name="bubble_attach">फ़ोटो या फ़ाइल अटैच करें</string>
+    <string name="bubble_input_hint">%1$s से पूछें…</string>
+    <string name="bubble_paste">चिपकाएं</string>
+    <string name="bubble_send">भेजें</string>
+    <string name="bubble_empty_chat">नई %1$s चैट. अपने फ़ोन पर कोई भी काम करवाने के लिए मुझसे कहें.</string>
+    <plurals name="bubble_tool_calls">
+        <item quantity="one">%1$d टूल कॉल</item>
+        <item quantity="other">%1$d टूल कॉल</item>
+    </plurals>
+
+    <!-- List of chats in the panel. -->
+    <string name="bubble_chat_row_working">काम जारी है…</string>
+    <string name="bubble_chat_row_you">आप: %1$s</string>
+    <string name="bubble_delete_chat">यह चैट मिटाएं?</string>
+    <string name="bubble_delete">मिटाएं</string>
+
+    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
+    <string name="bubble_agent_default">डिफ़ॉल्ट</string>
+    <string name="bubble_agent_not_signed_in">साइन इन नहीं है · सेट अप करने के लिए टैप करें</string>
+    <string name="bubble_agent_not_installed">इंस्टॉल नहीं है · सेट अप करने के लिए टैप करें</string>
+
+    <!-- Model and effort picker for the current chat. -->
+    <string name="bubble_model_note">सिर्फ़ इस चैट के लिए. बातचीत जारी रहती है; अगले मैसेज से नया विकल्प इस्तेमाल होगा.</string>
+    <string name="bubble_effort">प्रयास का स्तर</string>
+    <string name="bubble_effort_note">“ऑटो” में एजेंट खुद तय करता है. ऊंचे स्तर ज़्यादा देर सोचते हैं और आपके प्लान का ज़्यादा हिस्सा इस्तेमाल करते हैं.</string>
+    <string name="bubble_model">मॉडल</string>
+
+    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
+    <string name="card_label_approval">आपकी मंज़ूरी चाहिए</string>
+    <string name="card_label_question">सवाल</string>
+    <string name="card_label_other_session">%1$s · दूसरे सेशन से</string>
+    <string name="card_deny">मना करें</string>
+    <string name="card_change">बदलें</string>
+    <string name="card_approve">मंज़ूर करें</string>
+    <string name="card_skip">छोड़ें</string>
+    <string name="card_type_own_answer">अपना जवाब लिखें…</string>
+    <string name="card_change_hint">क्या बदलना है?</string>
+    <string name="card_answer_hint">आपका जवाब…</string>
+
+    <!-- Notes posted into the chat after the user answers a card. -->
+    <string name="card_note_answered">✓ जवाब दिया: %1$s</string>
+    <string name="card_note_change_requested">✎ बदलाव का अनुरोध: %1$s</string>
+    <string name="card_note_approved">✓ मंज़ूर किया: %1$s</string>
+    <string name="card_note_denied">✗ मना किया</string>
+    <string name="card_note_skipped">सवाल छोड़ा गया</string>
+
+    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
+    <string name="control_channel_name">Buddy आपका फ़ोन इस्तेमाल कर रहा है</string>
+    <string name="control_channel_description">जब कोई एजेंट फ़ोन चलाता है, तब स्टेटस बार में दिखती है.</string>
+    <string name="control_title">Buddy आपका फ़ोन इस्तेमाल कर रहा है</string>
+    <string name="control_text">काम पूरा होने तक स्क्रीन को न छुएं, या कंट्रोल वापस लेने के लिए “रोकें” पर टैप करें.</string>
+    <string name="control_stop">रोकें</string>
+
+    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
+
+    <!-- Chat screen: app bar -->
+    <string name="chat_back">वापस जाएं</string>
+    <string name="chat_read_aloud">जवाब पढ़कर सुनाएं</string>
+    <string name="chat_read_aloud_on">जवाब पढ़कर सुनाए जाएंगे</string>
+    <string name="chat_read_aloud_off">जवाब पढ़कर नहीं सुनाए जाएंगे</string>
+    <string name="chat_chip_dev">%1$s · डेवलपर</string>
+
+    <!-- Chat screen: the strip shown while the agent works -->
+    <string name="chat_stop">रोकें</string>
+    <string name="chat_working">काम जारी है…</string>
+
+    <!-- Chat screen: composer and empty chat -->
+    <string name="chat_attach_description">फ़ोटो या फ़ाइल अटैच करें</string>
+    <string name="chat_input_hint">%1$s से पूछें…</string>
+    <string name="chat_input_hint_running">काम के दौरान कोई निर्देश जोड़ें…</string>
+    <string name="chat_talk">बोलें</string>
+    <string name="chat_send">भेजें</string>
+    <string name="chat_empty_hint">नई %1$s चैट. अपने फ़ोन पर कोई भी काम करवाने के लिए इससे कहें.</string>
+    <string name="chat_empty_hint_dev">नई %1$s चैट. अपने फ़ोन पर कोई काम करवाने या कोई ऐप बनवाने के लिए इससे कहें (डेवलपर मोड चालू है).</string>
+
+    <!-- Model sheet (tap the model chip under the chat title) -->
+    <string name="chat_model_title">%1$s मॉडल</string>
+    <string name="chat_model_subtitle">सिर्फ़ इस चैट के लिए. बातचीत नए मॉडल के साथ जारी रहती है.</string>
+    <string name="chat_effort">प्रयास का स्तर</string>
+    <string name="chat_effort_help">“ऑटो” में एजेंट खुद तय करता है. ऊंचे स्तर ज़्यादा देर सोचते हैं और आपके प्लान का ज़्यादा हिस्सा इस्तेमाल करते हैं.</string>
+    <string name="chat_model">मॉडल</string>
+    <string name="chat_model_other_hint">कोई और… जैसे %1$s</string>
+    <string name="chat_model_use">इस्तेमाल करें</string>
+
+    <!-- Language sheet (long-press the mic) -->
+    <string name="chat_speak_in">बोलने की भाषा</string>
+    <string name="chat_speak_in_help">सेटिंग → आवाज़ में अपनी भाषाएं चुनें.</string>
+    <string name="chat_phone_voice">फ़ोन की आवाज़</string>
+
+    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
+    <string name="chat_card_question">सवाल</string>
+    <string name="chat_card_needs_ok">आपकी मंज़ूरी चाहिए</string>
+    <string name="chat_deny">मना करें</string>
+    <string name="chat_change">बदलें</string>
+    <string name="chat_approve">मंज़ूर करें</string>
+    <string name="chat_skip">छोड़ें</string>
+    <string name="chat_type_own_answer">अपना जवाब लिखें</string>
+    <string name="chat_answer_hint">आपका जवाब</string>
+    <string name="chat_change_hint">क्या बदलना है?</string>
+    <string name="chat_send_answer">जवाब भेजें</string>
+    <string name="chat_send_change">बदलाव भेजें</string>
+
+    <!-- Attachments -->
+    <string name="chat_attach">अटैच करें</string>
+    <string name="chat_attach_camera">फ़ोटो लें</string>
+    <string name="chat_attach_camera_sub">कैमरे का इस्तेमाल करें</string>
+    <string name="chat_attach_photos">फ़ोटो</string>
+    <string name="chat_attach_photos_sub">अपनी गैलरी से चुनें</string>
+    <string name="chat_attach_files">फ़ाइलें</string>
+    <string name="chat_attach_files_sub">PDF, दस्तावेज़ या 25 एमबी तक की कोई भी फ़ाइल</string>
+    <string name="chat_no_app_for_action">इस फ़ोन पर कोई भी ऐप यह काम नहीं कर सकता.</string>
+    <string name="chat_adding">जोड़ा जा रहा है…</string>
+    <plurals name="chat_adding_files">
+        <item quantity="one">%1$d फ़ाइल जोड़ी जा रही है…</item>
+        <item quantity="other">%1$d फ़ाइलें जोड़ी जा रही हैं…</item>
+    </plurals>
+    <string name="chat_attachment_remove">हटाएं</string>
+    <string name="chat_no_app_for_file">कोई भी ऐप %1$s को नहीं खोल सकता.</string>
+
+    <!-- Chat messages -->
+    <string name="chat_copied">कॉपी किया गया</string>
+    <plurals name="chat_tool_calls">
+        <item quantity="one">%1$d टूल कॉल</item>
+        <item quantity="other">%1$d टूल कॉल</item>
+    </plurals>
+
+    <!-- Notes Buddy posts into a chat, and the chat's status line -->
+    <string name="hub_continuing">पिछला %1$s सेशन जारी रखा जा रहा है. अगर यह अब भी किसी टर्मिनल में खुला है, तो पहले उसे वहां बंद करें.</string>
+    <string name="hub_still_working_attachments">यह चैट अभी काम कर रही है. काम पूरा होने पर अटैचमेंट भेजें.</string>
+    <string name="hub_thinking">सोच रहा है…</string>
+    <string name="hub_still_waiting">मॉडल के जवाब का अब भी इंतज़ार है…</string>
+    <string name="hub_no_answer">मॉडल ने जवाब नहीं दिया. हो सकता है वह व्यस्त हो: फिर से कोशिश करें या चैट में सबसे ऊपर से कोई दूसरा मॉडल चुनें.</string>
+    <string name="hub_model_set">मॉडल: %1$s</string>
+    <string name="hub_effort_set">प्रयास: %1$s</string>
+    <string name="hub_effort_default">प्रयास: डिफ़ॉल्ट</string>
+    <string name="hub_stopping">रोका जा रहा है…</string>
+    <string name="hub_stopped">रोक दिया गया.</string>
+    <string name="hub_agent_stopped">%1$s रुक गया.</string>
+    <string name="hub_something_wrong">कोई गड़बड़ी हुई.</string>
+    <string name="hub_note_added">काम के दौरान जोड़ा गया: %1$s को यह अगले चरण में मिलेगा</string>
+    <string name="hub_note_passed">आपने जो जोड़ा था, वह आगे भेज दिया गया</string>
+    <plurals name="hub_pill_chats">
+        <item quantity="one">%1$d चैट · %2$s</item>
+        <item quantity="other">%1$d चैट · %2$s</item>
+    </plurals>
+
+    <!-- The agent's steps, one line each, shown in the chat and the bubble while it works. -->
+    <string name="hub_tool_read_screen">स्क्रीन पढ़ रहा है</string>
+    <string name="hub_tool_screenshot">स्क्रीनशॉट ले रहा है</string>
+    <string name="hub_tool_tap_element">एलिमेंट %1$d पर टैप कर रहा है</string>
+    <string name="hub_tool_tap_point">%1$d,%2$d पर टैप कर रहा है</string>
+    <string name="hub_tool_long_press">दबाकर रख रहा है</string>
+    <string name="hub_tool_type">“%1$s” टाइप कर रहा है</string>
+    <string name="hub_tool_scroll_up">ऊपर स्क्रोल कर रहा है</string>
+    <string name="hub_tool_scroll_down">नीचे स्क्रोल कर रहा है</string>
+    <string name="hub_tool_scroll_left">बाईं ओर स्क्रोल कर रहा है</string>
+    <string name="hub_tool_scroll_right">दाईं ओर स्क्रोल कर रहा है</string>
+    <string name="hub_tool_scroll">स्क्रोल कर रहा है: %1$s</string>
+    <string name="hub_tool_swipe">स्वाइप कर रहा है</string>
+    <string name="hub_tool_press_back">वापस जाएं बटन दबा रहा है</string>
+    <string name="hub_tool_press_home">होम बटन दबा रहा है</string>
+    <string name="hub_tool_press_recents">हाल ही के ऐप वाला बटन दबा रहा है</string>
+    <string name="hub_tool_press_notifications">सूचनाएं खोल रहा है</string>
+    <string name="hub_tool_press_quick_settings">फटाफट सेटिंग खोल रहा है</string>
+    <string name="hub_tool_press">%1$s दबा रहा है</string>
+    <string name="hub_tool_open_app">%1$s खोल रहा है</string>
+    <string name="hub_tool_open_url">%1$s खोल रहा है</string>
+    <string name="hub_tool_list_apps">ऐप की सूची देख रहा है</string>
+    <string name="hub_tool_approved">✓ मंज़ूर किया: %1$s</string>
+    <string name="hub_tool_change_requested">✎ बदलाव का अनुरोध किया</string>
+    <string name="hub_tool_change_requested_text">✎ बदलाव का अनुरोध: %1$s</string>
+    <string name="hub_tool_denied">✗ मना किया</string>
+    <string name="hub_tool_asking_approval">आपकी मंज़ूरी मांग रहा है</string>
+    <string name="hub_tool_answered">✓ जवाब दिया</string>
+    <string name="hub_tool_answered_text">✓ जवाब दिया: %1$s</string>
+    <string name="hub_tool_question_skipped">सवाल छोड़ा गया</string>
+    <string name="hub_tool_asking">पूछ रहा है: %1$s</string>
+    <string name="hub_tool_update_download">Buddy का अपडेट डाउनलोड कर रहा है</string>
+    <string name="hub_tool_update_check">Buddy के अपडेट की जांच कर रहा है</string>
+    <string name="hub_tool_web_search">वेब पर खोज रहा है: %1$s</string>
+    <string name="hub_tool_web_fetch">%1$s पढ़ रहा है</string>
+    <string name="hub_tool_command">चला रहा है: %1$s</string>
+    <string name="hub_tool_command_any">कमांड चला रहा है</string>
+    <string name="hub_tool_edit">%1$s में बदलाव कर रहा है</string>
+    <string name="hub_tool_edit_any">फ़ाइलों में बदलाव कर रहा है</string>
+    <string name="hub_tool_read_file">%1$s पढ़ रहा है</string>
+    <string name="hub_tool_other">%1$s इस्तेमाल कर रहा है</string>
+
+    <!-- Transcript of an earlier agent session that isn't a Buddy chat (read-only) -->
+    <string name="transcript_loading">लोड हो रहा है…</string>
+    <string name="transcript_continue">Buddy में जारी रखें</string>
+    <string name="transcript_empty">इस सेशन में पढ़ने लायक कोई मैसेज नहीं है.</string>
+    <plurals name="transcript_last_messages">
+        <item quantity="one">आखिरी %1$d मैसेज · सिर्फ़ पढ़ने के लिए</item>
+        <item quantity="other">आखिरी %1$d मैसेज · सिर्फ़ पढ़ने के लिए</item>
+    </plurals>
+
+    <!-- Shared screens: links -->
+    <string name="ui_no_app_for_link">कोई भी ऐप यह लिंक नहीं खोल सकता</string>
+
+    <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
+    <string name="ui_a11y_title">Buddy सुलभता सेवा का इस्तेमाल कैसे करता है</string>
+    <string name="ui_a11y_what">Buddy, Android की सुलभता सेवा का इस्तेमाल करके दूसरे ऐप में वह काम करता है जो आप कहते हैं: यह स्क्रीन पर दिख रही चीज़ें पढ़ता है और आपके लिए टैप, टाइप और स्क्रोल करता है. यह तैरता हुआ बबल भी दिखाता है.</string>
+    <string name="ui_a11y_data">टास्क चलने के दौरान, स्क्रीन का कॉन्टेंट आपके चुने गए एजेंट की एआई सेवा को भेजा जाता है (Claude Code के लिए Anthropic, Codex के लिए OpenAI या आपके OpenCode मॉडल का प्रोवाइडर). इसमें मैसेज, नाम या पते जैसी निजी जानकारी हो सकती है. इसे सिर्फ़ आपका अनुरोध पूरा करने के लिए भेजा जाता है.</string>
+    <string name="ui_a11y_no_servers">Buddy के अपने कोई सर्वर नहीं हैं. यह इस डेटा को न तो इकट्ठा करता है, न बेचता है और न ही शेयर करता है. साथ ही, यह इसका इस्तेमाल विज्ञापनों के लिए भी नहीं करता.</string>
+    <string name="ui_a11y_asks">कुछ भी भेजने, पोस्ट करने, खरीदने या मिटाने से पहले Buddy आपकी मंज़ूरी लेता है. आप Android की सुलभता सेटिंग में जाकर किसी भी समय यह सेवा बंद कर सकते हैं.</string>
+    <string name="ui_privacy_policy">निजता नीति</string>
+    <string name="ui_no_thanks">रहने दें</string>
+    <string name="ui_agree_continue">सहमति दें और जारी रखें</string>
+
+    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
+    <string name="ui_nav_chats">चैट</string>
+    <string name="ui_nav_sessions">सेशन</string>
+    <string name="ui_nav_settings">सेटिंग</string>
+
+    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
+    <string name="service_pause_expired">5 मिनट तक पॉज़ रहने की वजह से Buddy ने टास्क रोक दिया.</string>
+    <string name="service_stopped_toast">रोक दिया गया. आपका फ़ोन अब फिर से आपके हाथ में है.</string>
+    <string name="service_paused_note">पॉज़ किया गया: जब तक आप फिर से शुरू नहीं करते, फ़ोन आपके हाथ में है</string>
+    <string name="service_paused_toast">पॉज़ किया गया. अपना फ़ोन इस्तेमाल करें, फिर दोबारा शुरू करने के लिए बबल को दबाकर रखें.</string>
+    <string name="service_resumed_note">फिर से शुरू किया गया</string>
+
+    <!-- Voice input and output -->
+    <string name="voice_mic_needed">Buddy को माइक्रोफ़ोन की ज़रूरत है. अनुमति देने के लिए Buddy ऐप खोलें और एक बार 🎙 पर टैप करें.</string>
+    <string name="voice_no_recognizer">इस फ़ोन पर बोली पहचानने की कोई सेवा नहीं है.</string>
+    <string name="voice_starting">शुरू हो रहा है…</string>
+    <string name="voice_finishing">पूरा हो रहा है…</string>
+    <string name="voice_didnt_catch">समझ नहीं आया.</string>
+    <string name="voice_error">बोली पहचानने में गड़बड़ी हुई (%1$d).</string>
+    <string name="voice_code_omitted">कोड छोड़ दिया गया.</string>
+    <string name="voice_link">लिंक</string>
+    <string name="voice_stop_and_send">रोकें और भेजें</string>
+
+    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
+
+    <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). -->
+    <string name="signin_back">वापस जाएं</string>
+    <string name="signin_checking">जांच की जा रही है…</string>
+
+    <!-- Sign-in screen: the agent isn't installed yet. -->
+    <string name="signin_install">%1$s इंस्टॉल करें</string>
+    <string name="signin_install_sub_claude">आपकी Claude सदस्यता पर, Buddy के अंदर Claude Code चलाता है.</string>
+    <string name="signin_install_sub_opencode">Buddy के अंदर OpenCode चलाता है. इसके मुफ़्त मॉडल तुरंत काम करते हैं, किसी खाते की ज़रूरत नहीं; अपने प्रोवाइडर (Anthropic, OpenAI, GitHub Copilot…) कभी भी जोड़ें.</string>
+    <string name="signin_install_sub_codex">आपके ChatGPT प्लान पर, Buddy के अंदर Codex चलाता है.</string>
+    <string name="signin_install_size_claude">एक बार करीब 235 एमबी डाउनलोड होगा: Buddy का Linux और Anthropic से Claude Code. हो सके तो वाई-फ़ाई इस्तेमाल करें.</string>
+    <string name="signin_install_size_opencode">एक बार करीब 230 एमबी डाउनलोड होगा: Buddy का Linux, Node.js और OpenCode. हो सके तो वाई-फ़ाई इस्तेमाल करें.</string>
+    <string name="signin_install_size_codex">एक बार करीब 150 एमबी डाउनलोड होगा: Buddy का Linux, Node.js और OpenAI से Codex. हो सके तो वाई-फ़ाई इस्तेमाल करें.</string>
+
+    <!-- Sign-in screen: install or update in progress (screen titles). -->
+    <string name="signin_installing">इंस्टॉल हो रहा है</string>
+    <string name="signin_updating">अपडेट हो रहा है</string>
+    <string name="signin_install_wait">इसमें कुछ मिनट लगते हैं. आप यह स्क्रीन छोड़ सकते हैं; काम चलता रहेगा.</string>
+
+    <!-- Sign-in screen: installed, not signed in. -->
+    <string name="signin_title_claude">Claude में साइन इन करें</string>
+    <string name="signin_title_chatgpt">ChatGPT में साइन इन करें</string>
+    <string name="signin_sub_claude">अपने Claude खाते (Pro या Max) का इस्तेमाल करें. आपका ब्राउज़र खुलेगा; वहां मंज़ूरी दें और Buddy अपने-आप वापस आ जाएगा.</string>
+    <string name="signin_sub_chatgpt">अपने ChatGPT खाते (Plus, Pro या Business) का इस्तेमाल करें. आपका ब्राउज़र खुलेगा; वहां मंज़ूरी दें और Buddy अपने-आप वापस आ जाएगा.</string>
+    <string name="signin_with_claude">Claude से साइन इन करें</string>
+    <string name="signin_with_chatgpt">ChatGPT से साइन इन करें</string>
+    <string name="signin_other_device">किसी दूसरे डिवाइस पर साइन इन करें</string>
+    <string name="signin_with_code">कोड से साइन इन करें</string>
+
+    <!-- Sign-in screen: sign-in in progress. -->
+    <string name="signin_sign_in">साइन इन करें</string>
+    <string name="signin_starting">साइन इन शुरू हो रहा है…</string>
+    <string name="signin_approve_title">अपने ब्राउज़र में मंज़ूरी दें</string>
+    <string name="signin_approve_claude">Claude पेज पर Authorize पर टैप करें. Buddy कोड ले लेगा और अपने-आप वापस आ जाएगा.</string>
+    <string name="signin_approve_codex">साइन इन करें और Codex को अनुमति दें. इसके बाद Buddy पर वापस आएं; बाकी काम वह खुद पूरा कर लेगा.</string>
+    <string name="signin_open_again">साइन-इन पेज फिर से खोलें</string>
+    <string name="signin_signing_in">साइन इन हो रहा है</string>
+    <string name="signin_finishing">साइन इन पूरा हो रहा है…</string>
+    <string name="signin_not_finished">साइन इन पूरा नहीं हुआ. %1$s</string>
+
+    <!-- Sign-in screen: signing in from another device. -->
+    <string name="signin_remote_claude">यह लिंक किसी भी डिवाइस पर खोलें और मंज़ूरी दें. फिर पेज पर दिखने वाला कोड कॉपी करें और उसे नीचे चिपकाएं.</string>
+    <string name="signin_enter_code">यह कोड डालें</string>
+    <string name="signin_remote_codex">किसी भी डिवाइस पर नीचे दिया गया लिंक खोलें, ChatGPT में साइन इन करें और कोड डालें. बाकी काम Buddy खुद पूरा कर लेगा.</string>
+    <string name="signin_copy_code">कोड कॉपी करें</string>
+    <string name="signin_code_copied">कोड कॉपी किया गया</string>
+    <string name="signin_code_expiry">यह कोड 15 मिनट तक काम करेगा.</string>
+    <string name="signin_copy_link">लिंक कॉपी करें</string>
+    <string name="signin_link_copied">लिंक कॉपी किया गया</string>
+    <string name="signin_share">शेयर करें</string>
+    <string name="signin_open_here">यहां खोलें</string>
+    <string name="signin_no_browser">कोई ब्राउज़र नहीं मिला.</string>
+    <string name="signin_no_browser_page">साइन-इन पेज खोलने के लिए कोई ब्राउज़र नहीं मिला.</string>
+    <string name="signin_clip_label">साइन-इन</string>
+
+    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
+    <string name="signin_paste_instead">इसके बजाय कोड चिपकाएं</string>
+    <string name="signin_paste_help">अगर Buddy अपने-आप वापस नहीं आता, तो Claude पेज पर Copy Code पर टैप करें और फिर उसे यहां चिपकाएं.</string>
+    <string name="signin_code_hint">कोड</string>
+    <string name="signin_use_code">इस्तेमाल करें</string>
+    <string name="signin_start_again">पहले साइन इन फिर से शुरू करें.</string>
+
+    <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
+    <string name="signin_signed_in">साइन इन हो गया</string>
+    <string name="signin_agent_ready">%1$s तैयार है.</string>
+    <string name="signin_done">हो गया</string>
+    <string name="signin_sign_out">साइन आउट करें</string>
+    <string name="signin_sign_out_title">%1$s से साइन आउट करें?</string>
+    <string name="signin_sign_out_text">जब तक आप फिर से साइन इन नहीं करते, Buddy में %1$s काम नहीं करेगा.</string>
+    <string name="signin_opencode_ready">OpenCode तैयार है</string>
+    <string name="signin_opencode_free">OpenCode के मुफ़्त मॉडल इस्तेमाल हो रहे हैं. मॉडल बटन से हर चैट के लिए एक मॉडल चुनें या अपना प्रोवाइडर जोड़ें.</string>
+    <string name="signin_opencode_connected">जुड़े हुए प्रोवाइडर: %1$s. OpenCode के मुफ़्त मॉडल भी उपलब्ध रहेंगे.</string>
+    <string name="signin_opencode_connect_note">प्रोवाइडर जोड़ने पर Buddy का टर्मिनल %1$s के साथ खुलता है: कोई प्रोवाइडर चुनें और उसके चरणों का पालन करें. बाद में किसी प्रोवाइडर को हटाने के लिए, वहां %2$s चलाएं.</string>
+    <string name="signin_connect_provider">प्रोवाइडर जोड़ें</string>
+    <string name="signin_version">%1$s %2$s.</string>
+    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2 आ गया है: नए वर्शन मिलते रहें, इसके लिए अपडेट करें. आपके जुड़े हुए प्रोवाइडर बने रहेंगे.</string>
+    <string name="signin_update_opencode2">OpenCode 2 पर अपडेट करें</string>
+    <string name="signin_check_updates">अपडेट की जांच करें</string>
+
+    <!-- Sign-in screen: error. -->
+    <string name="signin_error_title">कोई गड़बड़ी हुई</string>
+    <string name="signin_try_again">फिर से कोशिश करें</string>
+
+    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
+    <string name="account_tagline_claude">आपका Claude प्लान इस्तेमाल करता है</string>
+    <string name="account_tagline_opencode">मुफ़्त मॉडल या आपके अपने प्रोवाइडर</string>
+    <string name="account_tagline_codex">आपका ChatGPT प्लान इस्तेमाल करता है</string>
+    <string name="account_setting_up_linux">Buddy का Linux सेट अप हो रहा है…</string>
+    <string name="account_installing_tools">टूल इंस्टॉल हो रहे हैं…</string>
+    <string name="account_downloading_claude">Claude Code डाउनलोड हो रहा है (करीब 230 एमबी)…</string>
+    <string name="account_downloading">%1$s डाउनलोड हो रहा है…</string>
+    <string name="account_check_failed">%1$s की जांच नहीं हो सकी: %2$s</string>
+    <string name="account_install_failed">इंस्टॉल नहीं हो सका: %1$s</string>
+    <string name="account_update_checking">%1$s का नया वर्शन देखा जा रहा है…</string>
+    <string name="account_update_latest">आपके पास सबसे नया वर्शन (%1$s) है.</string>
+    <string name="account_updated">%1$s पर अपडेट किया गया.</string>
+    <string name="account_updated_from">%1$s पर अपडेट किया गया (पहले %2$s था).</string>
+    <string name="account_update_opencode2_failed">OpenCode 2 पर अपडेट नहीं हो सका; आपके पास अब भी %1$s है. वाई-फ़ाई पर फिर से कोशिश करें.</string>
+    <string name="account_update_failed">अपडेट नहीं हो सका: %1$s</string>
+
+    <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort"). -->
+    <string name="models_default">डिफ़ॉल्ट</string>
+    <string name="models_name_default">%1$s (डिफ़ॉल्ट)</string>
+    <string name="models_default_model">डिफ़ॉल्ट मॉडल</string>
+    <string name="models_default_now">अभी %1$s</string>
+    <string name="models_default_claude">Claude Code आपके प्लान के हिसाब से इसे चुनता है; पहले मैसेज के बाद यहां दिखेगा</string>
+    <string name="models_default_codex">Codex इसे चुनता है; अगले जवाब के बाद यहां दिखेगा</string>
+    <string name="models_default_opencode">OpenCode का डिफ़ॉल्ट मॉडल</string>
+    <string name="models_effort_auto">ऑटो</string>
+    <string name="models_effort_low">कम</string>
+    <string name="models_effort_medium">मध्यम</string>
+    <string name="models_effort_high">उच्च</string>
+    <string name="models_effort_xhigh">अति उच्च</string>
+    <string name="models_effort_max">अधिकतम</string>
+    <string name="models_chip_effort">प्रयास: %1$s</string>
+
+    <!-- Chats. -->
+    <string name="session_new_chat">नई %1$s चैट</string>
+    <plurals name="attach_count">
+        <item quantity="one">📎 %1$d अटैचमेंट</item>
+        <item quantity="other">📎 %1$d अटैचमेंट</item>
+    </plurals>
+
+    <!-- Attaching a photo or file to a chat message (toasts). -->
+    <string name="attach_cant_open">%1$s को खोला नहीं जा सका</string>
+    <string name="attach_too_large">%1$s का साइज़ 25 एमबी से ज़्यादा है.</string>
+
+    <!-- Remote Control session in Settings: a Claude Code session that can be continued from the Claude app. -->
+    <string name="remote_sign_in_first">पहले Claude Code में साइन इन करें.</string>
+    <string name="remote_starting">शुरू हो रहा है…</string>
+    <string name="remote_restarting">फिर से शुरू हो रहा है…</string>
+    <string name="remote_start_failed">शुरू नहीं हो सका: %1$s</string>
+    <string name="remote_keeps_stopping">सेशन बार-बार रुक रहा है. इसे बंद करके फिर से चालू करें या Claude Code का साइन-इन देखें.</string>
+
+    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
+
+    <!-- Settings screen: header. -->
+    <string name="setup_settings_title">सेटिंग</string>
+    <string name="setup_settings_subtitle">Buddy आपकी अपनी सदस्यता (या OpenCode के मुफ़्त मॉडल) पर, ऐप के अंदर ही Claude Code, Codex या OpenCode चलाता है.</string>
+
+    <!-- Settings screen: the setup checklist card (5 steps). -->
+    <string name="setup_card_title">सेटअप</string>
+    <string name="setup_open_guide">चरण-दर-चरण गाइड खोलें</string>
+    <string name="setup_all_set">सब हो गया. Buddy तैयार है.</string>
+    <string name="setup_next_step">अगला: %1$s</string>
+    <string name="setup_step_a11y_title">Buddy की सुलभता सेवा चालू करें</string>
+    <string name="setup_step_a11y_body">इससे बबल दिखता है और Buddy आपके लिए स्क्रीन पढ़ पाता है, टैप और टाइप कर पाता है.</string>
+    <string name="setup_step_a11y_restricted">स्विच धूसर है (“पाबंदी वाली सेटिंग”)? Android, फ़ाइल से इंस्टॉल किए गए ऐप के लिए इसे ब्लॉक करता है. “ऐप्लिकेशन की जानकारी” पर टैप करें. इसके बाद सबसे ऊपर दाईं ओर ⋮ → “पाबंदी वाली सेटिंग को अनुमति दें” पर टैप करें और फिर से कोशिश करें.</string>
+    <string name="setup_open_settings">सेटिंग खोलें</string>
+    <string name="setup_app_info">ऐप्लिकेशन की जानकारी</string>
+    <string name="setup_step_install_title">%1$s इंस्टॉल करें</string>
+    <string name="setup_step_install_done">%1$s, Buddy में इंस्टॉल है.</string>
+    <string name="setup_step_install_claude">Buddy अपना छोटा Linux और Anthropic से %1$s डाउनलोड करता है (करीब 235 एमबी).</string>
+    <string name="setup_step_install_opencode">Buddy अपना छोटा Linux और %1$s डाउनलोड करता है (Node.js के साथ करीब 230 एमबी).</string>
+    <string name="setup_step_install_codex">Buddy अपना छोटा Linux और OpenAI से %1$s डाउनलोड करता है (करीब 150 एमबी).</string>
+    <string name="setup_install">इंस्टॉल करें</string>
+    <string name="setup_step_signin_title">साइन इन करें</string>
+    <string name="setup_step_signin_opencode_done">साइन इन की ज़रूरत नहीं: OpenCode के मुफ़्त मॉडल तुरंत काम करते हैं. अपने प्रोवाइडर कभी भी जोड़ें.</string>
+    <string name="setup_step_signin_opencode">OpenCode के मुफ़्त मॉडल के लिए साइन इन की ज़रूरत नहीं है.</string>
+    <string name="setup_step_signin_done">साइन इन हो गया.</string>
+    <string name="setup_step_signin_done_email">%1$s के रूप में साइन इन किया गया.</string>
+    <string name="setup_step_signin_claude">अपने Claude खाते (Pro या Max) से. आपका ब्राउज़र खुलेगा; वहां मंज़ूरी दें और Buddy अपने-आप वापस आ जाएगा.</string>
+    <string name="setup_step_signin_codex">अपने ChatGPT खाते से. आपका ब्राउज़र खुलेगा; वहां मंज़ूरी दें और Buddy अपने-आप वापस आ जाएगा.</string>
+    <string name="setup_sign_in">साइन इन करें</string>
+    <string name="setup_step_background_title">Buddy को बैकग्राउंड में चलने दें</string>
+    <string name="setup_step_background_done">अनुमति दी गई.</string>
+    <string name="setup_step_background_body">ताकि एजेंट के काम करते समय, बैटरी बचाने के लिए आपका फ़ोन Buddy को बंद न कर दे.</string>
+    <string name="setup_allow">अनुमति दें</string>
+    <string name="setup_step_try_title">आज़माएं</string>
+    <string name="setup_step_try_done">Buddy ने आपको जवाब दे दिया है. और कुछ पूछने के लिए कभी भी बबल पर टैप करें.</string>
+    <string name="setup_step_try_body">अपनी स्क्रीन के किनारे पर मौजूद बबल पर टैप करें और कुछ ऐसा कहें, जैसे “Messenger खोलें”. या यहीं कोई चैट शुरू करें.</string>
+    <string name="setup_step_try_wait">पहले ऊपर दिए गए चरण पूरे करें.</string>
+    <string name="setup_step_name_a11y">सुलभता सेवा चालू करें</string>
+    <string name="setup_step_name_install">अपना एजेंट इंस्टॉल करें</string>
+    <string name="setup_step_name_background">बैकग्राउंड में चलने की अनुमति दें</string>
+
+    <!-- Settings screen: Appearance. -->
+    <string name="setup_appearance">दिखावट</string>
+    <string name="setup_theme_mode">मोड</string>
+    <string name="setup_accent">ऐक्सेंट रंग</string>
+    <string name="setup_surface">बैकग्राउंड</string>
+    <string name="setup_surface_note">“गर्म”, Buddy का ओरिजनल टोन है. “काला” (बिल्कुल काला) सिर्फ़ डार्क मोड में लागू होता है.</string>
+    <string name="setup_custom_colour">कस्टम रंग</string>
+    <string name="setup_custom_accent_title">कस्टम ऐक्सेंट रंग</string>
+    <string name="setup_custom_accent_hint">हेक्स कोड के रूप में कोई भी रंग, जैसे #4F8BFF.</string>
+    <string name="setup_apply">लागू करें</string>
+
+    <!-- Settings screen: Agent. -->
+    <string name="setup_agent">एजेंट</string>
+    <string name="setup_default_brain">डिफ़ॉल्ट एजेंट</string>
+    <string name="setup_default_brain_info">बबल या “नई चैट” बटन से शुरू होने वाली नई चैट के जवाब कौन देगा. Claude Code आपका Claude प्लान इस्तेमाल करता है, Codex आपका ChatGPT प्लान, और OpenCode अपने मुफ़्त मॉडल या आपके अपने प्रोवाइडर. सिर्फ़ सेट अप किए गए एजेंट ही चुने जा सकते हैं.</string>
+    <string name="setup_default_brain_set">नई चैट में %1$s इस्तेमाल होगा. आप “नई चैट” बटन से हर चैट के लिए अलग एजेंट चुन सकते हैं.</string>
+    <string name="setup_set_up_first">पहले %1$s सेट अप करें.</string>
+    <string name="setup_agent_installing">इंस्टॉल हो रहा है…</string>
+    <string name="setup_agent_not_installed">इंस्टॉल नहीं है</string>
+    <string name="setup_agent_ready">तैयार</string>
+    <string name="setup_agent_ready_plan">तैयार · %1$s</string>
+    <string name="setup_agent_signed_in">साइन इन है</string>
+    <string name="setup_agent_signed_in_email">साइन इन है · %1$s</string>
+    <string name="setup_agent_not_signed_in">साइन इन नहीं है</string>
+
+    <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
+    <string name="setup_phone_tools">आपके अपने सेशन में फ़ोन टूल</string>
+    <string name="setup_phone_tools_info">Buddy के फ़ोन टूल इस फ़ोन पर एक सामान्य MCP सर्वर हैं. फ़ोन के किसी टर्मिनल (जैसे Termux) में इसे एक बार चलाएं. इसके बाद उस एजेंट को हर सेशन में फ़ोन टूल मिलेंगे, बबल के बिना भी.</string>
+    <string name="setup_copy_command">कमांड कॉपी करें</string>
+    <string name="setup_command_copied">कॉपी किया गया. इसे अपने टर्मिनल में चिपकाएं.</string>
+
+    <!-- Settings screen: Voice. -->
+    <string name="setup_voice">आवाज़</string>
+    <string name="setup_voice_input">वॉइस इनपुट</string>
+    <string name="setup_voice_phone">फ़ोन</string>
+    <string name="setup_voice_input_claude">आपके Claude प्लान पर Claude Code की डिक्टेशन सुविधा: बहुत सटीक. यह अंग्रेज़ी, फ़्रेंच, जर्मन, स्पैनिश, इटैलियन, पुर्तगाली, डच, तुर्की, रूसी, जापानी और कई दूसरी भाषाओं में काम करती है, लेकिन अरबी में नहीं: अरबी के लिए Buddy फ़ोन की बोली पहचानने की सुविधा इस्तेमाल करता है. आपके रुकने पर शब्द दिखते हैं.</string>
+    <string name="setup_voice_input_chatgpt">Codex के ज़रिए ChatGPT की आवाज़, आपके ChatGPT प्लान पर. यह कोई भी भाषा समझती है, एक ही वाक्य में मिली-जुली भाषाएं भी. सिर्फ़ आपके शब्द इस्तेमाल होते हैं: ChatGPT के बोले गए जवाब म्यूट रहते हैं और यह कुछ भी नहीं चला सकता.</string>
+    <string name="setup_voice_input_phone">आपके फ़ोन की बोली पहचानने की सुविधा (ज़्यादातर फ़ोन पर Google). बोलते समय टेक्स्ट तुरंत दिखता है; यह पहचान लेती है कि आप अपनी किस भाषा में बोल रहे हैं.</string>
+    <string name="setup_voice_output">वॉइस आउटपुट</string>
+    <string name="setup_voice_output_chatgpt">जवाब ChatGPT की स्वाभाविक आवाज़ में पढ़े जाते हैं (आपका ChatGPT प्लान, Codex के ज़रिए). यह आपके ChatGPT वॉइस इस्तेमाल में गिना जाता है; अगर यह उपलब्ध न हो, तो फ़ोन की आवाज़ पढ़कर सुनाती है.</string>
+    <string name="setup_voice_output_phone">जवाब की भाषा में आपके फ़ोन की टेक्स्ट-टू-स्पीच आवाज़ें.</string>
+    <string name="setup_voice_sample">Bonjour ! नमस्ते, मैं Buddy हूं. मेरी आवाज़ ऐसी सुनाई देती है.</string>
+    <string name="setup_languages">भाषाएं</string>
+    <string name="setup_languages_hint">आप जो भाषाएं बोलते हैं, उन्हें चुनने के लिए टैप करें. किसी भाषा को डिफ़ॉल्ट बनाने के लिए उसे दबाकर रखें. चैट में भाषा बदलने के लिए माइक को दबाकर रखें.</string>
+    <string name="setup_sign_in_first">पहले %1$s में साइन इन करें</string>
+    <string name="setup_needs_claude">Claude की डिक्टेशन सुविधा, %1$s के ज़रिए आपके Claude प्लान पर चलती है.</string>
+    <string name="setup_needs_chatgpt">ChatGPT की आवाज़, %1$s के ज़रिए आपके ChatGPT प्लान पर चलती है.</string>
+    <string name="setup_set_up_agent">%1$s सेट अप करें</string>
+
+    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
+    <string name="setup_remote_control">रिमोट कंट्रोल</string>
+    <string name="setup_remote_session">Claude Code सेशन</string>
+    <string name="setup_remote_session_info">फ़ोन टूल के साथ Buddy के अंदर चलने वाला Claude Code सेशन. इसे इसी फ़ोन पर या कहीं से भी, Claude ऐप (Code) में जारी रखें.</string>
+    <string name="setup_remote_sign_in_first">पहले Claude Code में साइन इन करें.</string>
+    <string name="setup_remote_active">चालू · Claude ऐप में “%1$s”</string>
+    <string name="setup_remote_starting">शुरू हो रहा है…</string>
+    <string name="setup_remote_stopped">रुका हुआ</string>
+    <string name="setup_remote_open">Claude ऐप में खोलें</string>
+    <string name="setup_remote_open_failed">इसे खोला नहीं जा सका.</string>
+
+    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
+    <string name="setup_old_chats_title">Termux की पुरानी चैट हटाएं</string>
+    <plurals name="setup_old_chats_body">
+        <item quantity="one">Buddy का अपना Linux आने से पहले की %1$d चैट. एजेंट इसे जारी नहीं रख सकते.</item>
+        <item quantity="other">Buddy का अपना Linux आने से पहले की %1$d चैट. एजेंट इन्हें जारी नहीं रख सकते.</item>
+    </plurals>
+    <plurals name="setup_old_chats_remove">
+        <item quantity="one">%1$d पुरानी चैट हटाएं?</item>
+        <item quantity="other">%1$d पुरानी चैट हटाएं?</item>
+    </plurals>
+    <string name="setup_old_chats_remove_body">ये Buddy की चैट सूची से हट जाएंगी. इसे पहले जैसा नहीं किया जा सकता.</string>
+    <string name="setup_remove">हटाएं</string>
+    <string name="setup_removed">हटा दिया गया.</string>
+
+    <!-- Settings screen: Experience. -->
+    <string name="setup_experience">अनुभव</string>
+    <string name="setup_chat_bubble">चैट बबल</string>
+    <string name="setup_chat_bubble_info">दूसरे ऐप के ऊपर तैरता रहता है. इसे छिपाने के लिए ✕ पर खींचें; किसी एजेंट को आपकी मंज़ूरी चाहिए होने पर मंज़ूरी कार्ड तब भी दिखेंगे.</string>
+    <string name="setup_tap_to_talk">बोलने के लिए बबल पर टैप करें</string>
+    <string name="setup_tap_to_talk_info">एक टैप से माइक खुल जाता है: जो चाहिए वह बोलें, आपके रुकने पर इसे भेज दिया जाएगा. चैट और दूसरे विकल्पों के लिए बबल को दबाकर रखें.</string>
+    <string name="setup_read_aloud">जवाब पढ़कर सुनाएं</string>
+    <string name="setup_read_aloud_info">किसी भी चैट में माइक से बात करें; बोलना बंद करने पर इसे भेज दिया जाता है.</string>
+    <string name="setup_update_notices">अपडेट की सूचनाएं</string>
+    <string name="setup_update_notices_info">Buddy दिन में एक बार GitHub पर जांच करता है और नया वर्शन आने पर आपको सूचना देता है.</string>
+    <string name="setup_check_updates">अपडेट की जांच करें</string>
+    <string name="setup_check_updates_info">आपके पास Buddy %1$s है. या किसी भी एजेंट से कहें: “खुद को अपडेट करें”.</string>
+    <string name="setup_app_permissions">ऐप अनुमतियां</string>
+    <string name="setup_app_permissions_info">हर ऐप के लिए चुनें: “भरोसा” से एजेंट वहां बिना पॉप-अप के काम कर सकता है; “सख़्त” का मतलब है कि Send, Pay, Delete… से पहले Buddy खुद आपसे पूछेगा.</string>
+    <string name="setup_dev_mode">डेवलपर मोड</string>
+    <string name="setup_dev_mode_info">बबल का एजेंट ~/.buddy/work में कमांड चला सकता है और फ़ाइलों में बदलाव कर सकता है, ताकि वह ऐप बना और इंस्टॉल कर सके.</string>
+    <string name="setup_agents_tap">एजेंट को Buddy की स्क्रीन पर टैप करने दें</string>
+    <string name="setup_agents_tap_info">किसी एजेंट के साथ Buddy की टेस्टिंग के लिए (जैसे, फ़ोन टूल के साथ Termux में Claude Code). बबल, मंज़ूरी कार्ड, ऐप अनुमतियां और ये स्विच उसकी पहुंच से बाहर रहते हैं.</string>
+    <string name="setup_dev_mode_warning">रोज़ के इस्तेमाल के लिए इसे बंद रखें: इसके चालू रहने पर, स्क्रीन पर दिखने वाला कोई नुकसान पहुंचाने वाला मैसेज या वेब पेज, एजेंट को धोखे से कमांड चलाने के लिए उकसा सकता है. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले मंज़ूरी कार्ड तब भी दिखते हैं.</string>
+
+    <!-- Settings screen: footer links. -->
+    <string name="setup_licences">ओपन-सोर्स लाइसेंस</string>
+    <string name="setup_privacy_policy">निजता नीति</string>
+
+    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
+    <string name="linux_download_corrupt">Alpine का डाउनलोड खराब है (sha256 %1$s)</string>
+    <string name="linux_move_failed">Alpine को सही जगह पर नहीं ले जाया जा सका</string>
+    <string name="linux_download_failed_http">डाउनलोड नहीं हो सका: HTTP %1$d</string>
+    <string name="linux_unsafe_path">आर्काइव में असुरक्षित पाथ: %1$s</string>
+    <string name="linux_symlink_failed">%1$s का सिमलिंक नहीं बन सका: %2$s</string>
+    <string name="linux_truncated_archive">आर्काइव अधूरा है</string>
+
+    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
+    <string name="terminal_title">टर्मिनल</string>
+    <string name="terminal_back">वापस जाएं</string>
+    <string name="terminal_hide_keyboard">कीबोर्ड छिपाएं</string>
+    <string name="terminal_menu">मेन्यू</string>
+    <plurals name="terminal_sessions_count">
+        <item quantity="one">%1$d सेशन · buddy linux</item>
+        <item quantity="other">%1$d सेशन · buddy linux</item>
+    </plurals>
+    <string name="terminal_listening">सुन रहा है · माइक्रोफ़ोन चालू है</string>
+    <string name="terminal_session_ended">सेशन खत्म हुआ</string>
+    <string name="terminal_session_ended_code">सेशन खत्म हुआ · एग्ज़िट कोड %1$d</string>
+    <string name="terminal_close">बंद करें</string>
+    <string name="terminal_restart">रीस्टार्ट करें</string>
+    <string name="terminal_needs_linux">पहले सेटिंग में Claude Code, Codex या OpenCode इंस्टॉल करें: इससे Buddy का Linux सेट अप हो जाता है.</string>
+    <string name="terminal_start_failed">टर्मिनल शुरू नहीं हो सका: %1$s</string>
+    <string name="terminal_close_title">%1$s बंद करें?</string>
+    <string name="terminal_close_running">यह अब भी चल रहा है. इसे बंद करने पर यह और इसके शुरू किए गए सभी काम रुक जाएंगे.</string>
+    <string name="terminal_shell_name">शेल %1$d</string>
+    <string name="terminal_new_session">नया सेशन</string>
+    <string name="terminal_paste">चिपकाएं</string>
+    <string name="terminal_select_all">सभी चुनें</string>
+    <string name="terminal_larger_text">बड़ा टेक्स्ट</string>
+    <string name="terminal_smaller_text">छोटा टेक्स्ट</string>
+    <string name="terminal_screen_sleep">स्क्रीन को स्लीप मोड में जाने दें</string>
+    <string name="terminal_keep_screen_on">स्क्रीन चालू रखें</string>
+    <string name="terminal_close_session">यह सेशन बंद करें</string>
+    <string name="terminal_tips">टेक्स्ट या लिंक चुनने के लिए दबाकर रखें. ज़ूम करने के लिए पिंच करें और पीछे का आउटपुट देखने के लिए खींचें. किसी टैब को बंद करने के लिए उसे दबाकर रखें.</string>
+
+    <!-- Terminal: floating toolbar over selected text. Keep short. -->
+    <string name="terminal_copy">कॉपी करें</string>
+    <string name="terminal_open_link">लिंक खोलें</string>
+    <string name="terminal_share">शेयर करें</string>
+
+    <!-- Sessions screen: every agent session running on the phone, and recent history. -->
+    <string name="monitor_title">सेशन</string>
+    <string name="monitor_subtitle">इस फ़ोन पर Claude Code और Codex के सभी सेशन.</string>
+    <string name="monitor_terminal_running">एक शेल चल रहा है · वापस जाने के लिए टैप करें</string>
+    <string name="monitor_terminal_idle">Buddy के Linux में एक शेल</string>
+    <string name="monitor_running_now">अभी चल रहे हैं</string>
+    <string name="monitor_refresh">रीफ़्रेश: 3 सेकंड</string>
+    <string name="monitor_checking">जांच की जा रही है…</string>
+    <string name="monitor_recent">हाल ही में</string>
+    <string name="monitor_loading">लोड हो रहा है…</string>
+    <string name="monitor_service_off">Buddy की सुलभता सेवा बंद है, इसलिए सेशन की जांच नहीं की जा सकती. इसे सेटिंग में चालू करें.</string>
+    <string name="monitor_nothing_running">कुछ भी नहीं चल रहा है.</string>
+    <string name="monitor_deleted_chat">मिटाई गई Buddy चैट</string>
+    <string name="monitor_background_session">बैकग्राउंड सेशन</string>
+    <string name="monitor_terminal_session">टर्मिनल सेशन</string>
+    <string name="monitor_tag_background">बैकग्राउंड</string>
+    <string name="monitor_tag_terminal">टर्मिनल</string>
+    <string name="monitor_proc_meta">%1$s · pid %2$d · %3$s</string>
+    <string name="monitor_background_hint">Claude Code की बैकग्राउंड सेवा में चलता है, जैसे कोई चैट जिसे आप Claude ऐप से जारी रखते हैं.</string>
+    <string name="monitor_open_chat">चैट खोलें</string>
+    <string name="monitor_stop">रोकें</string>
+    <string name="monitor_stop_title">यह %1$s सेशन रोकें?</string>
+    <string name="monitor_stop_background_body">यह बैकग्राउंड में चलता है, जैसे कोई चैट जिसे आप Claude ऐप से जारी रख रहे हैं. हो सकता है कि यही सेशन Buddy को कंट्रोल कर रहा हो. इसे रोकने पर उस बातचीत का मौजूदा काम खत्म हो जाएगा.</string>
+    <string name="monitor_stop_terminal_body">हो सकता है कि आप इस सेशन को अभी किसी टर्मिनल में इस्तेमाल कर रहे हों. यह भी हो सकता है कि यही सेशन Buddy को कंट्रोल कर रहा हो. इसे रोकने पर उस बातचीत का मौजूदा काम खत्म हो जाएगा.</string>
+    <string name="monitor_stopping">रोका जा रहा है…</string>
+    <string name="monitor_service_title">Claude Code की बैकग्राउंड सेवा</string>
+    <string name="monitor_service_meta">pid %1$d · %2$s से चालू · बैकग्राउंड सेशन होस्ट करती है</string>
+    <string name="monitor_no_history">कोई इतिहास नहीं मिला.</string>
+    <string name="monitor_no_messages">(कोई मैसेज नहीं)</string>
+
+    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
+
+    <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app. -->
+    <string name="perms_title">ऐप अनुमतियां</string>
+    <string name="perms_back">वापस जाएं</string>
+    <string name="perms_mode_trust">भरोसा</string>
+    <string name="perms_mode_hard">सख़्त</string>
+    <string name="perms_mode_smart">स्मार्ट</string>
+    <string name="perms_modes_intro">भरोसा: एजेंट यहां खुद काम करता है, मंज़ूरी के लिए कोई पॉप-अप नहीं आता.\nसख़्त: आपके बटन नियम तय करते हैं. Send, Pay, Delete… के लिए कार्ड पर आपकी मंज़ूरी चाहिए.\nस्मार्ट: पहले नियम, फिर एक अलग समीक्षक एआई बाकी हर टैप को आपके अनुरोध से मिलाकर जांचता है.\nएजेंट कभी भी Buddy के अपने बबल, कार्ड या सेटिंग पर टैप नहीं कर सकता.</string>
+    <string name="perms_smart_reviewer">स्मार्ट समीक्षक</string>
+    <string name="perms_reviewer_same">चैट वाला ही</string>
+    <string name="perms_reviewer_sign_in">पहले %1$s में साइन इन करें (सेटिंग).</string>
+    <string name="perms_reviewer_about">हर टैप के लिए बिना टूल वाला एक अस्थायी सेशन: यह आपका अनुरोध, एजेंट का नोट और स्क्रीन देखता है, फिर बताता है कि अनुमति दी जाए, आपसे पूछा जाए या ऐसा न करने की सलाह है. हर टैप में करीब 3 सेकंड लगते हैं. OpenCode चैट की समीक्षा Claude Code (या Codex) करता है.</string>
+    <string name="perms_button_rules">बटन के नियम</string>
+    <string name="perms_rules_summary">%1$d पूछें · %2$d कभी न पूछें</string>
+    <string name="perms_apps">ऐप</string>
+    <string name="perms_all_apps">सभी ऐप</string>
+    <string name="perms_reset_suggested">सुझाए गए मोड पर रीसेट करें</string>
+
+    <!-- Button rules screen: buttons that always or never need the user's OK. -->
+    <string name="perms_rules_intro">“सख़्त” या “स्मार्ट” पर सेट ऐप के लिए. सुझावों से चुना गया नियम उसी ऐप पर लागू होता है; टाइप किया गया टेक्स्ट सभी ऐप पर लागू होता है. किसी नियम को हटाने के लिए उस पर टैप करें.</string>
+    <string name="perms_builtin_title">पहले से मौजूद जोखिम वाले शब्द</string>
+    <string name="perms_builtin_sub">भेजें, पोस्ट करें, भुगतान करें, खरीदें, ऑर्डर करें, हटाएं, कॉल करें… पर हमेशा पूछा जाता है, Buddy की हर भाषा में.</string>
+    <string name="perms_always_ask">हमेशा पूछें</string>
+    <string name="perms_never_ask">कभी न पूछें</string>
+    <string name="perms_ask">पूछें</string>
+    <string name="perms_add_hint">कोई बटन जोड़ें, जैसे Send</string>
+    <string name="perms_add">जोड़ें</string>
+    <string name="perms_seen_title">हाल ही में दिखे बटन</string>
+    <string name="perms_seen_empty">“सख़्त” और “स्मार्ट” ऐप में एजेंट जिन बटन पर टैप करता है, वे यहां दिखते हैं.</string>
+
+    <!-- Button rules and modes, as App permissions shows them. -->
+    <string name="guard_rule_all_apps">%1$s · सभी ऐप</string>
+    <string name="guard_why_choice">आपकी पसंद</string>
+    <string name="guard_why_category">सुझाया गया: मैसेज, सोशल, कॉल या पैसों से जुड़ा</string>
+    <string name="guard_why_name">सुझाया गया: नाम में “%1$s” है</string>
+    <string name="guard_why_social">सुझाया गया: सोशल ऐप</string>
+    <string name="guard_why_suggested">सुझाया गया</string>
+    <string name="guard_why_setup">सेटअप में आपकी पसंद: पहले मुझसे पूछें</string>
+
+    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
+    <string name="tools_card_tap">“%1$s” पर टैप करना</string>
+    <string name="tools_card_tap_in">%2$s में “%1$s” पर टैप करना</string>
+    <string name="tools_card_tap_this">“इस” पर टैप करना</string>
+    <string name="tools_card_tap_this_in">%1$s में “इस” पर टैप करना</string>
+    <string name="tools_card_enter">Enter दबाकर भेजना</string>
+    <string name="tools_card_enter_in">%1$s में Enter दबाकर भेजना</string>
+    <string name="tools_card_detail">%1$s:\n%2$s</string>
+    <string name="tools_card_quote">“%1$s”</string>
+    <string name="tools_card_no_reviewer">कोई समीक्षक साइन इन नहीं है, इसलिए Buddy आपसे पूछ रहा है.</string>
+    <string name="tools_card_reviewer_block">%1$s ऐसा न करने की सलाह देता है: %2$s</string>
+    <string name="tools_card_reviewer_ask">%1$s का कहना है कि आपसे पूछा जाए: %2$s</string>
+
+    <!-- Status line in the bubble while the agent works. -->
+    <string name="tools_status_checking_tap">इस टैप की जांच की जा रही है…</string>
+    <string name="tools_status_tap_install">“इंस्टॉल करें” पर टैप करें, फिर पुष्टि करें</string>
+    <string name="tools_status_tap_update">“अपडेट करें” पर टैप करें, फिर पुष्टि करें</string>
+    <string name="tools_status_installed">इंस्टॉल हो गया</string>
+    <string name="tools_status_downloading">Buddy %1$s डाउनलोड हो रहा है…</string>
+
+    <!-- Smart reviewer: its reason when it fails, shown on the approval card. -->
+    <string name="reviewer_failed">समीक्षक जवाब नहीं दे सका (%1$s)</string>
+    <string name="reviewer_no_answer">कोई जवाब नहीं</string>
+    <string name="reviewer_timed_out">समय खत्म हो गया</string>
+
+    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_linux_missing">Buddy का Linux अभी इंस्टॉल नहीं है. इसे सेट अप करने के लिए सेटिंग खोलें.</string>
+
+    <!-- Voice input (dictation). Status lines show in the voice bar, errors as toasts. -->
+    <string name="dictation_claude_sign_in">Claude वॉइस इस्तेमाल करने के लिए सेटिंग में Claude Code में साइन इन करें.</string>
+    <string name="dictation_codex_sign_in">ChatGPT वॉइस इस्तेमाल करने के लिए सेटिंग में Codex में साइन इन करें.</string>
+    <string name="dictation_starting">शुरू हो रहा है…</string>
+    <string name="dictation_starting_claude">Claude शुरू हो रहा है…</string>
+    <string name="dictation_transcribing">टेक्स्ट में बदला जा रहा है…</string>
+    <string name="dictation_no_speech">समझ नहीं आया.</string>
+    <string name="dictation_mic_failed">माइक्रोफ़ोन नहीं खुल सका.</string>
+    <string name="dictation_claude_start_failed">Claude वॉइस शुरू नहीं हो सकी: %1$s</string>
+    <string name="dictation_claude_no_start">Claude वॉइस शुरू नहीं हुई.</string>
+    <string name="dictation_claude_code_no_start">Claude Code शुरू नहीं हुआ</string>
+    <string name="dictation_chatgpt_start_failed">ChatGPT वॉइस शुरू नहीं हो सकी: %1$s</string>
+    <string name="dictation_chatgpt_no_connect">ChatGPT वॉइस कनेक्ट नहीं हुई (%1$s).</string>
+    <string name="dictation_chatgpt_error">ChatGPT वॉइस: %1$s</string>
+    <string name="dictation_connection_failed">कनेक्शन नहीं हो सका</string>
+    <string name="dictation_stage_page">पेज शुरू करना</string>
+    <string name="dictation_stage_codex">Codex का इंतज़ार</string>
+    <string name="dictation_stage_call">कॉल लगाना</string>
+    <string name="dictation_stage_answer">ChatGPT के जवाब का इंतज़ार</string>
+    <string name="dictation_stage_connecting">कनेक्ट करना</string>
+    <string name="dictation_codex_no_start">Codex शुरू नहीं हुआ</string>
+    <string name="dictation_request_timed_out">%1$s का समय खत्म हो गया</string>
+    <string name="dictation_codex_stopped">Codex रुक गया: %1$s</string>
+    <string name="dictation_no_details">कोई जानकारी नहीं</string>
+</resources>

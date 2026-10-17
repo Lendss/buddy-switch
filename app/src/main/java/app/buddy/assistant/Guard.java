@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 final class Guard {
     /** Words on buttons that send, pay, delete or otherwise can't be taken back, and add-to-cart buttons, so every
-     * agent asks the same way before shopping (EN, FR, DE, ES, IT, AR). */
+     * agent asks the same way before shopping, in each of Buddy's languages. */
     private static final Pattern RISKY = Pattern.compile("(?iu)^[^\\p{L}]*(?:(?:proceed|continue|go) to |passer (?:à la|au) |weiter zur |zur )?("
             + "send|post|publish|share now|tweet|reply all|submit|confirm|pay|pay now|buy|buy now|purchase|"
             + "order|place order|checkout|check out|payment|add to cart|add to basket|add to bag|add to trolley|subscribe|transfer|donate|delete|remove|erase|uninstall|"
@@ -28,7 +28,36 @@ final class Guard {
             + "désactiver|réinitialiser|se déconnecter|déconnexion|appeler|"
             + "senden|absenden|bezahlen|kaufen|bestellen|löschen|entfernen|in den einkaufswagen|in den warenkorb|kasse|"
             + "enviar|pagar|comprar|eliminar|borrar|añadir al carrito|agregar al carrito|inviare|pagare|acquista|elimina|"
-            + "aggiungi al carrello|"
+            + "aggiungi al carrello|invia|pubblica|paga|paga ora|compra|acquista ora|ordina|conferma|rimuovi|cancella|"
+            + "disinstalla|blocca|segnala|esci|disconnetti|chiama|abbonati|iscriviti|trasferisci|procedi all'acquisto|"
+            + "publicar|confirmar|pedir|realizar pedido|finalizar compra|tramitar pedido|suscribirse|transferir|"
+            + "desinstalar|bloquear|denunciar|cerrar sesión|llamar|quitar|"
+            + "posten|veröffentlichen|jetzt kaufen|zahlungspflichtig bestellen|abonnieren|überweisen|deinstallieren|"
+            + "blockieren|melden|abmelden|anrufen|bestätigen|"
+            // Portuguese, Dutch, Polish, Russian, Ukrainian, Turkish, Hindi, Indonesian, Japanese, Korean, Chinese
+            + "comprar agora|fazer pedido|adicionar ao carrinho|excluir|apagar|remover|assinar|inscrever-se|denunciar|sair|ligar|"
+            + "verzenden|versturen|verstuur|plaatsen|publiceren|betalen|nu betalen|kopen|nu kopen|bestellen|afrekenen|"
+            + "in winkelwagen|toevoegen aan winkelwagen|verwijderen|wissen|bevestigen|overmaken|abonneren|blokkeren|"
+            + "uitloggen|afmelden|bellen|"
+            + "wyślij|opublikuj|zapłać|kup|kup teraz|zamów|kupuję|zamawiam|do kasy|dodaj do koszyka|usuń|potwierdź|"
+            + "przelej|subskrybuj|odinstaluj|zablokuj|zgłoś|wyloguj|zadzwoń|"
+            + "отправить|опубликовать|оплатить|купить|заказать|оформить заказ|в корзину|добавить в корзину|удалить|"
+            + "подтвердить|перевести|подписаться|заблокировать|пожаловаться|выйти|позвонить|"
+            + "надіслати|відправити|опублікувати|сплатити|купити|замовити|оформити замовлення|у кошик|додати в кошик|"
+            + "додати до кошика|видалити|підтвердити|переказати|підписатися|заблокувати|поскаржитися|вийти|зателефонувати|"
+            + "gönder|paylaş|yayınla|öde|şimdi öde|satın al|hemen al|sipariş ver|siparişi tamamla|sepete ekle|sil|"
+            + "kaldır|onayla|abone ol|engelle|şikayet et|çıkış yap|"
+            + "भेजें|पोस्ट करें|भुगतान करें|खरीदें|अभी खरीदें|ऑर्डर करें|कार्ट में जोड़ें|हटाएं|हटाएँ|मिटाएं|"
+            + "पुष्टि करें|कॉल करें|"
+            + "kirim|bayar|bayar sekarang|beli|beli sekarang|pesan sekarang|buat pesanan|tambah ke keranjang|"
+            + "masukkan keranjang|hapus|konfirmasi|berlangganan|blokir|laporkan|telepon|"
+            + "送信|送信する|投稿|投稿する|支払う|支払い|購入|購入する|今すぐ購入|注文|注文する|注文を確定する|"
+            + "カートに入れる|カートに追加|削除|削除する|確定|確定する|送金|購読|アンインストール|ブロック|報告|"
+            + "ログアウト|発信|"
+            + "보내기|전송|게시|결제|결제하기|구매|구매하기|바로 구매|주문|주문하기|장바구니 담기|장바구니에 담기|"
+            + "삭제|삭제하기|송금|이체|구독|구독하기|차단|신고|로그아웃|전화 걸기|"
+            + "发送|发布|支付|付款|立即支付|立即付款|购买|立即购买|下单|提交订单|加入购物车|删除|移除|确认|转账|"
+            + "订阅|卸载|拉黑|举报|退出登录|拨打|"
             + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال|أضف إلى السلة|إضافة إلى السلة"
             + ")(?![\\p{L}])");
     /** Resource ids of send buttons that only have an icon (e.g. WhatsApp's "send"). */
@@ -76,7 +105,7 @@ final class Guard {
         }
 
         String describe() {
-            return pkg == null ? label + " · all apps" : label + " · " + (app == null || app.isEmpty() ? pkg : app);
+            return pkg == null ? BuddyApp.str(R.string.guard_rule_all_apps, label) : label + " · " + (app == null || app.isEmpty() ? pkg : app);
         }
     }
 
@@ -226,22 +255,23 @@ final class Guard {
     static String[] modeWhy(android.content.Context c, String pkg, CharSequence label) {
         if (pkg == null) return new String[]{"trust", ""};
         String set = Prefs.appSafety(c, pkg);
-        if (set != null) return new String[]{set, "Your choice"};
-        if (HARD_BY_DEFAULT.contains(pkg)) return new String[]{"hard", "Suggested: messages, social, calls or money"};
+        if (set != null) return new String[]{set, c.getString(R.string.guard_why_choice)};
+        if (HARD_BY_DEFAULT.contains(pkg)) return new String[]{"hard", c.getString(R.string.guard_why_category)};
         java.util.regex.Matcher m = HARD_NAME.matcher(pkg);
-        if (m.find()) return new String[]{"hard", "Suggested: name has “" + m.group(1) + "”"};
-        if (label != null && (m = HARD_NAME.matcher(label)).find()) return new String[]{"hard", "Suggested: name has “" + m.group(1) + "”"};
+        if (m.find()) return new String[]{"hard", c.getString(R.string.guard_why_name, m.group(1))};
+        if (label != null && (m = HARD_NAME.matcher(label)).find()) return new String[]{"hard", c.getString(R.string.guard_why_name, m.group(1))};
         try {
             android.content.pm.ApplicationInfo ai = c.getPackageManager().getApplicationInfo(pkg, 0);
-            if (ai.category == android.content.pm.ApplicationInfo.CATEGORY_SOCIAL) return new String[]{"hard", "Suggested: a social app"};
+            if (ai.category == android.content.pm.ApplicationInfo.CATEGORY_SOCIAL) return new String[]{"hard", c.getString(R.string.guard_why_social)};
             if (label == null) {
                 CharSequence l = c.getPackageManager().getApplicationLabel(ai);
-                if (l != null && (m = HARD_NAME.matcher(l)).find()) return new String[]{"hard", "Suggested: name has “" + m.group(1) + "”"};
+                if (l != null && (m = HARD_NAME.matcher(l)).find()) return new String[]{"hard", c.getString(R.string.guard_why_name, m.group(1))};
             }
         } catch (Exception ignored) {
         }
         // the rest follow the first-setup choice: work on its own, or ask first
-        return Prefs.autonomousDefault(c) ? new String[]{"trust", "Suggested"} : new String[]{"hard", "Your setup choice: ask first"};
+        return Prefs.autonomousDefault(c) ? new String[]{"trust", c.getString(R.string.guard_why_suggested)}
+                : new String[]{"hard", c.getString(R.string.guard_why_setup)};
     }
 
     private Guard() {

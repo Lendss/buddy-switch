@@ -97,7 +97,7 @@ final class Voice {
 
     /** Start listening. Returns an error message, or null when started. */
     static String listen(Context c, Listener l) {
-        if (!micAllowed(c)) return "Buddy needs the microphone. Open the Buddy app and tap 🎙 once to allow it.";
+        if (!micAllowed(c)) return c.getString(R.string.voice_mic_needed);
         stopListening();
         stopSpeaking();
         String lang = Prefs.voiceLang(c);
@@ -106,9 +106,9 @@ final class Voice {
             return ClaudeDictation.listen(c, lang, l);
         }
         if ("chatgpt".equals(Prefs.voiceEngine(c))) return CodexDictation.listen(c, l);
-        if (!SpeechRecognizer.isRecognitionAvailable(c)) return "No speech recognition service on this phone.";
+        if (!SpeechRecognizer.isRecognitionAvailable(c)) return c.getString(R.string.voice_no_recognizer);
         current = l;
-        l.onStatus("Starting…");
+        l.onStatus(c.getString(R.string.voice_starting));
         recognizer = SpeechRecognizer.createSpeechRecognizer(c.getApplicationContext());
         recognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -122,15 +122,15 @@ final class Voice {
                 String t = best(b);
                 finish();
                 if (t != null && !t.trim().isEmpty()) l.onFinal(t.trim());
-                else l.onEnd("Didn't catch that.");
+                else l.onEnd(c.getString(R.string.voice_didnt_catch));
             }
 
             @Override
             public void onError(int error) {
                 finish();
                 l.onEnd(error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT
-                        ? "Didn't catch that." : error == SpeechRecognizer.ERROR_CLIENT ? null
-                        : "Speech recognition error " + error + ".");
+                        ? c.getString(R.string.voice_didnt_catch) : error == SpeechRecognizer.ERROR_CLIENT ? null
+                        : c.getString(R.string.voice_error, error));
             }
 
             @Override
@@ -147,7 +147,7 @@ final class Voice {
             @Override public void onBufferReceived(byte[] buf) {}
             @Override
             public void onEndOfSpeech() {
-                if (current == l) l.onStatus("Finishing…");
+                if (current == l) l.onStatus(c.getString(R.string.voice_finishing));
             }
             @Override public void onEvent(int type, Bundle b) {}
         });
@@ -216,10 +216,13 @@ final class Voice {
     // ------------------------------------------------------------- speaking
 
     static void speak(Context c, String text) {
-        String clean = text.replaceAll("```[\\s\\S]*?```", " code omitted. ")
+        // the words spoken in place of code and links are plain text, not regex replacement syntax
+        String code = " " + java.util.regex.Matcher.quoteReplacement(c.getString(R.string.voice_code_omitted)) + " ";
+        String link = java.util.regex.Matcher.quoteReplacement(c.getString(R.string.voice_link));
+        String clean = text.replaceAll("```[\\s\\S]*?```", code)
                 .replaceAll("[*_`#>|]", "")
                 .replaceAll("\\[(.*?)\\]\\(.*?\\)", "$1")
-                .replaceAll("https?://\\S+", "link")
+                .replaceAll("https?://\\S+", link)
                 .trim();
         if (clean.isEmpty()) return;
         if ("chatgpt".equals(Prefs.speechEngine(c)) && SetupState.signedIn(c, "codex")) {

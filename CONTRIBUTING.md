@@ -35,8 +35,18 @@ Say in the pull request what you tested and on which phone.
 - Plain Java, no new libraries unless there's no other way. The APK is small on purpose.
 - Match the surrounding code: naming, comment density, the `Ui` helpers for views.
 - Text the user sees is short and plain: one idea per sentence, no jargon.
+- Text the user sees goes in `app/src/main/res/values/strings.xml`, never as a literal in the Java code (whole sentences with `%1$s` placeholders, not pieces glued together). Text only the agent reads (tool descriptions and results, prompts) stays in English in the code.
 - `linux/buddy-run` is bash with jq programs inside single quotes: no apostrophes in comments there, or the quoting breaks.
 - One topic per pull request. Don't bump the version; releases do that.
+
+## Translations
+
+Buddy's English text is in `app/src/main/res/values/strings.xml`, and each language has its own `values-<code>/strings.xml`. The first translations were made with AI, so corrections from native speakers are very welcome.
+
+- **Fix a translation:** edit that language's file and open a pull request.
+- **Add a language:** copy `values/strings.xml` to `values-<code>/strings.xml`, translate it (leave out entries marked `translatable="false"`) and add the code to `res/xml/locales_config.xml`, so it shows up in Android's per-app language setting.
+- Keep placeholders like `%1$s` and `%2$d` exactly, and escape apostrophes as `\'`.
+- New English text goes in `values/strings.xml`; until it's translated, other languages show it in English.
 
 ## License
 

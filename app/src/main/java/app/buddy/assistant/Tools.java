@@ -424,12 +424,22 @@ final class Tools {
         if (Guard.listed(svc, "allow", label, pkg)) return null; // the user said: never ask for this one
         AccessibilityNodeInfo field = findFocusedInput();
         CharSequence draft = field == null || field.isShowingHintText() ? null : field.getText();
-        String what = "Tap “" + (label == null ? "this" : label) + "”";
+        String what = "Tap “" + (label == null ? "this" : label) + "”"; // for the agent and the reviewer
+        java.util.function.Function<String, String> card = in -> tapCard(label, in); // the same, on the user's card
         boolean ask = Guard.listed(svc, "ask", label, pkg)
                 || (Prefs.guardBuiltin(svc) && (Guard.riskyLabel(target) != null || (hit != null && Guard.riskyLabel(hit) != null)));
-        if (ask) return guardAction(what, draft == null ? null : draft.toString());
+        if (ask) return guardAction(what, card, draft == null ? null : draft.toString());
         if (!"smart".equals(mode)) return null;
-        // smart: a temporary reviewer session decides this tap
+        return review(what, card, target, draft == null ? null : draft.toString());
+    }
+
+    /**
+     * Smart mode: a temporary reviewer session decides an action the rules didn't catch. null when it may go ahead,
+     * otherwise the card's answer. draft: text about to be sent, shown on the card (may be null).
+     */
+    private String review(String what, java.util.function.Function<String, String> card, AccessibilityNodeInfo target,
+                          String draft) throws InterruptedException {
+        String app = svc.foregroundAppName();
         final String[][] ctx = new String[1][];
         final CountDownLatch got = new CountDownLatch(1);
         svc.runOnMain(() -> {
@@ -439,24 +449,34 @@ final class Tools {
         got.await(2, TimeUnit.SECONDS);
         String[] cx = ctx[0];
         String harness = Reviewer.harness(svc, cx == null ? null : cx[0]);
-        if (harness == null) return guardAction(what, "No reviewer is signed in, so Buddy asks you.");
+        if (harness == null) return guardAction(what, card, svc.getString(R.string.tools_card_no_reviewer));
         svc.runOnMain(() -> {
-            if (svc.bubble() != null) svc.bubble().setStatus("Checking this tap…");
+            if (svc.bubble() != null) svc.bubble().setStatus(svc.getString(R.string.tools_status_checking_tap));
         });
         Reviewer.Decision d = Reviewer.review(svc, harness, cx == null ? null : cx[1], cx == null ? null : cx[2],
                 what + (app == null ? "" : " in " + app), Reviewer.screen(svc.getWindows(), target));
         if ("allow".equals(d.decision)) return null;
-        String why = d.by + " " + ("block".equals(d.decision) ? "advises against it" : "says ask you") + ": " + d.reason;
-        return guardAction(what, (draft == null || draft.length() == 0 ? "" : "“" + draft + "”\n") + why);
+        String why = svc.getString("block".equals(d.decision) ? R.string.tools_card_reviewer_block : R.string.tools_card_reviewer_ask,
+                d.by, d.reason);
+        return guardAction(what, card, (draft == null || draft.isEmpty() ? "" : svc.getString(R.string.tools_card_quote, draft) + "\n") + why);
     }
 
-    /** A risky action needs the user's OK: the agent's confirm just before, or a card now. */
-    private String guardAction(String what, String detail) throws InterruptedException {
+    /** The card's line for a tap on label (null: a button without one) in the app named app (null: not known). */
+    private String tapCard(String label, String app) {
+        if (label == null) return app == null ? svc.getString(R.string.tools_card_tap_this) : svc.getString(R.string.tools_card_tap_this_in, app);
+        return app == null ? svc.getString(R.string.tools_card_tap, label) : svc.getString(R.string.tools_card_tap_in, label, app);
+    }
+
+    /**
+     * A risky action needs the user's OK: the agent's confirm just before, or a card now. what: the action in English,
+     * for the agent; card: the same action on the card, in the user's language, given the app's name (or null).
+     */
+    private String guardAction(String what, java.util.function.Function<String, String> card, String detail) throws InterruptedException {
         if (Guard.takeApproval()) return null;
         String app = svc.foregroundAppName();
-        String summary = what + (app == null ? "" : " in " + app)
-                + (detail == null || detail.trim().isEmpty() ? "" : ":\n" + (detail.contains("\n") || detail.startsWith("“")
-                ? detail.trim() : "“" + detail.trim() + "”"));
+        String summary = detail == null || detail.trim().isEmpty() ? card.apply(app)
+                : svc.getString(R.string.tools_card_detail, card.apply(app), detail.contains("\n") || detail.startsWith("“")
+                ? detail.trim() : svc.getString(R.string.tools_card_quote, detail.trim()));
         String answer = svc.askConfirm(summary);
         if (answer.startsWith("APPROVED")) return null;
         if (answer.startsWith("CHANGES")) return "Not tapped: the user wants changes first. " + answer;
@@ -496,8 +516,12 @@ final class Tools {
         if (!ok) throw new IllegalStateException("This field did not accept text.");
         String result = "Typed " + text.length() + " characters.";
         if (a.optBoolean("submit")) {
-            String blocked = "hard".equals(Guard.mode(svc, str(target.getPackageName()), null))
-                    ? guardAction("Press Enter to send", text) : null;
+            String mode = Guard.mode(svc, str(target.getPackageName()), null);
+            java.util.function.Function<String, String> card = in -> in == null ? svc.getString(R.string.tools_card_enter)
+                    : svc.getString(R.string.tools_card_enter_in, in);
+            // Hard always asks; Smart lets the reviewer decide, as for a tap the rules don't catch
+            String blocked = "hard".equals(mode) ? guardAction("Press Enter to send", card, text)
+                    : "smart".equals(mode) ? review("Press Enter to send", card, target, text) : null;
             if (blocked != null) return result + " Not sent: " + blocked;
             Thread.sleep(150);
             boolean sent = target.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_IME_ENTER.getId());
@@ -673,13 +697,13 @@ final class Tools {
     private String waitForInstall(String pkg, long minVersion, int timeoutS) throws InterruptedException {
         long before = installedVersion(pkg);
         long need = minVersion > 0 ? minVersion : (before < 0 ? 0 : before + 1);
-        svc.showStatus(before < 0 ? "Tap Install, then confirm" : "Tap Update, then confirm");
+        svc.showStatus(svc.getString(before < 0 ? R.string.tools_status_tap_install : R.string.tools_status_tap_update));
         svc.nudge();
         long start = System.currentTimeMillis(), lastSeen = start;
         while (System.currentTimeMillis() - start < timeoutS * 1000L) {
             long v = installedVersion(pkg);
             if (v >= 0 && v >= need) {
-                svc.showStatus("Installed");
+                svc.showStatus(svc.getString(R.string.tools_status_installed));
                 return "Installed " + pkg + " (versionCode " + v + "). The user confirmed the install.";
             }
             if (installerOnScreen()) lastSeen = System.currentTimeMillis();
@@ -745,7 +769,7 @@ final class Tools {
             return head + " An update is available. What's new:\n" + r.notes + "\n\nAsk the user if they want it now; "
                     + "if yes, call update_buddy with install=true.";
         }
-        svc.showStatus("Downloading Buddy " + r.version + "…");
+        svc.showStatus(svc.getString(R.string.tools_status_downloading, r.version));
         String res = Updates.install(svc, r);
         if (Updates.NEEDS_PERMISSION.equals(res)) {
             return "Downloaded Buddy " + r.version + ", but Buddy isn't allowed to install apps yet. Android's settings page "

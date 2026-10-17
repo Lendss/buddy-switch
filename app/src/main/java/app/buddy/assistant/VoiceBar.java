@@ -35,14 +35,14 @@ final class VoiceBar extends LinearLayout {
         heard = text(c, "", 14, MUTED);
         heard.setMaxLines(3);
         heard.setEllipsize(android.text.TextUtils.TruncateAt.START);
-        heard.setPadding(dp(c, 14), dp(c, 8), dp(c, 14), 0);
+        heard.setPaddingRelative(dp(c, 14), dp(c, 8), dp(c, 14), 0);
         heard.setVisibility(GONE);
         addView(heard, full());
 
         LinearLayout row = row(c);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(c, 4), dp(c, 4), dp(c, 4), dp(c, 4));
-        ImageButton cancel = iconButton(c, R.drawable.ms_close, "Cancel", MUTED);
+        row.setPaddingRelative(dp(c, 4), dp(c, 4), dp(c, 4), dp(c, 4));
+        ImageButton cancel = iconButton(c, R.drawable.ms_close, c.getString(android.R.string.cancel), MUTED);
         cancel.setLayoutParams(new LayoutParams(dp(c, 40), dp(c, 40)));
         cancel.setOnClickListener(v -> a.cancel());
         row.addView(cancel);
@@ -55,13 +55,13 @@ final class VoiceBar extends LinearLayout {
         row.addView(status, wrap());
         ImageButton send = new ImageButton(c);
         send.setImageResource(R.drawable.ms_arrow_upward);
-        send.setContentDescription("Stop and send");
+        send.setContentDescription(c.getString(R.string.voice_stop_and_send));
         send.setScaleType(ImageView.ScaleType.CENTER);
         send.setImageTintList(ColorStateList.valueOf(ON_ACCENT));
         send.setBackground(oval(ACCENT));
         send.setOnClickListener(v -> a.send());
         LayoutParams sp = new LayoutParams(dp(c, 40), dp(c, 40));
-        sp.leftMargin = dp(c, 8);
+        sp.setMarginStart(dp(c, 8));
         row.addView(send, sp);
         addView(row, full());
         setBackground(outlined(c, CARD, 26, ACCENT, 1));

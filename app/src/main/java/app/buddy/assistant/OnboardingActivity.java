@@ -53,25 +53,25 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         root.setFitsSystemWindows(true);
 
         LinearLayout top = row(this);
-        top.setPadding(dp(this, 20), dp(this, 12), dp(this, 8), dp(this, 4));
+        top.setPaddingRelative(dp(this, 20), dp(this, 12), dp(this, 8), dp(this, 4));
         progress = monoText(this, "", 12, MUTED);
         top.addView(progress, weight1());
-        Button skip = button(this, "Skip setup", false);
+        Button skip = button(this, getString(R.string.onboarding_skip_setup), false);
         skip.setBackgroundResource(ripple(this, false));
         skip.setTextColor(MUTED);
-        skip.setOnClickListener(v -> confirmSheet(this, "Skip the setup guide?",
-                "You can finish setup any time in Settings. Chats won't run until it's done.", "Skip", false, this::finishGuide));
+        skip.setOnClickListener(v -> confirmSheet(this, getString(R.string.onboarding_skip_title),
+                getString(R.string.onboarding_skip_text), getString(R.string.onboarding_skip_action), false, this::finishGuide));
         top.addView(skip);
         root.addView(top, full());
 
         scroll = new ScrollView(this);
         body = column(this);
-        body.setPadding(dp(this, 24), dp(this, 16), dp(this, 24), dp(this, 24));
+        body.setPaddingRelative(dp(this, 24), dp(this, 16), dp(this, 24), dp(this, 24));
         scroll.addView(body);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         bottom = column(this);
-        bottom.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 16));
+        bottom.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 16));
         root.addView(bottom, full());
         setContentView(root);
     }
@@ -161,7 +161,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     private void render() {
         body.removeAllViews();
         bottom.removeAllViews();
-        progress.setText(step == WELCOME ? "" : "step " + step + " of " + LAST);
+        progress.setText(step == WELCOME ? "" : getString(R.string.onboarding_progress, step, LAST));
         boolean ok = done(this, step);
         switch (step) {
             case WELCOME:
@@ -171,24 +171,24 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 brain();
                 break;
             case ACCESS:
-                header(R.drawable.ms_shield_person, "Let Buddy see and tap", ok ? "Accessibility is on." :
-                        "Buddy's accessibility service shows the bubble and lets the agent read the screen, tap and type, "
-                                + "only when you ask it to do something.", ok);
+                header(R.drawable.ms_shield_person, getString(R.string.onboarding_access_title),
+                        getString(ok ? R.string.onboarding_access_done : R.string.onboarding_access_text), ok);
                 if (!ok) {
-                    note("Nothing leaves the phone except what " + agentNames() + " sends to "
-                            + ("codex".equals(Prefs.agents(this)) ? "OpenAI" : "opencode".equals(Prefs.agents(this))
-                            ? "the model's provider" : "Anthropic")
-                            + " to answer you. Sending, posting, buying and deleting always ask for your OK first.");
+                    String agents = Prefs.agents(this);
+                    note("opencode".equals(agents) ? getString(R.string.onboarding_access_privacy_opencode, agentNames())
+                            : "both".equals(agents) ? getString(R.string.onboarding_access_privacy_both)
+                            : getString(R.string.onboarding_access_privacy, agentNames(),
+                            "codex".equals(agents) ? "OpenAI" : "Anthropic"));
                     if (accessTries > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) restrictedHelp();
-                    note("In the list: Downloaded apps → Buddy assistant → turn it on.");
-                    primary("Open accessibility settings", v -> {
+                    note(getString(R.string.onboarding_access_list_hint));
+                    primary(getString(R.string.onboarding_access_open), v -> {
                         accessTries++;
                         openAccessibilitySettings(this);
                     });
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        stuck("Switch greyed out?", "Android blocks this for apps installed from a file. Tap App info "
-                                + "(below), then ⋮ in the top right → Allow restricted settings, and try again.", null, null);
-                        secondary("App info", v -> openAppInfo(getPackageName()));
+                        stuck(getString(R.string.onboarding_access_greyed_title),
+                                getString(R.string.onboarding_access_greyed_text), null, null);
+                        secondary(getString(R.string.onboarding_app_info), v -> openAppInfo(getPackageName()));
                     }
                 }
                 break;
@@ -208,7 +208,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 break;
         }
         if (ok && step != WELCOME && step != BRAIN && step != TRY) {
-            Button next = button(this, "Continue", true);
+            Button next = button(this, getString(R.string.onboarding_continue), true);
             next.setOnClickListener(v -> {
                 noAutoAdvance = false;
                 go(step + 1);
@@ -220,7 +220,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     private void welcome() {
         LinearLayout c = column(this);
         c.setGravity(Gravity.CENTER_HORIZONTAL);
-        c.setPadding(0, dp(this, 40), 0, 0);
+        c.setPaddingRelative(0, dp(this, 40), 0, 0);
         FrameLayout tile = new FrameLayout(this);
         tile.setBackgroundResource(R.drawable.ic_launcher_background);
         tile.setClipToOutline(true);
@@ -234,41 +234,43 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         face.setImageResource(R.drawable.bubble_face);
         tile.addView(face, new FrameLayout.LayoutParams(dp(this, 64), dp(this, 64), Gravity.CENTER));
         c.addView(tile, new LinearLayout.LayoutParams(dp(this, 88), dp(this, 88)));
-        TextView t = title(this, "Meet Buddy", 28);
+        TextView t = title(this, getString(R.string.onboarding_welcome_title), 28);
         t.setGravity(Gravity.CENTER);
-        t.setPadding(0, dp(this, 20), 0, dp(this, 6));
+        t.setPaddingRelative(0, dp(this, 20), 0, dp(this, 6));
         c.addView(t);
-        TextView s = text(this, "A chat bubble that can use your phone for you.", 16, MUTED);
+        TextView s = text(this, getString(R.string.onboarding_welcome_text), 16, MUTED);
         s.setGravity(Gravity.CENTER);
         c.addView(s);
         body.addView(c, full());
         LinearLayout list = column(this);
-        list.setPadding(0, dp(this, 28), 0, 0);
-        bullet(list, R.drawable.ms_chat_bubble, "Ask in plain words", "\"Reply to Sam that I'm late\", \"add milk to my basket\".");
-        bullet(list, R.drawable.ms_shield_person, "Your own plan, no API key", "Runs Claude Code from your Claude subscription. "
-                + "Codex with a ChatGPT plan works too.");
-        bullet(list, R.drawable.ms_check, "You stay in control", "Sending, posting, buying and deleting always ask first.");
+        list.setPaddingRelative(0, dp(this, 28), 0, 0);
+        bullet(list, R.drawable.ms_chat_bubble, getString(R.string.onboarding_welcome_ask_title),
+                getString(R.string.onboarding_welcome_ask_text));
+        bullet(list, R.drawable.ms_shield_person, getString(R.string.onboarding_welcome_plan_title),
+                getString(R.string.onboarding_welcome_plan_text));
+        bullet(list, R.drawable.ms_check, getString(R.string.onboarding_welcome_control_title),
+                getString(R.string.onboarding_welcome_control_text));
         body.addView(list, full());
-        TextView time = monoText(this, "setup takes about 5 minutes", 12, MUTED);
+        TextView time = monoText(this, getString(R.string.onboarding_welcome_time), 12, MUTED);
         time.setGravity(Gravity.CENTER);
-        time.setPadding(0, dp(this, 20), 0, 0);
+        time.setPaddingRelative(0, dp(this, 20), 0, 0);
         body.addView(time, full());
-        primary("Get started", v -> go(BRAIN));
+        primary(getString(R.string.onboarding_get_started), v -> go(BRAIN));
     }
 
     private void brain() {
-        header(R.drawable.ms_forum, "Choose your agent", "Who answers your chats. You can add others later in Settings.", false);
+        header(R.drawable.ms_forum, getString(R.string.onboarding_brain_title), getString(R.string.onboarding_brain_text), false);
         String cur = Prefs.agents(this);
         String[][] opts = {
-                {"claude", "Claude Code", "Uses your Claude subscription (Pro or Max)."},
-                {"codex", "Codex", "Uses your ChatGPT plan."},
-                {"opencode", "OpenCode", "Free models, no account needed. Connect your own providers later."},
-                {"both", "Claude Code + Codex", "Install both; pick per chat. Claude Code stays the default."},
+                {"claude", "Claude Code", getString(R.string.onboarding_brain_claude)},
+                {"codex", "Codex", getString(R.string.onboarding_brain_codex)},
+                {"opencode", "OpenCode", getString(R.string.onboarding_brain_opencode)},
+                {"both", "Claude Code + Codex", getString(R.string.onboarding_brain_both)},
         };
         for (String[] o : opts) {
             boolean on = o[0].equals(cur);
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
+            r.setPaddingRelative(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
             r.setBackground(outlined(this, CARD, 16, on ? ACCENT : OUTLINE, on ? 2 : 1));
             if ("both".equals(o[0])) {
                 LinearLayout two = row(this);
@@ -277,22 +279,22 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 two.addView(a);
                 TextView b = agentTile(this, "codex");
                 LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(dp(this, 28), dp(this, 40));
-                bp.leftMargin = dp(this, 2);
+                bp.setMarginStart(dp(this, 2));
                 two.addView(b, bp);
                 r.addView(two);
             } else {
                 r.addView(agentTile(this, o[0]));
             }
             LinearLayout t = column(this);
-            t.setPadding(dp(this, 14), 0, dp(this, 8), 0);
+            t.setPaddingRelative(dp(this, 14), 0, dp(this, 8), 0);
             LinearLayout tr = row(this);
             tr.addView(title(this, o[1], 16));
             if ("claude".equals(o[0])) {
-                TextView tag = monoText(this, "recommended", 11, ACCENT_TEXT);
-                tag.setPadding(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
+                TextView tag = monoText(this, getString(R.string.onboarding_recommended), 11, ACCENT_TEXT);
+                tag.setPaddingRelative(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
                 tag.setBackground(rounded(this, ACCENT_SOFT, 6));
                 LinearLayout.LayoutParams tp = wrap();
-                tp.leftMargin = dp(this, 8);
+                tp.setMarginStart(dp(this, 8));
                 tr.addView(tag, tp);
             }
             t.addView(tr);
@@ -308,28 +310,32 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             p.topMargin = dp(this, 10);
             body.addView(r, p);
         }
-        primary("Continue", v -> go(ACCESS));
+        primary(getString(R.string.onboarding_continue), v -> go(ACCESS));
     }
 
     private void agents(boolean ok) {
-        header(R.drawable.ms_terminal, ok ? "Ready" : "Install and sign in",
-                ok ? agentNames() + " is installed and signed in." : "Buddy installs " + agentNames()
-                        + " inside the app, then you sign in once. No Termux needed.", ok);
+        header(R.drawable.ms_terminal, getString(ok ? R.string.onboarding_agents_done_title : R.string.onboarding_agents_title),
+                ok && "both".equals(Prefs.agents(this)) ? getString(R.string.onboarding_agents_done_both)
+                        : getString(ok ? R.string.onboarding_agents_done : R.string.onboarding_agents_text, agentNames()), ok);
         boolean first = true;
         for (String a : wanted(this)) {
             Account acc = Account.of(a);
             boolean installed = SetupState.installed(this, a), signed = SetupState.signedIn(this, a);
             boolean installing = acc.step == Account.Step.INSTALLING;
             LinearLayout card = column(this);
-            card.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+            card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
             card.setBackground(rounded(this, CARD, 16));
             LinearLayout r = row(this);
             r.addView(agentTile(this, a));
             LinearLayout t = column(this);
-            t.setPadding(dp(this, 12), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 12), 0, 0, 0);
             t.addView(title(this, acc.name(), 15));
-            t.addView(single(monoText(this, signed ? (acc.opencode() ? "ready · " + (acc.plan.isEmpty() ? "free models" : acc.plan) : "signed in" + (acc.email.isEmpty() ? "" : " · " + acc.email))
-                    : installing ? "installing…" : installed ? "installed · not signed in" : "not installed", 12,
+            t.addView(single(monoText(this, signed ? (acc.opencode() ? getString(R.string.onboarding_agent_ready,
+                    acc.plan.isEmpty() ? getString(R.string.onboarding_agent_free_models) : acc.planLabel())
+                    : acc.email.isEmpty() ? getString(R.string.onboarding_agent_signed_in)
+                    : getString(R.string.onboarding_agent_signed_in_as, acc.email))
+                    : getString(installing ? R.string.onboarding_agent_installing : installed
+                    ? R.string.onboarding_agent_installed : R.string.onboarding_agent_not_installed), 12,
                     signed ? OK : MUTED)));
             r.addView(t, weight1());
             if (signed) r.addView(icon(this, R.drawable.ms_check, OK, 22));
@@ -338,18 +344,17 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             if (!signed) {
                 TextView how = text(this, installing ? acc.detail
                         : acc.step == Account.Step.ERROR ? acc.detail
-                        : installed ? (acc.claude() ? "Sign in with your Claude account. Your browser opens; tap Authorize "
-                        + "and Buddy comes back by itself." : acc.opencode() ? "Checking OpenCode…"
-                        : "Sign in with your ChatGPT account in the browser, then come back.")
-                        : (acc.claude() ? "Downloads about 235 MB once (Buddy's Linux and Claude Code from Anthropic)."
-                        : acc.opencode() ? "Downloads about 230 MB once (Buddy's Linux, Node.js and OpenCode). No account needed."
-                        : "Downloads about 150 MB once (Buddy's Linux, Node.js and Codex from OpenAI)."), 14,
+                        : getString(installed ? (acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
+                        ? R.string.onboarding_agent_checking_opencode : R.string.onboarding_agent_sign_in_codex)
+                        : (acc.claude() ? R.string.onboarding_agent_download_claude
+                        : acc.opencode() ? R.string.onboarding_agent_download_opencode
+                        : R.string.onboarding_agent_download_codex)), 14,
                         acc.step == Account.Step.ERROR ? ERR : MUTED);
-                how.setPadding(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
+                how.setPaddingRelative(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
                 card.addView(how);
                 if (!installing && !(installed && acc.opencode())) {
-                    Button b = button(this, installed ? (acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT")
-                            : "Install " + acc.name(), first);
+                    Button b = button(this, installed ? getString(acc.claude() ? R.string.onboarding_sign_in_claude
+                            : R.string.onboarding_sign_in_chatgpt) : getString(R.string.onboarding_install_agent, acc.name()), first);
                     b.setOnClickListener(v -> {
                         if (installed) startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a));
                         else acc.install(this);
@@ -363,38 +368,37 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             body.addView(card, p);
         }
         if (!ok) {
-            note("Use Wi-Fi if you can. You can leave this screen while it installs.");
-            stuck("Sign-in didn't come back?", "Claude: on the Claude page tap Copy Code, then come back to Buddy; "
-                            + "it picks the code up from the clipboard.",
-                    "Install failed?", "Check your connection and tap Install again; it continues where it stopped.");
+            note(getString(R.string.onboarding_agents_wifi));
+            stuck(getString(R.string.onboarding_stuck_sign_in_q), getString(R.string.onboarding_stuck_sign_in_a),
+                    getString(R.string.onboarding_stuck_install_q), getString(R.string.onboarding_stuck_install_a));
         }
     }
 
     private void background(boolean ok) {
-        header(R.drawable.ms_build_circle, "Keep it running", ok ? "Buddy can run in the background." :
-                "So your phone doesn't stop Buddy to save battery while the agent works.", ok);
+        header(R.drawable.ms_build_circle, getString(R.string.onboarding_background_title),
+                getString(ok ? R.string.onboarding_background_done : R.string.onboarding_background_text), ok);
         if (!ok) {
-            primary("Allow", v -> startActivity(new Intent(
+            primary(getString(R.string.onboarding_allow), v -> startActivity(new Intent(
                     Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))));
-            secondary("Skip for now", v -> go(SAFETY));
+            secondary(getString(R.string.onboarding_skip_for_now), v -> go(SAFETY));
         }
     }
 
     private void safety() {
-        header(R.drawable.ms_shield_person, "How much should it ask?", "Messaging, social, shopping, payment and banking "
-                + "apps always need your OK before Buddy sends, posts, buys or deletes. For your other apps:", false);
+        header(R.drawable.ms_shield_person, getString(R.string.onboarding_safety_title),
+                getString(R.string.onboarding_safety_text), false);
         boolean auto = Prefs.autonomousDefault(this);
         String[][] opts = {
-                {"ask", "Ask me first", "The agent asks before anything risky, like changing a setting. Safer, but more popups."},
-                {"auto", "Work on its own", "No popups: the agent just does what you asked, like turning on a camera or a light."},
+                {"ask", getString(R.string.onboarding_safety_ask_title), getString(R.string.onboarding_safety_ask_text)},
+                {"auto", getString(R.string.onboarding_safety_auto_title), getString(R.string.onboarding_safety_auto_text)},
         };
         for (String[] o : opts) {
             boolean on = "auto".equals(o[0]) == auto;
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
+            r.setPaddingRelative(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
             r.setBackground(outlined(this, CARD, 16, on ? ACCENT : OUTLINE, on ? 2 : 1));
             LinearLayout t = column(this);
-            t.setPadding(0, 0, dp(this, 8), 0);
+            t.setPaddingRelative(0, 0, dp(this, 8), 0);
             t.addView(title(this, o[1], 16));
             t.addView(text(this, o[2], 13, MUTED));
             r.addView(t, weight1());
@@ -407,31 +411,31 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             p.topMargin = dp(this, 10);
             body.addView(r, p);
         }
-        note("You can change this per app any time: Settings → App permissions. Set an app to Trust to let the agent "
-                + "work there without popups, or to Hard so Buddy itself asks you.");
-        primary("Continue", v -> go(TRY));
+        note(getString(R.string.onboarding_safety_note));
+        primary(getString(R.string.onboarding_continue), v -> go(TRY));
     }
 
     private void tryIt() {
-        header(R.drawable.ms_check, "You're all set", "Try a first task. Buddy will open Settings and read it for you.", true);
-        TextView ex = monoText(this, "\"Open Settings and tell me my Android version\"", 13, TEXT);
-        ex.setPadding(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 12));
+        header(R.drawable.ms_check, getString(R.string.onboarding_try_title), getString(R.string.onboarding_try_text), true);
+        String prompt = getString(R.string.onboarding_try_prompt);
+        TextView ex = monoText(this, getString(R.string.onboarding_try_prompt_quoted, prompt), 13, TEXT);
+        ex.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 12));
         ex.setBackground(rounded(this, CARD, 12));
         LinearLayout.LayoutParams ep = full();
         ep.topMargin = dp(this, 16);
         body.addView(ex, ep);
-        note("Tip: the bubble floats over other apps. Drag it onto the ✕ to hide it.");
-        primary("Try it now", v -> {
+        note(getString(R.string.onboarding_try_tip));
+        primary(getString(R.string.onboarding_try_now), v -> {
             Prefs.setOnboarded(this, true);
             ChatHub hub = ChatHub.get(this);
             Sessions.Session s = hub.create(Prefs.backend(this));
             hub.select(s);
             startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             startActivity(new Intent(this, ChatActivity.class).putExtra("id", s.id)
-                    .putExtra("draft", "Open Settings and tell me my Android version"));
+                    .putExtra("draft", prompt));
             finish();
         });
-        secondary("Go to my chats", v -> finishGuide());
+        secondary(getString(R.string.onboarding_go_to_chats), v -> finishGuide());
     }
 
     // ------------------------------------------------------------ pieces
@@ -445,7 +449,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         ip.topMargin = dp(this, 8);
         body.addView(ic, ip);
         TextView t = title(this, title, 26);
-        t.setPadding(0, dp(this, 18), 0, dp(this, 6));
+        t.setPaddingRelative(0, dp(this, 18), 0, dp(this, 6));
         body.addView(t);
         body.addView(text(this, sub, 16, MUTED));
     }
@@ -459,19 +463,19 @@ public class OnboardingActivity extends Screen implements Account.Listener {
 
     private void numbered(String[] lines) {
         LinearLayout box = column(this);
-        box.setPadding(dp(this, 16), dp(this, 6), dp(this, 16), dp(this, 14));
+        box.setPaddingRelative(dp(this, 16), dp(this, 6), dp(this, 16), dp(this, 14));
         box.setBackground(rounded(this, CARD, 16));
         for (int i = 0; i < lines.length; i++) {
             LinearLayout r = row(this);
             r.setGravity(Gravity.TOP);
-            r.setPadding(0, dp(this, 10), 0, 0);
+            r.setPaddingRelative(0, dp(this, 10), 0, 0);
             TextView n = monoText(this, String.valueOf(i + 1), 12, ACCENT_TEXT);
             n.setTypeface(mono(this, 600));
             n.setGravity(Gravity.CENTER);
             n.setBackground(outlined(this, 0x00000000, 11, ACCENT, 2));
             r.addView(n, new LinearLayout.LayoutParams(dp(this, 22), dp(this, 22)));
             TextView t = text(this, lines[i], 15, TEXT);
-            t.setPadding(dp(this, 12), dp(this, 1), 0, 0);
+            t.setPaddingRelative(dp(this, 12), dp(this, 1), 0, 0);
             r.addView(t, weight1());
             box.addView(r, full());
         }
@@ -483,10 +487,10 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     private void bullet(LinearLayout list, int iconRes, String title, String sub) {
         LinearLayout r = row(this);
         r.setGravity(Gravity.TOP);
-        r.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        r.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
         r.addView(icon(this, iconRes, ACCENT_TEXT, 22));
         LinearLayout t = column(this);
-        t.setPadding(dp(this, 14), 0, 0, 0);
+        t.setPaddingRelative(dp(this, 14), 0, 0, 0);
         t.addView(title(this, title, 15));
         t.addView(text(this, sub, 14, MUTED));
         r.addView(t, weight1());
@@ -495,10 +499,10 @@ public class OnboardingActivity extends Screen implements Account.Listener {
 
     private void statusLine(String what, boolean on) {
         LinearLayout r = row(this);
-        r.setPadding(0, dp(this, 14), 0, 0);
+        r.setPaddingRelative(0, dp(this, 14), 0, 0);
         r.addView(dot(this, on ? OK : CARD2, 10));
         TextView t = text(this, what + (on ? ": allowed" : ": not yet"), 15, on ? TEXT : MUTED);
-        t.setPadding(dp(this, 10), 0, 0, 0);
+        t.setPaddingRelative(dp(this, 10), 0, 0, 0);
         r.addView(t);
         body.addView(r, full());
     }
@@ -506,13 +510,12 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     /** Shown after a first try at the accessibility switch on Android 13+. */
     private void restrictedHelp() {
         LinearLayout c = column(this);
-        c.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        c.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
         c.setBackground(outlined(this, CARD, 16, Theme.withAlpha(ACCENT, 0x59), 1));
-        c.addView(title(this, "Switch greyed out?", 15));
-        TextView t = text(this, "1. Tap App info below.\n2. Tap ⋮ in the top right → Allow restricted settings.\n"
-                + "3. Come back and open accessibility settings again.", 14, MUTED);
+        c.addView(title(this, getString(R.string.onboarding_access_greyed_title), 15));
+        TextView t = text(this, getString(R.string.onboarding_access_restricted_steps), 14, MUTED);
         t.setLineSpacing(0, 1.2f);
-        t.setPadding(0, dp(this, 6), 0, 0);
+        t.setPaddingRelative(0, dp(this, 6), 0, 0);
         c.addView(t);
         LinearLayout.LayoutParams p = full();
         p.topMargin = dp(this, 16);
@@ -522,9 +525,9 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     private void stuck(String q1, String a1, String q2, String a2) {
         LinearLayout c = column(this);
         LinearLayout head = row(this);
-        head.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        head.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
         head.setBackgroundResource(ripple(this, false));
-        TextView h = title(this, "Stuck?", 14);
+        TextView h = title(this, getString(R.string.onboarding_stuck), 14);
         h.setTextColor(ACCENT_TEXT);
         head.addView(h, weight1());
         head.addView(icon(this, stuckOpen ? R.drawable.ms_expand_less : R.drawable.ms_expand_more, ACCENT_TEXT, 20));
@@ -544,7 +547,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
 
     private void qa(LinearLayout c, String q, String a) {
         TextView qt = title(this, q, 14);
-        qt.setPadding(0, dp(this, 6), 0, dp(this, 2));
+        qt.setPaddingRelative(0, dp(this, 6), 0, dp(this, 2));
         c.addView(qt);
         c.addView(text(this, a, 14, MUTED));
     }
@@ -583,7 +586,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
 
     private String agentNames() {
         String a = Prefs.agents(this);
-        return "both".equals(a) ? "Claude Code and Codex" : Account.nameOf(a);
+        return "both".equals(a) ? getString(R.string.onboarding_agent_names_both) : Account.nameOf(a);
     }
 
     private void openAppInfo(String pkg) {

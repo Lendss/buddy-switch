@@ -54,6 +54,11 @@ final class Ui {
         return Math.round(v * c.getResources().getDisplayMetrics().density);
     }
 
+    /** The app's language, for changing the case of text the user sees (Turkish i/İ). */
+    static java.util.Locale locale(Context c) {
+        return c.getResources().getConfiguration().getLocales().get(0);
+    }
+
     /** Geist at a weight (400…700); falls back to the system font. */
     static Typeface sans(Context c, int weight) {
         return font(c, "fonts/Geist.ttf", weight, weight >= 600 ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
@@ -183,7 +188,7 @@ final class Ui {
         b.setTextColor(primary ? ON_ACCENT : TEXT);
         b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         b.setTypeface(sans(c, 600));
-        b.setPadding(dp(c, 16), dp(c, 8), dp(c, 16), dp(c, 8));
+        b.setPaddingRelative(dp(c, 16), dp(c, 8), dp(c, 16), dp(c, 8));
         b.setMinHeight(dp(c, 40));
         b.setMinimumHeight(dp(c, 40));
         b.setMinWidth(0);
@@ -229,10 +234,10 @@ final class Ui {
 
     /** 12sp/600 muted ALL CAPS label; padding 20/16/20/4. */
     static TextView sectionLabel(Context c, String s) {
-        TextView t = text(c, s.toUpperCase(java.util.Locale.ROOT), 12, MUTED);
+        TextView t = text(c, s.toUpperCase(locale(c)), 12, MUTED);
         t.setTypeface(sans(c, 600));
         t.setLetterSpacing(0.06f);
-        t.setPadding(dp(c, 20), dp(c, 16), dp(c, 20), dp(c, 4));
+        t.setPaddingRelative(dp(c, 20), dp(c, 16), dp(c, 20), dp(c, 4));
         return t;
     }
 
@@ -251,7 +256,7 @@ final class Ui {
     /** Outlined mono chip with a trailing expand icon. */
     static LinearLayout chip(Context c, String s) {
         LinearLayout l = row(c);
-        l.setPadding(dp(c, 8), dp(c, 3), dp(c, 4), dp(c, 3));
+        l.setPaddingRelative(dp(c, 8), dp(c, 3), dp(c, 4), dp(c, 3));
         l.setBackground(outlined(c, 0x00000000, 8, OUTLINE, 1));
         TextView t = single(monoText(c, s, 12, MUTED));
         l.addView(t);
@@ -263,7 +268,7 @@ final class Ui {
     /** A plain flat row with a ripple (for list rows). */
     static LinearLayout listRow(Context c) {
         LinearLayout r = row(c);
-        r.setPadding(dp(c, 20), dp(c, 12), dp(c, 20), dp(c, 12));
+        r.setPaddingRelative(dp(c, 20), dp(c, 12), dp(c, 20), dp(c, 12));
         r.setBackgroundResource(ripple(c, false));
         r.setGravity(Gravity.TOP);
         return r;
@@ -294,13 +299,13 @@ final class Ui {
 
     static LinearLayout switchRow(Context c, String title, String sub, boolean on, Toggle l) {
         LinearLayout r = row(c);
-        r.setPadding(dp(c, 16), dp(c, 14), dp(c, 16), dp(c, 14));
+        r.setPaddingRelative(dp(c, 16), dp(c, 14), dp(c, 16), dp(c, 14));
         r.setBackgroundResource(ripple(c, false));
         LinearLayout texts = column(c);
         texts.addView(title(c, title, 15));
         if (sub != null && !sub.isEmpty()) {
             TextView s = text(c, sub, 13, MUTED);
-            s.setPadding(0, dp(c, 2), dp(c, 12), 0);
+            s.setPaddingRelative(0, dp(c, 2), dp(c, 12), 0);
             texts.addView(s);
         }
         r.addView(texts, weight1());
@@ -342,14 +347,18 @@ final class Ui {
     static LinearLayout segmented(Context c, String[][] options, String selected, boolean monoLabels, Pick l,
                                   java.util.Set<String> disabled, Pick whyNot) {
         LinearLayout box = row(c);
-        box.setPadding(dp(c, 3), dp(c, 3), dp(c, 3), dp(c, 3));
+        box.setPaddingRelative(dp(c, 3), dp(c, 3), dp(c, 3), dp(c, 3));
         box.setBackground(rounded(c, BG, 12));
         for (String[] o : options) {
             boolean on = o[0].equals(selected);
             TextView t = text(c, o[1], 14, on ? TEXT : MUTED);
             t.setTypeface(monoLabels ? mono(c, on ? 600 : 400) : sans(c, on ? 600 : 500));
             t.setGravity(Gravity.CENTER);
-            t.setPadding(dp(c, 10), dp(c, 8), dp(c, 10), dp(c, 8));
+            int side = dp(c, options.length > 4 ? 4 : 10);
+            t.setPaddingRelative(side, dp(c, 8), side, dp(c, 8));
+            // one line; a label too long for its segment (often a translation) shrinks instead of wrapping
+            t.setMaxLines(1);
+            t.setAutoSizeTextTypeUniformWithConfiguration(10, 14, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
             if (on) t.setBackground(rounded(c, CARD2, 10));
             else t.setBackgroundResource(ripple(c, false));
             boolean off = !on && disabled != null && disabled.contains(o[0]);
@@ -371,7 +380,7 @@ final class Ui {
         sb.setSpan(new android.text.style.ForegroundColorSpan(ACCENT), 0, 2, 0);
         t.setText(sb);
         t.setLineSpacing(0, 1.4f);
-        t.setPadding(dp(c, 12), dp(c, 12), dp(c, 12), dp(c, 12));
+        t.setPaddingRelative(dp(c, 12), dp(c, 12), dp(c, 12), dp(c, 12));
         t.setBackground(rounded(c, CODE, 12));
         return t;
     }
@@ -403,7 +412,7 @@ final class Ui {
                         v.getContext().startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
                                 android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
                     } catch (Exception e) {
-                        android.widget.Toast.makeText(v.getContext(), "No app can open this link", android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(v.getContext(), R.string.ui_no_app_for_link, android.widget.Toast.LENGTH_SHORT).show();
                     }
                 }
             }, a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -427,7 +436,7 @@ final class Ui {
         Dialog d = new Dialog(a);
         d.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout box = column(a);
-        box.setPadding(dp(a, 20), dp(a, 10), dp(a, 20), dp(a, 32));
+        box.setPaddingRelative(dp(a, 20), dp(a, 10), dp(a, 20), dp(a, 32));
         box.setBackground(corners(a, CARD, 28, 28, 0, 0));
         View handle = new View(a);
         handle.setBackground(rounded(a, OUTLINE, 2));
@@ -467,35 +476,31 @@ final class Ui {
             return;
         }
         LinearLayout c = column(a);
-        c.addView(title(a, "How Buddy uses accessibility", 18));
+        c.addView(title(a, a.getString(R.string.ui_a11y_title), 18));
         String[] points = {
-                "Buddy uses Android's accessibility service to do what you ask in other apps: it reads what's on the "
-                        + "screen and taps, types and scrolls for you. It also shows the floating bubble.",
-                "While a task runs, the screen content, which can include personal information such as messages, names "
-                        + "or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, "
-                        + "OpenAI for Codex, or your OpenCode model's provider), only to carry out your request.",
-                "Buddy has no servers of its own. It doesn't collect, sell or share this data, and doesn't use it for ads.",
-                "Before anything that sends, posts, buys or deletes, Buddy asks for your OK. You can turn the service "
-                        + "off anytime in Android's accessibility settings.",
+                a.getString(R.string.ui_a11y_what),
+                a.getString(R.string.ui_a11y_data),
+                a.getString(R.string.ui_a11y_no_servers),
+                a.getString(R.string.ui_a11y_asks),
         };
         for (String pt : points) {
             TextView t = text(a, pt, 14, MUTED);
-            t.setPadding(0, dp(a, 8), 0, 0);
+            t.setPaddingRelative(0, dp(a, 8), 0, 0);
             c.addView(t);
         }
-        TextView policy = text(a, "Privacy policy", 14, ACCENT_TEXT);
-        policy.setPadding(0, dp(a, 10), 0, 0);
+        TextView policy = text(a, a.getString(R.string.ui_privacy_policy), 14, ACCENT_TEXT);
+        policy.setPaddingRelative(0, dp(a, 10), 0, 0);
         policy.setOnClickListener(v -> a.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
                 android.net.Uri.parse(PRIVACY_URL))));
         c.addView(policy);
         LinearLayout btns = row(a);
-        btns.setPadding(0, dp(a, 18), 0, 0);
-        Button no = button(a, "No thanks", false);
-        Button yes = button(a, "Agree and continue", true);
+        btns.setPaddingRelative(0, dp(a, 18), 0, 0);
+        Button no = button(a, a.getString(R.string.ui_no_thanks), false);
+        Button yes = button(a, a.getString(R.string.ui_agree_continue), true);
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
         btns.addView(no, bp);
         LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
-        yp.leftMargin = dp(a, 10);
+        yp.setMarginStart(dp(a, 10));
         btns.addView(yes, yp);
         c.addView(btns, full());
         Dialog d = bottomSheet(a, c);
@@ -514,11 +519,11 @@ final class Ui {
         c.addView(title(a, title, 18));
         if (message != null) {
             TextView m = text(a, message, 14, MUTED);
-            m.setPadding(0, dp(a, 6), 0, dp(a, 18));
+            m.setPaddingRelative(0, dp(a, 6), 0, dp(a, 18));
             c.addView(m);
         }
         LinearLayout btns = row(a);
-        Button no = button(a, "Cancel", false);
+        Button no = button(a, a.getString(android.R.string.cancel), false);
         Button yes = button(a, action, !destructive);
         if (destructive) {
             yes.setTextColor(ERR);
@@ -527,7 +532,7 @@ final class Ui {
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
         btns.addView(no, bp);
         LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
-        yp.leftMargin = dp(a, 10);
+        yp.setMarginStart(dp(a, 10));
         btns.addView(yes, yp);
         c.addView(btns, full());
         Dialog d = bottomSheet(a, c);
@@ -549,16 +554,16 @@ final class Ui {
         bar.setBackgroundColor(NAV);
         bar.setGravity(Gravity.CENTER);
         Object[][] items = {
-                {R.drawable.ms_chat_bubble, "Chats", MainActivity.class},
-                {R.drawable.ms_terminal, "Sessions", MonitorActivity.class},
-                {R.drawable.ms_tune, "Settings", SetupActivity.class},
+                {R.drawable.ms_chat_bubble, a.getString(R.string.ui_nav_chats), MainActivity.class},
+                {R.drawable.ms_terminal, a.getString(R.string.ui_nav_sessions), MonitorActivity.class},
+                {R.drawable.ms_tune, a.getString(R.string.ui_nav_settings), SetupActivity.class},
         };
         for (int i = 0; i < items.length; i++) {
             final int idx = i;
             boolean on = i == active;
             LinearLayout it = column(a);
             it.setGravity(Gravity.CENTER_HORIZONTAL);
-            it.setPadding(0, dp(a, 10), 0, dp(a, 10));
+            it.setPaddingRelative(0, dp(a, 10), 0, dp(a, 10));
             FrameLayout pill = new FrameLayout(a);
             pill.setBackground(on ? rounded(a, Theme.withAlpha(ACCENT, 0x2E), 16) : null);
             ImageView ic = icon(a, (Integer) items[i][0], on ? TEXT : MUTED, 22);
@@ -568,17 +573,17 @@ final class Ui {
                 b.setTypeface(mono(a, 600));
                 b.setGravity(Gravity.CENTER);
                 b.setBackground(rounded(a, OK, 8));
-                b.setPadding(dp(a, 4), 0, dp(a, 4), 0);
+                b.setPaddingRelative(dp(a, 4), 0, dp(a, 4), 0);
                 FrameLayout.LayoutParams bp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                         dp(a, 16), Gravity.TOP | Gravity.END);
                 bp.topMargin = dp(a, 1);
-                bp.rightMargin = dp(a, 8);
+                bp.setMarginEnd(dp(a, 8));
                 pill.addView(b, bp);
             }
             it.addView(pill, new LinearLayout.LayoutParams(dp(a, 60), dp(a, 32)));
             TextView label = text(a, (String) items[i][1], 12, on ? TEXT : MUTED);
             label.setTypeface(sans(a, on ? 600 : 500));
-            label.setPadding(0, dp(a, 4), 0, 0);
+            label.setPaddingRelative(0, dp(a, 4), 0, 0);
             label.setGravity(Gravity.CENTER);
             it.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             it.setBackgroundResource(ripple(a, false));

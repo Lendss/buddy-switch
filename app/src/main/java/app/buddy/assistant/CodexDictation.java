@@ -43,8 +43,8 @@ final class CodexDictation {
     private static final StringBuilder done = new StringBuilder();
     private static String partial = "";
     private static long lastHeard;
-    /** How far the call got, for the message when it doesn't connect. */
-    private static volatile String stage = "";
+    /** How far the call got (a string resource), for the message when it doesn't connect. */
+    private static volatile int stage = R.string.dictation_stage_page;
 
     private CodexDictation() {
     }
@@ -56,11 +56,11 @@ final class CodexDictation {
     // ------------------------------------------------------------------ listening
 
     static String listen(Context c, Voice.Listener l) {
-        if (!SetupState.signedIn(c, "codex")) return "Sign in to Codex in Settings to use ChatGPT voice.";
+        if (!SetupState.signedIn(c, "codex")) return c.getString(R.string.dictation_codex_sign_in);
         final Context app = c.getApplicationContext();
         listener = l;
         finishing = drained = connected = false;
-        stage = "starting the page";
+        stage = R.string.dictation_stage_page;
         done.setLength(0);
         partial = "";
         l.onPartial("");
@@ -74,20 +74,20 @@ final class CodexDictation {
         if (!MicServer.startCapture(app)) {
             listener = null;
             MicServer.levels = null;
-            return "Couldn't open the microphone.";
+            return c.getString(R.string.dictation_mic_failed);
         }
         l.onStatus(null);
         try {
             openPage(c);
         } catch (Exception e) {
             listener = null;
-            return "ChatGPT voice couldn't start: " + e.getMessage();
+            return c.getString(R.string.dictation_chatgpt_start_failed, e.getMessage());
         }
         new Thread(() -> {
             try {
                 ensureServer(app);
             } catch (Exception e) {
-                main.post(() -> end(l, "ChatGPT voice couldn't start: " + e.getMessage()));
+                main.post(() -> end(l, app.getString(R.string.dictation_chatgpt_start_failed, e.getMessage())));
             }
         }, "codex-dictation").start();
         return null;
@@ -98,7 +98,7 @@ final class CodexDictation {
         if (listener == null || finishing) return;
         finishing = true;
         final Voice.Listener l = listener;
-        l.onStatus("Transcribing…");
+        l.onStatus(BuddyApp.str(R.string.dictation_transcribing));
         MicServer.stopCapture();
         final long asked = System.currentTimeMillis();
         main.post(new Runnable() {
@@ -107,7 +107,7 @@ final class CodexDictation {
                 if (listener != l) return;
                 long now = System.currentTimeMillis();
                 if (!connected) {
-                    if (now - asked > 30_000) end(l, "ChatGPT voice didn't connect (" + stage + ").");
+                    if (now - asked > 30_000) end(l, BuddyApp.str(R.string.dictation_chatgpt_no_connect, BuddyApp.str(stage)));
                     else main.postDelayed(this, 100);
                     return;
                 }
@@ -118,7 +118,7 @@ final class CodexDictation {
                     String text = (done + " " + partial).replaceAll("\\s+", " ").trim();
                     stopSession();
                     listener = null;
-                    if (text.isEmpty()) l.onEnd("Didn't catch that.");
+                    if (text.isEmpty()) l.onEnd(BuddyApp.str(R.string.dictation_no_speech));
                     else l.onFinal(text);
                     return;
                 }
@@ -177,7 +177,7 @@ final class CodexDictation {
         web.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void offer(String sdp) {
-                stage = "waiting for Codex";
+                stage = R.string.dictation_stage_codex;
                 new Thread(() -> startCall(mine, sdp), "codex-dictation-call").start();
             }
 
@@ -207,7 +207,9 @@ final class CodexDictation {
             @JavascriptInterface
             public void failed(String why) {
                 main.post(() -> {
-                    if (web == mine && listener != null) end(listener, "ChatGPT voice: " + why);
+                    // the page's own 'the connection failed' (see PAGE) in the user's language; other reasons come from the WebView
+                    if (web == mine && listener != null) end(listener, BuddyApp.str(R.string.dictation_chatgpt_error,
+                            "the connection failed".equals(why) ? BuddyApp.str(R.string.dictation_connection_failed) : why));
                 });
             }
         }, "Buddy");
@@ -218,8 +220,8 @@ final class CodexDictation {
     private static void startCall(WebView page, String sdp) {
         try {
             for (int i = 0; i < 600 && threadId == null; i++) Thread.sleep(100); // the server is still starting
-            if (threadId == null) throw new Exception("Codex didn't start");
-            stage = "placing the call";
+            if (threadId == null) throw new Exception(BuddyApp.str(R.string.dictation_codex_no_start));
+            stage = R.string.dictation_stage_call;
             JSONObject r = request("thread/realtime/start", new JSONObject()
                     .put("threadId", threadId)
                     .put("transport", new JSONObject().put("type", "webrtc").put("sdp", sdp))
@@ -229,10 +231,10 @@ final class CodexDictation {
                     .put("prompt", PROMPT)
                     .put("includeStartupContext", false), 30_000);
             if (r.has("error")) throw new Exception(r.getJSONObject("error").optString("message"));
-            stage = "waiting for ChatGPT to answer";
+            stage = R.string.dictation_stage_answer;
         } catch (Exception e) {
             main.post(() -> {
-                if (web == page && listener != null) end(listener, "ChatGPT voice couldn't start: " + e.getMessage());
+                if (web == page && listener != null) end(listener, BuddyApp.str(R.string.dictation_chatgpt_start_failed, e.getMessage()));
             });
         }
     }
@@ -301,7 +303,7 @@ final class CodexDictation {
             synchronized (out) {
                 while (out.indexOf("\u0000") < 0 && System.currentTimeMillis() < until) out.wait(200);
             }
-            if (out.indexOf("\u0000") < 0) throw new Exception("timed out");
+            if (out.indexOf("\u0000") < 0) throw new Exception(c.getString(R.string.reviewer_timed_out)); // shown on the card
             return out.toString().replace("\u0000", "");
         } finally {
             reviews.remove(tid);
@@ -396,7 +398,7 @@ final class CodexDictation {
                 break;
             }
             case "thread/realtime/sdp": {
-                stage = "connecting";
+                stage = R.string.dictation_stage_connecting;
                 final String sdp = p.optString("sdp");
                 main.post(() -> js("answer(" + JSONObject.quote(sdp) + ")"));
                 break;
@@ -416,7 +418,7 @@ final class CodexDictation {
             case "thread/realtime/error": {
                 final String msg = p.optString("message");
                 main.post(() -> {
-                    if (listener != null) end(listener, "ChatGPT voice: " + msg);
+                    if (listener != null) end(listener, BuddyApp.str(R.string.dictation_chatgpt_error, msg));
                 });
                 break;
             }
@@ -451,9 +453,9 @@ final class CodexDictation {
     private static String serverLog() {
         try {
             String t = Linux.exec(appContext, "tail -c 400 " + DIR + "/server.log | grep -v bubblewrap | tail -3", 20).trim();
-            return t.isEmpty() ? "no details" : t;
+            return t.isEmpty() ? BuddyApp.str(R.string.dictation_no_details) : t;
         } catch (Exception e) {
-            return "no details";
+            return BuddyApp.str(R.string.dictation_no_details);
         }
     }
 
@@ -474,8 +476,9 @@ final class CodexDictation {
                     if (slot[0] == null && (p == null || !p.isAlive())) slot[0] = DIED;
                 }
             }
-            if (slot[0] == null) throw new Exception(method + " timed out");
-            if (slot[0] == DIED) throw new Exception("Codex stopped: " + serverLog());
+            // the messages reach the user (ChatGPT voice errors, the reviewer's card)
+            if (slot[0] == null) throw new Exception(BuddyApp.str(R.string.dictation_request_timed_out, method));
+            if (slot[0] == DIED) throw new Exception(BuddyApp.str(R.string.dictation_codex_stopped, serverLog()));
             return slot[0];
         } finally {
             synchronized (replies) {

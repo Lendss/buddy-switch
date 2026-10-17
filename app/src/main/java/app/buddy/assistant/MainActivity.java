@@ -55,7 +55,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         LinearLayout column = column(this);
         ScrollView scroll = new ScrollView(this);
         list = column(this);
-        list.setPadding(0, dp(this, 8), 0, dp(this, 96));
+        list.setPaddingRelative(0, dp(this, 8), 0, dp(this, 96));
         scroll.addView(list);
         column.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         navSlot = new FrameLayout(this);
@@ -64,18 +64,18 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
         // "New chat" extended FAB above the nav
         LinearLayout fab = row(this);
-        fab.setPadding(dp(this, 16), 0, dp(this, 20), 0);
+        fab.setPaddingRelative(dp(this, 16), 0, dp(this, 20), 0);
         fab.setBackground(rounded(this, ACCENT, 18));
         fab.setElevation(dp(this, 6));
         fab.addView(icon(this, R.drawable.ms_add, ON_ACCENT, 24));
-        TextView ft = title(this, "New chat", 15);
+        TextView ft = title(this, getString(R.string.main_new_chat), 15);
         ft.setTextColor(ON_ACCENT);
-        ft.setPadding(dp(this, 8), 0, 0, 0);
+        ft.setPaddingRelative(dp(this, 8), 0, 0, 0);
         fab.addView(ft);
         fab.setOnClickListener(v -> newChatSheet());
         FrameLayout.LayoutParams fp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(this, 56),
                 Gravity.BOTTOM | Gravity.END);
-        fp.rightMargin = dp(this, 16);
+        fp.setMarginEnd(dp(this, 16));
         fp.bottomMargin = dp(this, 92);
         root.addView(fab, fp);
         setContentView(root);
@@ -123,7 +123,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         SetupState setup = new SetupState(this);
         boolean ready = setup.canRun();
         LinearLayout top = row(this);
-        top.setPadding(dp(this, 20), dp(this, 12), dp(this, 20), dp(this, 8));
+        top.setPaddingRelative(dp(this, 20), dp(this, 12), dp(this, 20), dp(this, 8));
         FrameLayout tile = new FrameLayout(this);
         tile.setBackgroundResource(R.drawable.ic_launcher_background);
         tile.setClipToOutline(true);
@@ -138,12 +138,13 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         tile.addView(face, new FrameLayout.LayoutParams(dp(this, 30), dp(this, 30), Gravity.CENTER));
         top.addView(tile, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         LinearLayout name = column(this);
-        name.setPadding(dp(this, 12), 0, 0, 0);
+        name.setPaddingRelative(dp(this, 12), 0, 0, 0);
         name.addView(title(this, "Buddy", 22));
         LinearLayout status = row(this);
         status.addView(dot(this, ready ? OK : ACCENT, 7));
-        TextView st = monoText(this, ready ? "ready · 127.0.0.1:" + McpServer.PORT : "setup " + setup.count() + "/5", 12, MUTED);
-        st.setPadding(dp(this, 6), 0, 0, 0);
+        TextView st = monoText(this, ready ? getString(R.string.main_status_ready, "127.0.0.1:" + McpServer.PORT)
+                : getString(R.string.main_status_setup, setup.count(), 5), 12, MUTED);
+        st.setPaddingRelative(dp(this, 6), 0, 0, 0);
         status.addView(st);
         name.addView(status);
         top.addView(name, weight1());
@@ -151,14 +152,15 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
         if (!ready || setup.next() >= 0 && setup.next() < 3) {
             LinearLayout warn = row(this);
-            warn.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+            warn.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
             warn.setBackground(outlined(this, CARD, 16, Theme.withAlpha(ACCENT, 0x59), 1));
             warn.addView(icon(this, R.drawable.ms_build_circle, ACCENT, 24));
             LinearLayout wt = column(this);
-            wt.setPadding(dp(this, 12), 0, dp(this, 8), 0);
-            wt.addView(title(this, "Finish setup to run chats", 15));
+            wt.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+            wt.addView(title(this, getString(R.string.main_setup_title), 15));
             int n = setup.next();
-            wt.addView(text(this, "Next: " + (n >= 0 ? SetupState.STEPS[n] : "open Buddy's accessibility service"), 13, MUTED));
+            wt.addView(text(this, n >= 0 ? getString(R.string.main_setup_next, SetupState.step(n))
+                    : getString(R.string.main_setup_next_accessibility), 13, MUTED));
             warn.addView(wt, weight1());
             warn.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
             warn.setOnClickListener(v -> go(SetupActivity.class));
@@ -176,22 +178,22 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         }
         java.util.Collections.sort(recent, (a, b) -> Long.compare(b.updated, a.updated));
         if (!working.isEmpty()) {
-            list.addView(sectionHeader("Working", working.size()));
+            list.addView(sectionHeader(getString(R.string.main_section_working), working.size()));
             for (Sessions.Session s : working) list.addView(chatRow(s), full());
         }
         if (!recent.isEmpty()) {
-            list.addView(sectionLabel(this, "Recent"));
+            list.addView(sectionLabel(this, getString(R.string.main_section_recent)));
             for (Sessions.Session s : recent) list.addView(chatRow(s), full());
         }
         if (working.isEmpty() && recent.isEmpty()) {
             LinearLayout empty = column(this);
             empty.setGravity(Gravity.CENTER_HORIZONTAL);
-            empty.setPadding(dp(this, 32), dp(this, 64), dp(this, 32), 0);
+            empty.setPaddingRelative(dp(this, 32), dp(this, 64), dp(this, 32), 0);
             empty.addView(icon(this, R.drawable.ms_forum, MUTED, 40));
-            TextView et = title(this, "No chats yet", 17);
-            et.setPadding(0, dp(this, 12), 0, dp(this, 4));
+            TextView et = title(this, getString(R.string.main_empty_title), 17);
+            et.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
             empty.addView(et);
-            TextView es = text(this, "Tap New chat to start one with Claude Code or Codex. Long-press a chat to delete it.", 14, MUTED);
+            TextView es = text(this, getString(R.string.main_empty_text), 14, MUTED);
             es.setGravity(Gravity.CENTER);
             empty.addView(es);
             list.addView(empty, full());
@@ -201,11 +203,11 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
     private View sectionHeader(String label, int count) {
         LinearLayout r = row(this);
         TextView l = sectionLabel(this, label);
-        l.setPadding(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));
+        l.setPaddingRelative(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));
         r.addView(l);
         TextView n = monoText(this, String.valueOf(count), 12, ACCENT_TEXT);
         n.setTypeface(mono(this, 600));
-        n.setPadding(0, dp(this, 12), 0, 0);
+        n.setPaddingRelative(0, dp(this, 12), 0, 0);
         r.addView(n);
         return r;
     }
@@ -214,26 +216,27 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         LinearLayout r = listRow(this);
         r.addView(agentTile(this, ses.backend));
         LinearLayout col = column(this);
-        col.setPadding(dp(this, 14), 0, 0, 0);
+        col.setPaddingRelative(dp(this, 14), 0, 0, 0);
 
         LinearLayout first = row(this);
         first.addView(single(title(this, ses.label(), 15)), weight1());
         TextView time = monoText(this, ago(ses.updated), 12, MUTED);
-        time.setPadding(dp(this, 8), 0, 0, 0);
+        time.setPaddingRelative(dp(this, 8), 0, 0, 0);
         first.addView(time);
         if (ses.unread) {
             View d = dot(this, OK, 8);
-            ((LinearLayout.LayoutParams) d.getLayoutParams()).leftMargin = dp(this, 6);
+            ((LinearLayout.LayoutParams) d.getLayoutParams()).setMarginStart(dp(this, 6));
             first.addView(d);
         }
         col.addView(first, full());
 
         String agent = Account.cliOf(ses.backend);
-        col.addView(single(monoText(this, agent + " · " + Models.shownModel(ses).toLowerCase(Locale.ROOT),
+        col.addView(single(monoText(this, agent + " · " + Models.shownModel(ses).toLowerCase(Ui.locale(this)),
                 12, MUTED)));
         if (ses.running) {
-            TextView s = single(monoText(this, ses.status.isEmpty() ? "working…" : ses.status, 12, ACCENT_TEXT));
-            s.setPadding(0, dp(this, 4), 0, dp(this, 6));
+            TextView s = single(monoText(this, ses.status.isEmpty() ? getString(R.string.main_chat_working) : ses.status,
+                    12, ACCENT_TEXT));
+            s.setPaddingRelative(0, dp(this, 4), 0, dp(this, 6));
             col.addView(s);
             col.addView(thinBar(this));
         } else {
@@ -241,7 +244,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             for (int i = ses.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg m = ses.messages.get(i);
                 if (m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.USER) {
-                    last = (m.kind == Bubble.Kind.USER ? "You: " : "") + m.label().replace('\n', ' ');
+                    String preview = m.label().replace('\n', ' ');
+                    last = m.kind == Bubble.Kind.USER ? getString(R.string.main_chat_last_you, preview) : preview;
                     break;
                 }
             }
@@ -249,14 +253,15 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
                 TextView l = text(this, last, 14, MUTED);
                 l.setMaxLines(2);
                 l.setEllipsize(TextUtils.TruncateAt.END);
-                l.setPadding(0, dp(this, 4), 0, 0);
+                l.setPaddingRelative(0, dp(this, 4), 0, 0);
                 col.addView(l);
             }
         }
         r.addView(col, weight1());
         r.setOnClickListener(v -> open(ses));
         r.setOnLongClickListener(v -> {
-            confirmSheet(this, "Delete this chat?", ses.label(), "Delete", true, () -> hub.delete(ses));
+            confirmSheet(this, getString(R.string.main_delete_title), ses.label(), getString(R.string.main_delete_action), true,
+                    () -> hub.delete(ses));
             return true;
         });
         return r;
@@ -264,8 +269,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
     private void newChatSheet() {
         LinearLayout c = column(this);
-        TextView h = title(this, "New chat", 18);
-        h.setPadding(0, 0, 0, dp(this, 8));
+        TextView h = title(this, getString(R.string.main_new_chat), 18);
+        h.setPaddingRelative(0, 0, 0, dp(this, 8));
         c.addView(h);
         final Dialog[] d = new Dialog[1];
         String def = Prefs.backend(this);
@@ -273,22 +278,23 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             String[] a = {acc.agent, acc.name(), acc.tagline()};
             // agents that aren't set up are greyed out; tapping one opens its setup instead of a chat
             boolean ready = SetupState.signedIn(this, acc.agent);
-            if (!ready) a[2] = SetupState.installed(this, acc.agent) ? "Not signed in · tap to set up" : "Not installed · tap to set up";
+            if (!ready) a[2] = getString(SetupState.installed(this, acc.agent) ? R.string.main_new_chat_not_signed_in
+                    : R.string.main_new_chat_not_installed);
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             r.setBackgroundResource(ripple(this, false));
             if (!ready) r.setAlpha(0.45f);
             r.addView(agentTile(this, a[0]));
             LinearLayout t = column(this);
-            t.setPadding(dp(this, 14), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             LinearLayout tr = row(this);
             tr.addView(title(this, a[1], 15));
             if (a[0].equals(def)) {
-                TextView tag = monoText(this, "default", 11, ACCENT_TEXT);
-                tag.setPadding(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
+                TextView tag = monoText(this, getString(R.string.main_new_chat_default), 11, ACCENT_TEXT);
+                tag.setPaddingRelative(dp(this, 6), dp(this, 1), dp(this, 6), dp(this, 1));
                 tag.setBackground(rounded(this, ACCENT_SOFT, 6));
                 LinearLayout.LayoutParams tp = wrap();
-                tp.leftMargin = dp(this, 8);
+                tp.setMarginStart(dp(this, 8));
                 tr.addView(tag, tp);
             }
             t.addView(tr);
@@ -308,10 +314,10 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
     static String ago(long t) {
         long s = Math.max(0, (System.currentTimeMillis() - t) / 1000);
-        if (s < 60) return "now";
-        if (s < 3600) return s / 60 + "m";
-        if (s < 86400) return s / 3600 + "h";
-        return s / 86400 + "d";
+        if (s < 60) return BuddyApp.str(R.string.main_ago_now);
+        if (s < 3600) return BuddyApp.plural(R.plurals.main_ago_minutes, (int) (s / 60), s / 60);
+        if (s < 86400) return BuddyApp.plural(R.plurals.main_ago_hours, (int) (s / 3600), s / 3600);
+        return BuddyApp.plural(R.plurals.main_ago_days, (int) (s / 86400), s / 86400);
     }
 
     private void go(Class<?> c) {

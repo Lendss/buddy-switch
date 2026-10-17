@@ -88,9 +88,15 @@ final class Account {
         return claude() ? "Claude Code" : opencode() ? "OpenCode" : "Codex";
     }
 
+    /** The plan to show: OpenCode's "free models" marker in the user's language, anything else as it is. */
+    String planLabel() {
+        return "free models".equals(plan) ? BuddyApp.str(R.string.onboarding_agent_free_models) : plan;
+    }
+
     /** One line on what the agent runs on, for pickers. */
     String tagline() {
-        return claude() ? "Uses your Claude plan" : opencode() ? "Free models, or your own providers" : "Uses your ChatGPT plan";
+        return BuddyApp.str(claude() ? R.string.account_tagline_claude : opencode() ? R.string.account_tagline_opencode
+                : R.string.account_tagline_codex);
     }
 
     static void addListener(Listener l) {
@@ -195,7 +201,7 @@ final class Account {
                     }
                 }
             } catch (Exception e) {
-                set(Step.ERROR, "Couldn't check " + name() + ": " + e.getMessage());
+                set(Step.ERROR, app.getString(R.string.account_check_failed, name(), e.getMessage()));
             }
         }).start();
     }
@@ -205,31 +211,31 @@ final class Account {
         app = c.getApplicationContext();
         if (busy()) return;
         final Context app = c.getApplicationContext();
-        set(Step.INSTALLING, "Setting up Buddy's Linux…");
+        set(Step.INSTALLING, app.getString(R.string.account_setting_up_linux));
         new Thread(() -> {
             try {
                 synchronized (Account.class) { // both agents use apk; don't run it twice at once
                     Linux.install(app);
                     Helper.sync(app);
-                    set(Step.INSTALLING, "Installing tools…");
+                    set(Step.INSTALLING, app.getString(R.string.account_installing_tools));
                     String o = Linux.exec(app, "apk update -q && apk add -q bash curl jq libgcc libstdc++ ripgrep git "
                             + "ca-certificates procps coreutils findutils" + (claude() ? "" : " nodejs npm")
                             + " && echo TOOLS_OK", 900);
                     if (!o.contains("TOOLS_OK")) throw new IOException(tail(o));
                 }
                 if (claude()) {
-                    set(Step.INSTALLING, "Downloading Claude Code (about 230 MB)…");
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading_claude));
                     String o = Linux.exec(app, "curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && bash /tmp/install.sh"
                             + " && /root/.local/bin/claude --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
-                    set(Step.INSTALLING, "Downloading OpenCode…");
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
                     // OpenCode 2 (npm @opencode/cli), always a fresh install (OC_REMOVE)
                     String o = Linux.exec(app, OC_REMOVE + " npm install -g @opencode/cli >/tmp/npm.log 2>&1;"
                             + " tail -5 /tmp/npm.log;" + OC_GLIBC + " opencode --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else {
-                    set(Step.INSTALLING, "Downloading Codex…");
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
                     String o = Linux.exec(app, "npm install -g @openai/codex >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
                             + " codex --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
@@ -237,7 +243,7 @@ final class Account {
                 set(Step.SIGNED_OUT, "");
                 refresh(app);
             } catch (Exception e) {
-                set(Step.ERROR, "Install failed: " + e.getMessage());
+                set(Step.ERROR, app.getString(R.string.account_install_failed, e.getMessage()));
             }
         }).start();
     }
@@ -274,7 +280,8 @@ final class Account {
         final boolean toV2 = oldOpencode();
         updating = true;
         updateNote = "";
-        set(Step.INSTALLING, toV2 ? "Downloading OpenCode 2…" : "Checking for a new " + name() + "…");
+        set(Step.INSTALLING, toV2 ? app.getString(R.string.account_downloading, "OpenCode 2")
+                : app.getString(R.string.account_update_checking, name()));
         new Thread(() -> {
             String o;
             try {
@@ -297,12 +304,13 @@ final class Account {
                 }
                 String after = ver(o);
                 if (after.isEmpty()) throw new IOException(tail(o));
-                updateNote = after.equals(before) ? "You have the latest version (" + after + ")."
-                        : "Updated to " + after + (before.isEmpty() ? "." : " (was " + before + ").");
-                if (toV2 && !after.startsWith("2") && !after.matches("[3-9].*")) updateNote = "Couldn't update to OpenCode 2; "
-                        + "you still have " + after + ". Try again on Wi-Fi.";
+                updateNote = after.equals(before) ? app.getString(R.string.account_update_latest, after)
+                        : before.isEmpty() ? app.getString(R.string.account_updated, after)
+                        : app.getString(R.string.account_updated_from, after, before);
+                if (toV2 && !after.startsWith("2") && !after.matches("[3-9].*")) updateNote = app.getString(
+                        R.string.account_update_opencode2_failed, after);
             } catch (Exception e) {
-                updateNote = "Update failed: " + e.getMessage();
+                updateNote = app.getString(R.string.account_update_failed, e.getMessage());
             }
             updating = false;
             set(Step.CHECKING, "");
@@ -324,7 +332,7 @@ final class Account {
         state = null;
         userCode = null;
         remote = onOtherDevice;
-        set(Step.WAITING_BROWSER, "Starting sign-in…");
+        set(Step.WAITING_BROWSER, app.getString(R.string.signin_starting));
         new Thread(() -> {
             StringBuilder out = new StringBuilder();
             try {
@@ -391,7 +399,7 @@ final class Account {
             refresh(app);
             final String why = tail(stripAnsi(out.toString()));
             main.postDelayed(() -> {
-                if (step == Step.SIGNED_OUT) set(Step.ERROR, "Sign-in didn't finish. " + why);
+                if (step == Step.SIGNED_OUT) set(Step.ERROR, app.getString(R.string.signin_not_finished, why));
             }, 4000);
         }).start();
     }
@@ -402,7 +410,7 @@ final class Account {
         try {
             loginIn.write((code.trim() + "\n").getBytes(StandardCharsets.UTF_8));
             loginIn.flush();
-            set(Step.FINISHING, "Finishing sign-in…");
+            set(Step.FINISHING, BuddyApp.str(R.string.signin_finishing));
             return true;
         } catch (IOException e) {
             return false;

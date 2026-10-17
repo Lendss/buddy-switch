@@ -69,13 +69,13 @@ final class Attachments {
         File out = new File(dir(c), id);
         if (photo && savePhoto(c, uri, out)) return id;
         try (InputStream in = c.getContentResolver().openInputStream(uri); OutputStream o = new FileOutputStream(out)) {
-            if (in == null) throw new IOException("Can't open " + name);
+            if (in == null) throw new IOException(c.getString(R.string.attach_cant_open, name));
             byte[] buf = new byte[64 * 1024];
             long total = 0;
             int n;
             while ((n = in.read(buf)) > 0) {
                 total += n;
-                if (total > MAX_BYTES) throw new IOException(name + " is larger than 25 MB.");
+                if (total > MAX_BYTES) throw new IOException(c.getString(R.string.attach_too_large, name));
                 o.write(buf, 0, n);
             }
         } catch (IOException e) {

@@ -121,6 +121,7 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 - **Approvals** appear in the chat and in the bubble: **Approve**, **Deny**, or **Change**: type or say what to adjust ("make it 9, add a smiley"), and the agent revises the message, post or email and asks again.
 - **Sessions:** every Claude Code, Codex and OpenCode process in Buddy's Linux, with a Stop button. Recent sessions can be read, or continued in Buddy.
 - **Settings:** setup, appearance (light/dark/system, accent colour, surface), agents (install, sign in, sign out), voice, the bubble, app permissions, developer mode and Remote Control.
+- **Languages:** Buddy is in English, Arabic, Chinese (Simplified), Dutch, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Turkish and Ukrainian. It follows the phone's language; to pick another one for Buddy alone, use Android Settings → Apps → Buddy → Language. The agents answer in whatever language you write in.
 - **Terminal:** a real terminal for Buddy's Linux (Sessions → Terminal): tabs, text selection and copy, links, pinch to zoom. Claude Code's, Codex's and OpenCode's own screens run in it.
 
 ### Phone tools in your own sessions
@@ -162,7 +163,7 @@ An accessibility service is powerful. Please read this before installing.
 - **Approval gate.** The agent is instructed to call `confirm` before sending messages, posting, buying, deleting or changing settings. You see the exact action with **Approve / Change / Deny**. When the agent needs you to choose (which reply, which item), it can call `ask` instead: a card with 2–4 answers and your own typed answer.
 - **App permissions (enforced by Buddy, not the agent).** Settings → Experience → App permissions, per app:
   - **Trust:** asking is left to the agent.
-  - **Hard:** Buddy itself checks every tap; buttons like Send, Pay, Delete (built-in words in six languages, plus your own *always ask* / *never ask* rules, with suggestions from buttons the agent has tapped) need your OK.
+  - **Hard:** Buddy itself checks every tap; buttons like Send, Pay, Delete (built-in words in all of Buddy's languages, plus your own *always ask* / *never ask* rules, with suggestions from buttons the agent has tapped) need your OK.
   - **Smart:** the rules, then a separate temporary Claude Code or Codex session without tools reviews every other tap against your request and the screen (about 3 s a tap). OpenCode chats are reviewed by Claude Code or Codex.
   
   Messaging, social, email, calling, shopping and money apps start on Hard. The agent can never tap or type in Buddy's own bubble, cards or settings, so it can't approve for you or loosen the rules.
@@ -238,6 +239,7 @@ The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 | `.../Helper.java` | Runs `buddy-run` inside Linux and keeps its files up to date |
 | `.../Account.java`, `SignInActivity.java` | Install, one-tap sign-in and status for Claude Code, Codex and OpenCode |
 | `.../RemoteSession.java` | The Remote Control session |
+| `app/src/main/res/values/strings.xml` | Every text Buddy shows, in English; `values-<language>/` holds the translations |
 | `app/src/main/jniLibs/arm64-v8a/` | proot and its libraries (see [third_party](third_party/README.md)) |
 | `linux/buddy-run` | Runs the agent with the phone tools and streams events back |
 | `linux/system-prompt.md` | Buddy's instructions for the agent |

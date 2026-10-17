@@ -125,6 +125,7 @@ final class McpServer {
                 }
             }
             byte[] body = readBody(in, headers);
+            CALLER_GONE.set(() -> gone(s, in));
 
             if (!("Bearer " + token).equals(headers.get("authorization"))) {
                 send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
@@ -172,6 +173,7 @@ final class McpServer {
         } catch (Exception e) {
             Log.w(TAG, "request failed", e);
         } finally {
+            CALLER_GONE.remove();
             try {
                 s.close();
             } catch (IOException ignored) {
@@ -182,6 +184,25 @@ final class McpServer {
     /** Returns null for notifications. */
     /** The Buddy chat whose agent made the current request (on this thread), or null for another session. */
     static final ThreadLocal<String> CALLER_CHAT = new ThreadLocal<>();
+    /** True once the client of the current request (on this thread) has hung up, e.g. its tool call timed out. */
+    static final ThreadLocal<java.util.function.BooleanSupplier> CALLER_GONE = new ThreadLocal<>();
+
+    /** Each connection carries one request, already read: the client sends nothing more, so EOF means it hung up. */
+    private static boolean gone(Socket s, InputStream in) {
+        try {
+            s.setSoTimeout(50);
+            return in.read() == -1;
+        } catch (java.net.SocketTimeoutException e) {
+            return false;
+        } catch (IOException e) {
+            return true;
+        } finally {
+            try {
+                s.setSoTimeout(30000);
+            } catch (IOException ignored) {
+            }
+        }
+    }
 
     private JSONObject rpc(JSONObject req) throws JSONException {
         if (!req.has("id")) return null;

@@ -43,7 +43,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         root.setFitsSystemWindows(true);
         scroll = new ScrollView(this);
         list = column(this);
-        list.setPadding(0, dp(this, 12), 0, dp(this, 24));
+        list.setPaddingRelative(0, dp(this, 12), 0, dp(this, 24));
         scroll.addView(list);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         root.addView(bottomNav(this, NAV_SETTINGS, ChatHub.get(this).runningCount()), full());
@@ -100,11 +100,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         list.removeAllViews();
 
         LinearLayout head = column(this);
-        head.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
-        head.addView(title(this, "Settings", 28));
-        TextView sub = text(this, "Buddy runs Claude Code, Codex or OpenCode inside the app, on your own subscription "
-                + "(or OpenCode's free models).", 14, MUTED);
-        sub.setPadding(0, dp(this, 4), 0, 0);
+        head.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
+        head.addView(title(this, getString(R.string.setup_settings_title), 28));
+        TextView sub = text(this, getString(R.string.setup_settings_subtitle), 14, MUTED);
+        sub.setPaddingRelative(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
 
@@ -114,99 +113,93 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account acc = Account.of(backend);
         Step[] steps = new Step[5];
 
-        String a11yText = "This shows the bubble and lets Buddy read the screen, tap and type for you.";
+        String a11yText = getString(R.string.setup_step_a11y_body);
         if (!a11y && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            a11yText += "\n\nSwitch greyed out (\"Restricted setting\")? Android blocks this for apps installed from a file. "
-                    + "Tap App info, then ⋮ in the top right → Allow restricted settings, and try again.";
+            a11yText += "\n\n" + getString(R.string.setup_step_a11y_restricted);
         }
-        steps[0] = step("Turn on the Buddy accessibility service", a11yText, a11y,
-                a11y ? null : "Open settings", v -> openAccessibilitySettings(this),
-                a11y || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ? null : "App info", v -> openAppInfo(getPackageName()));
+        steps[0] = step(getString(R.string.setup_step_a11y_title), a11yText, a11y,
+                a11y ? null : getString(R.string.setup_open_settings), v -> openAccessibilitySettings(this),
+                a11y || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ? null : getString(R.string.setup_app_info),
+                v -> openAppInfo(getPackageName()));
 
         boolean installed = SetupState.installed(this, backend);
-        steps[1] = step("Install " + acc.name(), installed ? acc.name() + " is installed in Buddy."
+        steps[1] = step(getString(R.string.setup_step_install_title, acc.name()),
+                installed ? getString(R.string.setup_step_install_done, acc.name())
                         : acc.step == Account.Step.INSTALLING ? acc.detail
-                        : "Buddy downloads its own small Linux and " + acc.name() + (acc.claude()
-                        ? " from Anthropic (about 235 MB)." : acc.opencode() ? " (about 230 MB with Node.js)."
-                        : " from OpenAI (about 150 MB)."),
-                installed, installed || acc.step == Account.Step.INSTALLING ? null : "Install", v -> openAgent(backend),
-                null, null);
+                        : getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
+                        ? R.string.setup_step_install_opencode : R.string.setup_step_install_codex, acc.name()),
+                installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
+                v -> openAgent(backend), null, null);
 
         boolean signed = SetupState.signedIn(this, backend);
-        steps[2] = step("Sign in", acc.opencode() ? (signed ? "No sign-in needed: OpenCode's free models work right away. "
-                        + "Connect your own providers anytime." : "No sign-in needed for OpenCode's free models.")
-                        : signed ? "Signed in" + (acc.email.isEmpty() ? "." : " as " + acc.email + ".")
-                        : (acc.claude() ? "With your Claude account (Pro or Max)." : "With your ChatGPT account.")
-                        + " Your browser opens; approve there and Buddy comes back by itself.",
-                installed ? signed : null, installed && !signed ? "Sign in" : null, v -> openAgent(backend), null, null);
+        steps[2] = step(getString(R.string.setup_step_signin_title), acc.opencode()
+                        ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
+                        : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
+                        : getString(R.string.setup_step_signin_done_email, acc.email))
+                        : getString(acc.claude() ? R.string.setup_step_signin_claude : R.string.setup_step_signin_codex),
+                installed ? signed : null, installed && !signed ? getString(R.string.setup_sign_in) : null,
+                v -> openAgent(backend), null, null);
 
         PowerManager pm = getSystemService(PowerManager.class);
         boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
-        steps[3] = step("Let Buddy run in the background", buddyBg ? "Allowed."
-                        : "So your phone doesn't stop Buddy to save battery while the agent works.",
-                buddyBg, buddyBg ? null : "Allow", v -> startActivity(new Intent(
+        steps[3] = step(getString(R.string.setup_step_background_title), getString(buddyBg
+                        ? R.string.setup_step_background_done : R.string.setup_step_background_body),
+                buddyBg, buddyBg ? null : getString(R.string.setup_allow), v -> startActivity(new Intent(
                         Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))),
                 null, null);
 
         boolean replied = Prefs.hadReply(this);
-        steps[4] = step("Try it", replied
-                        ? "Buddy has answered you. Tap the bubble anytime to ask for more."
-                        : a11y && signed
-                        ? "Tap the bubble on the edge of your screen and ask something like \"open Messenger\", or start a chat here."
-                        : "Finish the steps above first.",
+        steps[4] = step(getString(R.string.setup_step_try_title), getString(replied ? R.string.setup_step_try_done
+                        : a11y && signed ? R.string.setup_step_try_body : R.string.setup_step_try_wait),
                 replied ? Boolean.TRUE : null, null, null, null, null);
         setupCard(steps);
 
         // ----------------------------------------------------------- appearance
-        list.addView(sectionLabel(this, "Appearance"));
+        list.addView(sectionLabel(this, getString(R.string.setup_appearance)));
         LinearLayout ap = card();
-        ap.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        ap.addView(fieldLabel("Mode", null));
-        ap.addView(segmented(this, Theme.MODES, Prefs.themeMode(this), false, v -> {
+        ap.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        ap.addView(fieldLabel(getString(R.string.setup_theme_mode), null));
+        ap.addView(segmented(this, Theme.modes(this), Prefs.themeMode(this), false, v -> {
             Prefs.setThemeMode(this, v);
             themeChanged();
         }), topGap(8));
-        ap.addView(fieldLabel("Accent", Theme.hex(Prefs.accent(this))), topGap(18));
+        ap.addView(fieldLabel(getString(R.string.setup_accent), Theme.hex(Prefs.accent(this))), topGap(18));
         ap.addView(swatches(), topGap(10));
-        ap.addView(fieldLabel("Surface", null), topGap(18));
-        ap.addView(segmented(this, Theme.SURFACES, Prefs.surface(this), false, v -> {
+        ap.addView(fieldLabel(getString(R.string.setup_surface), null), topGap(18));
+        ap.addView(segmented(this, Theme.surfaces(this), Prefs.surface(this), false, v -> {
             Prefs.setSurface(this, v);
             themeChanged();
         }), topGap(8));
-        TextView sn = text(this, "Warm is Buddy's original tone. Black (true black) applies in dark mode only.", 13, MUTED);
+        TextView sn = text(this, getString(R.string.setup_surface_note), 13, MUTED);
         ap.addView(sn, topGap(8));
         addCard(ap);
 
         // ---------------------------------------------------------------- agent
-        list.addView(sectionLabel(this, "Agent"));
+        list.addView(sectionLabel(this, getString(R.string.setup_agent)));
         LinearLayout ag = card();
-        ag.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        ag.addView(title(this, "Default brain", 15));
-        TextView brainInfo = text(this, "Who answers new chats from the bubble or the New chat button. Claude Code uses "
-                + "your Claude plan, Codex your ChatGPT plan, OpenCode its free models or your own providers. "
-                + "Only agents that are set up can be picked.", 13, MUTED);
-        brainInfo.setPadding(0, dp(this, 2), 0, 0);
+        ag.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        ag.addView(title(this, getString(R.string.setup_default_brain), 15));
+        TextView brainInfo = text(this, getString(R.string.setup_default_brain_info), 13, MUTED);
+        brainInfo.setPaddingRelative(0, dp(this, 2), 0, 0);
         ag.addView(brainInfo);
         ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}},
                 backend, false, v -> {
                     Prefs.setBackend(this, v);
-                    Toast.makeText(this, "New chats will use " + Account.nameOf(v)
-                            + ". You can pick per chat with the New chat button.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(v)),
+                            Toast.LENGTH_LONG).show();
                     render();
                 }, notReady(), v -> {
-                    Toast.makeText(this, "Set up " + Account.nameOf(v) + " first.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.setup_set_up_first, Account.nameOf(v)), Toast.LENGTH_SHORT).show();
                     openAgent(v);
                 }), topGap(12));
         for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
         addCard(ag);
 
         // ---------------------------------------------------------- phone tools
-        list.addView(sectionLabel(this, "Phone tools in your own sessions"));
+        list.addView(sectionLabel(this, getString(R.string.setup_phone_tools)));
         LinearLayout mcp = card();
-        mcp.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        mcp.addView(text(this, "Buddy's phone tools are a regular MCP server on this phone. Run this once in a terminal "
-                + "on the phone (Termux, for example) and that agent gets the phone tools in every session, even without "
-                + "the bubble.", 14, MUTED));
+        mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        mcp.addView(text(this, getString(R.string.setup_phone_tools_info), 14, MUTED));
         mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"}},
                 mcpAgent, true, v -> {
                     mcpAgent = v;
@@ -227,14 +220,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 + " --header \"Authorization: Bearer " + token + "\"";
         // the token is masked on screen so screenshots never leak it
         mcp.addView(codeBlock(this, cmd.replace(token, token.substring(0, 4) + "••••••••")), topGap(12));
-        Button copy = button(this, "Copy command", false);
+        Button copy = button(this, getString(R.string.setup_copy_command), false);
         copy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
         copy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
         copy.setCompoundDrawablePadding(dp(this, 8));
         copy.setOnClickListener(v -> {
             ClipboardManager cm = getSystemService(ClipboardManager.class);
             cm.setPrimaryClip(ClipData.newPlainText("Buddy MCP", cmd));
-            Toast.makeText(this, "Copied. Paste it in your terminal.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.setup_command_copied, Toast.LENGTH_SHORT).show();
         });
         LinearLayout.LayoutParams cpp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
         cpp.topMargin = dp(this, 12);
@@ -242,52 +235,44 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         addCard(mcp);
 
         // ---------------------------------------------------------------- voice
-        list.addView(sectionLabel(this, "Voice"));
+        list.addView(sectionLabel(this, getString(R.string.setup_voice)));
         LinearLayout vc = card();
-        vc.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        vc.addView(fieldLabel("Voice input", null));
+        vc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
+        vc.addView(fieldLabel(getString(R.string.setup_voice_input), null));
         String engine = Prefs.voiceEngine(this);
         // Claude's dictation needs Claude Code signed in, ChatGPT's voice needs Codex: otherwise greyed out
         java.util.Set<String> noVoice = new java.util.HashSet<>();
         if (!SetupState.signedIn(this, "claude")) noVoice.add("claude");
         if (!SetupState.signedIn(this, "codex")) noVoice.add("chatgpt");
-        vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"claude", "Claude"}, {"chatgpt", "ChatGPT"}},
+        vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"claude", "Claude"},
+                        {"chatgpt", "ChatGPT"}},
                 engine, false, v -> {
                     Prefs.setVoiceEngine(this, v);
                     render();
                 }, noVoice, this::needSignIn), topGap(8));
-        String engineNote = "claude".equals(engine)
-                ? "Claude Code's dictation on your Claude plan: very accurate. Supports English, French, German, Spanish, "
-                + "Italian, Portuguese, Dutch, Turkish, Russian, Japanese and more, but not Arabic: for Arabic, Buddy uses "
-                + "the phone's recognizer. The words appear when you pause."
-                : "chatgpt".equals(engine)
-                ? "ChatGPT's voice through Codex, on your ChatGPT plan. Understands any language, even mixed in one sentence. "
-                + "Only your words are used: ChatGPT's spoken replies are muted and it can't run anything."
-                : "Your phone's speech recognition (Google on most phones). Live text while you speak; detects which "
-                + "of your languages you're speaking.";
+        String engineNote = getString("claude".equals(engine) ? R.string.setup_voice_input_claude
+                : "chatgpt".equals(engine) ? R.string.setup_voice_input_chatgpt : R.string.setup_voice_input_phone);
         vc.addView(text(this, engineNote, 13, MUTED), topGap(8));
-        vc.addView(fieldLabel("Voice output", null), topGap(16));
+        vc.addView(fieldLabel(getString(R.string.setup_voice_output), null), topGap(16));
         String speech = Prefs.speechEngine(this);
-        vc.addView(segmented(this, new String[][]{{"phone", "Phone"}, {"chatgpt", "ChatGPT"}}, speech, false, v -> {
+        vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"chatgpt", "ChatGPT"}},
+                speech, false, v -> {
             Prefs.setSpeechEngine(this, v);
             render();
         }, noVoice, this::needSignIn), topGap(8));
-        vc.addView(text(this, "chatgpt".equals(speech)
-                ? "Replies are read in ChatGPT's natural voice (your ChatGPT plan, through Codex). It counts toward "
-                + "your ChatGPT voice usage; if it's unavailable, the phone's voice reads instead."
-                : "Your phone's text-to-speech voices, in the reply's language.", 13, MUTED), topGap(8));
+        vc.addView(text(this, getString("chatgpt".equals(speech) ? R.string.setup_voice_output_chatgpt
+                : R.string.setup_voice_output_phone), 13, MUTED), topGap(8));
         if ("chatgpt".equals(speech)) {
             LinearLayout voices = segmented(this, CodexSpeech.VOICES, Prefs.speechVoice(this), false, v -> {
                 Prefs.setSpeechVoice(this, v);
                 render();
                 Voice.stopSpeaking();
-                Voice.speak(this, "Bonjour ! Hi, I'm Buddy. This is how I sound.");
+                Voice.speak(this, getString(R.string.setup_voice_sample));
             });
             vc.addView(voices, topGap(8));
         }
-        vc.addView(fieldLabel("Languages", Voice.languageName(Prefs.voiceLang(this))), topGap(16));
-        TextView lh = text(this, "Tap to choose the languages you speak. Long-press one to make it the default. "
-                + "In a chat, long-press the mic to switch language.", 13, MUTED);
+        vc.addView(fieldLabel(getString(R.string.setup_languages), Voice.languageName(Prefs.voiceLang(this))), topGap(16));
+        TextView lh = text(this, getString(R.string.setup_languages_hint), 13, MUTED);
         vc.addView(lh, topGap(4));
         java.util.List<String> chosen = new java.util.ArrayList<>(java.util.Arrays.asList(Prefs.voiceLangs(this).split(",")));
         LinearLayout chipRow = null;
@@ -305,7 +290,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             chip.setGravity(Gravity.CENTER);
             chip.setSingleLine(true);
             chip.setEllipsize(android.text.TextUtils.TruncateAt.END);
-            chip.setPadding(dp(this, 8), dp(this, 8), dp(this, 8), dp(this, 8));
+            chip.setPaddingRelative(dp(this, 8), dp(this, 8), dp(this, 8), dp(this, 8));
             chip.setBackground(on ? outlined(this, ACCENT_SOFT, 10, Theme.withAlpha(ACCENT, 0x66), 1)
                     : outlined(this, 0x00000000, 10, OUTLINE, 1));
             chip.setOnClickListener(v -> {
@@ -328,7 +313,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 return true;
             });
             LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
-            if (inRow > 0) cp.leftMargin = dp(this, 6);
+            if (inRow > 0) cp.setMarginStart(dp(this, 6));
             chipRow.addView(chip, cp);
             inRow++;
         }
@@ -336,13 +321,13 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         addCard(vc);
 
         // ------------------------------------------------------- remote control
-        list.addView(sectionLabel(this, "Remote Control"));
+        list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
         LinearLayout rcc = card();
         boolean claudeIn = SetupState.signedIn(this, "claude");
-        rcc.addView(switchRow(this, "Claude Code session", "A Claude Code session that runs inside Buddy, with the phone tools. "
-                + "Continue it from the Claude app (Code) on this phone or anywhere.", Prefs.remoteSession(this), on -> {
+        rcc.addView(switchRow(this, getString(R.string.setup_remote_session), getString(R.string.setup_remote_session_info),
+                Prefs.remoteSession(this), on -> {
             if (on && !claudeIn) {
-                Toast.makeText(this, "Sign in to Claude Code first.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.setup_remote_sign_in_first, Toast.LENGTH_LONG).show();
                 render();
                 return;
             }
@@ -353,23 +338,25 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }), full());
         if (Prefs.remoteSession(this)) {
             LinearLayout st = row(this);
-            st.setPadding(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+            st.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
             RemoteSession.State rs = RemoteSession.state;
             st.addView(dot(this, rs == RemoteSession.State.ACTIVE ? OK : rs == RemoteSession.State.ERROR ? ERR : ACCENT, 8));
-            TextView stt = monoText(this, rs == RemoteSession.State.ACTIVE ? "active · \"" + Prefs.remoteName(this) + "\" in the Claude app"
+            TextView stt = monoText(this, rs == RemoteSession.State.ACTIVE
+                    ? getString(R.string.setup_remote_active, Prefs.remoteName(this))
                     : rs == RemoteSession.State.ERROR ? RemoteSession.detail
-                    : rs == RemoteSession.State.STARTING ? "starting…" : "stopped", 12,
+                    : getString(rs == RemoteSession.State.STARTING ? R.string.setup_remote_starting
+                    : R.string.setup_remote_stopped), 12,
                     rs == RemoteSession.State.ERROR ? ERR : MUTED);
-            stt.setPadding(dp(this, 8), 0, 0, 0);
+            stt.setPaddingRelative(dp(this, 8), 0, 0, 0);
             st.addView(stt, weight1());
             rcc.addView(st, full());
             if (rs == RemoteSession.State.ACTIVE && RemoteSession.url != null) {
-                Button open = button(this, "Open in the Claude app", false);
+                Button open = button(this, getString(R.string.setup_remote_open), false);
                 open.setOnClickListener(v -> {
                     try {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RemoteSession.url)));
                     } catch (Exception e) {
-                        Toast.makeText(this, "Couldn't open it.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.setup_remote_open_failed, Toast.LENGTH_SHORT).show();
                     }
                 });
                 LinearLayout.LayoutParams op = wrap();
@@ -385,18 +372,19 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             LinearLayout oc = card();
             LinearLayout r = listRow(this);
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+            r.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
             LinearLayout t = column(this);
-            t.addView(title(this, "Remove old Termux chats", 15));
-            t.addView(text(this, old.size() + (old.size() == 1 ? " chat" : " chats")
-                    + " from before Buddy had its own Linux. Agents can't continue them.", 13, MUTED));
+            t.addView(title(this, getString(R.string.setup_old_chats_title), 15));
+            t.addView(text(this, getResources().getQuantityString(R.plurals.setup_old_chats_body, old.size(), old.size()),
+                    13, MUTED));
             r.addView(t, weight1());
             r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-            r.setOnClickListener(v -> confirmSheet(this, "Remove " + old.size() + (old.size() == 1 ? " old chat?" : " old chats?"),
-                    "Removes them from Buddy's chat list. This can't be undone.", "Remove", true, () -> {
+            r.setOnClickListener(v -> confirmSheet(this,
+                    getResources().getQuantityString(R.plurals.setup_old_chats_remove, old.size(), old.size()),
+                    getString(R.string.setup_old_chats_remove_body), getString(R.string.setup_remove), true, () -> {
                         ChatHub hub = ChatHub.get(this);
                         for (Sessions.Session s : old) hub.delete(s);
-                        Toast.makeText(this, "Removed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.setup_removed, Toast.LENGTH_SHORT).show();
                         render();
                     }));
             oc.addView(r, full());
@@ -404,28 +392,28 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }
 
         // ----------------------------------------------------------- experience
-        list.addView(sectionLabel(this, "Experience"));
+        list.addView(sectionLabel(this, getString(R.string.setup_experience)));
         LinearLayout ex = card();
-        ex.addView(switchRow(this, "Chat bubble", "Floats over other apps. Drag it onto the ✕ to hide it; "
-                + "approval cards still pop up when an agent needs your OK.", Prefs.bubbleEnabled(this), on -> {
+        ex.addView(switchRow(this, getString(R.string.setup_chat_bubble), getString(R.string.setup_chat_bubble_info),
+                Prefs.bubbleEnabled(this), on -> {
             Prefs.setBubbleEnabled(this, on);
             if (on) HiddenNotice.cancel(this);
             BuddyService svc = BuddyService.get();
             if (svc != null) svc.applyBubbleSetting();
         }), full());
         ex.addView(divider(), lineParams());
-        ex.addView(switchRow(this, "Tap the bubble to talk", "One tap opens the mic: say what you want and it sends "
-                + "when you pause. Hold the bubble for the chat and more.", Prefs.tapToTalk(this), on -> Prefs.setTapToTalk(this, on)), full());
+        ex.addView(switchRow(this, getString(R.string.setup_tap_to_talk), getString(R.string.setup_tap_to_talk_info),
+                Prefs.tapToTalk(this), on -> Prefs.setTapToTalk(this, on)), full());
         ex.addView(divider(), lineParams());
-        ex.addView(switchRow(this, "Read replies aloud", "Talk with the mic in any chat; it sends when you stop speaking.",
+        ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),
                 Prefs.speakReplies(this), on -> {
                     Prefs.setSpeakReplies(this, on);
                     if (!on) Voice.stopSpeaking();
                 }), full());
         ex.addView(divider(), lineParams());
         if (!Flavor.PLAY) { // the Play build is updated by Play
-            ex.addView(switchRow(this, "Update notices", "Buddy checks GitHub once a day and notifies you when a new "
-                    + "version is out.", Prefs.updateNotices(this), on -> {
+            ex.addView(switchRow(this, getString(R.string.setup_update_notices), getString(R.string.setup_update_notices_info),
+                    Prefs.updateNotices(this), on -> {
                 Prefs.setUpdateNotices(this, on);
                 if (!on) Updates.cancel(this);
                 else Prefs.setUpdateNotified(this, ""); // notify again about a version muted before
@@ -434,9 +422,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             LinearLayout upd = listRow(this);
             upd.setGravity(Gravity.CENTER_VERTICAL);
             LinearLayout ut = column(this);
-            ut.addView(title(this, "Check for updates", 15));
-            ut.addView(text(this, "You have Buddy " + BuildInfo.VERSION + ". Or ask any agent: \u201cupdate yourself\u201d.",
-                    13, MUTED), topGap(2));
+            ut.addView(title(this, getString(R.string.setup_check_updates), 15));
+            ut.addView(text(this, getString(R.string.setup_check_updates_info, BuildInfo.VERSION), 13, MUTED), topGap(2));
             upd.addView(ut, weight1());
             upd.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
             upd.setOnClickListener(v -> Updates.showSheet(this));
@@ -446,9 +433,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout perms = listRow(this);
         perms.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout pt = column(this);
-        pt.addView(title(this, "App permissions", 15));
-        pt.addView(text(this, "Choose per app: Trust lets the agent work there without popups; Hard means Buddy "
-                + "itself asks you before Send, Pay, Delete…", 13, MUTED), topGap(2));
+        pt.addView(title(this, getString(R.string.setup_app_permissions), 15));
+        pt.addView(text(this, getString(R.string.setup_app_permissions_info), 13, MUTED), topGap(2));
         perms.addView(pt, weight1());
         perms.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
         perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
@@ -456,29 +442,26 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
         if (!Flavor.PLAY) { // building and installing apps isn't allowed on Play
-            ex.addView(protect(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
-                    + "~/.buddy/work, so it can build and install apps.", dev, on -> {
+            ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
+                    dev, on -> {
                 Prefs.setDevMode(this, on);
                 render();
             })), full());
             ex.addView(divider(), lineParams());
         }
-        ex.addView(protect(switchRow(this, "Let agents tap Buddy's screens", "For testing Buddy with an agent (for "
-                + "example Claude Code in Termux with the phone tools). The bubble, approval cards, App permissions and "
-                + "these switches stay off-limits.", Prefs.agentsTapBuddy(this), on -> {
+        ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
+                Prefs.agentsTapBuddy(this), on -> {
             Prefs.setAgentsTapBuddy(this, on);
             render();
         })), full());
         if (dev) {
             LinearLayout warn = row(this);
             warn.setGravity(Gravity.TOP);
-            warn.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+            warn.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
             warn.setBackground(rounded(this, ERR_SOFT, 12));
             warn.addView(icon(this, R.drawable.ms_warning, ERR, 18));
-            TextView wt = text(this, "Leave it off for everyday use: with it on, a malicious message or web page on screen "
-                    + "could try to trick the agent into running commands. Approval cards still guard sending, posting, "
-                    + "buying and deleting.", 13, ERR);
-            wt.setPadding(dp(this, 10), 0, 0, 0);
+            TextView wt = text(this, getString(R.string.setup_dev_mode_warning), 13, ERR);
+            wt.setPaddingRelative(dp(this, 10), 0, 0, 0);
             warn.addView(wt, weight1());
             LinearLayout.LayoutParams wp = full();
             wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
@@ -488,16 +471,16 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
         TextView ver = monoText(this, "buddy " + BuildInfo.VERSION + " · " + getPackageName(), 12, MUTED);
         ver.setGravity(Gravity.CENTER);
-        ver.setPadding(0, dp(this, 24), 0, 0);
+        ver.setPaddingRelative(0, dp(this, 24), 0, 0);
         list.addView(ver, full());
-        TextView lic = text(this, "Open-source licences", 13, ACCENT_TEXT);
+        TextView lic = text(this, getString(R.string.setup_licences), 13, ACCENT_TEXT);
         lic.setGravity(Gravity.CENTER);
-        lic.setPadding(0, dp(this, 8), 0, dp(this, 4));
+        lic.setPaddingRelative(0, dp(this, 8), 0, dp(this, 4));
         lic.setOnClickListener(v -> licences());
         list.addView(lic, full());
-        TextView priv = text(this, "Privacy policy", 13, ACCENT_TEXT);
+        TextView priv = text(this, getString(R.string.setup_privacy_policy), 13, ACCENT_TEXT);
         priv.setGravity(Gravity.CENTER);
-        priv.setPadding(0, dp(this, 4), 0, dp(this, 8));
+        priv.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
         priv.setOnClickListener(v -> openUrl(Ui.PRIVACY_URL));
         list.addView(priv, full());
     }
@@ -527,12 +510,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         boolean open = setupOpen != null ? setupOpen : !complete;
 
         LinearLayout c = card();
-        c.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        c.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
         LinearLayout head = row(this);
-        head.addView(title(this, "Setup", 17));
+        head.addView(title(this, getString(R.string.setup_card_title), 17));
         TextView n = monoText(this, done + "/5", 12, complete ? OK : ACCENT_TEXT);
         n.setTypeface(mono(this, 600));
-        n.setPadding(dp(this, 8), dp(this, 2), 0, 0);
+        n.setPaddingRelative(dp(this, 8), dp(this, 2), 0, 0);
         head.addView(n, weight1());
         head.addView(icon(this, open ? R.drawable.ms_expand_less : R.drawable.ms_expand_more, MUTED, 22));
         head.setOnClickListener(v -> {
@@ -557,15 +540,16 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         c.addView(bar, bp);
 
         if (!complete) {
-            TextView guide = text(this, "Open the step-by-step guide", 14, ACCENT_TEXT);
+            TextView guide = text(this, getString(R.string.setup_open_guide), 14, ACCENT_TEXT);
             guide.setTypeface(sans(this, 600));
-            guide.setPadding(0, dp(this, 12), 0, 0);
+            guide.setPaddingRelative(0, dp(this, 12), 0, 0);
             guide.setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class)));
             c.addView(guide);
         }
         if (!open) {
-            TextView s = text(this, complete ? "All set. Buddy is ready." : "Next: " + steps[next].title, 13, MUTED);
-            s.setPadding(0, dp(this, 10), 0, 0);
+            TextView s = text(this, complete ? getString(R.string.setup_all_set)
+                    : getString(R.string.setup_next_step, steps[next].title), 13, MUTED);
+            s.setPaddingRelative(0, dp(this, 10), 0, 0);
             c.addView(single(s));
         } else {
             for (int i = 0; i < steps.length; i++) {
@@ -573,7 +557,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 boolean isDone = Boolean.TRUE.equals(st.done), isNext = i == next;
                 LinearLayout r = row(this);
                 r.setGravity(Gravity.TOP);
-                r.setPadding(0, dp(this, 14), 0, 0);
+                r.setPaddingRelative(0, dp(this, 14), 0, 0);
                 FrameLayout circle = new FrameLayout(this);
                 if (isDone) {
                     circle.setBackground(oval(OK));
@@ -589,13 +573,13 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 }
                 r.addView(circle, new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24)));
                 LinearLayout col = column(this);
-                col.setPadding(dp(this, 12), dp(this, 2), 0, 0);
+                col.setPaddingRelative(dp(this, 12), dp(this, 2), 0, 0);
                 TextView t = title(this, st.title, 15);
                 if (!isDone && !isNext) t.setTextColor(MUTED);
                 col.addView(t);
                 if (isNext) {
                     TextView b = text(this, st.body, 14, MUTED);
-                    b.setPadding(0, dp(this, 4), 0, 0);
+                    b.setPaddingRelative(0, dp(this, 4), 0, 0);
                     col.addView(b);
                     if (st.action != null || st.action2 != null) {
                         LinearLayout btns = row(this);
@@ -642,7 +626,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout r = row(this);
         int current = Prefs.accent(this);
         boolean preset = false;
-        for (String[] a : Theme.ACCENTS) {
+        for (String[] a : Theme.accents(this)) {
             int col = Theme.parse(a[0], 0xFFD97757);
             boolean on = col == current;
             preset |= on;
@@ -651,8 +635,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 themeChanged();
             }), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
         }
-        r.addView(swatch(preset ? CARD2 : current, !preset, preset ? R.drawable.ms_add : 0, "Custom colour",
-                v -> customAccent()), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
+        r.addView(swatch(preset ? CARD2 : current, !preset, preset ? R.drawable.ms_add : 0,
+                getString(R.string.setup_custom_colour), v -> customAccent()), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
         return r;
     }
 
@@ -675,9 +659,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     private void customAccent() {
         LinearLayout c = column(this);
-        c.addView(title(this, "Custom accent", 18));
-        TextView s = text(this, "Any colour as a hex code, like #4F8BFF.", 13, MUTED);
-        s.setPadding(0, dp(this, 2), 0, dp(this, 12));
+        c.addView(title(this, getString(R.string.setup_custom_accent_title), 18));
+        TextView s = text(this, getString(R.string.setup_custom_accent_hint), 13, MUTED);
+        s.setPaddingRelative(0, dp(this, 2), 0, dp(this, 12));
         c.addView(s);
         LinearLayout r = row(this);
         final View preview = new View(this);
@@ -689,14 +673,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         et.setTypeface(mono(this, 400));
         et.setTextSize(15);
         et.setSingleLine(true);
-        et.setPadding(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
         et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
         LinearLayout.LayoutParams ep = weight1();
-        ep.leftMargin = dp(this, 12);
+        ep.setMarginStart(dp(this, 12));
         r.addView(et, ep);
-        Button apply = button(this, "Apply", true);
+        Button apply = button(this, getString(R.string.setup_apply), true);
         LinearLayout.LayoutParams app = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-        app.leftMargin = dp(this, 8);
+        app.setMarginStart(dp(this, 8));
         r.addView(apply, app);
         c.addView(r, full());
         et.addTextChangedListener(new TextWatcher() {
@@ -792,7 +776,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         t.setTextIsSelectable(true);
         sv.addView(t);
         LinearLayout c = column(this);
-        c.addView(title(this, "Open-source licences", 18));
+        c.addView(title(this, getString(R.string.setup_licences), 18));
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 (int) (getResources().getDisplayMetrics().heightPixels * 0.6f));
         sp.topMargin = dp(this, 10);
@@ -817,10 +801,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     /** A greyed-out voice option was tapped: say which agent it needs, and offer to set it up. */
     private void needSignIn(String option) {
         String agent = "claude".equals(option) ? "claude" : "codex";
-        confirmSheet(this, "Sign in to " + Account.nameOf(agent) + " first",
-                ("claude".equals(option) ? "Claude's dictation" : "ChatGPT's voice") + " runs on your "
-                        + ("claude".equals(option) ? "Claude" : "ChatGPT") + " plan through " + Account.nameOf(agent) + ".",
-                "Set up " + Account.nameOf(agent), false, () -> openAgent(agent));
+        confirmSheet(this, getString(R.string.setup_sign_in_first, Account.nameOf(agent)),
+                getString("claude".equals(option) ? R.string.setup_needs_claude : R.string.setup_needs_chatgpt,
+                        Account.nameOf(agent)),
+                getString(R.string.setup_set_up_agent, Account.nameOf(agent)), false, () -> openAgent(agent));
     }
 
     /** An agent with its state (not installed / signed out / signed in); tap to install or sign in. */
@@ -828,15 +812,19 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account a = Account.of(agent);
         String st = Prefs.agentState(this, agent);
         boolean busy = a.step == Account.Step.INSTALLING;
-        String state = busy ? "installing…" : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? "not installed"
-                : a.opencode() ? "ready" + (a.plan.isEmpty() ? "" : " · " + a.plan)
-                : "SIGNED_IN".equals(st) ? "signed in" + (a.email.isEmpty() ? "" : " · " + a.email) : "not signed in";
+        String state = busy ? getString(R.string.setup_agent_installing)
+                : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? getString(R.string.setup_agent_not_installed)
+                : a.opencode() ? (a.plan.isEmpty() ? getString(R.string.setup_agent_ready)
+                : getString(R.string.setup_agent_ready_plan, a.planLabel()))
+                : "SIGNED_IN".equals(st) ? (a.email.isEmpty() ? getString(R.string.setup_agent_signed_in)
+                : getString(R.string.setup_agent_signed_in_email, a.email))
+                : getString(R.string.setup_agent_not_signed_in);
         LinearLayout r = row(this);
-        r.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        r.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
         r.setBackgroundResource(ripple(this, false));
         r.addView(agentTile(this, agent));
         LinearLayout t = column(this);
-        t.setPadding(dp(this, 12), 0, dp(this, 8), 0);
+        t.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
         t.addView(title(this, a.name(), 15));
         t.addView(single(monoText(this, state, 12, "SIGNED_IN".equals(st) && !busy ? OK : MUTED)));
         r.addView(t, weight1());

@@ -66,13 +66,13 @@ final class Reviewer {
         try {
             String out = "codex".equals(harness) ? CodexDictation.review(c, SYSTEM, prompt, TIMEOUT_MS) : claude(c, prompt);
             int a = out.indexOf('{'), b = out.lastIndexOf('}');
-            if (a < 0 || b < a) throw new Exception("no answer");
+            if (a < 0 || b < a) throw new Exception(c.getString(R.string.reviewer_no_answer));
             JSONObject j = new JSONObject(out.substring(a, b + 1));
             String d = j.optString("decision");
             if (!d.equals("allow") && !d.equals("ask") && !d.equals("block")) d = "ask";
             return new Decision(d, j.optString("reason"), name);
         } catch (Exception e) {
-            return new Decision("ask", "the reviewer couldn't answer (" + e.getMessage() + ")", name);
+            return new Decision("ask", c.getString(R.string.reviewer_failed, e.getMessage()), name); // the reason is shown on the card
         }
     }
 

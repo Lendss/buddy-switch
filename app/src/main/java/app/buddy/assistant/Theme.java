@@ -24,6 +24,29 @@ final class Theme {
     private Theme() {
     }
 
+    /** {@link #ACCENTS} with the colour names in the user's language (the labels above are English). */
+    static String[][] accents(Context c) {
+        return labeled(c, ACCENTS, R.string.prefs_accent_coral, R.string.prefs_accent_ocean, R.string.prefs_accent_mint,
+                R.string.prefs_accent_violet, R.string.prefs_accent_rose, R.string.prefs_accent_amber);
+    }
+
+    /** {@link #SURFACES} with labels in the user's language. */
+    static String[][] surfaces(Context c) {
+        return labeled(c, SURFACES, R.string.prefs_surface_warm, R.string.prefs_surface_neutral, R.string.prefs_surface_black);
+    }
+
+    /** {@link #MODES} with labels in the user's language. */
+    static String[][] modes(Context c) {
+        return labeled(c, MODES, R.string.prefs_theme_system, R.string.prefs_theme_light, R.string.prefs_theme_dark);
+    }
+
+    /** {value, label} pairs with each label replaced by the string resource at the same index. */
+    private static String[][] labeled(Context c, String[][] options, int... labels) {
+        String[][] out = new String[options.length][];
+        for (int i = 0; i < options.length; i++) out[i] = new String[]{options[i][0], c.getString(labels[i])};
+        return out;
+    }
+
     static boolean isDark(Context c) {
         String m = Prefs.themeMode(c);
         if ("dark".equals(m)) return true;

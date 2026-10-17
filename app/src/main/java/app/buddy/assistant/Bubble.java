@@ -178,7 +178,7 @@ final class Bubble implements ChatHub.Listener {
         face.setElevation(dp(5));
         face.setContentDescription("Buddy");
         // room around the face for the working ring
-        bubbleFrame.setPadding(dp(4), dp(4), dp(4), dp(4));
+        bubbleFrame.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
         bubbleFrame.setClipToPadding(false);
         bubbleFrame.setClipChildren(false);
         FrameLayout faceBox = new FrameLayout(svc);
@@ -190,7 +190,7 @@ final class Bubble implements ChatHub.Listener {
         holdRing = new HoldRing(svc);
         faceBox.addView(holdRing, new FrameLayout.LayoutParams(dp(74), dp(74), Gravity.CENTER));
         // 4. screen readers: "double-tap and hold for actions"
-        face.setContentDescription("Buddy. Tap to open, hold for actions");
+        face.setContentDescription(svc.getString(R.string.bubble_face_description));
         face.setLongClickable(true);
         face.setOnLongClickListener(v -> { // TalkBack's double-tap-and-hold (touches go to DragListener)
             openMenu();
@@ -201,7 +201,7 @@ final class Bubble implements ChatHub.Listener {
             public void onInitializeAccessibilityNodeInfo(View host, android.view.accessibility.AccessibilityNodeInfo info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
                 info.addAction(new android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction(
-                        android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK, "show actions"));
+                        android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK, svc.getString(R.string.bubble_show_actions)));
             }
         });
         LinearLayout column = new LinearLayout(svc);
@@ -227,15 +227,15 @@ final class Bubble implements ChatHub.Listener {
         pill.setMaxLines(2); // status lines are often longer than one line
         pill.setLineSpacing(0, 1.05f);
         pill.setEllipsize(TextUtils.TruncateAt.END);
-        pill.setPadding(dp(12), dp(8), dp(12), dp(8));
+        pill.setPaddingRelative(dp(12), dp(8), dp(12), dp(8));
         pill.setBackground(rounded(Ui.BG, 18, Ui.ACCENT, 1));
         pill.setVisibility(View.GONE);
         LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         plp.gravity = Gravity.TOP;
         plp.topMargin = dp(22); // level with the face's centre, not the stop button below it
-        plp.leftMargin = dp(6);
-        plp.rightMargin = dp(6);
+        plp.setMarginStart(dp(6));
+        plp.setMarginEnd(dp(6));
         collapsed.addView(pill, plp);
         pill.setOnClickListener(v -> expand());
 
@@ -245,7 +245,7 @@ final class Bubble implements ChatHub.Listener {
     private void buildPanel() {
         panel = new LinearLayout(svc);
         panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setPadding(dp(12), dp(10), dp(12), dp(12));
+        panel.setPaddingRelative(dp(12), dp(10), dp(12), dp(12));
         panel.setBackground(rounded(Ui.BG, 24, Ui.OUTLINE, 1));
         panel.setElevation(dp(10));
 
@@ -254,7 +254,7 @@ final class Bubble implements ChatHub.Listener {
         top.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout titles = new LinearLayout(svc);
         titles.setOrientation(LinearLayout.VERTICAL);
-        titles.setPadding(dp(4), dp(2), dp(4), dp(2));
+        titles.setPaddingRelative(dp(4), dp(2), dp(4), dp(2));
         titles.setOnClickListener(v -> toggleSessionList());
         header = new TextView(svc);
         header.setText("Buddy");
@@ -276,9 +276,9 @@ final class Bubble implements ChatHub.Listener {
         chp.topMargin = dp(3);
         titles.addView(chip, chp);
         top.addView(titles, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        top.addView(toolIcon(R.drawable.ms_add, "New chat", Ui.MUTED, v -> showNewChat()));
-        top.addView(toolIcon(R.drawable.ms_open_in_full, "Open in the app", Ui.MUTED, v -> openInApp(false)));
-        top.addView(toolIcon(R.drawable.ms_close, "Close", Ui.MUTED, v -> collapse()));
+        top.addView(toolIcon(R.drawable.ms_add, svc.getString(R.string.bubble_new_chat), Ui.MUTED, v -> showNewChat()));
+        top.addView(toolIcon(R.drawable.ms_open_in_full, svc.getString(R.string.bubble_open_in_app), Ui.MUTED, v -> openInApp(false)));
+        top.addView(toolIcon(R.drawable.ms_close, svc.getString(R.string.bubble_close), Ui.MUTED, v -> collapse()));
         panel.addView(top, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         View line = new View(svc);
@@ -291,18 +291,18 @@ final class Bubble implements ChatHub.Listener {
         // running strip, as in the chat screen: what it's doing, and Stop
         strip = new LinearLayout(svc);
         strip.setGravity(Gravity.CENTER_VERTICAL);
-        strip.setPadding(dp(12), dp(6), dp(6), dp(6));
+        strip.setPaddingRelative(dp(12), dp(6), dp(6), dp(6));
         strip.setBackground(rounded(Ui.CARD, 12, 0, 0));
         strip.addView(Ui.spinner(svc, 16));
         stripText = Ui.single(Ui.monoText(svc, "", 12, Ui.ACCENT_TEXT));
-        stripText.setPadding(dp(10), 0, dp(8), 0);
+        stripText.setPaddingRelative(dp(10), 0, dp(8), 0);
         strip.addView(stripText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        Button stopBtn = Ui.button(svc, "Stop", false);
+        Button stopBtn = Ui.button(svc, svc.getString(R.string.bubble_stop), false);
         stopBtn.setTextColor(Ui.ERR);
         stopBtn.setBackground(rounded(Ui.ERR_SOFT, 10, 0, 0));
         stopBtn.setMinHeight(dp(34));
         stopBtn.setMinimumHeight(dp(34));
-        stopBtn.setPadding(dp(14), 0, dp(14), 0);
+        stopBtn.setPaddingRelative(dp(14), 0, dp(14), 0);
         stopBtn.setOnClickListener(v -> stop());
         strip.addView(stopBtn, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(34)));
         strip.setVisibility(View.GONE);
@@ -322,23 +322,23 @@ final class Bubble implements ChatHub.Listener {
         };
         messages = new LinearLayout(svc);
         messages.setOrientation(LinearLayout.VERTICAL);
-        messages.setPadding(0, dp(8), 0, dp(8));
+        messages.setPaddingRelative(0, dp(8), 0, dp(8));
         scroll.addView(messages);
         panel.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         listScroll = new ScrollView(svc);
         sessionList = new LinearLayout(svc);
         sessionList.setOrientation(LinearLayout.VERTICAL);
-        sessionList.setPadding(0, dp(8), 0, dp(8));
+        sessionList.setPaddingRelative(0, dp(8), 0, dp(8));
         listScroll.addView(sessionList);
         listScroll.setVisibility(View.GONE);
         panel.addView(listScroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         confirmCard = new LinearLayout(svc);
         confirmCard.setOrientation(LinearLayout.VERTICAL);
-        confirmCard.setPadding(dp(12), dp(10), dp(12), dp(10));
+        confirmCard.setPaddingRelative(dp(12), dp(10), dp(12), dp(10));
         confirmCard.setBackground(rounded(Ui.CARD, 18, Theme.withAlpha(Ui.ACCENT, 0x73), 1));
         confirmLabel = new TextView(svc);
-        confirmLabel.setText("NEEDS YOUR OK");
+        confirmLabel.setText(R.string.card_label_approval);
         confirmLabel.setLetterSpacing(0.06f);
         confirmLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         confirmLabel.setTextColor(Ui.ACCENT_TEXT);
@@ -347,7 +347,7 @@ final class Bubble implements ChatHub.Listener {
         confirmText = new TextView(svc);
         confirmText.setTextColor(Ui.TEXT);
         confirmText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        confirmText.setPadding(0, dp(6), 0, dp(10));
+        confirmText.setPaddingRelative(0, dp(6), 0, dp(10));
         // long texts scroll inside the card, so its buttons always stay on screen
         ScrollView cs = new ScrollView(svc) {
             @Override
@@ -366,26 +366,26 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout row = new LinearLayout(svc);
         confirmRow = row;
         row.setGravity(Gravity.END);
-        Button deny = actionButton("Deny", Ui.ERR_SOFT);
+        Button deny = actionButton(svc.getString(R.string.card_deny), Ui.ERR_SOFT);
         confirmDeny = deny;
         deny.setTextColor(Ui.ERR);
         deny.setOnClickListener(v -> answerConfirm(false));
         // Change: the user types or says what to change, and the agent gets that back instead of a yes/no
-        Button change = actionButton("Change", Ui.CARD);
+        Button change = actionButton(svc.getString(R.string.card_change), Ui.CARD);
         confirmChange = change;
         change.setTextColor(Ui.TEXT);
         change.setOnClickListener(v -> startChange());
-        Button approve = actionButton("Approve", Ui.ACCENT);
+        Button approve = actionButton(svc.getString(R.string.card_approve), Ui.ACCENT);
         confirmApprove = approve;
         approve.setOnClickListener(v -> answerConfirm(true));
         row.addView(deny);
         LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        changeLp.leftMargin = dp(8);
+        changeLp.setMarginStart(dp(8));
         row.addView(change, changeLp);
         LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        alp.leftMargin = dp(8);
+        alp.setMarginStart(dp(8));
         row.addView(approve, alp);
         confirmCard.addView(row);
         confirmCard.setVisibility(View.GONE);
@@ -397,14 +397,14 @@ final class Bubble implements ChatHub.Listener {
         // composer: one pill with the text field, a mic and a round send button (like the chat screen)
         LinearLayout inputRow = new LinearLayout(svc);
         inputRow.setGravity(Gravity.CENTER_VERTICAL);
-        inputRow.setPadding(dp(4), dp(4), dp(4), dp(4));
+        inputRow.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
         inputRow.setBackground(rounded(Ui.CARD, 26, Ui.OUTLINE, 1));
         // attachments are picked in the app (camera, gallery, files), with this chat and draft open
-        android.widget.ImageButton attach = Ui.iconButton(svc, R.drawable.ms_attach_file, "Attach a photo or file", Ui.MUTED);
+        android.widget.ImageButton attach = Ui.iconButton(svc, R.drawable.ms_attach_file, svc.getString(R.string.bubble_attach), Ui.MUTED);
         attach.setOnClickListener(v -> openInApp(true));
         inputRow.addView(attach, new LinearLayout.LayoutParams(dp(40), dp(40)));
         input = new EditText(svc);
-        input.setHint("Ask Buddy…");
+        input.setHint(svc.getString(R.string.bubble_input_hint, "Buddy"));
         input.setHintTextColor(Ui.MUTED);
         input.setTextColor(Ui.TEXT);
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
@@ -413,7 +413,7 @@ final class Bubble implements ChatHub.Listener {
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         input.setImeOptions(EditorInfo.IME_ACTION_SEND);
-        input.setPadding(0, dp(10), 0, dp(10));
+        input.setPaddingRelative(0, dp(10), 0, dp(10));
         input.setBackground(null);
         input.setOnFocusChangeListener((v, has) -> {
             refit();
@@ -425,7 +425,7 @@ final class Bubble implements ChatHub.Listener {
         });
         inputRow.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         // Android shows no Copy/Paste menu in an overlay window: a Paste button shows while something is copied
-        paste = Ui.iconButton(svc, R.drawable.ms_content_paste, "Paste", Ui.MUTED);
+        paste = Ui.iconButton(svc, R.drawable.ms_content_paste, svc.getString(R.string.bubble_paste), Ui.MUTED);
         paste.setOnClickListener(v -> pasteClip());
         paste.setVisibility(View.GONE);
         inputRow.addView(paste, new LinearLayout.LayoutParams(dp(40), dp(40)));
@@ -434,7 +434,7 @@ final class Bubble implements ChatHub.Listener {
         input.setLongClickable(false);
         mic = new ImageButton(svc);
         mic.setImageResource(R.drawable.ms_mic);
-        mic.setContentDescription("Talk");
+        mic.setContentDescription(svc.getString(R.string.bubble_talk));
         mic.setScaleType(ImageView.ScaleType.CENTER);
         mic.setOnClickListener(v -> toggleMic());
         inputRow.addView(mic, new LinearLayout.LayoutParams(dp(40), dp(40)));
@@ -442,11 +442,11 @@ final class Bubble implements ChatHub.Listener {
         mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
         final ImageButton send = new ImageButton(svc);
         send.setImageResource(R.drawable.ms_arrow_upward);
-        send.setContentDescription("Send");
+        send.setContentDescription(svc.getString(R.string.bubble_send));
         send.setScaleType(ImageView.ScaleType.CENTER);
         send.setOnClickListener(v -> send());
         LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(dp(40), dp(40));
-        slp.leftMargin = dp(4);
+        slp.setMarginStart(dp(4));
         inputRow.addView(send, slp);
         Runnable paintSend = () -> {
             boolean has = input.getText().toString().trim().length() > 0;
@@ -568,7 +568,7 @@ final class Bubble implements ChatHub.Listener {
         }
         int pad = kb > 0 ? kb + dp(8) : 0;
         if (root.getPaddingBottom() != pad) {
-            root.setPadding(0, 0, 0, pad);
+            root.setPaddingRelative(0, 0, 0, pad);
             scrollToEnd();
         }
     }
@@ -637,7 +637,7 @@ final class Bubble implements ChatHub.Listener {
         unregisterBack();
         hideKeyboard();
         root.removeAllViews();
-        root.setPadding(0, 0, 0, 0);
+        root.setPaddingRelative(0, 0, 0, 0);
         root.addView(collapsed);
         applyCollapsedParams();
         wm.updateViewLayout(root, lp);
@@ -879,6 +879,7 @@ final class Bubble implements ChatHub.Listener {
                 wm.updateViewLayout(root, lp);
             } catch (Exception ignored) {
             }
+            followWaves();
         });
         windowAnim.addListener(new android.animation.AnimatorListenerAdapter() {
             boolean cancelled;
@@ -1057,9 +1058,9 @@ final class Bubble implements ChatHub.Listener {
             face.getLocationOnScreen(loc);
             int cx = loc[0] + face.getWidth() / 2, cy = loc[1] + face.getHeight() / 2;
             java.util.List<RadialMenu.Action> acts = new java.util.ArrayList<>();
-            acts.add(new RadialMenu.Action(R.drawable.ic_stop, "Stop", true, () -> { }));
-            acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Add", false, () -> { }));
-            acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, "Voice", false, () -> { }));
+            acts.add(new RadialMenu.Action(R.drawable.ic_stop, svc.getString(R.string.menu_peek_stop), true, () -> { }));
+            acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.menu_peek_add), false, () -> { }));
+            acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, svc.getString(R.string.menu_peek_voice), false, () -> { }));
             radial.peek(cx, cy, cx > screen().width() / 2, acts);
         }, 900);
     }
@@ -1070,7 +1071,7 @@ final class Bubble implements ChatHub.Listener {
         boolean speaking = Voice.isSpeaking(), working = running || controlling;
         if (!speaking && !working) return;
         Prefs.addTip(svc);
-        toast(speaking ? "Tip: hold the bubble to stop the voice" : "Tip: hold the bubble to pause, stop or add an instruction");
+        toast(svc.getString(speaking ? R.string.bubble_tip_stop_voice : R.string.bubble_tip_hold_menu));
     }
 
     /** Hold the bubble: what can be done right now, fanned out around it. */
@@ -1079,21 +1080,21 @@ final class Bubble implements ChatHub.Listener {
         Prefs.setMenuHinted(svc);
         java.util.List<RadialMenu.Action> acts = new java.util.ArrayList<>();
         boolean paused = svc.paused(), working = running || controlling || paused;
-        if (working) acts.add(new RadialMenu.Action(R.drawable.ic_stop, "Stop task", true, () -> {
+        if (working) acts.add(new RadialMenu.Action(R.drawable.ic_stop, svc.getString(R.string.menu_stop_task), true, () -> {
             if (controlling || paused) svc.takeBackControl();
             else {
                 hub.stopAll();
-                toast("Stopping…");
+                toast(svc.getString(R.string.bubble_stopping));
             }
         }));
-        if (paused) acts.add(new RadialMenu.Action(R.drawable.ic_play, "Resume", false, svc::resume));
-        else if (working) acts.add(new RadialMenu.Action(R.drawable.ic_pause, "Pause", false, svc::pause));
-        if (hub.runningCount() > 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Add instruction", false, this::dictateNote));
-        if (Voice.isSpeaking()) acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, "Stop voice", false, Voice::stopSpeaking));
+        if (paused) acts.add(new RadialMenu.Action(R.drawable.ic_play, svc.getString(R.string.menu_resume), false, svc::resume));
+        else if (working) acts.add(new RadialMenu.Action(R.drawable.ic_pause, svc.getString(R.string.menu_pause), false, svc::pause));
+        if (hub.runningCount() > 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.menu_add_instruction), false, this::dictateNote));
+        if (Voice.isSpeaking()) acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, svc.getString(R.string.menu_stop_voice), false, Voice::stopSpeaking));
         // listens with the chat closed, like Tap the bubble to talk (opening the chat first lost the mic)
-        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, "Talk", false, this::talk));
-        acts.add(new RadialMenu.Action(R.drawable.ms_forum, "Open chat", false, this::expand));
-        acts.add(new RadialMenu.Action(R.drawable.ms_close, "Hide", false, this::dismissToNotification));
+        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.bubble_talk), false, this::talk));
+        acts.add(new RadialMenu.Action(R.drawable.ms_forum, svc.getString(R.string.menu_open_chat), false, this::expand));
+        acts.add(new RadialMenu.Action(R.drawable.ms_close, svc.getString(R.string.menu_hide), false, this::dismissToNotification));
         int[] loc = new int[2];
         face.getLocationOnScreen(loc);
         int cx = loc[0] + face.getWidth() / 2, cy = loc[1] + face.getHeight() / 2;
@@ -1110,11 +1111,11 @@ final class Bubble implements ChatHub.Listener {
         }
         final Sessions.Session ses = hub.latestRunning();
         if (ses == null) {
-            toast("Nothing is running in Buddy's chats.");
+            toast(svc.getString(R.string.bubble_nothing_running));
             return;
         }
         if (!Voice.micAllowed(svc)) {
-            toast("Allow the microphone in Buddy, then tap the mic again.");
+            toast(svc.getString(R.string.bubble_allow_mic_tap_mic));
             svc.startActivity(new android.content.Intent(svc, MainActivity.class)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
             return;
@@ -1122,14 +1123,14 @@ final class Bubble implements ChatHub.Listener {
         String err = Voice.listen(svc, new Voice.Listener() {
             @Override
             public void onPartial(String text) {
-                if (!text.isEmpty()) noteStatus("“" + text + "”");
+                if (!text.isEmpty()) noteStatus(svc.getString(R.string.bubble_heard, text));
             }
 
             @Override
             public void onFinal(String text) {
                 noteDone();
                 String e = hub.addNote(ses, text);
-                toast(e != null ? e : "Got it: " + ses.brainName() + " will take it into account");
+                toast(e != null ? e : svc.getString(R.string.bubble_note_added, ses.brainName()));
             }
 
             @Override
@@ -1140,7 +1141,7 @@ final class Bubble implements ChatHub.Listener {
 
             @Override
             public void onStatus(String status) {
-                noteStatus(status == null ? "Listening… tap the bubble when done" : status);
+                noteStatus(status == null ? svc.getString(R.string.bubble_listening_tap_done) : status);
             }
         });
         if (err != null) {
@@ -1148,7 +1149,7 @@ final class Bubble implements ChatHub.Listener {
             return;
         }
         noteListening = true;
-        noteStatus("Listening… tap the bubble when done");
+        noteStatus(svc.getString(R.string.bubble_listening_tap_done));
     }
 
     // ------------------------------------------------- tap to talk, with the chat closed
@@ -1159,7 +1160,7 @@ final class Bubble implements ChatHub.Listener {
     /** Listen without opening the chat: waves under the bubble, the words beside it, sent when you pause. */
     private void talk() {
         if (!Voice.micAllowed(svc)) {
-            toast("Allow the microphone in Buddy, then tap the bubble again.");
+            toast(svc.getString(R.string.bubble_allow_mic_tap_bubble));
             svc.startActivity(new android.content.Intent(svc, MainActivity.class)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
             return;
@@ -1167,7 +1168,7 @@ final class Bubble implements ChatHub.Listener {
         String err = Voice.listen(svc, new Voice.Listener() {
             @Override
             public void onPartial(String text) {
-                if (!text.isEmpty()) noteStatus("“" + text + "”");
+                if (!text.isEmpty()) noteStatus(svc.getString(R.string.bubble_heard, text));
             }
 
             @Override
@@ -1196,7 +1197,7 @@ final class Bubble implements ChatHub.Listener {
             @Override
             public void onStatus(String status) {
                 if (waves != null) waves.setLive(status == null);
-                noteStatus(status == null ? "Listening…" : status);
+                noteStatus(status == null ? svc.getString(R.string.bubble_listening) : status);
             }
         });
         if (err != null) {
@@ -1205,7 +1206,7 @@ final class Bubble implements ChatHub.Listener {
         }
         talkListening = true;
         noteListening = true; // the pill shows what's heard
-        noteStatus("Listening…");
+        noteStatus(svc.getString(R.string.bubble_listening));
         showWaves(true);
     }
 
@@ -1245,6 +1246,23 @@ final class Bubble implements ChatHub.Listener {
         wm.addView(waves, p);
     }
 
+    /** Moves the waves along when the bubble is dragged or snaps to an edge while listening. */
+    private void followWaves() {
+        if (waves == null) return;
+        face.postOnAnimation(() -> {
+            if (waves == null) return;
+            WindowManager.LayoutParams p = (WindowManager.LayoutParams) waves.getLayoutParams();
+            int[] loc = new int[2];
+            face.getLocationOnScreen(loc);
+            p.x = Math.max(0, Math.min(screen().width() - p.width, loc[0] + face.getWidth() / 2 - p.width / 2));
+            p.y = loc[1] + face.getHeight() + dp(8);
+            try {
+                wm.updateViewLayout(waves, p);
+            } catch (Exception ignored) {
+            }
+        });
+    }
+
     private void noteStatus(String s) {
         pill.setText(s);
         pill.setVisibility(View.VISIBLE);
@@ -1263,7 +1281,7 @@ final class Bubble implements ChatHub.Listener {
         }
         if (!Voice.micAllowed(svc)) {
             // only an activity can ask for the microphone permission
-            toast("Allow the microphone in Buddy, then tap the mic again.");
+            toast(svc.getString(R.string.bubble_allow_mic_tap_mic));
             svc.startActivity(new android.content.Intent(svc, MainActivity.class)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
             collapse();
@@ -1311,11 +1329,12 @@ final class Bubble implements ChatHub.Listener {
         if (voiceBar != null) showVoiceBar(false);
         mic.setBackground(null);
         mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
-        input.setHint(changing ? "What should change?" : "Ask " + sessions.current.brainName() + "…");
+        input.setHint(changing ? svc.getString(R.string.card_change_hint)
+                : svc.getString(R.string.bubble_input_hint, sessions.current.brainName()));
     }
 
     private void stop() {
-        if (!sessions.current.running) toast("Nothing is running in this chat.");
+        if (!sessions.current.running) toast(svc.getString(R.string.bubble_nothing_running_chat));
         else hub.stop(sessions.current);
     }
 
@@ -1366,16 +1385,16 @@ final class Bubble implements ChatHub.Listener {
 
     private void renderModelPicker() {
         final Sessions.Session ses = sessions.current;
-        TextView note = Ui.text(svc, "For this chat. The conversation continues; the next message uses the new choice.", 13, Ui.MUTED);
-        note.setPadding(dp(8), dp(4), dp(8), dp(10));
+        TextView note = Ui.text(svc, svc.getString(R.string.bubble_model_note), 13, Ui.MUTED);
+        note.setPaddingRelative(dp(8), dp(4), dp(8), dp(10));
         sessionList.addView(note);
         String[][] efforts = Models.efforts(ses.backend);
         if (efforts != null) {
-            TextView el = Ui.sectionLabel(svc, "Effort");
-            el.setPadding(dp(8), dp(4), 0, dp(2));
+            TextView el = Ui.sectionLabel(svc, svc.getString(R.string.bubble_effort));
+            el.setPaddingRelative(dp(8), dp(4), 0, dp(2));
             sessionList.addView(el);
-            TextView es = Ui.text(svc, "Auto lets the agent decide. Higher thinks longer and uses more of your plan.", 13, Ui.MUTED);
-            es.setPadding(dp(8), 0, dp(8), dp(8));
+            TextView es = Ui.text(svc, svc.getString(R.string.bubble_effort_note), 13, Ui.MUTED);
+            es.setPaddingRelative(dp(8), 0, dp(8), dp(8));
             sessionList.addView(es);
             LinearLayout seg = Ui.segmented(svc, efforts, ses.effort, false, v -> {
                 hub.setEffort(ses, v);
@@ -1385,15 +1404,15 @@ final class Bubble implements ChatHub.Listener {
             sp.leftMargin = sp.rightMargin = dp(4);
             sessionList.addView(seg, sp);
         }
-        TextView ml = Ui.sectionLabel(svc, "Model");
-        ml.setPadding(dp(8), dp(16), 0, dp(4));
+        TextView ml = Ui.sectionLabel(svc, svc.getString(R.string.bubble_model));
+        ml.setPaddingRelative(dp(8), dp(16), 0, dp(4));
         sessionList.addView(ml);
         Models.refresh(svc);
         for (final String[] o : Models.forBackend(ses.backend)) {
             boolean on = o[0].equals(ses.model);
             LinearLayout r = Ui.listRow(svc);
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.setPadding(dp(8), dp(10), dp(8), dp(10));
+            r.setPaddingRelative(dp(8), dp(10), dp(8), dp(10));
             FrameLayout radio = new FrameLayout(svc);
             radio.setBackground(rounded(0x00000000, 11, on ? Ui.ACCENT : Ui.MUTED, 2));
             if (on) {
@@ -1404,7 +1423,7 @@ final class Bubble implements ChatHub.Listener {
             r.addView(radio, new LinearLayout.LayoutParams(dp(22), dp(22)));
             LinearLayout t = new LinearLayout(svc);
             t.setOrientation(LinearLayout.VERTICAL);
-            t.setPadding(dp(14), 0, 0, 0);
+            t.setPaddingRelative(dp(14), 0, 0, 0);
             t.addView(Ui.title(svc, o[1], 15));
             t.addView(Ui.single(Ui.monoText(svc, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, Ui.MUTED)));
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
@@ -1459,28 +1478,28 @@ final class Bubble implements ChatHub.Listener {
     /** A chat, laid out like the app's Chats tab: agent tile, title and time, agent · model, last message. */
     private View chatRow(final Sessions.Session ses) {
         LinearLayout r = Ui.listRow(svc);
-        r.setPadding(dp(8), dp(12), dp(8), dp(12));
+        r.setPaddingRelative(dp(8), dp(12), dp(8), dp(12));
         r.addView(Ui.agentTile(svc, ses.backend));
         LinearLayout col = new LinearLayout(svc);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(dp(14), 0, 0, 0);
+        col.setPaddingRelative(dp(14), 0, 0, 0);
         LinearLayout first = new LinearLayout(svc);
         first.setGravity(Gravity.CENTER_VERTICAL);
         first.addView(Ui.single(Ui.title(svc, ses.label(), 15)), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         TextView time = Ui.monoText(svc, MainActivity.ago(ses.updated), 12, Ui.MUTED);
-        time.setPadding(dp(8), 0, 0, 0);
+        time.setPaddingRelative(dp(8), 0, 0, 0);
         first.addView(time);
         if (ses.unread) {
             View d = Ui.dot(svc, Ui.OK, 8);
-            ((LinearLayout.LayoutParams) d.getLayoutParams()).leftMargin = dp(6);
+            ((LinearLayout.LayoutParams) d.getLayoutParams()).setMarginStart(dp(6));
             first.addView(d);
         }
         col.addView(first);
         col.addView(Ui.single(Ui.monoText(svc, Account.cliOf(ses.backend) + " · "
-                + Models.shownModel(ses).toLowerCase(java.util.Locale.ROOT), 12, Ui.MUTED)));
+                + Models.shownModel(ses).toLowerCase(Ui.locale(svc)), 12, Ui.MUTED)));
         if (ses.running) {
-            TextView st = Ui.single(Ui.monoText(svc, ses.status.isEmpty() ? "working…" : ses.status, 12, Ui.ACCENT_TEXT));
-            st.setPadding(0, dp(4), 0, dp(6));
+            TextView st = Ui.single(Ui.monoText(svc, ses.status.isEmpty() ? svc.getString(R.string.bubble_chat_row_working) : ses.status, 12, Ui.ACCENT_TEXT));
+            st.setPaddingRelative(0, dp(4), 0, dp(6));
             col.addView(st);
             col.addView(Ui.thinBar(svc));
         } else {
@@ -1488,7 +1507,8 @@ final class Bubble implements ChatHub.Listener {
             for (int i = ses.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg m = ses.messages.get(i);
                 if (m.kind == Kind.BUDDY || m.kind == Kind.USER) {
-                    last = (m.kind == Kind.USER ? "You: " : "") + m.label().replace('\n', ' ');
+                    String t = m.label().replace('\n', ' ');
+                    last = m.kind == Kind.USER ? svc.getString(R.string.bubble_chat_row_you, t) : t;
                     break;
                 }
             }
@@ -1496,7 +1516,7 @@ final class Bubble implements ChatHub.Listener {
                 TextView l = Ui.text(svc, last, 14, Ui.MUTED);
                 l.setMaxLines(2);
                 l.setEllipsize(TextUtils.TruncateAt.END);
-                l.setPadding(0, dp(4), 0, 0);
+                l.setPaddingRelative(0, dp(4), 0, 0);
                 col.addView(l);
             }
         }
@@ -1511,15 +1531,15 @@ final class Bubble implements ChatHub.Listener {
             vibrate(20);
             r.removeAllViews();
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.addView(Ui.text(svc, "Delete this chat?", 15, Ui.TEXT), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-            Button cancel = actionButton("Cancel", Ui.CARD);
+            r.addView(Ui.text(svc, svc.getString(R.string.bubble_delete_chat), 15, Ui.TEXT), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            Button cancel = actionButton(svc.getString(android.R.string.cancel), Ui.CARD);
             cancel.setOnClickListener(x -> renderSessionList());
             r.addView(cancel);
-            Button del = actionButton("Delete", Ui.ERR_SOFT);
+            Button del = actionButton(svc.getString(R.string.bubble_delete), Ui.ERR_SOFT);
             del.setTextColor(Ui.ERR);
             del.setOnClickListener(x -> deleteChat(ses));
             LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            dlp.leftMargin = dp(8);
+            dlp.setMarginStart(dp(8));
             r.addView(del, dlp);
             r.setOnClickListener(null);
             r.setOnLongClickListener(null);
@@ -1530,34 +1550,34 @@ final class Bubble implements ChatHub.Listener {
 
     /** The agents for a new chat, like the app's New chat sheet (the ones not set up open their setup). */
     private void renderNewChat() {
-        TextView h = Ui.title(svc, "New chat", 18);
-        h.setPadding(dp(8), dp(8), 0, dp(8));
+        TextView h = Ui.title(svc, svc.getString(R.string.bubble_new_chat), 18);
+        h.setPaddingRelative(dp(8), dp(8), 0, dp(8));
         sessionList.addView(h);
         String def = Prefs.backend(svc);
         for (Account acc : Account.ALL) {
             boolean ready = SetupState.signedIn(svc, acc.agent);
             LinearLayout r = Ui.listRow(svc);
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.setPadding(dp(8), dp(12), dp(8), dp(12));
+            r.setPaddingRelative(dp(8), dp(12), dp(8), dp(12));
             if (!ready) r.setAlpha(0.45f);
             r.addView(Ui.agentTile(svc, acc.agent));
             LinearLayout t = new LinearLayout(svc);
             t.setOrientation(LinearLayout.VERTICAL);
-            t.setPadding(dp(14), 0, 0, 0);
+            t.setPaddingRelative(dp(14), 0, 0, 0);
             LinearLayout tr = new LinearLayout(svc);
             tr.setGravity(Gravity.CENTER_VERTICAL);
             tr.addView(Ui.title(svc, acc.name(), 15));
             if (acc.agent.equals(def)) {
-                TextView tag = Ui.monoText(svc, "default", 11, Ui.ACCENT_TEXT);
-                tag.setPadding(dp(6), dp(1), dp(6), dp(1));
+                TextView tag = Ui.monoText(svc, svc.getString(R.string.bubble_agent_default), 11, Ui.ACCENT_TEXT);
+                tag.setPaddingRelative(dp(6), dp(1), dp(6), dp(1));
                 tag.setBackground(rounded(Ui.ACCENT_SOFT, 6, 0, 0));
                 LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                tp.leftMargin = dp(8);
+                tp.setMarginStart(dp(8));
                 tr.addView(tag, tp);
             }
             t.addView(tr);
-            t.addView(Ui.text(svc, ready ? acc.tagline() : SetupState.installed(svc, acc.agent)
-                    ? "Not signed in · tap to set up" : "Not installed · tap to set up", 13, Ui.MUTED));
+            t.addView(Ui.text(svc, ready ? acc.tagline() : svc.getString(SetupState.installed(svc, acc.agent)
+                    ? R.string.bubble_agent_not_signed_in : R.string.bubble_agent_not_installed), 13, Ui.MUTED));
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             r.addView(Ui.icon(svc, R.drawable.ms_chevron_right, Ui.MUTED, 22));
             r.setOnClickListener(v -> {
@@ -1583,16 +1603,16 @@ final class Bubble implements ChatHub.Listener {
         renderedFor = sessions.current;
         Sessions.Session ses = sessions.current;
         if (ses.messages.isEmpty()) {
-            TextView hint = Ui.text(svc, "New " + ses.brainName() + " chat. Ask me to do something on your phone.", 14, Ui.MUTED);
+            TextView hint = Ui.text(svc, svc.getString(R.string.bubble_empty_chat, ses.brainName()), 14, Ui.MUTED);
             hint.setGravity(Gravity.CENTER);
-            hint.setPadding(dp(24), dp(32), dp(24), 0);
+            hint.setPaddingRelative(dp(24), dp(32), dp(24), 0);
             hint.setTag("hint"); // removed by the first message
             messages.addView(hint, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
         }
         for (Sessions.Msg m : ses.messages) showMessage(m.kind, m.label());
         if (log != null && !ses.running) log.finish();
-        input.setHint("Ask " + ses.brainName() + "…");
+        input.setHint(svc.getString(R.string.bubble_input_hint, ses.brainName()));
         updateViewing();
         refreshStatus();
         scrollToEnd();
@@ -1611,12 +1631,16 @@ final class Bubble implements ChatHub.Listener {
 
     private void updateHeader() {
         Sessions.Session ses = sessions.current;
-        header.setText(pickingModel ? "Model & effort" : picking ? "New chat" : showingList ? "Chats" : ses.label());
-        subtitle.setText(Models.summary(ses) + (Prefs.devMode(svc) ? " · dev" : ""));
+        header.setText(pickingModel ? svc.getString(R.string.bubble_model_effort_title)
+                : picking ? svc.getString(R.string.bubble_new_chat)
+                : showingList ? svc.getString(R.string.bubble_chats_title) : ses.label());
+        String summary = Models.summary(ses);
+        subtitle.setText(Prefs.devMode(svc) ? svc.getString(R.string.bubble_summary_dev, summary) : summary);
         modelChip.setVisibility(showingList ? View.GONE : View.VISIBLE);
         boolean working = !showingList && (ses.running || controlling);
         strip.setVisibility(working ? View.VISIBLE : View.GONE);
-        stripText.setText(!ses.status.isEmpty() ? ses.status : ses.running ? "Working…" : "Using your phone");
+        stripText.setText(!ses.status.isEmpty() ? ses.status
+                : svc.getString(ses.running ? R.string.bubble_working : R.string.bubble_using_phone));
         if (log != null) log.setLive(ses.running);
     }
 
@@ -1685,7 +1709,7 @@ final class Bubble implements ChatHub.Listener {
         // the answer buttons make the card too tall to leave the text field above the keyboard
         confirmOptions.setVisibility(View.GONE);
         confirmCard.requestLayout();
-        input.setHint(asking ? "Your answer…" : "What should change?");
+        input.setHint(svc.getString(asking ? R.string.card_answer_hint : R.string.card_change_hint));
         input.requestFocus();
         input.postDelayed(() -> {
             InputMethodManager imm = svc.getSystemService(InputMethodManager.class);
@@ -1695,7 +1719,7 @@ final class Bubble implements ChatHub.Listener {
 
     private void endChange() {
         changing = false;
-        input.setHint("Ask " + sessions.current.brainName() + "…");
+        input.setHint(svc.getString(R.string.bubble_input_hint, sessions.current.brainName()));
         hideKeyboard();
         if (asking) confirmOptions.setVisibility(View.VISIBLE);
         confirmCard.requestLayout();
@@ -1708,7 +1732,8 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setVisibility(View.GONE);
         // OpenCode chats show the answer on the approval step itself (it arrives after the answer)
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
-            hub.note(cardChat, Kind.STEP, (asking ? "✓ Answered: " : "✎ Change requested: ") + clip(change, 80));
+            hub.note(cardChat, Kind.STEP, svc.getString(asking ? R.string.card_note_answered : R.string.card_note_change_requested,
+                    clip(change, 80)));
         }
         if (cb != null) cb.onAnswer(false, change);
         refreshStatus();
@@ -1744,21 +1769,22 @@ final class Bubble implements ChatHub.Listener {
         }
         asking = options != null;
         askOptions = options;
-        confirmLabel.setText((asking ? "QUESTION" : "NEEDS YOUR OK") + (cardChat == null ? " · FROM ANOTHER SESSION" : ""));
+        String label = svc.getString(asking ? R.string.card_label_question : R.string.card_label_approval);
+        confirmLabel.setText(cardChat == null ? svc.getString(R.string.card_label_other_session, label) : label);
         confirmOptions.removeAllViews();
         if (asking) {
             for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)), optionLp());
-            confirmOptions.addView(optionButton("Type my own answer…", true, v -> startChange()), optionLp());
+            confirmOptions.addView(optionButton(svc.getString(R.string.card_type_own_answer), true, v -> startChange()), optionLp());
         }
         confirmOptions.setVisibility(asking ? View.VISIBLE : View.GONE);
         // a question only needs Skip in the bottom row
-        confirmDeny.setText(asking ? "Skip" : "Deny");
+        confirmDeny.setText(asking ? R.string.card_skip : R.string.card_deny);
         confirmDeny.setTextColor(asking ? Ui.TEXT : Ui.ERR);
         confirmDeny.setBackground(rounded(asking ? Ui.CARD : Ui.ERR_SOFT, 16, 0, 0));
         confirmChange.setVisibility(asking ? View.GONE : View.VISIBLE);
         confirmApprove.setVisibility(asking ? View.GONE : View.VISIBLE);
-        if (asking) confirmRow.setPadding(0, dp(8), 0, 0);
-        else confirmRow.setPadding(0, 0, 0, 0);
+        if (asking) confirmRow.setPaddingRelative(0, dp(8), 0, 0);
+        else confirmRow.setPaddingRelative(0, 0, 0, 0);
         root.setVisibility(View.VISIBLE);
         confirmText.setText(text);
         confirmCard.setVisibility(View.VISIBLE);
@@ -1803,7 +1829,7 @@ final class Bubble implements ChatHub.Listener {
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
-            hub.note(cardChat, Kind.STEP, "✓ Answered: " + clip(option, 80));
+            hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_answered, clip(option, 80)));
         }
         if (cb != null) cb.onAnswer(true, option);
         refreshStatus();
@@ -1817,8 +1843,9 @@ final class Bubble implements ChatHub.Listener {
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
-            hub.note(cardChat, Kind.STEP, asking ? "Question skipped"
-                    : approved ? "✓ Approved: " + clip(confirmText.getText().toString(), 80) : "✗ Denied");
+            hub.note(cardChat, Kind.STEP, asking ? svc.getString(R.string.card_note_skipped)
+                    : approved ? svc.getString(R.string.card_note_approved, clip(confirmText.getText().toString(), 80))
+                    : svc.getString(R.string.card_note_denied));
         }
         if (cb != null) cb.onAnswer(approved, null);
         refreshStatus();
@@ -1849,14 +1876,18 @@ final class Bubble implements ChatHub.Listener {
         if (working && !wasWorking) maybePeek();
         wasWorking = working;
         boolean paused = svc.paused();
-        String text = pendingConfirm != null ? (asking ? "Waiting for your answer" : "Waiting for your approval") : hub.pillText();
+        String text = pendingConfirm != null
+                ? svc.getString(asking ? R.string.bubble_pill_waiting_answer : R.string.bubble_pill_waiting_approval)
+                : hub.pillText();
         if (paused && pendingConfirm == null) {
-            text = "Paused · hold the bubble to resume";
+            text = svc.getString(R.string.bubble_pill_paused);
         } else if (controlling && pendingConfirm == null) {
-            text = "Using your phone" + (text == null || text.isEmpty() ? "" : " · " + text);
+            text = text == null || text.isEmpty() ? svc.getString(R.string.bubble_using_phone)
+                    : svc.getString(R.string.bubble_using_phone_status, text);
         }
         if (!paused && (controlling || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
-            text = (text == null ? "" : text + " · ") + "hold the bubble for Stop and more";
+            text = text == null ? svc.getString(R.string.bubble_pill_hold_hint)
+                    : svc.getString(R.string.bubble_pill_status_hold_hint, text);
         }
         if (!noteListening) { // while dictating a note the pill shows what's heard
             pill.setText(text == null ? "" : text);
@@ -1940,10 +1971,10 @@ final class Bubble implements ChatHub.Listener {
             case USER: {
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
                 tv.setBackground(Ui.corners(svc, Ui.USER, 20, 20, 6, 20));
-                tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+                tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
                 Ui.linkifyForService(tv, this::collapse);
                 p.gravity = Gravity.END;
-                p.leftMargin = dp(40);
+                p.setMarginStart(dp(40));
                 v = tv;
                 break;
             }
@@ -1956,16 +1987,16 @@ final class Bubble implements ChatHub.Listener {
                 f.setImageResource(R.drawable.bubble_face);
                 av.addView(f, new FrameLayout.LayoutParams(dp(20), dp(20), Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
-                avp.rightMargin = dp(8);
+                avp.setMarginEnd(dp(8));
                 r.addView(av, avp);
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
                 tv.setLineSpacing(0, 1.15f);
                 tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
-                tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+                tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
                 Ui.linkifyForService(tv, this::collapse);
                 copyOnLongPress(tv, text);
                 r.addView(tv);
-                p.rightMargin = dp(24);
+                p.setMarginEnd(dp(24));
                 v = r;
                 break;
             }
@@ -1974,7 +2005,7 @@ final class Bubble implements ChatHub.Listener {
                 r.setGravity(Gravity.TOP);
                 r.addView(Ui.icon(svc, R.drawable.ms_error, Ui.ERR, 18));
                 TextView tv = Ui.text(svc, text, 13, Ui.ERR);
-                tv.setPadding(dp(8), 0, 0, 0);
+                tv.setPaddingRelative(dp(8), 0, 0, 0);
                 r.addView(tv, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 v = r;
@@ -2010,7 +2041,7 @@ final class Bubble implements ChatHub.Listener {
         v.setOnLongClickListener(x -> {
             ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
             cm.setPrimaryClip(ClipData.newPlainText("Buddy", text));
-            toast("Copied");
+            toast(svc.getString(R.string.bubble_copied));
             return true;
         });
     }
@@ -2030,10 +2061,10 @@ final class Bubble implements ChatHub.Listener {
             view.setBackground(rounded(0x00000000, 14, Ui.OUTLINE, 1));
             LinearLayout head = new LinearLayout(svc);
             head.setGravity(Gravity.CENTER_VERTICAL);
-            head.setPadding(dp(12), dp(9), dp(8), dp(9));
+            head.setPaddingRelative(dp(12), dp(9), dp(8), dp(9));
             head.addView(Ui.icon(svc, R.drawable.ms_terminal, Ui.MUTED, 16));
             count = Ui.monoText(svc, "", 12, Ui.MUTED);
-            count.setPadding(dp(8), 0, 0, 0);
+            count.setPaddingRelative(dp(8), 0, 0, 0);
             head.addView(count, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             chevron = Ui.icon(svc, R.drawable.ms_expand_more, Ui.MUTED, 18);
             head.addView(chevron);
@@ -2042,14 +2073,14 @@ final class Bubble implements ChatHub.Listener {
                 setOpen(!open);
             });
             view.addView(head);
-            rows.setPadding(dp(12), 0, dp(12), dp(8));
+            rows.setPaddingRelative(dp(12), 0, dp(12), dp(8));
             view.addView(rows);
             setOpen(false);
         }
 
         void add(String step) {
             n++;
-            count.setText(n + (n == 1 ? " tool call" : " tool calls"));
+            count.setText(svc.getResources().getQuantityString(R.plurals.bubble_tool_calls, n, n));
             if (lastMark != null) mark(lastMark, false);
             String s = step.trim();
             if (s.startsWith("✓ ")) s = s.substring(2); // the row gets its own check mark
@@ -2064,7 +2095,7 @@ final class Bubble implements ChatHub.Listener {
             String name = cut > 0 ? s.substring(0, cut) : s, arg = cut > 0 ? s.substring(cut) : "";
             LinearLayout r = new LinearLayout(svc);
             r.setGravity(Gravity.TOP);
-            r.setPadding(0, dp(3), 0, dp(3));
+            r.setPaddingRelative(0, dp(3), 0, dp(3));
             FrameLayout m = new FrameLayout(svc);
             r.addView(m, new LinearLayout.LayoutParams(dp(16), dp(16)));
             TextView t = Ui.monoText(svc, "", 12, Ui.MUTED);
@@ -2074,7 +2105,7 @@ final class Bubble implements ChatHub.Listener {
             t.setText(sb);
             t.setMaxLines(3);
             t.setEllipsize(TextUtils.TruncateAt.END);
-            t.setPadding(dp(8), 0, 0, 0);
+            t.setPaddingRelative(dp(8), 0, 0, 0);
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             copyOnLongPress(r, step);
             rows.addView(r);
@@ -2119,7 +2150,7 @@ final class Bubble implements ChatHub.Listener {
     private android.widget.ImageButton toolIcon(int icon, String description, int tint, View.OnClickListener l) {
         android.widget.ImageButton b = Ui.iconButton(svc, icon, description, tint);
         b.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        b.setPadding(dp(8), dp(8), dp(8), dp(8));
+        b.setPaddingRelative(dp(8), dp(8), dp(8), dp(8));
         b.setLayoutParams(new LinearLayout.LayoutParams(dp(36), dp(36)));
         b.setOnClickListener(l);
         return b;
@@ -2142,12 +2173,12 @@ final class Bubble implements ChatHub.Listener {
         b.setMinimumWidth(0);
         b.setMinHeight(0);
         b.setMinimumHeight(0);
-        b.setPadding(dp(10), dp(6), dp(10), dp(6));
+        b.setPaddingRelative(dp(10), dp(6), dp(10), dp(6));
         b.setBackground(rounded(Ui.CARD, 12, 0, 0));
         b.setOnClickListener(l);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        p.leftMargin = dp(6);
+        p.setMarginStart(dp(6));
         b.setLayoutParams(p);
         return b;
     }
@@ -2160,7 +2191,7 @@ final class Bubble implements ChatHub.Listener {
         b.setTypeface(Ui.sans(svc, 600));
         b.setMinHeight(0);
         b.setMinimumHeight(0);
-        b.setPadding(dp(16), dp(10), dp(16), dp(10));
+        b.setPaddingRelative(dp(16), dp(10), dp(16), dp(10));
         b.setBackground(rounded(color, 16, 0, 0));
         return b;
     }
@@ -2297,6 +2328,7 @@ final class Bubble implements ChatHub.Listener {
                         lp.x = x;
                         lp.y = y;
                         wm.updateViewLayout(root, lp);
+                        followWaves();
                         feedArcs();
                     }
                     return true;
@@ -2330,6 +2362,7 @@ final class Bubble implements ChatHub.Listener {
                             Prefs.saveBubblePos(svc, right ? 1 : 0, lp.y);
                             applyCollapsedParams();
                             wm.updateViewLayout(root, lp);
+                            followWaves();
                         });
                     } else {
                         maybeTip();

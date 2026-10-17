@@ -48,29 +48,29 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
 
         // top bar: back · title + status · keyboard · menu
         LinearLayout bar = row(this);
-        bar.setPadding(dp(this, 4), dp(this, 4), dp(this, 4), 0);
-        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, "Back", fg);
+        bar.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), 0);
+        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.terminal_back), fg);
         back.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         back.setOnClickListener(v -> finish());
         bar.addView(back);
         LinearLayout titles = column(this);
-        titles.setPadding(dp(this, 4), 0, dp(this, 4), 0);
-        titleView = single(title(this, "Terminal", 16));
+        titles.setPaddingRelative(dp(this, 4), 0, dp(this, 4), 0);
+        titleView = single(title(this, getString(R.string.terminal_title), 16));
         titleView.setTextColor(fg);
         titles.addView(titleView);
         LinearLayout sub = row(this);
         statusDot = dot(this, OK, 7);
         sub.addView(statusDot);
         subView = single(monoText(this, "buddy linux · alpine", 12, Theme.withAlpha(fg, 0x99)));
-        subView.setPadding(dp(this, 6), 0, 0, 0);
+        subView.setPaddingRelative(dp(this, 6), 0, 0, 0);
         sub.addView(subView);
         titles.addView(sub);
         bar.addView(titles, weight1());
-        ImageButton kb = iconButton(this, R.drawable.ms_keyboard_hide, "Hide keyboard", fg);
+        ImageButton kb = iconButton(this, R.drawable.ms_keyboard_hide, getString(R.string.terminal_hide_keyboard), fg);
         kb.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         kb.setOnClickListener(v -> term.hideKeyboard());
         bar.addView(kb);
-        ImageButton menu = iconButton(this, R.drawable.ms_more_vert, "Menu", fg);
+        ImageButton menu = iconButton(this, R.drawable.ms_more_vert, getString(R.string.terminal_menu), fg);
         menu.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         menu.setOnClickListener(v -> menu());
         bar.addView(menu);
@@ -80,7 +80,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         tabScroll = new HorizontalScrollView(this);
         tabScroll.setHorizontalScrollBarEnabled(false);
         tabs = row(this);
-        tabs.setPadding(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 8));
+        tabs.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 8));
         tabScroll.addView(tabs);
         root.addView(tabScroll, full());
         View line = new View(this);
@@ -92,14 +92,14 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
 
         // shown when the shell in front has exited
         ended = row(this);
-        ended.setPadding(dp(this, 16), dp(this, 10), dp(this, 10), dp(this, 10));
+        ended.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 10), dp(this, 10));
         ended.setBackgroundColor(Theme.withAlpha(fg, 0x0F));
-        endedText = text(this, "Session ended", 14, fg);
+        endedText = text(this, getString(R.string.terminal_session_ended), 14, fg);
         ended.addView(endedText, weight1());
-        android.widget.Button close = button(this, "Close", false);
+        android.widget.Button close = button(this, getString(R.string.terminal_close), false);
         close.setOnClickListener(v -> closeSession(session));
         ended.addView(close, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 38)));
-        android.widget.Button again = button(this, "Restart", true);
+        android.widget.Button again = button(this, getString(R.string.terminal_restart), true);
         again.setOnClickListener(v -> {
             TermSession old = session;
             newSession();
@@ -109,17 +109,17 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             }
         });
         LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 38));
-        ap.leftMargin = dp(this, 8);
+        ap.setMarginStart(dp(this, 8));
         ended.addView(again, ap);
         ended.setVisibility(View.GONE);
         root.addView(ended, full());
 
         root.addView(extraKeys(), full());
+        root.setLayoutDirection(View.LAYOUT_DIRECTION_LTR); // a terminal stays left to right in every language
         setContentView(root);
 
         if (!Linux.installed(this)) {
-            Toast.makeText(this, "Install Claude Code, Codex or OpenCode in Settings first: that sets up Buddy's Linux.",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.terminal_needs_linux, Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, SetupActivity.class));
             finish();
             return;
@@ -176,7 +176,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         try {
             s = TermSession.start(this, g[0], g[1], run);
         } catch (Exception e) {
-            Toast.makeText(this, "Couldn't start the terminal: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.terminal_start_failed, e.getMessage()), Toast.LENGTH_LONG).show();
             return;
         }
         show(s);
@@ -200,7 +200,8 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
 
     private void showEnded() {
         statusDot.setBackground(oval(MUTED));
-        endedText.setText("Session ended" + (session != null && session.exitCode != 0 ? " · exit " + session.exitCode : ""));
+        endedText.setText(session != null && session.exitCode != 0
+                ? getString(R.string.terminal_session_ended_code, session.exitCode) : getString(R.string.terminal_session_ended));
         ended.setVisibility(View.VISIBLE);
         term.invalidate();
     }
@@ -221,11 +222,11 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         for (final TermSession s : TermSession.all) {
             boolean on = s == session;
             LinearLayout tab = row(this);
-            tab.setPadding(dp(this, 12), 0, dp(this, 12), 0);
+            tab.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
             tab.setBackground(rounded(this, on ? Theme.withAlpha(TermColors.CURSOR, 0x33) : Theme.withAlpha(fg, 0x0F), 10));
             if (!s.exited) {
                 View d = dot(this, on ? TermColors.CURSOR : OK, 6);
-                ((LinearLayout.LayoutParams) d.getLayoutParams()).rightMargin = dp(this, 7);
+                ((LinearLayout.LayoutParams) d.getLayoutParams()).setMarginEnd(dp(this, 7));
                 tab.addView(d);
             }
             TextView t = single(monoText(this, s.label(), 12, s.exited ? Theme.withAlpha(fg, 0x66) : fg));
@@ -236,15 +237,16 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
                 if (s != session) show(s);
             });
             tab.setOnLongClickListener(v -> {
-                confirmSheet(this, "Close " + s.label() + "?", s.exited ? null
-                        : "It's still running. Closing it stops it and everything it started.", "Close", true, () -> closeSession(s));
+                confirmSheet(this, getString(R.string.terminal_close_title, s.label()), s.exited ? null
+                        : getString(R.string.terminal_close_running), getString(R.string.terminal_close), true,
+                        () -> closeSession(s));
                 return true;
             });
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 32));
-            p.rightMargin = dp(this, 6);
+            p.setMarginEnd(dp(this, 6));
             tabs.addView(tab, p);
         }
-        ImageButton add = iconButton(this, R.drawable.ms_add, "New session", fg);
+        ImageButton add = iconButton(this, R.drawable.ms_add, getString(R.string.terminal_new_session), fg);
         add.setBackground(rounded(this, Theme.withAlpha(fg, 0x0F), 10));
         tabs.addView(add, new LinearLayout.LayoutParams(dp(this, 36), dp(this, 32)));
         add.setOnClickListener(v -> newSession());
@@ -252,7 +254,8 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             View cur = tabs.getChildAt(Math.max(0, TermSession.all.indexOf(session)));
             if (cur != null) tabScroll.smoothScrollTo(Math.max(0, cur.getLeft() - dp(this, 24)), 0);
         });
-        subView.setText(TermSession.all.size() > 1 ? TermSession.all.size() + " sessions · buddy linux" : "buddy linux · alpine");
+        int n = TermSession.all.size();
+        subView.setText(n > 1 ? getResources().getQuantityString(R.plurals.terminal_sessions_count, n, n) : "buddy linux · alpine");
     }
 
     @Override
@@ -269,8 +272,9 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             @Override
             public void onListening(boolean on) {
                 runOnUiThread(() -> {
-                    subView.setText(on ? "listening · microphone on" : (TermSession.all.size() > 1
-                            ? TermSession.all.size() + " sessions · buddy linux" : "buddy linux · alpine"));
+                    int n = TermSession.all.size();
+                    subView.setText(on ? getString(R.string.terminal_listening) : (n > 1
+                            ? getResources().getQuantityString(R.plurals.terminal_sessions_count, n, n) : "buddy linux · alpine"));
                     statusDot.setBackground(oval(on ? ERR : (session != null && session.exited ? MUTED : OK)));
                 });
             }
@@ -314,7 +318,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         hs.setHorizontalScrollBarEnabled(false);
         hs.setBackgroundColor(Theme.withAlpha(TermColors.DEFAULT_FG, 0x0A));
         LinearLayout keys = row(this);
-        keys.setPadding(dp(this, 8), dp(this, 6), dp(this, 8), dp(this, 6));
+        keys.setPaddingRelative(dp(this, 8), dp(this, 6), dp(this, 8), dp(this, 6));
         addKey(keys, "esc", v -> term.send("\033"));
         addKey(keys, "tab", v -> term.send("\t"));
         ctrlKey = addKey(keys, "ctrl", v -> {
@@ -336,7 +340,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         TextView paste = addKey(keys, "", v -> paste());
         paste.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_paste, 0, 0, 0);
         paste.setCompoundDrawableTintList(ColorStateList.valueOf(TermColors.DEFAULT_FG));
-        paste.setContentDescription("Paste");
+        paste.setContentDescription(getString(R.string.terminal_paste));
         hs.addView(keys);
         return hs;
     }
@@ -354,7 +358,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         TextView k = monoText(this, label, 13, TermColors.DEFAULT_FG);
         k.setGravity(Gravity.CENTER);
         k.setMinWidth(dp(this, 40));
-        k.setPadding(dp(this, 12), 0, dp(this, 12), 0);
+        k.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
         k.setBackground(rounded(this, Theme.withAlpha(TermColors.DEFAULT_FG, 0x14), 10));
         k.setForeground(getDrawable(ripple(this, false)));
         k.setOnClickListener(v -> {
@@ -362,7 +366,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             l.onClick(v);
         });
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 38));
-        p.rightMargin = dp(this, 6);
+        p.setMarginEnd(dp(this, 6));
         keys.addView(k, p);
         return k;
     }
@@ -389,29 +393,31 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
 
     private void menu() {
         LinearLayout c = column(this);
-        TextView h = title(this, "Terminal", 18);
-        h.setPadding(0, 0, 0, dp(this, 6));
+        TextView h = title(this, getString(R.string.terminal_title), 18);
+        h.setPaddingRelative(0, 0, 0, dp(this, 6));
         c.addView(h);
         final Dialog[] d = new Dialog[1];
         boolean awake = Prefs.termAwake(this);
         Object[][] items = {
-                {R.drawable.ms_terminal, "New session", (Runnable) this::newSession},
-                {R.drawable.ms_content_paste, "Paste", (Runnable) this::paste},
-                {R.drawable.ms_content_copy, "Select all", (Runnable) () -> term.selectAll()},
-                {R.drawable.ms_add, "Larger text", (Runnable) () -> zoom(1.15f)},
-                {R.drawable.ms_expand_more, "Smaller text", (Runnable) () -> zoom(1 / 1.15f)},
-                {R.drawable.ms_build_circle, awake ? "Let the screen sleep" : "Keep the screen on", (Runnable) () -> {
+                {R.drawable.ms_terminal, getString(R.string.terminal_new_session), (Runnable) this::newSession},
+                {R.drawable.ms_content_paste, getString(R.string.terminal_paste), (Runnable) this::paste},
+                {R.drawable.ms_content_copy, getString(R.string.terminal_select_all), (Runnable) () -> term.selectAll()},
+                {R.drawable.ms_add, getString(R.string.terminal_larger_text), (Runnable) () -> zoom(1.15f)},
+                {R.drawable.ms_expand_more, getString(R.string.terminal_smaller_text), (Runnable) () -> zoom(1 / 1.15f)},
+                {R.drawable.ms_build_circle, getString(awake ? R.string.terminal_screen_sleep : R.string.terminal_keep_screen_on),
+                        (Runnable) () -> {
                     Prefs.setTermAwake(this, !awake);
                     if (!awake) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }},
-                {R.drawable.ms_close, "Close this session", (Runnable) () -> confirmSheet(this, "Close " + session.label() + "?",
-                        session.exited ? null : "It's still running. Closing it stops it and everything it started.",
-                        "Close", true, () -> closeSession(session))},
+                {R.drawable.ms_close, getString(R.string.terminal_close_session), (Runnable) () -> confirmSheet(this,
+                        getString(R.string.terminal_close_title, session.label()),
+                        session.exited ? null : getString(R.string.terminal_close_running),
+                        getString(R.string.terminal_close), true, () -> closeSession(session))},
         };
         for (Object[] it : items) {
             LinearLayout r = row(this);
-            r.setPadding(dp(this, 4), dp(this, 11), dp(this, 4), dp(this, 11));
+            r.setPaddingRelative(dp(this, 4), dp(this, 11), dp(this, 4), dp(this, 11));
             r.setBackgroundResource(ripple(this, false));
             FrameLayout ic = new FrameLayout(this);
             ic.setBackground(rounded(this, ACCENT_SOFT, 12));
@@ -419,7 +425,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             ic.addView(iv, new FrameLayout.LayoutParams(dp(this, 20), dp(this, 20), Gravity.CENTER));
             r.addView(ic, new LinearLayout.LayoutParams(dp(this, 36), dp(this, 36)));
             TextView t = title(this, (String) it[1], 15);
-            t.setPadding(dp(this, 14), 0, 0, 0);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();
@@ -427,9 +433,8 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
             });
             c.addView(r, full());
         }
-        TextView tip = text(this, "Long-press to select text or a link. Pinch to zoom, drag to scroll back. "
-                + "Long-press a tab to close it.", 13, MUTED);
-        tip.setPadding(0, dp(this, 8), 0, 0);
+        TextView tip = text(this, getString(R.string.terminal_tips), 13, MUTED);
+        tip.setPaddingRelative(0, dp(this, 8), 0, 0);
         c.addView(tip);
         d[0] = bottomSheet(this, c);
         d[0].show();

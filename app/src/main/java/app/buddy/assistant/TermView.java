@@ -688,11 +688,11 @@ final class TermView extends View {
             @Override
             public boolean onPrepareActionMode(android.view.ActionMode m, android.view.Menu menu) {
                 menu.clear();
-                menu.add(0, 1, 0, "Copy");
-                if (selectedLink() != null) menu.add(0, 4, 1, "Open link"); // up front, not in the overflow
-                menu.add(0, 2, 2, "Paste");
-                menu.add(0, 3, 3, "Select all");
-                menu.add(0, 5, 4, "Share");
+                menu.add(0, 1, 0, R.string.terminal_copy);
+                if (selectedLink() != null) menu.add(0, 4, 1, R.string.terminal_open_link); // up front, not in the overflow
+                menu.add(0, 2, 2, R.string.terminal_paste);
+                menu.add(0, 3, 3, R.string.terminal_select_all);
+                menu.add(0, 5, 4, R.string.terminal_share);
                 return true;
             }
 
@@ -702,7 +702,8 @@ final class TermView extends View {
                     case 1: {
                         String t = selectedText();
                         getContext().getSystemService(android.content.ClipboardManager.class)
-                                .setPrimaryClip(android.content.ClipData.newPlainText("Terminal", t));
+                                .setPrimaryClip(android.content.ClipData.newPlainText(
+                                        getContext().getString(R.string.terminal_title), t));
                         clearSelection();
                         return true;
                     }

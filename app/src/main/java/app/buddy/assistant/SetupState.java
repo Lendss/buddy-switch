@@ -8,9 +8,16 @@ import android.text.TextUtils;
 
 /** Setup progress from saved state: used for the Chats header, the Settings card and the guide. */
 final class SetupState {
-    static final String[] STEPS = {
-            "Turn on the accessibility service", "Install your agent", "Sign in", "Allow background running", "Try it",
+    /** The steps' short names as string resources, in order. */
+    private static final int[] STEP_NAMES = {
+            R.string.setup_step_name_a11y, R.string.setup_step_name_install, R.string.setup_step_signin_title,
+            R.string.setup_step_name_background, R.string.setup_step_try_title,
     };
+
+    /** Short name of step n (0 to 4) in the app's language, e.g. after "Next:" in the Chats header. */
+    static String step(int n) {
+        return BuddyApp.str(STEP_NAMES[n]);
+    }
 
     final boolean[] done = new boolean[5];
 

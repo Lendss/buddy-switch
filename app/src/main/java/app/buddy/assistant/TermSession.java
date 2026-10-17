@@ -32,8 +32,8 @@ final class TermSession implements TermEmulator.Host {
     static final java.util.List<TermSession> all = new java.util.ArrayList<>();
     static TermSession current;
     private static int counter;
-    /** "shell 1", "shell 2"… until the program sets a title. */
-    final String name;
+    /** Tab number: the tab is "shell 1", "shell 2"… until the program sets a title. */
+    final int number;
 
     final TermEmulator emulator;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -49,12 +49,12 @@ final class TermSession implements TermEmulator.Host {
 
     private TermSession(int rows, int cols) {
         emulator = new TermEmulator(rows, cols, this);
-        name = "shell " + (++counter);
+        number = ++counter;
     }
 
     String label() {
         String t = emulator.title;
-        return t == null || t.trim().isEmpty() ? name : t.trim();
+        return t == null || t.trim().isEmpty() ? BuddyApp.str(R.string.terminal_shell_name, number) : t.trim();
     }
 
     /** Starts a login shell in Buddy's Linux, as a new tab. Linux must be installed. */

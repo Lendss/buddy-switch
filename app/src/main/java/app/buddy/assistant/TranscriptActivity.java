@@ -39,13 +39,13 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
         root.setBackgroundColor(BG);
 
         LinearLayout top = row(this);
-        top.setPadding(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
-        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, "Back");
+        top.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
+        ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.chat_back));
         back.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         back.setOnClickListener(v -> finish());
         top.addView(back);
         LinearLayout titles = column(this);
-        titles.setPadding(dp(this, 4), 0, 0, 0);
+        titles.setPaddingRelative(dp(this, 4), 0, 0, 0);
         titles.addView(single(title(this, title, 16)));
         titles.addView(single(monoText(this, Account.cliOf(agent)
                 + (cwd != null && !cwd.isEmpty() ? " · " + cwd : ""), 12, MUTED)));
@@ -57,8 +57,8 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
 
         scroll = new ScrollView(this);
         messages = column(this);
-        messages.setPadding(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
-        messages.addView(note("Loading…"), full());
+        messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
+        messages.addView(note(getString(R.string.transcript_loading)), full());
         scroll.addView(messages);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
@@ -68,9 +68,9 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
             cont.setGravity(Gravity.CENTER);
             cont.setBackground(rounded(this, ACCENT, 14));
             cont.addView(icon(this, R.drawable.ms_forum, ON_ACCENT, 20));
-            TextView ct = title(this, "Continue in Buddy", 15);
+            TextView ct = title(this, getString(R.string.transcript_continue), 15);
             ct.setTextColor(ON_ACCENT);
-            ct.setPadding(dp(this, 8), 0, 0, 0);
+            ct.setPaddingRelative(dp(this, 8), 0, 0, 0);
             cont.addView(ct);
             cont.setOnClickListener(v -> {
                 Sessions.Session s = hub.adopt(agent, id, title);
@@ -92,7 +92,7 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
     private TextView note(String s) {
         TextView t = monoText(this, s, 12, MUTED);
         t.setGravity(Gravity.CENTER);
-        t.setPadding(0, dp(this, 12), 0, dp(this, 4));
+        t.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
         return t;
     }
 
@@ -121,17 +121,17 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
         messages.removeAllViews();
         JSONArray list = ev.optJSONArray("messages");
         if (list == null || list.length() == 0) {
-            messages.addView(note("No readable messages in this session."), full());
+            messages.addView(note(getString(R.string.transcript_empty)), full());
             return;
         }
-        messages.addView(note("last " + list.length() + " messages · read-only"), full());
+        messages.addView(note(getResources().getQuantityString(R.plurals.transcript_last_messages, list.length(), list.length())), full());
         for (int i = 0; i < list.length(); i++) {
             JSONObject m = list.optJSONObject(i);
             if (m == null) continue;
             boolean user = "user".equals(m.optString("role"));
             TextView tv = text(this, m.optString("text"), 15, TEXT);
             tv.setTextIsSelectable(true);
-            tv.setPadding(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+            tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             p.topMargin = dp(this, 12);
@@ -149,7 +149,7 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
                 face.setImageResource(R.drawable.bubble_face);
                 av.addView(face, new FrameLayout.LayoutParams(dp(this, 20), dp(this, 20), Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
-                avp.rightMargin = dp(this, 8);
+                avp.setMarginEnd(dp(this, 8));
                 r.addView(av, avp);
                 tv.setMaxWidth(maxBubble - dp(this, 32));
                 tv.setBackground(corners(this, CARD, 20, 20, 20, 6));

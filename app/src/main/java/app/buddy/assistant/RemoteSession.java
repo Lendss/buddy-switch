@@ -69,12 +69,12 @@ final class RemoteSession {
         synchronized (RemoteSession.class) {
             if (!Prefs.remoteSession(app) || proc != null || starting) return;
             if (!SetupState.signedIn(app, "claude")) {
-                set(State.ERROR, "Sign in to Claude Code first.");
+                set(State.ERROR, app.getString(R.string.remote_sign_in_first));
                 return;
             }
             starting = true;
         }
-        set(State.STARTING, "Starting…");
+        set(State.STARTING, app.getString(R.string.remote_starting));
         new Thread(() -> run(app)).start();
     }
 
@@ -129,7 +129,7 @@ final class RemoteSession {
             }
             p.waitFor();
         } catch (Exception e) {
-            set(State.ERROR, "Couldn't start: " + e.getMessage());
+            set(State.ERROR, app.getString(R.string.remote_start_failed, e.getMessage()));
         }
         boolean wanted;
         synchronized (RemoteSession.class) {
@@ -143,10 +143,10 @@ final class RemoteSession {
         // it stopped on its own: start again, backing off if it keeps failing right away
         if (System.currentTimeMillis() - lastStart < 30_000) quickFails++;
         if (quickFails >= 3) {
-            set(State.ERROR, "The session keeps stopping. Turn it off and on again, or check the Claude Code sign-in.");
+            set(State.ERROR, app.getString(R.string.remote_keeps_stopping));
             return;
         }
-        set(State.STARTING, "Restarting…");
+        set(State.STARTING, app.getString(R.string.remote_restarting));
         main.postDelayed(() -> ensure(app), 3000L * (quickFails + 1));
     }
 

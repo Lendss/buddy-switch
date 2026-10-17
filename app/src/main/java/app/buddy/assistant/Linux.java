@@ -53,7 +53,7 @@ final class Linux {
         String sum = sha256(tgz);
         if (!ALPINE_SHA256.equals(sum)) {
             tgz.delete();
-            throw new IOException("Alpine download is corrupt (sha256 " + sum + ")");
+            throw new IOException(c.getString(R.string.linux_download_corrupt, sum));
         }
         File staging = new File(root.getParentFile(), "alpine.partial");
         deleteTree(staging);
@@ -67,7 +67,7 @@ final class Linux {
         new File(staging, "tmp").mkdirs();
         tgz.delete();
         deleteTree(root);
-        if (!staging.renameTo(root)) throw new IOException("Couldn't move Alpine into place");
+        if (!staging.renameTo(root)) throw new IOException(c.getString(R.string.linux_move_failed));
     }
 
     /** The proot command line for running {@code cmd} inside Alpine. */
@@ -144,7 +144,9 @@ final class Linux {
 
     private static InputStream openOk(HttpURLConnection con) throws IOException {
         try {
-            if (con.getResponseCode() != 200) throw new IOException("Download failed: HTTP " + con.getResponseCode());
+            if (con.getResponseCode() != 200) {
+                throw new IOException(BuddyApp.str(R.string.linux_download_failed_http, con.getResponseCode()));
+            }
             return con.getInputStream();
         } catch (IOException e) {
             con.disconnect();
@@ -198,7 +200,7 @@ final class Linux {
                 continue;
             }
             if (name.startsWith("/") || ("/" + name + "/").contains("/../")) {
-                throw new IOException("Unsafe path in archive: " + name);
+                throw new IOException(BuddyApp.str(R.string.linux_unsafe_path, name));
             }
             File f = new File(dest, name);
             f.getParentFile().mkdirs();
@@ -213,7 +215,7 @@ final class Linux {
                     try {
                         Os.symlink(link, f.getPath());
                     } catch (Exception e) {
-                        throw new IOException("symlink " + name + ": " + e.getMessage());
+                        throw new IOException(BuddyApp.str(R.string.linux_symlink_failed, name, e.getMessage()));
                     }
                     skip(in, size);
                     break;
@@ -232,7 +234,7 @@ final class Linux {
                         byte[] buf = new byte[64 * 1024];
                         while (left > 0) {
                             int n = in.read(buf, 0, (int) Math.min(buf.length, left));
-                            if (n < 0) throw new IOException("Truncated archive");
+                            if (n < 0) throw new IOException(BuddyApp.str(R.string.linux_truncated_archive));
                             out.write(buf, 0, n);
                             left -= n;
                         }
@@ -280,7 +282,7 @@ final class Linux {
 
     private static byte[] readData(InputStream in, long size) throws IOException {
         byte[] d = new byte[(int) size];
-        if (!readFully(in, d)) throw new IOException("Truncated archive");
+        if (!readFully(in, d)) throw new IOException(BuddyApp.str(R.string.linux_truncated_archive));
         skipPadding(in, size);
         return d;
     }
@@ -290,7 +292,7 @@ final class Linux {
         while (total > 0) {
             long n = in.skip(total);
             if (n <= 0) {
-                if (in.read() < 0) throw new IOException("Truncated archive");
+                if (in.read() < 0) throw new IOException(BuddyApp.str(R.string.linux_truncated_archive));
                 n = 1;
             }
             total -= n;

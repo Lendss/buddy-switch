@@ -1,0 +1,1342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_label">Asistente Buddy</string>
+    <string name="service_description">Muestra la burbuja de chat de Buddy y permite que Claude Code o Codex, que se ejecutan dentro de Buddy en este teléfono, lean la pantalla, toquen, escriban y se desplacen por ti. Nada sale del teléfono, excepto lo que el propio agente envía a Anthropic u OpenAI.</string>
+
+    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
+
+    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
+    <!-- Button at the top right of every step. Keep short. -->
+    <string name="onboarding_skip_setup">Omitir</string>
+    <string name="onboarding_skip_title">¿Omitir la guía de configuración?</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_skip_text">Puedes terminar la configuración cuando quieras en Ajustes. Los chats no funcionarán hasta que la completes.</string>
+    <!-- Verb. Confirm button of the "Skip the setup guide?" sheet. -->
+    <string name="onboarding_skip_action">Omitir</string>
+    <!-- Progress at the top of the guide, small lowercase mono text. %1$d = this step, %2$d = number of steps. -->
+    <string name="onboarding_progress">paso %1$d de %2$d</string>
+    <!-- Button: go to the next step. -->
+    <string name="onboarding_continue">Continuar</string>
+    <!-- Title of the expandable help section at the bottom of a step. -->
+    <string name="onboarding_stuck">¿Necesitas ayuda?</string>
+
+    <!-- Guide, welcome screen. -->
+    <string name="onboarding_welcome_title">Conoce a Buddy</string>
+    <string name="onboarding_welcome_text">Una burbuja de chat que puede usar tu teléfono por ti.</string>
+    <string name="onboarding_welcome_ask_title">Pídelo con tus palabras</string>
+    <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
+    <string name="onboarding_welcome_ask_text">“Responde a Sam que llego tarde”, “agrega leche a mi carrito”.</string>
+    <string name="onboarding_welcome_plan_title">Tu propio plan, sin clave de API</string>
+    <string name="onboarding_welcome_plan_text">Ejecuta Claude Code con tu suscripción de Claude. Codex con un plan de ChatGPT también funciona.</string>
+    <string name="onboarding_welcome_control_title">Tú tienes el control</string>
+    <string name="onboarding_welcome_control_text">Buddy siempre te pide aprobación antes de enviar, publicar, comprar o eliminar algo.</string>
+    <!-- Small lowercase mono line under the list. -->
+    <string name="onboarding_welcome_time">la configuración tarda unos 5 minutos</string>
+    <string name="onboarding_get_started">Empezar</string>
+
+    <!-- Guide, step: choose the agent. Agent names next to each option stay in English. -->
+    <string name="onboarding_brain_title">Elige tu agente</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_brain_text">Quién responde en tus chats. Puedes agregar otros más adelante en Ajustes.</string>
+    <string name="onboarding_brain_claude">Usa tu suscripción de Claude (Pro o Max).</string>
+    <string name="onboarding_brain_codex">Usa tu plan de ChatGPT.</string>
+    <string name="onboarding_brain_opencode">Modelos gratuitos, sin necesidad de cuenta. Conecta tus propios proveedores más adelante.</string>
+    <!-- The option that installs both Claude Code and Codex. -->
+    <string name="onboarding_brain_both">Instala ambos y elige en cada chat. Claude Code sigue siendo el predeterminado.</string>
+    <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
+    <string name="onboarding_recommended">recomendado</string>
+
+    <!-- Guide, step: turn on Buddy's accessibility service. -->
+    <string name="onboarding_access_title">Deja que Buddy vea y toque</string>
+    <string name="onboarding_access_done">Accesibilidad activada.</string>
+    <string name="onboarding_access_text">El servicio de accesibilidad de Buddy muestra la burbuja y permite que el agente lea la pantalla, toque y escriba, solo cuando le pides que haga algo.</string>
+    <!-- %1$s = the agent's name (Claude Code or Codex); %2$s = the company it sends to (Anthropic or OpenAI). -->
+    <string name="onboarding_access_privacy">Nada sale del teléfono, excepto lo que %1$s envía a %2$s para responderte. Buddy siempre te pide aprobación antes de enviar, publicar, comprar o eliminar algo.</string>
+    <!-- Same as onboarding_access_privacy, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_access_privacy_both">Nada sale del teléfono, excepto lo que Claude Code y Codex envían a Anthropic y OpenAI para responderte. Buddy siempre te pide aprobación antes de enviar, publicar, comprar o eliminar algo.</string>
+    <!-- Same as onboarding_access_privacy, for OpenCode. %1$s = OpenCode. The model's provider = whichever AI company runs the chosen model. -->
+    <string name="onboarding_access_privacy_opencode">Nada sale del teléfono, excepto lo que %1$s envía al proveedor del modelo para responderte. Buddy siempre te pide aprobación antes de enviar, publicar, comprar o eliminar algo.</string>
+    <!-- Path in Android's Accessibility settings. "Downloaded apps" = that section's name on Android (use Android's wording in your language); "Buddy assistant" = Buddy's service name (service_label). -->
+    <string name="onboarding_access_list_hint">En la lista: Apps descargadas → Asistente Buddy → actívalo.</string>
+    <string name="onboarding_access_open">Abrir configuración de accesibilidad</string>
+    <!-- Android 13+ greys out the switch for apps installed from a file. Title of a help box and a help question. -->
+    <string name="onboarding_access_greyed_title">¿El interruptor está en gris?</string>
+    <!-- "App info" = the button below (onboarding_app_info). "Allow restricted settings" = Android's own menu item; ⋮ = the three-dot menu. -->
+    <string name="onboarding_access_greyed_text">Android lo bloquea en las apps instaladas desde un archivo. Toca Información de la app (abajo), luego ⋮ arriba a la derecha → Permitir configuración restringida, y vuelve a intentarlo.</string>
+    <!-- Numbered steps, one per line. Same names as in onboarding_access_greyed_text. -->
+    <string name="onboarding_access_restricted_steps">1. Toca Información de la app abajo.\n2. Toca ⋮ arriba a la derecha → Permitir configuración restringida.\n3. Vuelve y abre otra vez la configuración de accesibilidad.</string>
+    <!-- Button: opens Android's App info page for Buddy. Use Android's name for that page. -->
+    <string name="onboarding_app_info">Información de la app</string>
+
+    <!-- Guide, step: install the agent inside Buddy and sign in. -->
+    <string name="onboarding_agents_title">Instala e inicia sesión</string>
+    <!-- Title once every chosen agent is installed and signed in. -->
+    <string name="onboarding_agents_done_title">Listo</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="onboarding_agents_done">%1$s está instalado y con la sesión iniciada.</string>
+    <!-- Same as onboarding_agents_done, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_agents_done_both">Claude Code y Codex están instalados y con la sesión iniciada.</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode) or onboarding_agent_names_both. -->
+    <string name="onboarding_agents_text">Buddy instala %1$s dentro de la app y luego inicias sesión una vez. No necesitas Termux.</string>
+    <!-- Both agents together, inserted as %1$s into onboarding_agents_text. -->
+    <string name="onboarding_agent_names_both">Claude Code y Codex</string>
+    <!-- Agent card status lines: small lowercase mono text, one line. -->
+    <!-- OpenCode is ready. %1$s = its model providers, or onboarding_agent_free_models. -->
+    <string name="onboarding_agent_ready">listo · %1$s</string>
+    <string name="onboarding_agent_free_models">modelos gratuitos</string>
+    <string name="onboarding_agent_signed_in">sesión iniciada</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="onboarding_agent_signed_in_as">sesión iniciada · %1$s</string>
+    <string name="onboarding_agent_installing">instalando…</string>
+    <string name="onboarding_agent_installed">instalado · sin sesión iniciada</string>
+    <string name="onboarding_agent_not_installed">no instalado</string>
+    <!-- Agent card help text. "Authorize" = the button on Claude's sign-in web page (the page may be in English). -->
+    <string name="onboarding_agent_sign_in_claude">Inicia sesión con tu cuenta de Claude. Se abrirá el navegador; toca Autorizar y Buddy volverá automáticamente.</string>
+    <string name="onboarding_agent_checking_opencode">Comprobando OpenCode…</string>
+    <string name="onboarding_agent_sign_in_codex">Inicia sesión con tu cuenta de ChatGPT en el navegador y luego vuelve.</string>
+    <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
+    <string name="onboarding_agent_download_claude">Descarga unos 235 MB una sola vez (el Linux de Buddy y Claude Code de Anthropic).</string>
+    <string name="onboarding_agent_download_opencode">Descarga unos 230 MB una sola vez (el Linux de Buddy, Node.js y OpenCode). No necesitas cuenta.</string>
+    <string name="onboarding_agent_download_codex">Descarga unos 150 MB una sola vez (el Linux de Buddy, Node.js y Codex de OpenAI).</string>
+    <!-- Buttons on the agent card. -->
+    <string name="onboarding_sign_in_claude">Iniciar sesión con Claude</string>
+    <string name="onboarding_sign_in_chatgpt">Iniciar sesión con ChatGPT</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="onboarding_install_agent">Instalar %1$s</string>
+    <string name="onboarding_agents_wifi">Usa Wi-Fi si puedes. Puedes salir de esta pantalla mientras se instala.</string>
+    <!-- Help questions and answers under "Stuck?". "Copy Code" = a button on Claude's web page. -->
+    <string name="onboarding_stuck_sign_in_q">¿Buddy no volvió tras iniciar sesión?</string>
+    <string name="onboarding_stuck_sign_in_a">Claude: en la página de Claude, toca Copiar código y vuelve a Buddy; tomará el código del portapapeles.</string>
+    <string name="onboarding_stuck_install_q">¿Falló la instalación?</string>
+    <!-- "Install" = the Install button on the agent card (onboarding_install_agent). -->
+    <string name="onboarding_stuck_install_a">Revisa tu conexión y vuelve a tocar Instalar; continuará donde se quedó.</string>
+
+    <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
+    <string name="onboarding_background_title">Mantén Buddy activo</string>
+    <string name="onboarding_background_done">Buddy puede funcionar en segundo plano.</string>
+    <string name="onboarding_background_text">Así tu teléfono no cerrará Buddy para ahorrar batería mientras el agente trabaja.</string>
+    <!-- Button: opens Android's dialog to let Buddy run in the background. -->
+    <string name="onboarding_allow">Permitir</string>
+    <string name="onboarding_skip_for_now">Omitir por ahora</string>
+
+    <!-- Guide, step: how much the agent asks before acting. -->
+    <string name="onboarding_safety_title">¿Cuánto debe preguntar?</string>
+    <!-- Ends with a colon: the two options follow. -->
+    <string name="onboarding_safety_text">Las apps de mensajería, redes sociales, compras, pagos y bancos siempre necesitan tu aprobación antes de que Buddy envíe, publique, compre o elimine algo. Para tus otras apps:</string>
+    <string name="onboarding_safety_ask_title">Preguntar antes</string>
+    <string name="onboarding_safety_ask_text">El agente pregunta antes de hacer algo arriesgado, como cambiar una configuración. Más seguro, pero con más preguntas.</string>
+    <string name="onboarding_safety_auto_title">Trabajar por su cuenta</string>
+    <string name="onboarding_safety_auto_text">Sin interrupciones: el agente simplemente hace lo que pediste, como encender una cámara o una luz.</string>
+    <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
+    <string name="onboarding_safety_note">Puedes cambiarlo para cada app cuando quieras: Ajustes → Permisos de apps. Pon una app en Libre para que el agente trabaje en ella sin preguntarte, o en Estricto para que sea el propio Buddy quien te pregunte.</string>
+
+    <!-- Guide, last step: try a first task. -->
+    <string name="onboarding_try_title">Todo listo</string>
+    <!-- "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_text">Prueba una primera tarea. Buddy abrirá Configuración y la leerá por ti.</string>
+    <!-- Example request: shown on this screen and put in the chat's input box, ready to send to the agent. "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_prompt">Abre Configuración y dime qué versión de Android tengo</string>
+    <!-- onboarding_try_prompt in quotation marks (%1$s). Use your language's quotation marks. -->
+    <string name="onboarding_try_prompt_quoted">“%1$s”</string>
+    <!-- ✕ = the close target that appears while dragging the bubble. -->
+    <string name="onboarding_try_tip">Consejo: la burbuja flota sobre otras apps. Arrástrala hasta la ✕ para ocultarla.</string>
+    <string name="onboarding_try_now">Probar ahora</string>
+    <string name="onboarding_go_to_chats">Ir a mis chats</string>
+
+    <!-- Home screen: the chat list. -->
+    <!-- Floating button that starts a chat, and the title of the sheet that picks its agent. Keep short. -->
+    <string name="main_new_chat">Nuevo chat</string>
+    <!-- Small lowercase mono status under the app name when Buddy is ready. %1$s = Buddy's local server address (127.0.0.1:8765). -->
+    <string name="main_status_ready">listo · %1$s</string>
+    <!-- Small lowercase mono status while setup isn't finished: %1$d steps done out of %2$d. -->
+    <string name="main_status_setup">configuración %1$d/%2$d</string>
+    <string name="main_setup_title">Termina la configuración para usar los chats</string>
+    <!-- %1$s = the name of the next setup step, e.g. Turn on the accessibility service. -->
+    <string name="main_setup_next">Siguiente: %1$s</string>
+    <string name="main_setup_next_accessibility">Siguiente: abre el servicio de accesibilidad de Buddy</string>
+    <!-- Section header, shown in capitals: chats whose task is running now. The count follows it. -->
+    <string name="main_section_working">En curso</string>
+    <!-- Section header, shown in capitals. -->
+    <string name="main_section_recent">Recientes</string>
+    <string name="main_empty_title">Aún no hay chats</string>
+    <!-- "New chat" = the button (main_new_chat). -->
+    <string name="main_empty_text">Toca Nuevo chat para empezar uno con Claude Code o Codex. Mantén presionado un chat para eliminarlo.</string>
+    <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
+    <string name="main_chat_working">trabajando…</string>
+    <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
+    <string name="main_chat_last_you">Tú: %1$s</string>
+    <string name="main_delete_title">¿Eliminar este chat?</string>
+    <!-- Verb. Confirm button. -->
+    <string name="main_delete_action">Eliminar</string>
+    <!-- New chat sheet: small lowercase tag next to the default agent's name. Keep very short. -->
+    <string name="main_new_chat_default">predeterminado</string>
+    <!-- New chat sheet: shown under an agent that isn't ready yet. -->
+    <string name="main_new_chat_not_signed_in">Sin sesión iniciada · toca para configurar</string>
+    <string name="main_new_chat_not_installed">No instalado · toca para configurar</string>
+    <!-- How long ago a chat changed, next to it in the chat lists. Very little room: keep as short as the English (m = minutes, h = hours, d = days). -->
+    <string name="main_ago_now">ahora</string>
+    <plurals name="main_ago_minutes">
+        <item quantity="one">%1$d min</item>
+        <item quantity="other">%1$d min</item>
+    </plurals>
+    <plurals name="main_ago_hours">
+        <item quantity="one">%1$d h</item>
+        <item quantity="other">%1$d h</item>
+    </plurals>
+    <plurals name="main_ago_days">
+        <item quantity="one">%1$d d</item>
+        <item quantity="other">%1$d d</item>
+    </plurals>
+
+    <!-- Notification shown after the bubble is dragged away to hide it. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="notice_channel_name">Burbuja oculta</string>
+    <string name="notice_hidden_title">Buddy está oculto</string>
+    <string name="notice_hidden_text">Toca para volver a mostrar la burbuja.</string>
+    <!-- Notification button: opens Buddy's chat list. Keep short. -->
+    <string name="notice_open_chats">Abrir chats</string>
+
+    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="update_channel_name">Actualizaciones de Buddy</string>
+    <!-- Notification and sheet title. %1$s = the new version number, e.g. 2.1.14. -->
+    <string name="update_available_title">Buddy %1$s está disponible</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_notification_text">Tienes la versión %1$s. Toca para ver las novedades y actualizar; tus chats se conservan.</string>
+    <!-- Verb: download and install the new version. Notification button and sheet button (half width). Keep short. -->
+    <string name="update_action">Actualizar</string>
+    <!-- Notification button: stop update notifications. Keep short. -->
+    <string name="update_mute">No avisarme</string>
+    <!-- "Settings" = Buddy's own Settings tab (its Update notices switch). -->
+    <string name="update_muted">Ya no recibirás avisos de actualización. Vuelve a activarlos en Ajustes.</string>
+    <string name="update_checking">Buscando actualizaciones…</string>
+    <string name="update_check_failed">No se pudo conectar con GitHub. Inténtalo de nuevo más tarde.</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_up_to_date">Buddy %1$s está actualizado.</string>
+    <!-- Under the sheet title. %1$s = the installed version number. -->
+    <string name="update_sheet_text">Tienes la versión %1$s. Al actualizar se conservan tus chats, ajustes y sesiones iniciadas.</string>
+    <!-- Sheet button (half width): close without updating. -->
+    <string name="update_later">Más tarde</string>
+    <!-- On the Update button while the new version downloads. -->
+    <string name="update_downloading">Descargando…</string>
+    <!-- "Update" = the button (update_action). -->
+    <string name="update_needs_permission">Permite que Buddy instale apps y vuelve a tocar Actualizar.</string>
+    <!-- Why an update failed (%1$s of update_failed_manual). buddy.apk is a file name. -->
+    <string name="update_error_no_apk">Esta versión todavía no incluye buddy.apk.</string>
+    <!-- %1$s = the system's technical error message (usually English). -->
+    <string name="update_error_download">La descarga falló (%1$s).</string>
+    <string name="update_error_not_newer">El archivo descargado no es una versión más reciente de Buddy, así que no se abrió.</string>
+    <!-- Message after a failed update. %1$s = what went wrong (an update_error_ sentence); %2$s = the web address of the latest release; %3$s = the web address of the update instructions. Obtainium is an app name. -->
+    <string name="update_failed_manual">%1$s También puedes descargarlo en %2$s (buddy.apk) o usar Obtainium para recibir actualizaciones automáticas (consulta %3$s).</string>
+
+    <!-- Settings, Appearance: option names. -->
+    <!-- Light/dark mode, segmented control: keep short. System = follow the phone's setting. -->
+    <string name="prefs_theme_system">Sistema</string>
+    <string name="prefs_theme_light">Claro</string>
+    <string name="prefs_theme_dark">Oscuro</string>
+    <!-- Surface (background) tone, segmented control: keep short. Warm = Buddy's original warm greys; Black = true black, in dark mode only. -->
+    <string name="prefs_surface_warm">Cálido</string>
+    <string name="prefs_surface_neutral">Neutro</string>
+    <string name="prefs_surface_black">Negro</string>
+    <!-- Accent colour names, read aloud by TalkBack for the colour swatches. -->
+    <string name="prefs_accent_coral">Coral</string>
+    <string name="prefs_accent_ocean">Océano</string>
+    <string name="prefs_accent_mint">Menta</string>
+    <string name="prefs_accent_violet">Violeta</string>
+    <string name="prefs_accent_rose">Rosa</string>
+    <string name="prefs_accent_amber">Ámbar</string>
+
+    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
+
+    <!-- Floating bubble, read by TalkBack. -->
+    <string name="bubble_face_description">Buddy. Toca para abrir; mantén presionado para ver las acciones</string>
+    <!-- TalkBack action on the bubble, read as "Double-tap and hold to show actions". Lowercase. -->
+    <string name="bubble_show_actions">mostrar acciones</string>
+
+    <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…".
+         "hold" = long-press the bubble, which opens the hold menu. -->
+    <string name="bubble_pill_waiting_answer">Esperando tu respuesta</string>
+    <string name="bubble_pill_waiting_approval">Esperando tu aprobación</string>
+    <string name="bubble_pill_paused">En pausa · mantén presionada la burbuja para reanudar</string>
+    <!-- The agent is operating the phone. Also the chat panel's running strip. -->
+    <string name="bubble_using_phone">Usando tu teléfono</string>
+    <!-- %1$s: what the agent is doing right now (its own status text). -->
+    <string name="bubble_using_phone_status">Usando tu teléfono · %1$s</string>
+    <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
+         next string. "Stop" is the hold menu's Stop task action. -->
+    <string name="bubble_pill_hold_hint">mantén presionada la burbuja: Detener y más</string>
+    <!-- %1$s: the current status text. -->
+    <string name="bubble_pill_status_hold_hint">%1$s · mantén presionada la burbuja: Detener y más</string>
+
+    <!-- Hold menu: actions fanned out around the bubble while it is held. Very little room: one line, 72dp wide
+         (about 12 characters); longer labels are cut off. -->
+    <string name="menu_stop_task">Detener</string>
+    <string name="menu_resume">Reanudar</string>
+    <string name="menu_pause">Pausar</string>
+    <!-- Dictate an extra instruction for the agent while it works. -->
+    <string name="menu_add_instruction">Instrucción</string>
+    <!-- Stops Buddy reading a reply aloud. -->
+    <string name="menu_stop_voice">Silenciar</string>
+    <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
+         mic button (read by TalkBack). -->
+    <string name="bubble_talk">Hablar</string>
+    <string name="menu_open_chat">Abrir chat</string>
+    <!-- Hides the bubble; a notification brings it back. -->
+    <string name="menu_hide">Ocultar</string>
+
+    <!-- Hold-menu preview: the first few times a task starts, three actions peek out of the bubble for a moment.
+         Short forms of Stop task, Add instruction and Stop voice; keep them very short. -->
+    <string name="menu_peek_stop">Detener</string>
+    <!-- Verb. -->
+    <string name="menu_peek_add">Agregar</string>
+    <!-- Noun: Buddy's spoken voice (the action silences it). -->
+    <string name="menu_peek_voice">Voz</string>
+    <!-- Badge under the preview: long-press the bubble; "me" is the bubble. -->
+    <string name="menu_peek_hint">Mantén presionado</string>
+
+    <!-- Toasts from the bubble. "hold" = long-press. -->
+    <string name="bubble_tip_stop_voice">Consejo: mantén presionada la burbuja para silenciar la voz</string>
+    <string name="bubble_tip_hold_menu">Consejo: mantén presionada la burbuja para pausar, detener o agregar una instrucción</string>
+    <string name="bubble_stopping">Deteniendo…</string>
+    <string name="bubble_nothing_running">No hay nada en curso en los chats de Buddy.</string>
+    <string name="bubble_nothing_running_chat">No hay nada en curso en este chat.</string>
+    <string name="bubble_allow_mic_tap_mic">Permite el acceso al micrófono en Buddy y vuelve a tocar el micrófono.</string>
+    <string name="bubble_allow_mic_tap_bubble">Permite el acceso al micrófono en Buddy y vuelve a tocar la burbuja.</string>
+    <!-- After dictating an instruction while the agent works. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="bubble_note_added">Entendido: %1$s lo tendrá en cuenta</string>
+    <!-- A message was copied to the clipboard. -->
+    <string name="bubble_copied">Copiado</string>
+
+    <!-- Voice input, shown in the status pill beside the bubble. -->
+    <string name="bubble_listening">Escuchando…</string>
+    <string name="bubble_listening_tap_done">Escuchando… toca la burbuja cuando termines</string>
+    <!-- The words heard so far. %1$s: the words. Use your language's quotation marks. -->
+    <string name="bubble_heard">“%1$s”</string>
+
+    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
+    <!-- Starts a new chat: the + button, and the title of the agent picker it opens. -->
+    <string name="bubble_new_chat">Nuevo chat</string>
+    <string name="bubble_open_in_app">Abrir en la app</string>
+    <!-- Closes the chat panel. -->
+    <string name="bubble_close">Cerrar</string>
+    <!-- Panel title while the list of chats shows. -->
+    <string name="bubble_chats_title">Chats</string>
+    <!-- Panel title while picking this chat's model and effort (how hard the agent thinks). -->
+    <string name="bubble_model_effort_title">Modelo y esfuerzo</string>
+    <!-- Under the title. %1$s: the agent · model · effort summary; "dev" marks that developer mode is on. -->
+    <string name="bubble_summary_dev">%1$s · dev</string>
+
+    <!-- Strip at the top of the chat panel while the agent works. -->
+    <string name="bubble_working">Trabajando…</string>
+    <!-- Verb: stops this chat's task. -->
+    <string name="bubble_stop">Detener</string>
+
+    <!-- Composer at the bottom of the chat panel. -->
+    <string name="bubble_attach">Adjuntar una foto o un archivo</string>
+    <!-- Hint in the empty text field. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="bubble_input_hint">Pídele a %1$s…</string>
+    <!-- Verb: pastes copied text into the field. -->
+    <string name="bubble_paste">Pegar</string>
+    <!-- Verb: sends the message (read by TalkBack). -->
+    <string name="bubble_send">Enviar</string>
+    <!-- A chat with no messages yet. %1$s: the agent's name (Claude Code, Codex or OpenCode); "me" is Buddy. -->
+    <string name="bubble_empty_chat">Nuevo chat con %1$s. Pídeme que haga algo en tu teléfono.</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="bubble_tool_calls">
+        <item quantity="one">%1$d llamada a herramienta</item>
+        <item quantity="other">%1$d llamadas a herramientas</item>
+    </plurals>
+
+    <!-- List of chats in the panel. -->
+    <!-- Status of a running chat, under its title. Lowercase. -->
+    <string name="bubble_chat_row_working">trabajando…</string>
+    <!-- Preview of the last message when the user wrote it. %1$s: the message. -->
+    <string name="bubble_chat_row_you">Tú: %1$s</string>
+    <!-- Asked in the chat's row after a long press, next to Cancel and Delete buttons. -->
+    <string name="bubble_delete_chat">¿Eliminar este chat?</string>
+    <!-- Button: deletes the chat. -->
+    <string name="bubble_delete">Eliminar</string>
+
+    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
+    <!-- Small tag next to the agent that new chats use by default. Lowercase. -->
+    <string name="bubble_agent_default">predeterminado</string>
+    <string name="bubble_agent_not_signed_in">Sin sesión iniciada · toca para configurar</string>
+    <string name="bubble_agent_not_installed">No instalado · toca para configurar</string>
+
+    <!-- Model and effort picker for the current chat. -->
+    <string name="bubble_model_note">Solo para este chat. La conversación continúa; el próximo mensaje usará la nueva elección.</string>
+    <!-- Section heading, shown in capitals: how hard the agent thinks. -->
+    <string name="bubble_effort">Esfuerzo</string>
+    <!-- "Auto" is the name of the first effort choice below it; "Higher" = the higher effort levels; "plan" = the
+         user's subscription plan. -->
+    <string name="bubble_effort_note">Auto deja que el agente decida. Los niveles más altos piensan más y consumen más de tu plan.</string>
+    <!-- Section heading, shown in capitals: the AI model. -->
+    <string name="bubble_model">Modelo</string>
+
+    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
+    <!-- Small all-caps label at the top of an approval card. -->
+    <string name="card_label_approval">NECESITA TU APROBACIÓN</string>
+    <!-- Small all-caps label at the top of a question card. -->
+    <string name="card_label_question">PREGUNTA</string>
+    <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
+         %1$s: card_label_approval or card_label_question. All caps. -->
+    <string name="card_label_other_session">%1$s · DE OTRA SESIÓN</string>
+    <!-- Buttons side by side at the bottom of the card: keep them short. -->
+    <string name="card_deny">Rechazar</string>
+    <!-- Verb: the user says what the agent should change instead of approving. -->
+    <string name="card_change">Cambiar</string>
+    <string name="card_approve">Aprobar</string>
+    <!-- Verb: skips the question without answering. -->
+    <string name="card_skip">Omitir</string>
+    <!-- Last button under a question's answers: type an answer instead of picking one. -->
+    <string name="card_type_own_answer">Escribir mi propia respuesta…</string>
+    <!-- Hint in the text field after tapping Change. -->
+    <string name="card_change_hint">¿Qué debería cambiar?</string>
+    <!-- Hint in the text field when typing an answer to a question. -->
+    <string name="card_answer_hint">Tu respuesta…</string>
+
+    <!-- Notes posted into the chat after the user answers a card. Keep the mark at the start (✓ ✎ ✗) and the space
+         after it. %1$s: the answer, the requested change or what was approved (shortened). -->
+    <string name="card_note_answered">✓ Respondido: %1$s</string>
+    <string name="card_note_change_requested">✎ Cambio solicitado: %1$s</string>
+    <string name="card_note_approved">✓ Aprobado: %1$s</string>
+    <string name="card_note_denied">✗ Rechazado</string>
+    <string name="card_note_skipped">Pregunta omitida</string>
+
+    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
+    <!-- Name of this notification category in Android's notification settings. -->
+    <string name="control_channel_name">Buddy está usando tu teléfono</string>
+    <string name="control_channel_description">Aparece en la barra de estado mientras un agente controla el teléfono.</string>
+    <string name="control_title">Buddy está usando tu teléfono</string>
+    <!-- "Stop" is the notification's button (control_stop): use the same word. -->
+    <string name="control_text">No toques la pantalla hasta que termine, o toca Detener para tomar el control.</string>
+    <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
+    <string name="control_stop">Detener</string>
+
+    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
+
+    <!-- Chat screen: app bar -->
+    <!-- Verb, go back. Read by TalkBack for the back arrow at the top of the chat and transcript screens; also a
+         button on the approval card that leaves the text box. Keep short. -->
+    <string name="chat_back">Atrás</string>
+    <!-- Read by TalkBack for the speaker button at the top of the chat (turns reading replies aloud on or off). -->
+    <string name="chat_read_aloud">Leer respuestas en voz alta</string>
+    <string name="chat_read_aloud_on">Las respuestas se leerán en voz alta</string>
+    <string name="chat_read_aloud_off">Las respuestas no se leerán en voz alta</string>
+    <!-- Model chip under the chat title when developer mode is on. %1$s = agent · model · effort.
+         "dev" = developer mode. Keep very short. -->
+    <string name="chat_chip_dev">%1$s · dev</string>
+
+    <!-- Chat screen: the strip shown while the agent works -->
+    <!-- Button, verb: stops the agent's task. Keep short. -->
+    <string name="chat_stop">Detener</string>
+    <!-- Status while an agent works and has no step to show yet (chat strip, the bubble's status pill). -->
+    <string name="chat_working">Trabajando…</string>
+
+    <!-- Chat screen: composer and empty chat -->
+    <!-- Read by TalkBack for the paperclip button. -->
+    <string name="chat_attach_description">Adjuntar una foto o un archivo</string>
+    <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <string name="chat_input_hint">Pídele a %1$s…</string>
+    <!-- Hint in the message box while the agent works: what you type now reaches it at its next step. -->
+    <string name="chat_input_hint_running">Agrega una instrucción mientras trabaja…</string>
+    <!-- Read by TalkBack for the mic button. Verb: starts voice input. -->
+    <string name="chat_talk">Hablar</string>
+    <!-- Read by TalkBack for the send button. Verb. -->
+    <string name="chat_send">Enviar</string>
+    <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <string name="chat_empty_hint">Nuevo chat con %1$s. Pídele que haga algo en tu teléfono.</string>
+    <!-- Same, when developer mode is on. %1$s = agent name. -->
+    <string name="chat_empty_hint_dev">Nuevo chat con %1$s. Pídele que haga algo en tu teléfono o que cree una app (el modo de desarrollador está activado).</string>
+
+    <!-- Model sheet (tap the model chip under the chat title) -->
+    <!-- %1$s = agent name, e.g. "Claude Code model". -->
+    <string name="chat_model_title">Modelo de %1$s</string>
+    <string name="chat_model_subtitle">Solo para este chat. La conversación continúa con el nuevo modelo.</string>
+    <!-- Section label, shown in capitals: how hard the model thinks (reasoning effort). -->
+    <string name="chat_effort">Esfuerzo</string>
+    <!-- "Auto" is the first effort option below it; "Higher" means the higher options. -->
+    <string name="chat_effort_help">Auto deja que el agente decida. Los niveles más altos piensan más y consumen más de tu plan.</string>
+    <!-- Section label, shown in capitals, above the list of models. -->
+    <string name="chat_model">Modelo</string>
+    <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
+    <string name="chat_model_other_hint">otro… p. ej. %1$s</string>
+    <!-- Button, verb: use the model typed in the box. Keep short. -->
+    <string name="chat_model_use">Usar</string>
+
+    <!-- Language sheet (long-press the mic) -->
+    <!-- Title, followed by a list of languages to speak in. -->
+    <string name="chat_speak_in">Hablar en</string>
+    <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
+    <string name="chat_speak_in_help">Elige tus idiomas en Ajustes → Voz.</string>
+    <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
+    <string name="chat_phone_voice">voz del teléfono</string>
+
+    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_question">PREGUNTA</string>
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_needs_ok">NECESITA TU APROBACIÓN</string>
+    <!-- Buttons, verbs. Deny, Change and Approve sit three in a row: keep short. -->
+    <string name="chat_deny">Rechazar</string>
+    <!-- Verb: ask the agent to change what it wants to do. -->
+    <string name="chat_change">Cambiar</string>
+    <string name="chat_approve">Aprobar</string>
+    <!-- Verb: skip the agent's question without answering. -->
+    <string name="chat_skip">Omitir</string>
+    <string name="chat_type_own_answer">Escribir mi propia respuesta</string>
+    <string name="chat_answer_hint">Tu respuesta</string>
+    <string name="chat_change_hint">¿Qué debería cambiar?</string>
+    <string name="chat_send_answer">Enviar respuesta</string>
+    <string name="chat_send_change">Enviar cambio</string>
+
+    <!-- Attachments -->
+    <!-- Title of the sheet behind the paperclip button. Verb. -->
+    <string name="chat_attach">Adjuntar</string>
+    <string name="chat_attach_camera">Tomar una foto</string>
+    <string name="chat_attach_camera_sub">Usar la cámara</string>
+    <string name="chat_attach_photos">Fotos</string>
+    <string name="chat_attach_photos_sub">Elegir de tu galería</string>
+    <string name="chat_attach_files">Archivos</string>
+    <string name="chat_attach_files_sub">PDF, documentos, cualquier archivo de hasta 25 MB</string>
+    <string name="chat_no_app_for_action">Ninguna app de este teléfono puede hacer eso.</string>
+    <!-- Toast while one picked photo or file is added. -->
+    <string name="chat_adding">Agregando…</string>
+    <!-- Toast while several picked photos or files are added (always 2 or more). -->
+    <plurals name="chat_adding_files">
+        <item quantity="one">Agregando %1$d archivo…</item>
+        <item quantity="other">Agregando %1$d archivos…</item>
+    </plurals>
+    <!-- Read by TalkBack for the × on an attachment waiting to be sent. Verb. -->
+    <string name="chat_attachment_remove">Quitar</string>
+    <!-- %1$s = file name. -->
+    <string name="chat_no_app_for_file">Ninguna app puede abrir %1$s.</string>
+
+    <!-- Chat messages -->
+    <!-- Toast after a long press copies a message. -->
+    <string name="chat_copied">Copiado</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="chat_tool_calls">
+        <item quantity="one">%1$d llamada a herramienta</item>
+        <item quantity="other">%1$d llamadas a herramientas</item>
+    </plurals>
+
+    <!-- Notes Buddy posts into a chat, and the chat's status line -->
+    <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
+    <string name="hub_continuing">Continuando una sesión anterior de %1$s. Si sigue abierta en una terminal, ciérrala allí primero.</string>
+    <string name="hub_still_working_attachments">Este chat todavía está trabajando. Envía los archivos adjuntos cuando termine.</string>
+    <!-- Status right after a message is sent, until the agent's first step. -->
+    <string name="hub_thinking">Pensando…</string>
+    <string name="hub_still_waiting">Todavía esperando la respuesta del modelo…</string>
+    <!-- "the top of the chat" = the model chip under the chat title. -->
+    <string name="hub_no_answer">El modelo no respondió. Puede que esté ocupado: inténtalo de nuevo o elige otro modelo en la parte superior del chat.</string>
+    <!-- After picking a model for the chat. %1$s = model name. -->
+    <string name="hub_model_set">Modelo: %1$s</string>
+    <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
+    <string name="hub_effort_set">Esfuerzo: %1$s</string>
+    <!-- After picking Auto effort: the agent's default effort. -->
+    <string name="hub_effort_default">Esfuerzo: predeterminado</string>
+    <!-- Status after the user taps Stop. -->
+    <string name="hub_stopping">Deteniendo…</string>
+    <!-- Note after the task was stopped. -->
+    <string name="hub_stopped">Detenido.</string>
+    <!-- The agent ended with an error and gave no message. %1$s = agent name. -->
+    <string name="hub_agent_stopped">%1$s se detuvo.</string>
+    <string name="hub_something_wrong">Algo salió mal.</string>
+    <!-- After the user adds something while the agent works. %1$s = agent name. -->
+    <string name="hub_note_added">Agregado mientras trabaja: %1$s lo recibirá en su próximo paso</string>
+    <!-- The agent received what the user added while it worked. -->
+    <string name="hub_note_passed">Lo que agregaste ya le llegó</string>
+    <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
+         %2$s = the newest chat's status. -->
+    <plurals name="hub_pill_chats">
+        <item quantity="one">%1$d chat · %2$s</item>
+        <item quantity="other">%1$d chats · %2$s</item>
+    </plurals>
+
+    <!-- The agent's steps, one line each, shown in the chat and the bubble while it works. Arguments come from
+         the agent and are not translated. -->
+    <string name="hub_tool_read_screen">Leyendo la pantalla</string>
+    <string name="hub_tool_screenshot">Haciendo una captura de pantalla</string>
+    <!-- %1$d = number of an element on the screen. -->
+    <string name="hub_tool_tap_element">Tocando el elemento %1$d</string>
+    <!-- %1$d,%2$d = x,y position on the screen. -->
+    <string name="hub_tool_tap_point">Tocando en %1$d,%2$d</string>
+    <string name="hub_tool_long_press">Manteniendo presionado</string>
+    <!-- %1$s = the text being typed. -->
+    <string name="hub_tool_type">Escribiendo “%1$s”</string>
+    <string name="hub_tool_scroll_up">Desplazando hacia arriba</string>
+    <string name="hub_tool_scroll_down">Desplazando hacia abajo</string>
+    <string name="hub_tool_scroll_left">Desplazando hacia la izquierda</string>
+    <string name="hub_tool_scroll_right">Desplazando hacia la derecha</string>
+    <!-- Any other direction. %1$s = the direction as the agent wrote it, not translated. -->
+    <string name="hub_tool_scroll">Desplazando: %1$s</string>
+    <string name="hub_tool_swipe">Deslizando</string>
+    <!-- Pressing the phone's Back button. -->
+    <string name="hub_tool_press_back">Presionando Atrás</string>
+    <!-- Pressing the phone's Home button. -->
+    <string name="hub_tool_press_home">Presionando Inicio</string>
+    <!-- Pressing the phone's Recents button (recent apps). -->
+    <string name="hub_tool_press_recents">Presionando Recientes</string>
+    <!-- Opening the notification shade. -->
+    <string name="hub_tool_press_notifications">Abriendo las notificaciones</string>
+    <!-- Opening Quick Settings ("quick_settings" is how the agent names it). -->
+    <string name="hub_tool_press_quick_settings">Abriendo la configuración rápida</string>
+    <!-- Any other button. %1$s = the button as the agent named it, not translated. -->
+    <string name="hub_tool_press">Presionando %1$s</string>
+    <!-- %1$s = app name. -->
+    <string name="hub_tool_open_app">Abriendo %1$s</string>
+    <!-- %1$s = web address. -->
+    <string name="hub_tool_open_url">Abriendo %1$s</string>
+    <string name="hub_tool_list_apps">Consultando la lista de apps</string>
+    <!-- The user's answer to an approval request. Keep the mark (✓ ✎ ✗) and the space after it at the start.
+         %1$s = what was approved. -->
+    <string name="hub_tool_approved">✓ Aprobado: %1$s</string>
+    <string name="hub_tool_change_requested">✎ Cambio solicitado</string>
+    <!-- %1$s = the change the user asked for. -->
+    <string name="hub_tool_change_requested_text">✎ Cambio solicitado: %1$s</string>
+    <string name="hub_tool_denied">✗ Rechazado</string>
+    <string name="hub_tool_asking_approval">Pidiendo tu aprobación</string>
+    <!-- The user answered the agent's question. Keep the ✓ and the space after it at the start. -->
+    <string name="hub_tool_answered">✓ Respondido</string>
+    <!-- %1$s = the user's answer. -->
+    <string name="hub_tool_answered_text">✓ Respondido: %1$s</string>
+    <string name="hub_tool_question_skipped">Pregunta omitida</string>
+    <!-- %1$s = the agent's question. -->
+    <string name="hub_tool_asking">Preguntando: %1$s</string>
+    <string name="hub_tool_update_download">Descargando la actualización de Buddy</string>
+    <string name="hub_tool_update_check">Buscando una actualización de Buddy</string>
+    <!-- %1$s = what is searched for. -->
+    <string name="hub_tool_web_search">Buscando en la web: %1$s</string>
+    <!-- Reading a web page. %1$s = web address. -->
+    <string name="hub_tool_web_fetch">Leyendo %1$s</string>
+    <!-- %1$s = a shell command. -->
+    <string name="hub_tool_command">Ejecutando: %1$s</string>
+    <string name="hub_tool_command_any">Ejecutando un comando</string>
+    <!-- %1$s = file name. -->
+    <string name="hub_tool_edit">Editando %1$s</string>
+    <string name="hub_tool_edit_any">Editando archivos</string>
+    <!-- Reading a file. %1$s = file name. -->
+    <string name="hub_tool_read_file">Leyendo %1$s</string>
+    <!-- Any other tool. %1$s = the tool's name, not translated. -->
+    <string name="hub_tool_other">Usando %1$s</string>
+
+    <!-- Transcript of an earlier agent session that isn't a Buddy chat (read-only) -->
+    <string name="transcript_loading">Cargando…</string>
+    <!-- Button: continue this earlier session as a Buddy chat. -->
+    <string name="transcript_continue">Continuar en Buddy</string>
+    <string name="transcript_empty">No hay mensajes legibles en esta sesión.</string>
+    <!-- Above the messages. %1$d = how many of the session's last messages are shown. -->
+    <plurals name="transcript_last_messages">
+        <item quantity="one">último mensaje · solo lectura</item>
+        <item quantity="other">últimos %1$d mensajes · solo lectura</item>
+    </plurals>
+
+    <!-- Shared screens: links -->
+    <!-- Toast when a tapped link can't be opened. -->
+    <string name="ui_no_app_for_link">Ninguna app puede abrir este enlace</string>
+
+    <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
+    <string name="ui_a11y_title">Cómo usa Buddy la accesibilidad</string>
+    <string name="ui_a11y_what">Buddy usa el servicio de accesibilidad de Android para hacer lo que le pides en otras apps: lee lo que hay en la pantalla y toca, escribe y se desplaza por ti. También muestra la burbuja flotante.</string>
+    <string name="ui_a11y_data">Mientras se ejecuta una tarea, el contenido de la pantalla, que puede incluir información personal como mensajes, nombres o direcciones, se envía al servicio de IA del agente que elijas (Anthropic para Claude Code, OpenAI para Codex o el proveedor de tu modelo de OpenCode), solo para llevar a cabo tu petición.</string>
+    <string name="ui_a11y_no_servers">Buddy no tiene servidores propios. No recopila, vende ni comparte estos datos, ni los usa para publicidad.</string>
+    <string name="ui_a11y_asks">Buddy te pide aprobación antes de cualquier acción que envíe, publique, compre o elimine algo. Puedes desactivar el servicio cuando quieras en la configuración de accesibilidad de Android.</string>
+    <string name="ui_privacy_policy">Política de privacidad</string>
+    <!-- Button: close the disclosure without opening the settings. -->
+    <string name="ui_no_thanks">No, gracias</string>
+    <!-- Button: agree to the disclosure and open Android's accessibility settings. -->
+    <string name="ui_agree_continue">Aceptar y continuar</string>
+
+    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
+    <!-- Tab: the list of Buddy chats. -->
+    <string name="ui_nav_chats">Chats</string>
+    <!-- Tab: every agent session on the phone (running and recent). -->
+    <string name="ui_nav_sessions">Sesiones</string>
+    <!-- Tab: Buddy's settings. -->
+    <string name="ui_nav_settings">Ajustes</string>
+
+    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
+    <!-- Toast when a pause runs out after 5 minutes. -->
+    <string name="service_pause_expired">Estuvo en pausa 5 minutos, así que Buddy detuvo la tarea.</string>
+    <!-- Toast after the user stops the task to use the phone. -->
+    <string name="service_stopped_toast">Detenido. Tu teléfono vuelve a ser tuyo.</string>
+    <!-- Note in the chat when the user pauses the agent. -->
+    <string name="service_paused_note">En pausa: el teléfono es tuyo hasta que reanudes</string>
+    <string name="service_paused_toast">En pausa. Usa tu teléfono y luego mantén presionada la burbuja para reanudar.</string>
+    <!-- Note in the chat when the user resumes the agent. -->
+    <string name="service_resumed_note">Reanudado</string>
+
+    <!-- Voice input and output -->
+    <!-- 🎙 = the mic button. -->
+    <string name="voice_mic_needed">Buddy necesita el micrófono. Abre la app de Buddy y toca 🎙 una vez para permitirlo.</string>
+    <string name="voice_no_recognizer">No hay ningún servicio de reconocimiento de voz en este teléfono.</string>
+    <!-- Status in the recording bar while speech recognition starts. Keep short. -->
+    <string name="voice_starting">Iniciando…</string>
+    <!-- Status in the recording bar after the user stopped talking. Keep short. -->
+    <string name="voice_finishing">Terminando…</string>
+    <!-- Nothing was understood. -->
+    <string name="voice_didnt_catch">No te entendí.</string>
+    <!-- %1$d = Android's error number. -->
+    <string name="voice_error">Error de reconocimiento de voz %1$d.</string>
+    <!-- Spoken aloud by text-to-speech in place of a block of code in a reply. -->
+    <string name="voice_code_omitted">código omitido.</string>
+    <!-- Spoken aloud by text-to-speech in place of a web address in a reply. Noun. -->
+    <string name="voice_link">enlace</string>
+    <!-- Read by TalkBack for the send button of the recording bar: stops recording and sends. -->
+    <string name="voice_stop_and_send">Detener y enviar</string>
+
+    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
+
+    <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). Product and plan names
+         (Claude, ChatGPT, Codex, OpenCode, Anthropic, OpenAI, Pro, Max, Plus, Business) stay as they are. -->
+    <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
+    <string name="signin_back">Atrás</string>
+    <!-- Subtitle while Buddy checks whether the agent is installed and signed in. -->
+    <string name="signin_checking">Comprobando…</string>
+
+    <!-- Sign-in screen: the agent isn't installed yet. -->
+    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="signin_install">Instalar %1$s</string>
+    <string name="signin_install_sub_claude">Ejecuta Claude Code dentro de Buddy con tu suscripción de Claude.</string>
+    <string name="signin_install_sub_opencode">Ejecuta OpenCode dentro de Buddy. Sus modelos gratuitos funcionan al instante, sin necesidad de cuenta; conecta tus propios proveedores (Anthropic, OpenAI, GitHub Copilot…) cuando quieras.</string>
+    <string name="signin_install_sub_codex">Ejecuta Codex dentro de Buddy con tu plan de ChatGPT.</string>
+    <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
+    <string name="signin_install_size_claude">Descarga unos 235 MB una sola vez: el Linux de Buddy y Claude Code de Anthropic. Usa Wi-Fi si puedes.</string>
+    <string name="signin_install_size_opencode">Descarga unos 230 MB una sola vez: el Linux de Buddy, Node.js y OpenCode. Usa Wi-Fi si puedes.</string>
+    <string name="signin_install_size_codex">Descarga unos 150 MB una sola vez: el Linux de Buddy, Node.js y Codex de OpenAI. Usa Wi-Fi si puedes.</string>
+
+    <!-- Sign-in screen: install or update in progress (screen titles). -->
+    <string name="signin_installing">Instalando</string>
+    <string name="signin_updating">Actualizando</string>
+    <string name="signin_install_wait">Esto tarda unos minutos. Puedes salir de esta pantalla; el proceso seguirá en marcha.</string>
+
+    <!-- Sign-in screen: installed, not signed in. -->
+    <string name="signin_title_claude">Inicia sesión en Claude</string>
+    <string name="signin_title_chatgpt">Inicia sesión en ChatGPT</string>
+    <string name="signin_sub_claude">Usa tu cuenta de Claude (Pro o Max). Se abrirá el navegador; aprueba allí y Buddy volverá automáticamente.</string>
+    <string name="signin_sub_chatgpt">Usa tu cuenta de ChatGPT (Plus, Pro o Business). Se abrirá el navegador; aprueba allí y Buddy volverá automáticamente.</string>
+    <!-- Main button. -->
+    <string name="signin_with_claude">Iniciar sesión con Claude</string>
+    <string name="signin_with_chatgpt">Iniciar sesión con ChatGPT</string>
+    <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
+    <string name="signin_other_device">Iniciar sesión en otro dispositivo</string>
+    <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
+    <string name="signin_with_code">Iniciar sesión con un código</string>
+
+    <!-- Sign-in screen: sign-in in progress. -->
+    <!-- Screen title while the sign-in starts. -->
+    <string name="signin_sign_in">Iniciar sesión</string>
+    <!-- Also shown as status text elsewhere while the sign-in starts. -->
+    <string name="signin_starting">Preparando el inicio de sesión…</string>
+    <string name="signin_approve_title">Aprueba en tu navegador</string>
+    <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_approve_claude">Toca Autorizar en la página de Claude. Buddy tomará el código y volverá automáticamente.</string>
+    <string name="signin_approve_codex">Inicia sesión y autoriza a Codex. Luego vuelve a Buddy; terminará automáticamente.</string>
+    <!-- Button. -->
+    <string name="signin_open_again">Volver a abrir la página de inicio de sesión</string>
+    <!-- Screen title after the code was handed over. -->
+    <string name="signin_signing_in">Iniciando sesión</string>
+    <!-- Also shown as status text elsewhere after the code was handed over. -->
+    <string name="signin_finishing">Terminando de iniciar sesión…</string>
+    <!-- Error status. %1$s = the agent's last output (English, technical); may be empty. -->
+    <string name="signin_not_finished">No se completó el inicio de sesión. %1$s</string>
+
+    <!-- Sign-in screen: signing in from another device. -->
+    <string name="signin_remote_claude">Abre este enlace en cualquier dispositivo y aprueba. Luego copia el código que muestra la página y pégalo abajo.</string>
+    <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
+    <string name="signin_enter_code">Escribe este código</string>
+    <string name="signin_remote_codex">En cualquier dispositivo, abre el enlace de abajo, inicia sesión en ChatGPT y escribe el código. Buddy terminará automáticamente.</string>
+    <!-- Buttons and the toasts after them. -->
+    <string name="signin_copy_code">Copiar código</string>
+    <string name="signin_code_copied">Código copiado</string>
+    <string name="signin_code_expiry">El código es válido durante 15 minutos.</string>
+    <string name="signin_copy_link">Copiar enlace</string>
+    <string name="signin_link_copied">Enlace copiado</string>
+    <!-- Button: share the sign-in link with another app. Verb. -->
+    <string name="signin_share">Compartir</string>
+    <!-- Button: open the sign-in link on this phone. -->
+    <string name="signin_open_here">Abrir aquí</string>
+    <!-- Toasts. -->
+    <string name="signin_no_browser">No se encontró ningún navegador.</string>
+    <string name="signin_no_browser_page">No se encontró ningún navegador para abrir la página de inicio de sesión.</string>
+    <!-- Label of the copied code or link on the clipboard (rarely shown). -->
+    <string name="signin_clip_label">Inicio de sesión</string>
+
+    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
+    <string name="signin_paste_instead">Pegar el código manualmente</string>
+    <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_paste_help">Si Buddy no vuelve automáticamente, toca Copiar código en la página de Claude y pégalo aquí.</string>
+    <!-- Hint inside the empty text box for the code. Lowercase in English. -->
+    <string name="signin_code_hint">código</string>
+    <!-- Short button next to the text box: use the pasted code. Verb. -->
+    <string name="signin_use_code">Usar</string>
+    <!-- Toast when there is no sign-in waiting for a code. -->
+    <string name="signin_start_again">Primero vuelve a iniciar sesión.</string>
+
+    <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
+    <string name="signin_signed_in">Sesión iniciada</string>
+    <!-- %1$s = agent name (Claude Code or Codex). -->
+    <string name="signin_agent_ready">%1$s está listo.</string>
+    <!-- Button that closes the screen. -->
+    <string name="signin_done">Listo</string>
+    <!-- Button, and the button of the confirmation sheet. -->
+    <string name="signin_sign_out">Cerrar sesión</string>
+    <!-- Confirmation sheet. %1$s = agent name. -->
+    <string name="signin_sign_out_title">¿Cerrar sesión en %1$s?</string>
+    <string name="signin_sign_out_text">%1$s dejará de funcionar en Buddy hasta que vuelvas a iniciar sesión.</string>
+    <string name="signin_opencode_ready">OpenCode está listo</string>
+    <!-- "model chip" = the button at the top of a chat that shows the agent and model. -->
+    <string name="signin_opencode_free">Usando los modelos gratuitos de OpenCode. Elige uno en cada chat con el chip del modelo o conecta tu propio proveedor.</string>
+    <!-- %1$s = connected providers, comma-separated (e.g. "anthropic, openai"). -->
+    <string name="signin_opencode_connected">Conectados: %1$s. Los modelos gratuitos de OpenCode siguen disponibles.</string>
+    <!-- %1$s = the command "opencode auth login", %2$s = the command "opencode auth logout" (both stay as they are). -->
+    <string name="signin_opencode_connect_note">Al conectar un proveedor, se abre la terminal de Buddy con %1$s: elige un proveedor y sigue sus pasos. Para quitarlo más tarde, ejecuta %2$s allí.</string>
+    <!-- Button. -->
+    <string name="signin_connect_provider">Conectar un proveedor</string>
+    <!-- Installed version. %1$s = agent name, %2$s = version number (e.g. "Claude Code 2.1.40."). -->
+    <string name="signin_version">%1$s %2$s.</string>
+    <!-- %1$s = the installed OpenCode 1.x version number. -->
+    <string name="signin_version_old_opencode">OpenCode %1$s. Ya salió OpenCode 2: actualiza para seguir recibiendo nuevas versiones. Se conservan tus proveedores conectados.</string>
+    <!-- Buttons. -->
+    <string name="signin_update_opencode2">Actualizar a OpenCode 2</string>
+    <string name="signin_check_updates">Buscar actualizaciones</string>
+
+    <!-- Sign-in screen: error. -->
+    <string name="signin_error_title">Algo salió mal</string>
+    <!-- Button. -->
+    <string name="signin_try_again">Intentar de nuevo</string>
+
+    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
+    <!-- One line under the agent's name in the agent pickers. -->
+    <string name="account_tagline_claude">Usa tu plan de Claude</string>
+    <string name="account_tagline_opencode">Modelos gratuitos o tus propios proveedores</string>
+    <string name="account_tagline_codex">Usa tu plan de ChatGPT</string>
+    <!-- Install progress. -->
+    <string name="account_setting_up_linux">Configurando el Linux de Buddy…</string>
+    <string name="account_installing_tools">Instalando herramientas…</string>
+    <string name="account_downloading_claude">Descargando Claude Code (unos 230 MB)…</string>
+    <!-- %1$s = what is downloaded: an agent name (Codex, OpenCode) or "OpenCode 2". -->
+    <string name="account_downloading">Descargando %1$s…</string>
+    <!-- Error. %1$s = agent name, %2$s = technical detail in English. -->
+    <string name="account_check_failed">No se pudo comprobar %1$s: %2$s</string>
+    <!-- Error. %1$s = technical detail in English. -->
+    <string name="account_install_failed">Falló la instalación: %1$s</string>
+    <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
+    <string name="account_update_checking">Buscando una nueva versión de %1$s…</string>
+    <!-- %1$s = version number. -->
+    <string name="account_update_latest">Tienes la última versión (%1$s).</string>
+    <!-- %1$s = new version number. -->
+    <string name="account_updated">Actualizado a %1$s.</string>
+    <!-- %1$s = new version number, %2$s = previous version number. -->
+    <string name="account_updated_from">Actualizado a %1$s (antes %2$s).</string>
+    <!-- %1$s = the OpenCode version that is still installed. -->
+    <string name="account_update_opencode2_failed">No se pudo actualizar a OpenCode 2; sigues con la versión %1$s. Inténtalo de nuevo con Wi-Fi.</string>
+    <string name="account_update_failed">Falló la actualización: %1$s</string>
+
+    <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort").
+         Model names (Opus 5.5, GPT-6.1-Sol…) stay as they are. -->
+    <!-- Model picker row: the agent's own default model. Also shown in a chat note "Model: Default". -->
+    <string name="models_default">Predeterminado</string>
+    <!-- Chip: the agent's default model, now known. %1$s = model name (e.g. "Opus 5.5"). -->
+    <string name="models_name_default">%1$s (predeterminado)</string>
+    <!-- Chip: the default model, not known yet. Lowercase in English. -->
+    <string name="models_default_model">modelo predeterminado</string>
+    <!-- Small grey line under "Default" in the model picker. Lowercase in English.
+         %1$s = the model the agent uses by default (e.g. "Opus 5.5"). -->
+    <string name="models_default_now">ahora %1$s</string>
+    <string name="models_default_claude">Claude Code lo elige según tu plan; aparecerá aquí después del primer mensaje</string>
+    <string name="models_default_codex">Codex lo elige; aparecerá aquí después de la próxima respuesta</string>
+    <string name="models_default_opencode">Modelo predeterminado de OpenCode</string>
+    <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
+         "Auto" = the agent decides how much to think. -->
+    <string name="models_effort_auto">Auto</string>
+    <string name="models_effort_low">Bajo</string>
+    <!-- Short for "Medium". -->
+    <string name="models_effort_medium">Medio</string>
+    <string name="models_effort_high">Alto</string>
+    <!-- Extra high. -->
+    <string name="models_effort_xhigh">Extra</string>
+    <!-- Maximum. -->
+    <string name="models_effort_max">Máx.</string>
+    <!-- Chip, after the model. %1$s = effort level as the agent names it (low, medium, high, xhigh or max); not translated. -->
+    <string name="models_chip_effort">esfuerzo %1$s</string>
+
+    <!-- Chats. -->
+    <!-- Title of a chat before its first message. %1$s = agent name (e.g. "New Claude Code chat"). -->
+    <string name="session_new_chat">Nuevo chat con %1$s</string>
+    <!-- Preview of a message with several photos or files (a single one shows its file name instead). -->
+    <plurals name="attach_count">
+        <item quantity="one">📎 %1$d archivo adjunto</item>
+        <item quantity="other">📎 %1$d archivos adjuntos</item>
+    </plurals>
+
+    <!-- Attaching a photo or file to a chat message (toasts). %1$s = file name. -->
+    <string name="attach_cant_open">No se puede abrir %1$s</string>
+    <string name="attach_too_large">%1$s ocupa más de 25 MB.</string>
+
+    <!-- Remote Control session in Settings: a Claude Code session that can be continued from the Claude app. -->
+    <string name="remote_sign_in_first">Primero inicia sesión en Claude Code.</string>
+    <string name="remote_starting">Iniciando…</string>
+    <string name="remote_restarting">Reiniciando…</string>
+    <!-- %1$s = technical detail in English. -->
+    <string name="remote_start_failed">No se pudo iniciar: %1$s</string>
+    <string name="remote_keeps_stopping">La sesión se detiene una y otra vez. Desactívala y vuelve a activarla, o revisa el inicio de sesión de Claude Code.</string>
+
+    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
+
+    <!-- Settings screen: header. -->
+    <string name="setup_settings_title">Ajustes</string>
+    <string name="setup_settings_subtitle">Buddy ejecuta Claude Code, Codex u OpenCode dentro de la app, con tu propia suscripción (o con los modelos gratuitos de OpenCode).</string>
+
+    <!-- Settings screen: the setup checklist card (5 steps). -->
+    <!-- Title of the setup checklist card (noun). -->
+    <string name="setup_card_title">Configuración</string>
+    <string name="setup_open_guide">Abrir la guía paso a paso</string>
+    <string name="setup_all_set">Todo listo. Buddy está preparado.</string>
+    <!-- %1$s = name of the next unfinished setup step, e.g. "Install Claude Code". -->
+    <string name="setup_next_step">Siguiente: %1$s</string>
+    <string name="setup_step_a11y_title">Activa el servicio de accesibilidad de Buddy</string>
+    <string name="setup_step_a11y_body">Muestra la burbuja y permite que Buddy lea la pantalla, toque y escriba por ti.</string>
+    <!-- Second paragraph of the accessibility step on Android 13+. "Restricted setting", "App info" and "Allow restricted settings" are Android's own labels: use the wording Android uses in your language. ⋮ is the three-dot menu icon. -->
+    <string name="setup_step_a11y_restricted">¿El interruptor está en gris (“Configuración restringida”)? Android lo bloquea en las apps instaladas desde un archivo. Toca Información de la app, luego ⋮ arriba a la derecha → Permitir configuración restringida, y vuelve a intentarlo.</string>
+    <!-- Button: opens Android's accessibility settings. -->
+    <string name="setup_open_settings">Abrir configuración</string>
+    <!-- Button: opens Android's App info page for Buddy (Android's own label). -->
+    <string name="setup_app_info">Información de la app</string>
+    <!-- %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="setup_step_install_title">Instala %1$s</string>
+    <!-- %1$s = agent name. -->
+    <string name="setup_step_install_done">%1$s está instalado en Buddy.</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_step_install_claude">Buddy descarga un pequeño Linux propio y %1$s de Anthropic (unos 235 MB).</string>
+    <!-- %1$s = OpenCode. -->
+    <string name="setup_step_install_opencode">Buddy descarga un pequeño Linux propio y %1$s (unos 230 MB con Node.js).</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_step_install_codex">Buddy descarga un pequeño Linux propio y %1$s de OpenAI (unos 150 MB).</string>
+    <!-- Button (verb). -->
+    <string name="setup_install">Instalar</string>
+    <!-- Name of the sign-in setup step. -->
+    <string name="setup_step_signin_title">Inicia sesión</string>
+    <string name="setup_step_signin_opencode_done">No hace falta iniciar sesión: los modelos gratuitos de OpenCode funcionan al instante. Conecta tus propios proveedores cuando quieras.</string>
+    <string name="setup_step_signin_opencode">No hace falta iniciar sesión para usar los modelos gratuitos de OpenCode.</string>
+    <string name="setup_step_signin_done">Sesión iniciada.</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_step_signin_done_email">Sesión iniciada como %1$s.</string>
+    <string name="setup_step_signin_claude">Con tu cuenta de Claude (Pro o Max). Se abrirá el navegador; aprueba allí y Buddy volverá automáticamente.</string>
+    <string name="setup_step_signin_codex">Con tu cuenta de ChatGPT. Se abrirá el navegador; aprueba allí y Buddy volverá automáticamente.</string>
+    <!-- Button (verb). -->
+    <string name="setup_sign_in">Iniciar sesión</string>
+    <string name="setup_step_background_title">Deja que Buddy funcione en segundo plano</string>
+    <string name="setup_step_background_done">Permitido.</string>
+    <string name="setup_step_background_body">Así tu teléfono no cerrará Buddy para ahorrar batería mientras el agente trabaja.</string>
+    <!-- Button (verb): lets Buddy ignore battery optimization. -->
+    <string name="setup_allow">Permitir</string>
+    <!-- Name of the last setup step: try Buddy out. -->
+    <string name="setup_step_try_title">Pruébalo</string>
+    <string name="setup_step_try_done">Buddy ya te respondió. Toca la burbuja cuando quieras para pedir más.</string>
+    <!-- "open Messenger" is an example of what to say to Buddy: translate it. -->
+    <string name="setup_step_try_body">Toca la burbuja en el borde de la pantalla y pide algo como “abre Messenger”, o empieza un chat aquí.</string>
+    <string name="setup_step_try_wait">Primero completa los pasos anteriores.</string>
+    <!-- Short names of the setup steps, shown after "Next:" in the Chats header. -->
+    <string name="setup_step_name_a11y">Activa el servicio de accesibilidad</string>
+    <string name="setup_step_name_install">Instala tu agente</string>
+    <string name="setup_step_name_background">Permite la ejecución en segundo plano</string>
+
+    <!-- Settings screen: Appearance. Section labels are shown in ALL CAPS. -->
+    <string name="setup_appearance">Apariencia</string>
+    <!-- Label of the light / dark mode picker. -->
+    <string name="setup_theme_mode">Modo</string>
+    <!-- Label of the accent colour picker. -->
+    <string name="setup_accent">Color de acento</string>
+    <!-- Label of the background tone picker. -->
+    <string name="setup_surface">Fondo</string>
+    <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
+    <string name="setup_surface_note">Cálido es el tono original de Buddy. Negro (negro puro) solo se aplica en modo oscuro.</string>
+    <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
+    <string name="setup_custom_colour">Color personalizado</string>
+    <string name="setup_custom_accent_title">Color de acento personalizado</string>
+    <string name="setup_custom_accent_hint">Cualquier color en código hexadecimal, como #4F8BFF.</string>
+    <!-- Button (verb). -->
+    <string name="setup_apply">Aplicar</string>
+
+    <!-- Settings screen: Agent. -->
+    <string name="setup_agent">Agente</string>
+    <!-- Which AI agent answers new chats. -->
+    <string name="setup_default_brain">Cerebro predeterminado</string>
+    <!-- "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_info">Quién responde los chats nuevos que abres desde la burbuja o el botón Nuevo chat. Claude Code usa tu plan de Claude; Codex, tu plan de ChatGPT; y OpenCode, sus modelos gratuitos o tus propios proveedores. Solo puedes elegir agentes ya configurados.</string>
+    <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_set">Los chats nuevos usarán %1$s. Puedes elegir en cada chat con el botón Nuevo chat.</string>
+    <!-- Toast. %1$s = agent name. -->
+    <string name="setup_set_up_first">Primero configura %1$s.</string>
+    <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
+    <string name="setup_agent_installing">instalando…</string>
+    <string name="setup_agent_not_installed">no instalado</string>
+    <string name="setup_agent_ready">listo</string>
+    <!-- %1$s = the agent's plan or models. -->
+    <string name="setup_agent_ready_plan">listo · %1$s</string>
+    <string name="setup_agent_signed_in">sesión iniciada</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_agent_signed_in_email">sesión iniciada · %1$s</string>
+    <string name="setup_agent_not_signed_in">sin sesión iniciada</string>
+
+    <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
+    <string name="setup_phone_tools">Herramientas del teléfono en tus propias sesiones</string>
+    <string name="setup_phone_tools_info">Las herramientas del teléfono de Buddy son un servidor MCP normal en este teléfono. Ejecuta esto una vez en una terminal del teléfono (Termux, por ejemplo) y ese agente tendrá las herramientas del teléfono en todas sus sesiones, incluso sin la burbuja.</string>
+    <!-- Button. -->
+    <string name="setup_copy_command">Copiar comando</string>
+    <string name="setup_command_copied">Copiado. Pégalo en tu terminal.</string>
+
+    <!-- Settings screen: Voice. -->
+    <string name="setup_voice">Voz</string>
+    <string name="setup_voice_input">Entrada de voz</string>
+    <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
+    <string name="setup_voice_phone">Teléfono</string>
+    <string name="setup_voice_input_claude">El dictado de Claude Code con tu plan de Claude: muy preciso. Admite inglés, francés, alemán, español, italiano, portugués, neerlandés, turco, ruso, japonés y más, pero no árabe: para el árabe, Buddy usa el reconocimiento de voz del teléfono. Las palabras aparecen cuando haces una pausa.</string>
+    <string name="setup_voice_input_chatgpt">La voz de ChatGPT a través de Codex, con tu plan de ChatGPT. Entiende cualquier idioma, incluso varios mezclados en una misma frase. Solo se usan tus palabras: las respuestas habladas de ChatGPT se silencian y no puede ejecutar nada.</string>
+    <string name="setup_voice_input_phone">El reconocimiento de voz de tu teléfono (Google en la mayoría de los teléfonos). Texto en tiempo real mientras hablas; detecta cuál de tus idiomas estás hablando.</string>
+    <string name="setup_voice_output">Salida de voz</string>
+    <string name="setup_voice_output_chatgpt">Las respuestas se leen con la voz natural de ChatGPT (tu plan de ChatGPT, a través de Codex). Cuenta para tu uso de voz de ChatGPT; si no está disponible, las lee la voz del teléfono.</string>
+    <string name="setup_voice_output_phone">Las voces de texto a voz de tu teléfono, en el idioma de la respuesta.</string>
+    <!-- Spoken aloud to preview the chosen ChatGPT voice. Mixing two languages is on purpose (it shows the voice switches languages): keep a greeting in another language. -->
+    <string name="setup_voice_sample">Bonjour ! Hola, soy Buddy. Así suena mi voz.</string>
+    <string name="setup_languages">Idiomas</string>
+    <string name="setup_languages_hint">Toca para elegir los idiomas que hablas. Mantén presionado uno para que sea el predeterminado. En un chat, mantén presionado el micrófono para cambiar de idioma.</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code or Codex). -->
+    <string name="setup_sign_in_first">Primero inicia sesión en %1$s</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_needs_claude">El dictado de Claude funciona con tu plan de Claude a través de %1$s.</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_needs_chatgpt">La voz de ChatGPT funciona con tu plan de ChatGPT a través de %1$s.</string>
+    <!-- Button. %1$s = agent name. -->
+    <string name="setup_set_up_agent">Configurar %1$s</string>
+
+    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
+    <!-- Section label: Remote Control is the name of a Claude Code feature. -->
+    <string name="setup_remote_control">Control remoto</string>
+    <string name="setup_remote_session">Sesión de Claude Code</string>
+    <!-- "Code" is the name of a section of the Claude app. -->
+    <string name="setup_remote_session_info">Una sesión de Claude Code que se ejecuta dentro de Buddy, con las herramientas del teléfono. Continúala desde la app de Claude (Code) en este teléfono o en cualquier otro lugar.</string>
+    <string name="setup_remote_sign_in_first">Primero inicia sesión en Claude Code.</string>
+    <!-- Status, lowercase. %1$s = the session's name as shown in the Claude app. -->
+    <string name="setup_remote_active">activa · “%1$s” en la app de Claude</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_starting">iniciando…</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_stopped">detenida</string>
+    <string name="setup_remote_open">Abrir en la app de Claude</string>
+    <string name="setup_remote_open_failed">No se pudo abrir.</string>
+
+    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
+    <string name="setup_old_chats_title">Quitar los chats antiguos de Termux</string>
+    <plurals name="setup_old_chats_body">
+        <item quantity="one">%1$d chat de antes de que Buddy tuviera su propio Linux. Los agentes no pueden continuarlo.</item>
+        <item quantity="other">%1$d chats de antes de que Buddy tuviera su propio Linux. Los agentes no pueden continuarlos.</item>
+    </plurals>
+    <plurals name="setup_old_chats_remove">
+        <item quantity="one">¿Quitar %1$d chat antiguo?</item>
+        <item quantity="other">¿Quitar %1$d chats antiguos?</item>
+    </plurals>
+    <string name="setup_old_chats_remove_body">Se quitarán de la lista de chats de Buddy. Esta acción no se puede deshacer.</string>
+    <!-- Button (verb). -->
+    <string name="setup_remove">Quitar</string>
+    <string name="setup_removed">Quitados.</string>
+
+    <!-- Settings screen: Experience. -->
+    <string name="setup_experience">Experiencia</string>
+    <string name="setup_chat_bubble">Burbuja de chat</string>
+    <!-- ✕ is the close target that appears while dragging the bubble. -->
+    <string name="setup_chat_bubble_info">Flota sobre otras apps. Arrástrala hasta la ✕ para ocultarla; las tarjetas de aprobación seguirán apareciendo cuando un agente necesite que apruebes algo.</string>
+    <string name="setup_tap_to_talk">Toca la burbuja para hablar</string>
+    <string name="setup_tap_to_talk_info">Un toque abre el micrófono: di lo que quieras y se enviará cuando hagas una pausa. Mantén presionada la burbuja para ver el chat y más.</string>
+    <string name="setup_read_aloud">Leer respuestas en voz alta</string>
+    <string name="setup_read_aloud_info">Habla con el micrófono en cualquier chat; se envía cuando dejas de hablar.</string>
+    <string name="setup_update_notices">Avisos de actualización</string>
+    <string name="setup_update_notices_info">Buddy consulta GitHub una vez al día y te avisa cuando sale una nueva versión.</string>
+    <string name="setup_check_updates">Buscar actualizaciones</string>
+    <!-- %1$s = Buddy's version number. "update yourself" is what you can say to an agent: translate it. -->
+    <string name="setup_check_updates_info">Tienes Buddy %1$s. O pídele a cualquier agente: “actualízate”.</string>
+    <!-- Name of the App permissions screen. -->
+    <string name="setup_app_permissions">Permisos de apps</string>
+    <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
+    <string name="setup_app_permissions_info">Elige para cada app: Libre deja que el agente trabaje en ella sin preguntarte; Estricto hace que el propio Buddy te pregunte antes de Enviar, Pagar, Eliminar…</string>
+    <string name="setup_dev_mode">Modo de desarrollador</string>
+    <string name="setup_dev_mode_info">El agente de la burbuja puede ejecutar comandos y editar archivos en ~/.buddy/work, para crear e instalar apps.</string>
+    <string name="setup_agents_tap">Permitir que los agentes toquen las pantallas de Buddy</string>
+    <!-- "App permissions" is the name of a screen in Buddy. -->
+    <string name="setup_agents_tap_info">Para probar Buddy con un agente (por ejemplo, Claude Code en Termux con las herramientas del teléfono). La burbuja, las tarjetas de aprobación, Permisos de apps y estas opciones siguen fuera de su alcance.</string>
+    <!-- Warning shown while Developer mode is on. -->
+    <string name="setup_dev_mode_warning">Déjalo desactivado para el uso diario: si está activado, un mensaje o una página web maliciosos en pantalla podrían intentar engañar al agente para que ejecute comandos. Las tarjetas de aprobación siguen protegiendo los envíos, las publicaciones, las compras y las eliminaciones.</string>
+
+    <!-- Settings screen: footer links. -->
+    <!-- Link and sheet title. -->
+    <string name="setup_licences">Licencias de código abierto</string>
+    <string name="setup_privacy_policy">Política de privacidad</string>
+
+    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
+    <!-- %1$s = SHA-256 checksum of the download. -->
+    <string name="linux_download_corrupt">La descarga de Alpine está dañada (sha256 %1$s)</string>
+    <string name="linux_move_failed">No se pudo mover Alpine a su ubicación</string>
+    <!-- %1$d = HTTP status code, e.g. 404. -->
+    <string name="linux_download_failed_http">Falló la descarga: HTTP %1$d</string>
+    <!-- %1$s = a file path inside the downloaded archive. -->
+    <string name="linux_unsafe_path">Ruta no segura en el archivo comprimido: %1$s</string>
+    <!-- Creating a symbolic link failed. %1$s = file path, %2$s = the system's error message. -->
+    <string name="linux_symlink_failed">symlink %1$s: %2$s</string>
+    <string name="linux_truncated_archive">Archivo comprimido incompleto</string>
+
+    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
+    <!-- Name of Buddy's built-in terminal: title of the Terminal screen and its menu, and of the Terminal card on the Sessions screen. -->
+    <string name="terminal_title">Terminal</string>
+    <!-- Read by TalkBack: back button. -->
+    <string name="terminal_back">Atrás</string>
+    <!-- Read by TalkBack: button that hides the on-screen keyboard. -->
+    <string name="terminal_hide_keyboard">Ocultar teclado</string>
+    <!-- Read by TalkBack: button that opens the terminal menu. -->
+    <string name="terminal_menu">Menú</string>
+    <!-- Status line under the title, lowercase. "buddy linux" is the name of Buddy's Linux: keep it. Only shown for 2 or more. -->
+    <plurals name="terminal_sessions_count">
+        <item quantity="one">%1$d sesión · buddy linux</item>
+        <item quantity="other">%1$d sesiones · buddy linux</item>
+    </plurals>
+    <!-- Status line under the title while the microphone is in use, lowercase. -->
+    <string name="terminal_listening">escuchando · micrófono activado</string>
+    <string name="terminal_session_ended">Sesión finalizada</string>
+    <!-- %1$d = the shell's exit code. -->
+    <string name="terminal_session_ended_code">Sesión finalizada · código %1$d</string>
+    <!-- Button (verb): closes the terminal tab. -->
+    <string name="terminal_close">Cerrar</string>
+    <!-- Button (verb): starts a new shell. -->
+    <string name="terminal_restart">Reiniciar</string>
+    <string name="terminal_needs_linux">Primero instala Claude Code, Codex u OpenCode en Ajustes: así se configura el Linux de Buddy.</string>
+    <!-- %1$s = error message. -->
+    <string name="terminal_start_failed">No se pudo iniciar la terminal: %1$s</string>
+    <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
+    <string name="terminal_close_title">¿Cerrar %1$s?</string>
+    <string name="terminal_close_running">Todavía está en ejecución. Si lo cierras, se detendrá junto con todo lo que inició.</string>
+    <!-- Default name of a terminal tab until the program in it sets a title. Lowercase. %1$d = tab number. -->
+    <string name="terminal_shell_name">shell %1$d</string>
+    <!-- Menu item and "+" tab button: opens a new shell tab. -->
+    <string name="terminal_new_session">Nueva sesión</string>
+    <!-- Menu item, selection toolbar item and paste key: pastes the clipboard into the terminal. -->
+    <string name="terminal_paste">Pegar</string>
+    <!-- Menu item and selection toolbar item. -->
+    <string name="terminal_select_all">Seleccionar todo</string>
+    <string name="terminal_larger_text">Texto más grande</string>
+    <string name="terminal_smaller_text">Texto más pequeño</string>
+    <string name="terminal_screen_sleep">Permitir que la pantalla se apague</string>
+    <string name="terminal_keep_screen_on">Mantener la pantalla encendida</string>
+    <string name="terminal_close_session">Cerrar esta sesión</string>
+    <string name="terminal_tips">Mantén presionado para seleccionar texto o un enlace. Pellizca para hacer zoom y arrastra para ver lo anterior. Mantén presionada una pestaña para cerrarla.</string>
+
+    <!-- Terminal: floating toolbar over selected text. Keep short. -->
+    <string name="terminal_copy">Copiar</string>
+    <string name="terminal_open_link">Abrir enlace</string>
+    <string name="terminal_share">Compartir</string>
+
+    <!-- Sessions screen: every agent session running on the phone, and recent history. -->
+    <string name="monitor_title">Sesiones</string>
+    <string name="monitor_subtitle">Todas las sesiones de Claude Code y Codex en este teléfono.</string>
+    <string name="monitor_terminal_running">Hay un shell en ejecución · toca para volver</string>
+    <string name="monitor_terminal_idle">Un shell en el Linux de Buddy</string>
+    <string name="monitor_running_now">En ejecución</string>
+    <!-- Next to "Running now": the list refreshes every 3 seconds. Lowercase, monospace, keep short. -->
+    <string name="monitor_refresh">actualiza cada 3 s</string>
+    <string name="monitor_checking">Comprobando…</string>
+    <string name="monitor_recent">Recientes</string>
+    <string name="monitor_loading">Cargando…</string>
+    <string name="monitor_service_off">El servicio de accesibilidad de Buddy está desactivado, así que no se pueden comprobar las sesiones. Actívalo en Ajustes.</string>
+    <string name="monitor_nothing_running">No hay nada en ejecución.</string>
+    <!-- Title of a running session whose Buddy chat was deleted. -->
+    <string name="monitor_deleted_chat">Chat de Buddy eliminado</string>
+    <string name="monitor_background_session">Sesión en segundo plano</string>
+    <string name="monitor_terminal_session">Sesión de terminal</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_background">segundo plano</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_terminal">terminal</string>
+    <!-- Monospace details line. %1$s = command name (claude-code, codex, opencode), %2$d = process id, %3$s = working folder. -->
+    <string name="monitor_proc_meta">%1$s · pid %2$d · %3$s</string>
+    <string name="monitor_background_hint">Se ejecuta en el servicio en segundo plano de Claude Code; por ejemplo, un chat que continúas desde la app de Claude.</string>
+    <!-- Button. -->
+    <string name="monitor_open_chat">Abrir chat</string>
+    <!-- Button (verb): stops the session. -->
+    <string name="monitor_stop">Detener</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <string name="monitor_stop_title">¿Detener esta sesión de %1$s?</string>
+    <string name="monitor_stop_background_body">Se ejecuta en segundo plano; por ejemplo, un chat que continúas desde la app de Claude. Incluso podría ser la que controla Buddy. Al detenerla, termina el trabajo actual de esa conversación.</string>
+    <string name="monitor_stop_terminal_body">Puede que sea una sesión que estás usando ahora mismo en una terminal. Incluso podría ser la que controla Buddy. Al detenerla, termina el trabajo actual de esa conversación.</string>
+    <string name="monitor_stopping">Deteniendo…</string>
+    <string name="monitor_service_title">Servicio en segundo plano de Claude Code</string>
+    <!-- Monospace details line. %1$d = process id, %2$s = how long it has been running (e.g. 1:02:03). -->
+    <string name="monitor_service_meta">pid %1$d · activo %2$s · aloja sesiones en segundo plano</string>
+    <string name="monitor_no_history">No se encontró historial.</string>
+    <!-- Title of a past session that has no messages. -->
+    <string name="monitor_no_messages">(sin mensajes)</string>
+
+    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
+
+    <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app.
+         The three approval modes are named Trust, Hard and Smart (perms_mode_*): use the same names wherever they appear. -->
+    <string name="perms_title">Permisos de apps</string>
+    <!-- Content description of the back arrow at the top of the screen (read by TalkBack). -->
+    <string name="perms_back">Atrás</string>
+    <!-- Approval mode name, in a small one-line segmented control next to each app's name: keep it short (about 6 characters).
+         Trust = the agent works on its own in this app, without asking. -->
+    <string name="perms_mode_trust">Libre</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Hard = the button rules decide: risky buttons need the user's OK. -->
+    <string name="perms_mode_hard">Estricto</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Smart = the button rules, then a reviewer AI checks every other tap. -->
+    <string name="perms_mode_smart">IA</string>
+    <!-- Explains the three modes, one per line. Trust, Hard and Smart are the mode names above; Send, Pay, Delete are example button labels. -->
+    <string name="perms_modes_intro">Libre: el agente trabaja por su cuenta aquí, sin pedirte aprobación.\nEstricto: deciden tus reglas de botones. Enviar, Pagar, Eliminar… necesitan tu aprobación en una tarjeta.\nIA: primero, las reglas; después, una IA revisora independiente comprueba cada uno de los demás toques según lo que pediste.\nEl agente nunca puede tocar la burbuja, las tarjetas ni los ajustes de Buddy.</string>
+    <!-- Section title: which AI reviews the taps in apps set to Smart. -->
+    <string name="perms_smart_reviewer">Revisor IA</string>
+    <!-- Reviewer choice in a segmented control, next to “Claude Code” and “Codex”: the same agent as the chat. Keep it short. -->
+    <string name="perms_reviewer_same">Como el chat</string>
+    <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
+    <string name="perms_reviewer_sign_in">Primero inicia sesión en %1$s (Ajustes).</string>
+    <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
+    <string name="perms_reviewer_about">Una sesión temporal por cada toque, sin herramientas: ve tu petición, la nota del agente y la pantalla, y decide si permitirlo, preguntarte o desaconsejarlo. Unos 3 segundos por toque. Los chats de OpenCode los revisa Claude Code (o Codex).</string>
+    <!-- Title of the button rules screen, and of the row that opens it. -->
+    <string name="perms_button_rules">Reglas de botones</string>
+    <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
+    <string name="perms_rules_summary">%1$d preguntar · %2$d nunca preguntar</string>
+    <!-- Section title above the list of installed apps. -->
+    <string name="perms_apps">Apps</string>
+    <!-- Row that sets the mode of every app at once. -->
+    <string name="perms_all_apps">Todas las apps</string>
+    <!-- Link under “All apps”: puts every app back on the mode Buddy suggests for it. -->
+    <string name="perms_reset_suggested">Restablecer los modos sugeridos</string>
+
+    <!-- Button rules screen: buttons that always or never need the user's OK. Hard and Smart are approval mode names (perms_mode_*). -->
+    <string name="perms_rules_intro">Para las apps en modo Estricto o IA. Una regla elegida de las sugerencias se aplica a esa app; el texto que escribas se aplica a todas las apps. Toca una regla para quitarla.</string>
+    <!-- Switch title: Buddy's own list of risky button words. -->
+    <string name="perms_builtin_title">Palabras de riesgo integradas</string>
+    <!-- Switch description. The words are examples from the built-in list, which only covers the languages named here:
+         if your language isn't one of them, keep the example words in English. -->
+    <string name="perms_builtin_sub">Enviar, Publicar, Pagar, Comprar, Pedir, Eliminar, Llamar, Cerrar sesión… siempre piden tu aprobación, en todos los idiomas de Buddy.</string>
+    <!-- List title: buttons that always need the user's OK. -->
+    <string name="perms_always_ask">Preguntar siempre</string>
+    <!-- List title, and an option in a small segmented control (keep it short): buttons the agent may tap without asking. -->
+    <string name="perms_never_ask">Nunca preguntar</string>
+    <!-- Option in a small segmented control next to “Never ask” (keep it short): put this button on the “Always ask” list. Verb. -->
+    <string name="perms_ask">Preguntar</string>
+    <!-- Hint in the field where the user types a button's label, as their apps show it. -->
+    <string name="perms_add_hint">Agrega un botón, p. ej. Enviar</string>
+    <!-- Button: adds the typed button to the list. Verb. -->
+    <string name="perms_add">Agregar</string>
+    <!-- Section title: buttons the agent tapped lately, to put them on a list with one tap. -->
+    <string name="perms_seen_title">Botones vistos recientemente</string>
+    <!-- Shown while no buttons were seen yet. Hard and Smart are approval mode names. -->
+    <string name="perms_seen_empty">Aquí aparecen los botones que el agente toca en las apps en modo Estricto e IA.</string>
+
+    <!-- Button rules and modes, as App permissions shows them. -->
+    <!-- A button rule that applies in every app, on a chip and in the suggestions. %1$s = the button's label, e.g. Send. -->
+    <string name="guard_rule_all_apps">%1$s · todas las apps</string>
+    <!-- Why an app has its mode, in small text under the app's name. Here: the user picked it. -->
+    <string name="guard_why_choice">Tu elección</string>
+    <!-- Buddy suggests Hard for this app because of the kind of app it is. -->
+    <string name="guard_why_category">Sugerido: mensajes, redes sociales, llamadas o dinero</string>
+    <!-- Buddy suggests Hard because the app's name contains a word like bank or pay. %1$s = that word, as found (usually English). -->
+    <string name="guard_why_name">Sugerido: el nombre contiene “%1$s”</string>
+    <!-- Buddy suggests Hard because Android lists the app as a social app. -->
+    <string name="guard_why_social">Sugerido: una app social</string>
+    <!-- The mode is Buddy's suggestion. -->
+    <string name="guard_why_suggested">Sugerido</string>
+    <!-- The mode comes from the first setup, where the user chose that the agent asks first. -->
+    <string name="guard_why_setup">Tu elección inicial: preguntar antes</string>
+
+    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
+    <!-- %1$s = the button's label, e.g. Send. -->
+    <string name="tools_card_tap">Tocar “%1$s”</string>
+    <!-- %1$s = the button's label, e.g. Send; %2$s = the app's name, e.g. WhatsApp. -->
+    <string name="tools_card_tap_in">Tocar “%1$s” en %2$s</string>
+    <!-- For a button without a label: “this” stands for the button. -->
+    <string name="tools_card_tap_this">Tocar “esto”</string>
+    <!-- For a button without a label: “this” stands for the button. %1$s = the app's name. -->
+    <string name="tools_card_tap_this_in">Tocar “esto” en %1$s</string>
+    <!-- The agent typed text and wants to press the keyboard's Enter key to send it. -->
+    <string name="tools_card_enter">Presionar Enter para enviar</string>
+    <!-- Same, %1$s = the app's name. -->
+    <string name="tools_card_enter_in">Presionar Enter para enviar en %1$s</string>
+    <!-- %1$s = the action (e.g. Tap “Send” in WhatsApp); on the next line, %2$s = what it would send, or why Buddy asks. -->
+    <string name="tools_card_detail">%1$s:\n%2$s</string>
+    <!-- Quotation marks around text on the card (a draft message, a reason). Use your language's quotation marks. -->
+    <string name="tools_card_quote">“%1$s”</string>
+    <!-- In an app set to Smart, when neither Claude Code nor Codex is signed in to review the tap. -->
+    <string name="tools_card_no_reviewer">No hay ningún revisor con sesión iniciada, así que Buddy te pregunta.</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_block">%1$s lo desaconseja: %2$s</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_ask">%1$s recomienda preguntarte: %2$s</string>
+
+    <!-- Status line in the bubble while the agent works. -->
+    <!-- The smart reviewer is checking a tap. -->
+    <string name="tools_status_checking_tap">Revisando este toque…</string>
+    <!-- Android's installer is open. Install is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_install">Toca Instalar y luego confirma</string>
+    <!-- Android's installer is open. Update is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_update">Toca Actualizar y luego confirma</string>
+    <!-- An app the agent opened the installer for is now installed (adjective). -->
+    <string name="tools_status_installed">App instalada</string>
+    <!-- Downloading Buddy's update. %1$s = version number, e.g. 2.1.13 -->
+    <string name="tools_status_downloading">Descargando Buddy %1$s…</string>
+
+    <!-- Smart reviewer: its reason when it fails, shown on the approval card after “Claude says ask you:”, so it starts lowercase.
+         %1$s = the technical reason (reviewer_no_answer, reviewer_timed_out, or an error in English). -->
+    <string name="reviewer_failed">el revisor no pudo responder (%1$s)</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer's reply had no decision in it. -->
+    <string name="reviewer_no_answer">sin respuesta</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer took too long. -->
+    <string name="reviewer_timed_out">se agotó el tiempo</string>
+
+    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_linux_missing">El Linux de Buddy aún no está instalado. Abre Ajustes para configurarlo.</string>
+
+    <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
+         speech-to-text and ChatGPT's voice (through Codex). Status lines show in the voice bar, errors as toasts. -->
+    <string name="dictation_claude_sign_in">Inicia sesión en Claude Code en Ajustes para usar la voz de Claude.</string>
+    <string name="dictation_codex_sign_in">Inicia sesión en Codex en Ajustes para usar la voz de ChatGPT.</string>
+    <!-- Status: voice input is starting. -->
+    <string name="dictation_starting">Iniciando…</string>
+    <!-- Status: Claude Code, which does the voice input, is starting. -->
+    <string name="dictation_starting_claude">Iniciando Claude…</string>
+    <!-- Status: the recorded speech is being turned into text. -->
+    <string name="dictation_transcribing">Transcribiendo…</string>
+    <!-- Voice input ended without any words recognized. -->
+    <string name="dictation_no_speech">No te entendí.</string>
+    <string name="dictation_mic_failed">No se pudo abrir el micrófono.</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_claude_start_failed">No se pudo iniciar la voz de Claude: %1$s</string>
+    <string name="dictation_claude_no_start">La voz de Claude no se inició.</string>
+    <!-- A reason after “Claude voice couldn't start:”. -->
+    <string name="dictation_claude_code_no_start">Claude Code no se inició</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_chatgpt_start_failed">No se pudo iniciar la voz de ChatGPT: %1$s</string>
+    <!-- %1$s = how far it got, one of dictation_stage_* below. -->
+    <string name="dictation_chatgpt_no_connect">La voz de ChatGPT no se conectó (%1$s).</string>
+    <!-- %1$s = what went wrong: dictation_connection_failed, or an error from ChatGPT (often in English). -->
+    <string name="dictation_chatgpt_error">Voz de ChatGPT: %1$s</string>
+    <!-- After “ChatGPT voice:”, so it starts lowercase. -->
+    <string name="dictation_connection_failed">falló la conexión</string>
+    <!-- How far ChatGPT voice got, in the parentheses of dictation_chatgpt_no_connect, so lowercase. -->
+    <string name="dictation_stage_page">iniciando la página</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_codex">esperando a Codex</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_call">iniciando la llamada</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_answer">esperando la respuesta de ChatGPT</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_connecting">conectando</string>
+    <!-- A reason after “ChatGPT voice couldn't start:”. -->
+    <string name="dictation_codex_no_start">Codex no se inició</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = a technical request name, e.g. thread/start. -->
+    <string name="dictation_request_timed_out">%1$s: se agotó el tiempo de espera</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = the end of Codex's error log (technical, English), or dictation_no_details. -->
+    <string name="dictation_codex_stopped">Codex se detuvo: %1$s</string>
+    <!-- After “Codex stopped:” when its log says nothing. -->
+    <string name="dictation_no_details">sin detalles</string>
+</resources>

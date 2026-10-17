@@ -42,9 +42,16 @@ final class Models {
     }
 
     static String[][] forBackend(String backend) {
-        if ("opencode".equals(backend)) return opencodeLive != null ? opencodeLive : OPENCODE;
-        if (!"codex".equals(backend)) return CLAUDE;
-        return codexLive != null ? codexLive : CODEX;
+        if ("opencode".equals(backend)) return withDefault(opencodeLive != null ? opencodeLive : OPENCODE);
+        if (!"codex".equals(backend)) return withDefault(CLAUDE);
+        return withDefault(codexLive != null ? codexLive : CODEX);
+    }
+
+    /** A copy of a list with its "" row (the agent's default) labeled in the user's language; the lists keep "Default". */
+    private static String[][] withDefault(String[][] list) {
+        String[][] m = list.clone();
+        for (int i = 0; i < m.length; i++) if (m[i][0].isEmpty()) m[i] = new String[]{"", BuddyApp.str(R.string.models_default)};
+        return m;
     }
 
     /** OpenCode's models as JSON [[id, name], …] ("provider/model" for both). */
@@ -77,30 +84,35 @@ final class Models {
 
     /** Effort levels an agent accepts ([value, label]; "" is the agent's default), or null if Buddy can't set it. */
     static String[][] efforts(String backend) {
-        if ("claude".equals(backend)) return new String[][]{{"", "Auto"}, {"low", "Low"}, {"medium", "Med"},
-                {"high", "High"}, {"xhigh", "XHigh"}, {"max", "Max"}};
-        if ("codex".equals(backend)) return new String[][]{{"", "Auto"}, {"low", "Low"}, {"medium", "Med"}, {"high", "High"}};
+        if ("claude".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
+                {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
+                {"high", BuddyApp.str(R.string.models_effort_high)}, {"xhigh", BuddyApp.str(R.string.models_effort_xhigh)},
+                {"max", BuddyApp.str(R.string.models_effort_max)}};
+        if ("codex".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
+                {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
+                {"high", BuddyApp.str(R.string.models_effort_high)}};
         return null; // OpenCode: effort ("variants") depends on the model
     }
 
     /** "agent · model · effort" for a chat's chip. */
     static String summary(Sessions.Session s) {
-        return s.brainName() + " · " + shownModel(s) + (s.effort.isEmpty() ? "" : " · " + s.effort + " effort");
+        return s.brainName() + " · " + shownModel(s)
+                + (s.effort.isEmpty() ? "" : " · " + BuddyApp.str(R.string.models_chip_effort, s.effort));
     }
 
     /** The chat's model for display: the one picked, or what "Default" really is when the agent told us. */
     static String shownModel(Sessions.Session s) {
         if (!s.model.isEmpty()) return label(s.backend, s.model);
-        if (!s.actualModel.isEmpty()) return nameOf(s.backend, s.actualModel) + " (default)";
-        return "default model";
+        if (!s.actualModel.isEmpty()) return BuddyApp.str(R.string.models_name_default, nameOf(s.backend, s.actualModel));
+        return BuddyApp.str(R.string.models_default_model);
     }
 
     /** What "Default" means for this chat, for the pickers. */
     static String defaultHint(Sessions.Session s) {
-        if (!s.actualModel.isEmpty()) return "now " + nameOf(s.backend, s.actualModel);
-        if ("claude".equals(s.backend)) return "Claude Code picks it from your plan; shown here after the first message";
-        if ("codex".equals(s.backend)) return "Codex picks it; shown here after the next reply";
-        return "OpenCode's default model";
+        if (!s.actualModel.isEmpty()) return BuddyApp.str(R.string.models_default_now, nameOf(s.backend, s.actualModel));
+        if ("claude".equals(s.backend)) return BuddyApp.str(R.string.models_default_claude);
+        if ("codex".equals(s.backend)) return BuddyApp.str(R.string.models_default_codex);
+        return BuddyApp.str(R.string.models_default_opencode);
     }
 
     /** A model id the agent reported, by its name in the model list if it's there. */
@@ -118,7 +130,7 @@ final class Models {
     }
 
     static String label(String backend, String model) {
-        if (model == null || model.isEmpty()) return "Default";
+        if (model == null || model.isEmpty()) return BuddyApp.str(R.string.models_default);
         for (String[] m : forBackend(backend)) if (m[0].equals(model)) return m[1];
         return model;
     }

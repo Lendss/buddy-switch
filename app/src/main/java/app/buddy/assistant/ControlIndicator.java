@@ -77,9 +77,9 @@ final class ControlIndicator {
 
     private void notifyChip() {
         NotificationManager nm = svc.getSystemService(NotificationManager.class);
-        NotificationChannel ch = new NotificationChannel(CHANNEL, "Buddy is using your phone",
+        NotificationChannel ch = new NotificationChannel(CHANNEL, svc.getString(R.string.control_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT);
-        ch.setDescription("Shows in the status bar while an agent operates the phone.");
+        ch.setDescription(svc.getString(R.string.control_channel_description));
         ch.setSound(null, null);
         ch.enableVibration(false);
         nm.createNotificationChannel(ch);
@@ -94,14 +94,14 @@ final class ControlIndicator {
         extras.putBoolean("android.requestPromotedOngoing", true);
         Notification.Builder b = new Notification.Builder(svc, CHANNEL)
                 .setSmallIcon(R.drawable.ic_launcher_monochrome)
-                .setContentTitle("Buddy is using your phone")
-                .setContentText("Don't touch the screen until it's done, or tap Stop to take over.")
+                .setContentTitle(svc.getString(R.string.control_title))
+                .setContentText(svc.getString(R.string.control_text))
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setCategory(Notification.CATEGORY_PROGRESS)
                 .setContentIntent(open)
                 .addExtras(extras)
-                .addAction(new Notification.Action.Builder(null, "Stop", stop).build());
+                .addAction(new Notification.Action.Builder(null, svc.getString(R.string.control_stop), stop).build());
         if (android.os.Build.VERSION.SDK_INT >= 36) b.setShortCriticalText("Buddy");
         try {
             nm.notify(NOTIFICATION_ID, b.build());

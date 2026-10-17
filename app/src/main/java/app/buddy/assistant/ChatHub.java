@@ -51,7 +51,7 @@ final class ChatHub {
         } catch (Exception e) {
             add(s, Bubble.Kind.ERROR, e.getMessage());
         }
-        add(s, Bubble.Kind.STEP, "Continuing an earlier " + s.brainName() + " session. If it's still open in a terminal, close it there first.");
+        add(s, Bubble.Kind.STEP, app.getString(R.string.hub_continuing, s.brainName()));
         changed();
         return s;
     }
@@ -113,7 +113,7 @@ final class ChatHub {
     /** Sends a message with attachments (ids from Attachments); the helper fetches them before the agent runs. */
     String send(final Sessions.Session ses, String text, List<String> files) {
         if (ses.running) {
-            if (files != null && !files.isEmpty()) return "This chat is still working. Send attachments when it's done.";
+            if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
         }
         boolean hasFiles = files != null && !files.isEmpty();
@@ -131,20 +131,20 @@ final class ChatHub {
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
         startRun(ses);
-        ses.status = "Thinking…";
+        ses.status = app.getString(R.string.hub_thinking);
         changed();
         final int id = ses.runId;
         // the agent is running but its model can be slow (free models especially): say so, keep waiting
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= NO_RESPONSE_MS - 100) {
-                add(ses, Bubble.Kind.STEP, "Still waiting for the model to answer…");
+                add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_still_waiting));
                 changed();
             }
         }, NO_RESPONSE_MS);
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
                 ses.running = false;
-                add(ses, Bubble.Kind.ERROR, "The model didn't answer. It may be busy: try again, or pick another model at the top of the chat.");
+                add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer));
                 changed();
             }
         }, GIVE_UP_MS);
@@ -154,14 +154,15 @@ final class ChatHub {
     /** Change a chat's model; the next message uses it, and the conversation continues. */
     void setModel(Sessions.Session ses, String model) {
         ses.model = model == null ? "" : model.trim();
-        add(ses, Bubble.Kind.STEP, "Model: " + Models.label(ses.backend, ses.model));
+        add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_model_set, Models.label(ses.backend, ses.model)));
         changed();
     }
 
     /** Change a chat's effort ("" = the agent's default); the next message uses it. */
     void setEffort(Sessions.Session ses, String effort) {
         ses.effort = effort == null ? "" : effort;
-        add(ses, Bubble.Kind.STEP, "Effort: " + (ses.effort.isEmpty() ? "default" : ses.effort));
+        add(ses, Bubble.Kind.STEP, ses.effort.isEmpty() ? app.getString(R.string.hub_effort_default)
+                : app.getString(R.string.hub_effort_set, ses.effort));
         changed();
     }
 
@@ -176,7 +177,7 @@ final class ChatHub {
         if (svc != null) svc.stopPaused();
         try {
             Helper.run(app, "stop", ses.id);
-            ses.status = "Stopping…";
+            ses.status = app.getString(R.string.hub_stopping);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
         }
@@ -209,7 +210,7 @@ final class ChatHub {
                         changed();
                     }
                 } else if ("init".equals(ev.optString("subtype"))) {
-                    ses.status = "Thinking…";
+                    ses.status = app.getString(R.string.hub_thinking);
                     // the model really in use (Claude Code says it here), shown when the chat is on "Default"
                     String m = ev.optString("model", "");
                     if (!m.isEmpty() && !m.equals(ses.actualModel)) {
@@ -245,7 +246,7 @@ final class ChatHub {
             case "result": {
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
-                if (error) add(ses, Bubble.Kind.ERROR, r.isEmpty() ? ses.brainName() + " stopped." : r);
+                if (error) add(ses, Bubble.Kind.ERROR, r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r);
                 else if (!ses.gotText && !r.isEmpty()) {
                     add(ses, Bubble.Kind.BUDDY, r);
                     ses.lastReply = r;
@@ -253,10 +254,10 @@ final class ChatHub {
                 break;
             }
             case "buddy_error":
-                add(ses, Bubble.Kind.ERROR, ev.optString("text", "Something went wrong."));
+                add(ses, Bubble.Kind.ERROR, ev.optString("text", app.getString(R.string.hub_something_wrong)));
                 break;
             case "buddy_stopped":
-                add(ses, Bubble.Kind.STEP, "Stopped.");
+                add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_stopped));
                 break;
             case "buddy_done":
                 if (ses.running) {
@@ -326,7 +327,7 @@ final class ChatHub {
             ses.notes.add(text);
         }
         add(ses, Bubble.Kind.USER, text);
-        add(ses, Bubble.Kind.STEP, "Added while working: " + ses.brainName() + " gets it at its next step");
+        add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_note_added, ses.brainName()));
         changed();
         return null;
     }
@@ -351,7 +352,7 @@ final class ChatHub {
             return;
         }
         startRun(ses);
-        ses.status = "Thinking…";
+        ses.status = app.getString(R.string.hub_thinking);
         changed();
     }
 
@@ -377,7 +378,7 @@ final class ChatHub {
                 s.notes.clear();
             }
             main.post(() -> {
-                add(s, Bubble.Kind.STEP, "Passed on what you added");
+                add(s, Bubble.Kind.STEP, app.getString(R.string.hub_note_passed));
                 changed();
             });
             return joined;
@@ -392,8 +393,8 @@ final class ChatHub {
             Sessions.Session latest = null;
             for (Sessions.Session s : sessions.all)
                 if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
-            String st = latest == null || latest.status.isEmpty() ? "Working…" : latest.status;
-            return n > 1 ? n + " chats · " + st : st;
+            String st = latest == null || latest.status.isEmpty() ? app.getString(R.string.chat_working) : latest.status;
+            return n > 1 ? app.getResources().getQuantityString(R.plurals.hub_pill_chats, n, n, st) : st;
         }
         return flash;
     }
@@ -450,17 +451,37 @@ final class ChatHub {
         if (in == null) in = new JSONObject();
         String n = name.startsWith(TOOL_PREFIX) ? name.substring(TOOL_PREFIX.length()) : name;
         switch (n) {
-            case "read_screen": return "Reading the screen";
-            case "screenshot": return "Taking a screenshot";
-            case "tap": return in.has("element") ? "Tapping element " + in.optInt("element") : "Tapping " + in.optInt("x") + "," + in.optInt("y");
-            case "long_press": return "Long-pressing";
-            case "type_text": return "Typing \"" + clip(in.optString("text"), 40) + "\"";
-            case "scroll": return "Scrolling " + in.optString("direction");
-            case "swipe": return "Swiping";
-            case "press": return "Pressing " + in.optString("button");
-            case "open_app": return "Opening " + in.optString("app");
-            case "list_apps": return "Listing apps";
-            case "open_url": return "Opening " + clip(in.optString("url"), 40);
+            case "read_screen": return BuddyApp.str(R.string.hub_tool_read_screen);
+            case "screenshot": return BuddyApp.str(R.string.hub_tool_screenshot);
+            case "tap": return in.has("element") ? BuddyApp.str(R.string.hub_tool_tap_element, in.optInt("element"))
+                    : BuddyApp.str(R.string.hub_tool_tap_point, in.optInt("x"), in.optInt("y"));
+            case "long_press": return BuddyApp.str(R.string.hub_tool_long_press);
+            case "type_text": return BuddyApp.str(R.string.hub_tool_type, clip(in.optString("text"), 40));
+            case "scroll": {
+                String d = in.optString("direction"); // the tool's enum values get whole translated lines
+                switch (d) {
+                    case "up": return BuddyApp.str(R.string.hub_tool_scroll_up);
+                    case "down": return BuddyApp.str(R.string.hub_tool_scroll_down);
+                    case "left": return BuddyApp.str(R.string.hub_tool_scroll_left);
+                    case "right": return BuddyApp.str(R.string.hub_tool_scroll_right);
+                    default: return BuddyApp.str(R.string.hub_tool_scroll, d);
+                }
+            }
+            case "swipe": return BuddyApp.str(R.string.hub_tool_swipe);
+            case "press": {
+                String b = in.optString("button"); // as for scroll
+                switch (b) {
+                    case "back": return BuddyApp.str(R.string.hub_tool_press_back);
+                    case "home": return BuddyApp.str(R.string.hub_tool_press_home);
+                    case "recents": return BuddyApp.str(R.string.hub_tool_press_recents);
+                    case "notifications": return BuddyApp.str(R.string.hub_tool_press_notifications);
+                    case "quick_settings": return BuddyApp.str(R.string.hub_tool_press_quick_settings);
+                    default: return BuddyApp.str(R.string.hub_tool_press, b);
+                }
+            }
+            case "open_app": return BuddyApp.str(R.string.hub_tool_open_app, in.optString("app"));
+            case "list_apps": return BuddyApp.str(R.string.hub_tool_list_apps);
+            case "open_url": return BuddyApp.str(R.string.hub_tool_open_url, clip(in.optString("url"), 40));
             case "wait":
             case "ToolSearch":
             case "TodoWrite":
@@ -468,32 +489,36 @@ final class ChatHub {
             case "confirm": {
                 // OpenCode reports a step only once it's done, so its approval step carries the answer (_answer)
                 String ans = in.optString("_answer", "");
-                if (ans.startsWith("APPROVED")) return "✓ Approved: " + clip(in.optString("summary"), 80);
+                if (ans.startsWith("APPROVED")) return BuddyApp.str(R.string.hub_tool_approved, clip(in.optString("summary"), 80));
                 if (ans.startsWith("CHANGES")) {
                     int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
-                    return "✎ Change requested" + (a >= 0 && b > a ? ": " + clip(ans.substring(a + 1, b), 80) : "");
+                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_change_requested_text, clip(ans.substring(a + 1, b), 80))
+                            : BuddyApp.str(R.string.hub_tool_change_requested);
                 }
-                if (ans.startsWith("DENIED")) return "✗ Denied";
-                return "Asking for your approval";
+                if (ans.startsWith("DENIED")) return BuddyApp.str(R.string.hub_tool_denied);
+                return BuddyApp.str(R.string.hub_tool_asking_approval);
             }
             case "ask": {
                 String ans = in.optString("_answer", ""); // OpenCode, as for confirm
                 if (ans.startsWith("ANSWER")) {
                     int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
-                    return "✓ Answered" + (a >= 0 && b > a ? ": " + clip(ans.substring(a + 1, b), 80) : "");
+                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_answered_text, clip(ans.substring(a + 1, b), 80))
+                            : BuddyApp.str(R.string.hub_tool_answered);
                 }
-                if (ans.startsWith("NO ANSWER")) return "Question skipped";
-                return "Asking: " + clip(in.optString("question"), 80);
+                if (ans.startsWith("NO ANSWER")) return BuddyApp.str(R.string.hub_tool_question_skipped);
+                return BuddyApp.str(R.string.hub_tool_asking, clip(in.optString("question"), 80));
             }
-            case "update_buddy": return in.optBoolean("install") ? "Downloading the Buddy update" : "Checking for a Buddy update";
+            case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
-            case "WebSearch": return "Searching the web: " + clip(in.optString("query"), 40);
-            case "WebFetch": return "Reading " + clip(in.optString("url"), 40);
-            case "Bash": return in.has("command") ? "Running: " + clip(in.optString("command"), 40) : "Running a command";
+            case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, clip(in.optString("query"), 40));
+            case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, clip(in.optString("url"), 40));
+            case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, clip(in.optString("command"), 40))
+                    : BuddyApp.str(R.string.hub_tool_command_any);
             case "Edit":
-            case "Write": return in.has("file_path") ? "Editing " + clip(in.optString("file_path").replaceAll(".*/", ""), 40) : "Editing files";
-            case "Read": return "Reading " + clip(in.optString("file_path").replaceAll(".*/", ""), 40);
-            default: return "Using " + n;
+            case "Write": return in.has("file_path") ? BuddyApp.str(R.string.hub_tool_edit, clip(in.optString("file_path").replaceAll(".*/", ""), 40))
+                    : BuddyApp.str(R.string.hub_tool_edit_any);
+            case "Read": return BuddyApp.str(R.string.hub_tool_read_file, clip(in.optString("file_path").replaceAll(".*/", ""), 40));
+            default: return BuddyApp.str(R.string.hub_tool_other, n);
         }
     }
 

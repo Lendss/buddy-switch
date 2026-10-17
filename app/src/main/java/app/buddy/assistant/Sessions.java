@@ -33,7 +33,8 @@ final class Sessions {
         /** Text for places that can't show attachments (bubble panel, previews). */
         String label() {
             if (files.isEmpty()) return text;
-            String n = files.size() == 1 ? "📎 " + Attachments.name(files.get(0)) : "📎 " + files.size() + " attachments";
+            String n = files.size() == 1 ? "📎 " + Attachments.name(files.get(0))
+                    : BuddyApp.plural(R.plurals.attach_count, files.size(), files.size());
             return text.isEmpty() ? n : n + "\n" + text;
         }
     }
@@ -69,7 +70,7 @@ final class Sessions {
         }
 
         String label() {
-            return title.isEmpty() ? "New " + brainName() + " chat" : title;
+            return title.isEmpty() ? BuddyApp.str(R.string.session_new_chat, brainName()) : title;
         }
     }
 
