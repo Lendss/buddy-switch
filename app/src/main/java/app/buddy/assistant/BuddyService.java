@@ -62,6 +62,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         super.onServiceConnected();
         instance = this;
         Theme.load(this);
+        orientation = getResources().getConfiguration().orientation;
         Models.setCodex(Prefs.codexModels(this));
         Models.setOpencode(Prefs.opencodeModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
@@ -194,10 +195,18 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         });
     }
 
+    private int orientation = android.content.res.Configuration.ORIENTATION_UNDEFINED;
+
     @Override
     public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (Theme.load(this)) applyTheme();
+        if (newConfig.orientation != orientation) {
+            orientation = newConfig.orientation;
+            main.post(() -> {
+                if (bubble != null) bubble.onRotated();
+            });
+        }
     }
 
     // ---------------------------------------- Claude sign-in (built-in Linux)

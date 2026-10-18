@@ -32,7 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /** The phone-control tools exposed to Claude Code and Codex over MCP. */
 final class Tools {
     private static final int MAX_NODES = 350;
-    private static final int SCREENSHOT_WIDTH = 720;
+    /** Screenshots are scaled so their shorter side is at most this, the same in portrait and landscape. */
+    private static final int SCREENSHOT_SHORT_SIDE = 720;
 
     private final BuddyService svc;
     private final Object lock = new Object();
@@ -906,7 +907,7 @@ final class Tools {
         }
         Bitmap full = shot.get();
         if (full == null) throw new IllegalStateException(error.get() != null ? error.get() : "Screenshot timed out.");
-        float scale = Math.min(1f, (float) SCREENSHOT_WIDTH / full.getWidth());
+        float scale = Math.min(1f, (float) SCREENSHOT_SHORT_SIDE / Math.min(full.getWidth(), full.getHeight()));
         Bitmap small = scale < 1f
                 ? Bitmap.createScaledBitmap(full, Math.round(full.getWidth() * scale), Math.round(full.getHeight() * scale), true)
                 : full;

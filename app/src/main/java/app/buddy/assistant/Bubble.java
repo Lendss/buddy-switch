@@ -78,13 +78,16 @@ final class Bubble implements ChatHub.Listener {
     // expanded
     private LinearLayout panel, messages, confirmCard;
     private ScrollView scroll;
+    /** The card's scrolling part (text and answers), and the most it may take so the panel fits (see buildPanel). */
+    private ScrollView cardScroll;
+    private int cardRoom = Integer.MAX_VALUE;
     private TextView header, confirmText, confirmLabel;
     private LinearLayout confirmOptions, confirmRow, countdownRow;
     private android.widget.ProgressBar countdownBar;
     private TextView countdownText;
     /** A card's countdown (a notification rule's): when it ends and how long it is (elapsedRealtime ms), or 0. */
     private long countdownEnd, countdownLength;
-    private Button confirmDeny, confirmChange, confirmApprove;
+    private Button confirmDeny, confirmChange, confirmApprove, confirmOwn;
     /** The card asks a question (the ask tool) rather than for approval; askOptions are its buttons. */
     private boolean asking;
     private java.util.List<String> askOptions;
@@ -252,7 +255,28 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void buildPanel() {
-        panel = new LinearLayout(svc);
+        panel = new LinearLayout(svc) {
+            @Override
+            protected void onMeasure(int w, int h) {
+                cardRoom = Integer.MAX_VALUE;
+                super.onMeasure(w, h);
+                if (confirmCard == null || confirmCard.getVisibility() != VISIBLE) return;
+                // a card taller than the room left (landscape, or with the keyboard up) would push the composer
+                // out of the panel: the card's scrolling part gives up the difference instead
+                int over = getPaddingTop() + getPaddingBottom() - getMeasuredHeight();
+                for (int i = 0; i < getChildCount(); i++) {
+                    View v = getChildAt(i);
+                    if (v.getVisibility() == GONE) continue;
+                    LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) v.getLayoutParams();
+                    over += v.getMeasuredHeight() + p.topMargin + p.bottomMargin;
+                }
+                if (over <= 0) return;
+                cardRoom = Math.max(dp(48), cardScroll.getMeasuredHeight() - over);
+                confirmCard.forceLayout();
+                cardScroll.forceLayout();
+                super.onMeasure(w, h);
+            }
+        };
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPaddingRelative(dp(12), dp(10), dp(12), dp(12));
         panel.setBackground(rounded(Ui.BG, 24, Ui.OUTLINE, 1));
@@ -357,21 +381,27 @@ final class Bubble implements ChatHub.Listener {
         confirmText.setTextColor(Ui.TEXT);
         confirmText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         confirmText.setPaddingRelative(0, dp(6), 0, dp(10));
-        // long texts scroll inside the card, so its buttons always stay on screen
+        // long texts and a question's answers scroll inside the card, so the card's buttons and the composer
+        // always stay in the panel, landscape included (cardRoom)
         ScrollView cs = new ScrollView(svc) {
             @Override
             protected void onMeasure(int w, int h) {
                 // smaller while the user types an answer or change, so the text field stays above the keyboard
-                float cap = changing ? 0.12f : 0.3f;
-                super.onMeasure(w, MeasureSpec.makeMeasureSpec((int) (screen().height() * cap), MeasureSpec.AT_MOST));
+                float cap = changing ? 0.12f : 0.5f;
+                int most = Math.min((int) (screen().height() * cap), cardRoom);
+                super.onMeasure(w, MeasureSpec.makeMeasureSpec(most, MeasureSpec.AT_MOST));
             }
         };
-        cs.addView(confirmText);
-        confirmCard.addView(cs, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        cardScroll = cs;
+        LinearLayout body = new LinearLayout(svc);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.addView(confirmText);
         // a question's answers, one button each (filled in by showCard)
         confirmOptions = new LinearLayout(svc);
         confirmOptions.setOrientation(LinearLayout.VERTICAL);
-        confirmCard.addView(confirmOptions, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        body.addView(confirmOptions, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        cs.addView(body);
+        confirmCard.addView(cs, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         // a notification rule's countdown: the card approves itself when it runs out; a tap stops it
         countdownRow = new LinearLayout(svc);
         countdownRow.setOrientation(LinearLayout.VERTICAL);
@@ -405,6 +435,12 @@ final class Bubble implements ChatHub.Listener {
         Button approve = actionButton(svc.getString(R.string.card_approve), Ui.ACCENT);
         confirmApprove = approve;
         approve.setOnClickListener(v -> answerConfirm(true));
+        // a question's "Type my own answer…" shares the bottom row with Skip, so it takes no row of its own
+        confirmOwn = optionButton(svc.getString(R.string.card_type_own_answer), true, v -> startChange());
+        LinearLayout.LayoutParams ownLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        ownLp.setMarginEnd(dp(8));
+        confirmOwn.setVisibility(View.GONE);
+        row.addView(confirmOwn, ownLp);
         row.addView(deny);
         LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -618,10 +654,10 @@ final class Bubble implements ChatHub.Listener {
         boolean compact = "compact".equals(Prefs.panelSize(svc));
         int side = compact ? Math.max(Math.max(edges.left, edges.right) + dp(8), usable.width() / 8) : 0;
         lp.width = usable.width() - 2 * side;
-        // full height (or about three quarters in "compact"); the keyboard is made room for by padding
-        // (fitKeyboard), only when it's for Buddy's own text field (not another app's, e.g. while the agent types
-        // in Messenger)
-        lp.height = Math.max(dp(220), compact ? usable.height() * 3 / 4 : usable.height() - dp(8) - dp(8));
+        // full height (or about three quarters in "compact", in portrait: landscape is short already); the keyboard
+        // is made room for by padding (fitKeyboard), only when it's for Buddy's own text field (not another app's,
+        // e.g. while the agent types in Messenger)
+        lp.height = Math.max(dp(220), shortPanel() ? usable.height() * 3 / 4 : usable.height() - dp(8) - dp(8));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
         lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
@@ -630,6 +666,45 @@ final class Bubble implements ChatHub.Listener {
                 | (passThrough ? WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE : 0);
         // Buddy moves the panel itself (followKeyboard), so the system must not resize the window too
         lp.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING;
+    }
+
+    /** "compact" panel in portrait: about three quarters of the height. */
+    private boolean shortPanel() {
+        Rect sc = screen();
+        return "compact".equals(Prefs.panelSize(svc)) && sc.height() > sc.width();
+    }
+
+    /**
+     * Where the system puts the panel's window differs by phone and orientation (in landscape it can start at the
+     * top of the screen instead of under the status bar, leaving a gap at the bottom): once it's placed, a full-height
+     * panel is made to end just above the navigation bar.
+     */
+    private void fitPanelHeight() {
+        root.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                root.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (!expanded || shortPanel()) return;
+                int[] loc = new int[2];
+                root.getLocationOnScreen(loc);
+                int h = Math.max(dp(220), usable().bottom - dp(8) - loc[1]);
+                if (Math.abs(h - lp.height) <= 1) return;
+                lp.height = h;
+                wm.updateViewLayout(root, lp);
+            }
+        });
+    }
+
+    /** The screen rotated: size the panel (or place the bubble) for the new orientation. */
+    void onRotated() {
+        layoutOptions();
+        if (expanded) applyExpandedParams();
+        else applyCollapsedParams();
+        wm.updateViewLayout(root, lp);
+        if (expanded) {
+            fitPanelHeight();
+            scrollToEnd();
+        }
     }
 
     void expand() {
@@ -642,6 +717,7 @@ final class Bubble implements ChatHub.Listener {
         applyExpandedParams();
         Voice.prepare(svc); // so the mic is quick
         wm.updateViewLayout(root, lp);
+        fitPanelHeight();
         boolean right = Prefs.bubblePos(svc)[0] != 0;
         panel.setPivotX(right ? lp.width : 0);
         panel.setPivotY(0);
@@ -1744,6 +1820,7 @@ final class Bubble implements ChatHub.Listener {
         changing = true;
         // the answer buttons make the card too tall to leave the text field above the keyboard
         confirmOptions.setVisibility(View.GONE);
+        confirmOwn.setVisibility(View.GONE);
         confirmCard.requestLayout();
         input.setHint(svc.getString(asking ? R.string.card_answer_hint : R.string.card_change_hint));
         input.requestFocus();
@@ -1757,7 +1834,10 @@ final class Bubble implements ChatHub.Listener {
         changing = false;
         input.setHint(svc.getString(R.string.bubble_input_hint, sessions.current.brainName()));
         hideKeyboard();
-        if (asking) confirmOptions.setVisibility(View.VISIBLE);
+        if (asking) {
+            confirmOptions.setVisibility(View.VISIBLE);
+            confirmOwn.setVisibility(View.VISIBLE);
+        }
         confirmCard.requestLayout();
     }
 
@@ -1880,11 +1960,10 @@ final class Bubble implements ChatHub.Listener {
         String label = svc.getString(asking ? R.string.card_label_question : R.string.card_label_approval);
         confirmLabel.setText(cardChat == null ? svc.getString(R.string.card_label_other_session, label) : label);
         confirmOptions.removeAllViews();
-        if (asking) {
-            for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)), optionLp());
-            confirmOptions.addView(optionButton(svc.getString(R.string.card_type_own_answer), true, v -> startChange()), optionLp());
-        }
+        if (asking) for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)));
+        layoutOptions();
         confirmOptions.setVisibility(asking ? View.VISIBLE : View.GONE);
+        confirmOwn.setVisibility(asking ? View.VISIBLE : View.GONE);
         // a question only needs Skip in the bottom row
         confirmDeny.setText(asking ? R.string.card_skip : R.string.card_deny);
         confirmDeny.setTextColor(asking ? Ui.TEXT : Ui.ERR);
@@ -1926,11 +2005,19 @@ final class Bubble implements ChatHub.Listener {
         return b;
     }
 
-    private LinearLayout.LayoutParams optionLp() {
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        p.topMargin = dp(6);
-        return p;
+    /** A question's answers: one under the other, or side by side in landscape, where the panel is short. */
+    private void layoutOptions() {
+        Rect sc = screen();
+        boolean side = sc.width() > sc.height();
+        confirmOptions.setOrientation(side ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        for (int i = 0; i < confirmOptions.getChildCount(); i++) {
+            LinearLayout.LayoutParams p = side
+                    ? new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1)
+                    : new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            p.topMargin = dp(6);
+            if (side && i > 0) p.setMarginStart(dp(6));
+            confirmOptions.getChildAt(i).setLayoutParams(p);
+        }
     }
 
     private void answerOption(String option) {
