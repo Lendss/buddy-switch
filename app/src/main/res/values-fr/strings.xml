@@ -1200,6 +1200,9 @@
     <string name="perms_reviewer_sign_in">Connectez-vous d\'abord à %1$s (Paramètres).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">Une session temporaire par appui, sans outils : le vérificateur voit votre demande, la note de l\'agent et l\'écran, puis indique s\'il faut autoriser, vous demander ou déconseiller. Environ 3 secondes par appui. Les discussions OpenCode sont vérifiées par Claude Code (ou Codex).</string>
+    <string name="perms_reviewer_rules">Il vérifie aussi les réponses avant que le compte à rebours d\'une règle de notification ne les envoie.</string>
+    <string name="reviewer_default_claude">Haiku : rapide et léger. Recommandé.</string>
+    <string name="reviewer_default_codex">Un petit modèle rapide. Recommandé.</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">Règles des boutons</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1340,4 +1343,87 @@
     <string name="dictation_codex_stopped">Codex s\'est arrêté : %1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">aucun détail</string>
+
+    <!-- Notification rules -->
+    <string name="card_label_countdown">APPROBATION AUTOMATIQUE</string>
+    <string name="card_countdown">Approbation automatique dans %1$d s · Appuyez pour arrêter</string>
+    <string name="card_note_auto_approved">✓ Approuvé à la fin du compte à rebours : %1$s</string>
+    <string name="card_note_countdown_stopped">Compte à rebours arrêté : en attente de votre accord</string>
+    <string name="hub_tool_reply_notification">Envoi de la réponse : %1$s</string>
+    <string name="setup_rules">Règles de notification</string>
+    <string name="setup_rules_info">Laissez un agent agir à l\'arrivée d\'une notification : répondre à un message, noter une livraison dans votre agenda…</string>
+    <string name="tools_card_reply">Répondre à %1$s dans %2$s :\n« %3$s »</string>
+    <string name="tools_card_open_url">Ouvrir %1$s</string>
+    <string name="rules_service_label">Règles de notification de Buddy</string>
+    <string name="rules_title">Règles de notification</string>
+    <string name="rules_intro">Quand une notification que vous avez choisie arrive, Buddy transmet votre consigne à un agent, comme un message que vous écririez. Les notifications qui ne correspondent à aucune règle sont ignorées.</string>
+    <string name="rules_access_off_title">L\'accès aux notifications est désactivé</string>
+    <string name="rules_access_off_text">Buddy en a besoin pour voir les notifications surveillées par vos règles.</string>
+    <string name="rules_access_turn_on">Activer</string>
+    <string name="rules_run">Activer les règles</string>
+    <string name="rules_run_info">Désactivez pour mettre toutes les règles en pause.</string>
+    <string name="rules_section">Règles</string>
+    <string name="rules_empty">Aucune règle pour l\'instant. Par exemple : quand un client vous écrit sur WhatsApp, Buddy lui répond avec vos horaires d\'ouverture.</string>
+    <string name="rules_add">Ajouter une règle</string>
+    <string name="rules_any">Toutes les notifications</string>
+    <string name="rules_from_summary">De : %1$s</string>
+    <string name="rules_words_summary">Contenant « %1$s »</string>
+    <string name="rules_tag_ask">Vous demande d\'abord</string>
+    <string name="rules_tag_countdown">Compte à rebours %1$s</string>
+    <string name="rules_tag_off">Désactivée</string>
+    <string name="rules_seconds">%1$d s</string>
+    <string name="rules_minutes">%1$d min</string>
+    <string name="rules_activity">Activité récente</string>
+    <string name="rules_activity_empty">Rien pour l\'instant.</string>
+    <string name="rules_activity_clear">Effacer</string>
+    <string name="rules_log_replied">Réponse envoyée : « %1$s »</string>
+    <string name="rules_log_done_empty">Terminé, sans réponse.</string>
+    <string name="rules_log_limit">Ignoré : trop de déclenchements au cours de la dernière heure.</string>
+    <string name="rules_log_busy">Ignoré : le téléphone est resté occupé trop longtemps.</string>
+    <string name="rules_log_error">Non exécuté : %1$s</string>
+    <string name="rules_log_no_service">le service d\'accessibilité de Buddy est désactivé</string>
+    <string name="rules_log_not_signed_in">%1$s n\'est pas connecté</string>
+    <string name="rules_new">Nouvelle règle</string>
+    <string name="rules_edit">Modifier la règle</string>
+    <string name="rules_app">Quand une notification provient de</string>
+    <string name="rules_pick_app">Choisir une appli</string>
+    <string name="rules_search_apps">Rechercher des applis</string>
+    <string name="rules_from">De (facultatif)</string>
+    <string name="rules_from_hint">N\'importe qui ou des noms séparés par des virgules</string>
+    <string name="rules_words">Contenant (facultatif)</string>
+    <string name="rules_words_hint">N\'importe quel texte ou des mots séparés par des virgules</string>
+    <string name="rules_instruction">Que doit faire Buddy ?</string>
+    <string name="rules_instruction_hint">Par exemple : réponds dans mon style. Nous sommes ouverts de 8 h à 18 h, fermés le dimanche.</string>
+    <string name="rules_example_reply">Répondre pour moi</string>
+    <string name="rules_example_reply_text">Réponds dans mon style, de façon brève et amicale.</string>
+    <string name="rules_example_summary">Résumer</string>
+    <string name="rules_example_summary_text">Dis-moi en une ligne ce que dit la notification et si je dois faire quelque chose.</string>
+    <string name="rules_example_calendar">Ajouter à l\'agenda</string>
+    <string name="rules_example_calendar_text">S\'il s\'agit d\'un rendez-vous ou d\'une livraison, ajoute-le à mon agenda.</string>
+    <string name="rules_agent">Agent</string>
+    <string name="rules_approval">Avant d\'agir</string>
+    <string name="rules_approval_ask">Me demander</string>
+    <string name="rules_approval_countdown">Compte à rebours</string>
+    <string name="rules_approval_ask_info">Les cartes d\'approbation attendent votre décision, comme dans n\'importe quelle discussion.</string>
+    <string name="rules_approval_countdown_info">À la fin du compte à rebours, la carte est approuvée automatiquement, sauf si vous appuyez dessus pour l\'arrêter. Cela ne fonctionne que pour l\'envoi d\'un message, après qu\'une seconde IA l\'a vérifié par rapport à votre règle. Les paiements, les achats, les suppressions et l\'ouverture de liens attendent toujours votre accord.</string>
+    <string name="rules_checker">Seconde IA : %1$s. Appuyez pour en changer dans Autorisations des applis.</string>
+    <string name="rules_model_default">Modèle par défaut de l\'agent</string>
+    <string name="rules_on">Règle activée</string>
+    <string name="rules_save">Enregistrer</string>
+    <string name="rules_delete">Supprimer</string>
+    <string name="rules_delete_title">Supprimer cette règle ?</string>
+    <string name="rules_need_app">Choisissez d\'abord une appli.</string>
+    <string name="rules_need_instruction">Indiquez ce que Buddy doit faire.</string>
+    <string name="rules_access_title">Autoriser l\'accès aux notifications ?</string>
+    <string name="rules_access_what">Buddy compare chaque notification à vos règles. Celles qui ne correspondent à aucune règle sont ignorées immédiatement : elles ne sont ni stockées ni envoyées nulle part.</string>
+    <string name="rules_access_data">Quand l\'une d\'elles correspond, son appli, son expéditeur et son texte sont transmis à l\'agent de la règle (Claude Code, Codex ou OpenCode) avec votre consigne.</string>
+    <string name="rules_access_reply">Buddy peut répondre via le bouton Répondre d\'une notification. Il vous demande d\'abord votre accord, sauf si vous définissez un compte à rebours pour la règle.</string>
+    <string name="rules_chat_shown">🔔 %1$s · %2$s : %3$s\n⚡ %4$s</string>
+    <string name="rules_status_checking">Vérification par rapport à votre règle…</string>
+    <string name="rules_channel_results">Règles de notification : résultats</string>
+    <string name="approvals_channel">Approbations</string>
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <string name="rules_approval_title">Votre accord requis : %1$s · %2$s</string>
+    <string name="card_locked_title">Votre accord requis : %1$s</string>
+    <string name="rules_approval_auto">Approbation automatique dans %1$s, sauf si vous l\'arrêtez.\n%2$s</string>
 </resources>

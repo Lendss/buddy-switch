@@ -1224,6 +1224,12 @@
     <string name="perms_reviewer_sign_in">Спершу увійдіть у %1$s (Налаштування).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">Тимчасовий сеанс для кожного натискання, без інструментів: рецензент бачить ваш запит, примітку агента й екран і відповідає «дозволити», «запитати вас» або «не радити». Близько 3 секунд на натискання. Чати OpenCode перевіряє Claude Code (або Codex).</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">Він також перевіряє відповіді, перш ніж правило сповіщень надішле їх за таймером.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku: швидка й легка. Рекомендовано.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">Невелика швидка модель. Рекомендовано.</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">Правила кнопок</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1364,4 +1370,87 @@
     <string name="dictation_codex_stopped">Codex зупинився: %1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">без подробиць</string>
+
+    <!-- Notification rules -->
+    <string name="card_label_countdown">БУДЕ СХВАЛЕНО АВТОМАТИЧНО</string>
+    <string name="card_countdown">Буде схвалено автоматично через %1$d с · Натисніть, щоб зупинити</string>
+    <string name="card_note_auto_approved">✓ Схвалено за таймером: %1$s</string>
+    <string name="card_note_countdown_stopped">Таймер зупинено: чекаю на ваш дозвіл</string>
+    <string name="hub_tool_reply_notification">Відповідаю на сповіщення: %1$s</string>
+    <string name="setup_rules">Правила сповіщень</string>
+    <string name="setup_rules_info">Дозвольте агентові діяти, коли надходить сповіщення: відповісти на повідомлення, додати доставку в календар…</string>
+    <string name="tools_card_reply">Відповісти: %1$s · %2$s\n«%3$s»</string>
+    <string name="tools_card_open_url">Відкрити %1$s</string>
+    <string name="rules_service_label">Правила сповіщень Buddy</string>
+    <string name="rules_title">Правила сповіщень</string>
+    <string name="rules_intro">Коли надходить вибране вами сповіщення, Buddy передає агентові вашу вказівку, ніби ви самі написали йому повідомлення. Сповіщення, які не відповідають жодному правилу, ігноруються.</string>
+    <string name="rules_access_off_title">Доступ до сповіщень вимкнено</string>
+    <string name="rules_access_off_text">Він потрібен Buddy, щоб бачити сповіщення, які відстежують ваші правила.</string>
+    <string name="rules_access_turn_on">Увімкнути</string>
+    <string name="rules_run">Виконувати правила</string>
+    <string name="rules_run_info">Вимкніть, щоб призупинити всі правила.</string>
+    <string name="rules_section">Правила</string>
+    <string name="rules_empty">Правил ще немає. Наприклад: коли клієнт пише вам у WhatsApp, надсилати йому у відповідь години роботи.</string>
+    <string name="rules_add">Додати правило</string>
+    <string name="rules_any">Усі сповіщення</string>
+    <string name="rules_from_summary">Від: %1$s</string>
+    <string name="rules_words_summary">Містить «%1$s»</string>
+    <string name="rules_tag_ask">Спершу питає</string>
+    <string name="rules_tag_countdown">Таймер %1$s</string>
+    <string name="rules_tag_off">Вимк.</string>
+    <string name="rules_seconds">%1$d с</string>
+    <string name="rules_minutes">%1$d хв</string>
+    <string name="rules_activity">Нещодавні дії</string>
+    <string name="rules_activity_empty">Ще нічого немає.</string>
+    <string name="rules_activity_clear">Очистити</string>
+    <string name="rules_log_replied">Надіслано відповідь: «%1$s»</string>
+    <string name="rules_log_done_empty">Готово, без відповіді.</string>
+    <string name="rules_log_limit">Пропущено: забагато запусків за останню годину.</string>
+    <string name="rules_log_busy">Пропущено: телефон був зайнятий надто довго.</string>
+    <string name="rules_log_error">Не запущено: %1$s</string>
+    <string name="rules_log_no_service">сервіс спеціальних можливостей Buddy вимкнено</string>
+    <string name="rules_log_not_signed_in">вхід у %1$s не виконано</string>
+    <string name="rules_new">Нове правило</string>
+    <string name="rules_edit">Редагувати правило</string>
+    <string name="rules_app">Коли надходить сповіщення від</string>
+    <string name="rules_pick_app">Виберіть додаток</string>
+    <string name="rules_search_apps">Пошук додатків</string>
+    <string name="rules_from">Від кого (необов\'язково)</string>
+    <string name="rules_from_hint">Будь-хто або імена через кому</string>
+    <string name="rules_words">Містить (необов\'язково)</string>
+    <string name="rules_words_hint">Будь-що або слова через кому</string>
+    <string name="rules_instruction">Що має зробити Buddy?</string>
+    <string name="rules_instruction_hint">Наприклад: Відповідай у моєму стилі. Ми працюємо з 8 до 18, у неділю вихідний.</string>
+    <string name="rules_example_reply">Відповісти за мене</string>
+    <string name="rules_example_reply_text">Відповідай у моєму стилі, коротко й дружньо.</string>
+    <string name="rules_example_summary">Коротко переказати</string>
+    <string name="rules_example_summary_text">Скажи одним рядком, про що там ідеться і чи треба мені щось робити.</string>
+    <string name="rules_example_calendar">Додати до календаря</string>
+    <string name="rules_example_calendar_text">Якщо йдеться про зустріч чи доставку, додай це до мого календаря.</string>
+    <string name="rules_agent">Агент</string>
+    <string name="rules_approval">Перед дією</string>
+    <string name="rules_approval_ask">Питати мене</string>
+    <string name="rules_approval_countdown">Таймер</string>
+    <string name="rules_approval_ask_info">Картки схвалення чекають на ваше рішення, як у будь-якому чаті.</string>
+    <string name="rules_approval_countdown_info">Коли таймер дійде до нуля, картку буде схвалено автоматично, якщо ви не зупините його натисканням. Це працює лише для надсилання повідомлень і лише після того, як другий ШІ перевірить повідомлення на відповідність вашому правилу. Оплата, покупки, видалення й відкриття посилань завжди чекають на ваш дозвіл.</string>
+    <string name="rules_checker">Другий ШІ: %1$s. Натисніть, щоб змінити його в розділі «Дозволи додатків».</string>
+    <string name="rules_model_default">Типова модель самого агента</string>
+    <string name="rules_on">Правило ввімкнено</string>
+    <string name="rules_save">Зберегти</string>
+    <string name="rules_delete">Видалити</string>
+    <string name="rules_delete_title">Видалити це правило?</string>
+    <string name="rules_need_app">Спершу виберіть додаток.</string>
+    <string name="rules_need_instruction">Напишіть, що має зробити Buddy.</string>
+    <string name="rules_access_title">Дозволити доступ до сповіщень?</string>
+    <string name="rules_access_what">Buddy перевіряє кожне сповіщення на відповідність вашим правилам. Сповіщення, які не відповідають жодному правилу, одразу ігноруються: вони ніде не зберігаються й нікуди не надсилаються.</string>
+    <string name="rules_access_data">Якщо сповіщення відповідає правилу, його додаток, відправник і текст передаються агентові цього правила (Claude Code, Codex або OpenCode) разом із вашою вказівкою.</string>
+    <string name="rules_access_reply">Buddy може відповідати через кнопку «Відповісти» в сповіщенні. Спершу він питає вас, якщо тільки ви не задасте для правила таймер.</string>
+    <string name="rules_chat_shown">🔔 %1$s · %2$s: %3$s\n⚡ %4$s</string>
+    <string name="rules_status_checking">Перевіряю на відповідність вашому правилу…</string>
+    <string name="rules_channel_results">Правила сповіщень: результати</string>
+    <string name="approvals_channel">Схвалення</string>
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <string name="rules_approval_title">Потрібен ваш дозвіл: %1$s · %2$s</string>
+    <string name="card_locked_title">Потрібен ваш дозвіл: %1$s</string>
+    <string name="rules_approval_auto">Буде схвалено автоматично через %1$s, якщо ви не зупините таймер.\n%2$s</string>
 </resources>

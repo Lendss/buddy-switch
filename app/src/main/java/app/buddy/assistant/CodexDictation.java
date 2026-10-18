@@ -289,7 +289,9 @@ final class CodexDictation {
         }
         JSONObject ts = new JSONObject().put("ephemeral", true).put("cwd", DIR).put("sandbox", "read-only")
                 .put("approvalPolicy", "never").put("baseInstructions", system);
-        if (!reviewModel.isEmpty()) ts.put("model", reviewModel);
+        String chosen = Prefs.reviewerModel(c, "codex"); // the user's pick, else the small model found above
+        if (!chosen.isEmpty()) ts.put("model", chosen);
+        else if (!reviewModel.isEmpty()) ts.put("model", reviewModel);
         JSONObject t = request("thread/start", ts, 30_000);
         if (t.has("error")) throw new Exception(t.getJSONObject("error").optString("message"));
         String tid = t.getJSONObject("result").getJSONObject("thread").getString("id");

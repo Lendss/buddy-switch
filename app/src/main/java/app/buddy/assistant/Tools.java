@@ -112,6 +112,12 @@ final class Tools {
                 "question", "options"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
+        t.put(tool("reply_notification",
+                "Answer the notification that started this chat through its own reply field, without opening the app. "
+                        + "Only in chats started by one of the user's notification rules, when the notification has a reply "
+                        + "field. Buddy shows the user an approval card with the text first, unless you called confirm "
+                        + "with it just before.",
+                props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
         if (!Flavor.PLAY) { // Play updates Buddy itself and doesn't allow installing other APKs
             t.put(tool("install_apk",
                     "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
@@ -186,8 +192,8 @@ final class Tools {
     private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
-        // asking the user and posting a note go on while paused; operating the phone waits
-        if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name)) {
+        // asking the user, posting a note and answering in a notification go on while paused; operating the phone waits
+        if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)) {
             String held = svc.awaitResume(name);
             if (held != null) return text(held);
         }
@@ -202,7 +208,14 @@ final class Tools {
             case "press": return text(press(a.getString("button")));
             case "open_app": return text(openApp(a.getString("app")));
             case "list_apps": return text(listApps());
-            case "open_url": return text(openUrl(a.getString("url")));
+            case "open_url": {
+                // a rule's run works for someone else's message: a link could carry the user's data away
+                if (ruleRun() && !Guard.takeApproval(false)) {
+                    String answer = svc.askConfirm(svc.getString(R.string.tools_card_open_url, a.getString("url")), false);
+                    if (!answer.startsWith("APPROVED")) return text("Not opened. " + answer);
+                }
+                return text(openUrl(a.getString("url")));
+            }
             case "screenshot": return screenshot();
             case "wait": {
                 long ms = Math.max(0, Math.min(10000, a.optLong("ms", 1000)));
@@ -210,13 +223,14 @@ final class Tools {
                 return text("Waited " + ms + " ms.");
             }
             case "confirm": {
-                if (Guard.autonomous(svc, svc.foregroundPkg())) {
+                if (!ruleRun() && Guard.autonomous(svc, svc.foregroundPkg())) {
                     // no card in an app the user trusts; not counted as approval for a tap in another app
                     return text("APPROVED automatically: the user trusts " + svc.foregroundAppName() + ", so work on "
                             + "your own there without calling confirm. Apps on Hard or Smart still ask the user.");
                 }
-                String answer = svc.askConfirm(a.getString("summary"));
-                if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary")); // covers the next risky tap
+                String answer = svc.askConfirm(a.getString("summary"), true);
+                // covers the next risky tap (after a rule's countdown, only a send)
+                if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary"), answer.equals(BuddyService.AUTO_APPROVED));
                 return text(answer);
             }
             case "ask": {
@@ -230,25 +244,74 @@ final class Tools {
                 return text(svc.askQuestion(a.getString("question"), options));
             }
             case "update_buddy":
-                if (Flavor.PLAY) return text("Buddy updates through Google Play.");
-                return text(updateBuddy(a.optBoolean("install", false)));
             case "install_apk":
-                if (Flavor.PLAY) return text("Installing APKs isn't available in Buddy from Google Play.");
-                return text(installApk(a.getString("path")));
             case "wait_for_install":
-                return text(waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
-                        Math.max(10, Math.min(300, a.optInt("timeout_s", 120)))));
+                if (ruleRun()) return text("Not available in a notification rule's run. Tell the user what's needed instead.");
+                return text(installs(name, a));
             case "notify": {
                 svc.showStatus(a.getString("text"));
                 return text("Shown.");
             }
+            case "reply_notification":
+                return text(replyNotification(a.getString("text")));
             default:
                 throw new IllegalArgumentException("Unknown tool " + name);
         }
     }
 
+    /** update_buddy, install_apk and wait_for_install. */
+    private String installs(String name, JSONObject a) throws Exception {
+        switch (name) {
+            case "update_buddy":
+                if (Flavor.PLAY) return "Buddy updates through Google Play.";
+                return updateBuddy(a.optBoolean("install", false));
+            case "install_apk":
+                if (Flavor.PLAY) return "Installing APKs isn't available in Buddy from Google Play.";
+                return installApk(a.getString("path"));
+            default:
+                return waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
+                        Math.max(10, Math.min(300, a.optInt("timeout_s", 120))));
+        }
+    }
+
+    /** The calling chat is a notification rule's run (see Triggers.ruleRun). */
+    private boolean ruleRun() {
+        return Triggers.ruleRun(McpServer.CALLER_CHAT.get());
+    }
+
+    /** The app's mode for this call: a rule's run gets no Trust (it works for someone else's message). */
+    private String mode(String pkg) {
+        String m = Guard.mode(svc, pkg, null);
+        return "trust".equals(m) && ruleRun() ? "hard" : m;
+    }
+
     private static JSONObject text(String s) throws JSONException {
         return new JSONObject().put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", s)));
+    }
+
+    /** Answers the notification a rule's run started from, through its reply field (see Triggers). */
+    private String replyNotification(String text) throws InterruptedException {
+        String chat = McpServer.CALLER_CHAT.get();
+        Triggers.Note n = Triggers.note(chat);
+        if (n == null) {
+            return "There's no notification to answer: reply_notification only works in chats started by a notification "
+                    + "rule. Open the app to reply instead.";
+        }
+        if (n.reply == null) return "This notification has no reply field. Open " + n.app + " to answer instead.";
+        text = text == null ? "" : text.trim();
+        if (text.isEmpty()) return "Give the text to send.";
+        // like a tap on Send (in a rule's run, where Trust doesn't apply): the confirm just before covers it, or a card asks now
+        if (!Guard.takeApproval(true)) {
+            String answer = svc.askConfirm(svc.getString(R.string.tools_card_reply, n.who(), n.app, text), true);
+            if (answer.startsWith("CHANGES")) return "Not sent: the user wants changes first. " + answer;
+            if (!answer.startsWith("APPROVED")) return "Not sent. " + answer;
+        }
+        if (!Triggers.sendReply(svc, n.reply, text)) {
+            return "Not sent: " + n.app + " no longer takes replies from this notification (it was probably answered or "
+                    + "dismissed). Open the app to check before trying again.";
+        }
+        Triggers.replied(chat, text);
+        return "Sent to " + n.who() + " through the notification's reply field: \u201c" + text + "\u201d. Don't send it again.";
     }
 
     // ---------------------------------------------------------- read_screen
@@ -416,19 +479,20 @@ final class Tools {
         AccessibilityNodeInfo target = element != null ? element : hit;
         if (target == null) return null;
         String pkg = str(target.getPackageName());
-        String mode = Guard.mode(svc, pkg, null);
+        String mode = mode(pkg);
         if ("trust".equals(mode)) return null;
         String label = Guard.buttonLabel(target);
         String app = svc.foregroundAppName();
         Guard.remember(svc, label, pkg, app);
-        if (Guard.listed(svc, "allow", label, pkg)) return null; // the user said: never ask for this one
+        if (!ruleRun() && Guard.listed(svc, "allow", label, pkg)) return null; // the user said: never ask for this one
         AccessibilityNodeInfo field = findFocusedInput();
         CharSequence draft = field == null || field.isShowingHintText() ? null : field.getText();
         String what = "Tap “" + (label == null ? "this" : label) + "”"; // for the agent and the reviewer
         java.util.function.Function<String, String> card = in -> tapCard(label, in); // the same, on the user's card
         boolean ask = Guard.listed(svc, "ask", label, pkg)
                 || (Prefs.guardBuiltin(svc) && (Guard.riskyLabel(target) != null || (hit != null && Guard.riskyLabel(hit) != null)));
-        if (ask) return guardAction(what, card, draft == null ? null : draft.toString());
+        if (ask) return guardAction(what, card, draft == null ? null : draft.toString(),
+                Guard.sends(svc, target) || (hit != null && Guard.sends(svc, hit)));
         if (!"smart".equals(mode)) return null;
         return review(what, card, target, draft == null ? null : draft.toString());
     }
@@ -449,7 +513,7 @@ final class Tools {
         got.await(2, TimeUnit.SECONDS);
         String[] cx = ctx[0];
         String harness = Reviewer.harness(svc, cx == null ? null : cx[0]);
-        if (harness == null) return guardAction(what, card, svc.getString(R.string.tools_card_no_reviewer));
+        if (harness == null) return guardAction(what, card, svc.getString(R.string.tools_card_no_reviewer), false);
         svc.runOnMain(() -> {
             if (svc.bubble() != null) svc.bubble().setStatus(svc.getString(R.string.tools_status_checking_tap));
         });
@@ -458,7 +522,7 @@ final class Tools {
         if ("allow".equals(d.decision)) return null;
         String why = svc.getString("block".equals(d.decision) ? R.string.tools_card_reviewer_block : R.string.tools_card_reviewer_ask,
                 d.by, d.reason);
-        return guardAction(what, card, (draft == null || draft.isEmpty() ? "" : svc.getString(R.string.tools_card_quote, draft) + "\n") + why);
+        return guardAction(what, card, (draft == null || draft.isEmpty() ? "" : svc.getString(R.string.tools_card_quote, draft) + "\n") + why, false);
     }
 
     /** The card's line for a tap on label (null: a button without one) in the app named app (null: not known). */
@@ -470,14 +534,16 @@ final class Tools {
     /**
      * A risky action needs the user's OK: the agent's confirm just before, or a card now. what: the action in English,
      * for the agent; card: the same action on the card, in the user's language, given the app's name (or null).
+     * send: it sends a message, which a notification rule's countdown may approve.
      */
-    private String guardAction(String what, java.util.function.Function<String, String> card, String detail) throws InterruptedException {
-        if (Guard.takeApproval()) return null;
+    private String guardAction(String what, java.util.function.Function<String, String> card, String detail, boolean send)
+            throws InterruptedException {
+        if (Guard.takeApproval(send)) return null;
         String app = svc.foregroundAppName();
         String summary = detail == null || detail.trim().isEmpty() ? card.apply(app)
                 : svc.getString(R.string.tools_card_detail, card.apply(app), detail.contains("\n") || detail.startsWith("“")
                 ? detail.trim() : svc.getString(R.string.tools_card_quote, detail.trim()));
-        String answer = svc.askConfirm(summary);
+        String answer = svc.askConfirm(summary, send);
         if (answer.startsWith("APPROVED")) return null;
         if (answer.startsWith("CHANGES")) return "Not tapped: the user wants changes first. " + answer;
         return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; "
@@ -516,11 +582,11 @@ final class Tools {
         if (!ok) throw new IllegalStateException("This field did not accept text.");
         String result = "Typed " + text.length() + " characters.";
         if (a.optBoolean("submit")) {
-            String mode = Guard.mode(svc, str(target.getPackageName()), null);
+            String mode = mode(str(target.getPackageName()));
             java.util.function.Function<String, String> card = in -> in == null ? svc.getString(R.string.tools_card_enter)
                     : svc.getString(R.string.tools_card_enter_in, in);
             // Hard always asks; Smart lets the reviewer decide, as for a tap the rules don't catch
-            String blocked = "hard".equals(mode) ? guardAction("Press Enter to send", card, text)
+            String blocked = "hard".equals(mode) ? guardAction("Press Enter to send", card, text, !Guard.moneyApp(svc, target.getPackageName()))
                     : "smart".equals(mode) ? review("Press Enter to send", card, target, text) : null;
             if (blocked != null) return result + " Not sent: " + blocked;
             Thread.sleep(150);

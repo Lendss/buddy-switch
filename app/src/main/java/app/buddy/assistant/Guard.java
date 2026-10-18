@@ -60,12 +60,26 @@ final class Guard {
             + "订阅|卸载|拉黑|举报|退出登录|拨打|"
             + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال|أضف إلى السلة|إضافة إلى السلة"
             + ")(?![\\p{L}])");
+    /** Of those, the ones that send or post a message, in each of Buddy's languages: a notification rule's countdown
+     * may approve these (see Triggers), never paying, buying, deleting and the rest. */
+    private static final Pattern SEND = Pattern.compile("(?iu)^[^\\p{L}]*("
+            + "send|send now|post|publish|share now|tweet|reply|reply all|"
+            + "envoyer|envoi|publier|partager maintenant|répondre|répondre à tous|senden|absenden|posten|veröffentlichen|antworten|"
+            + "enviar|publicar|responder|inviare|invia|pubblica|rispondi|verzenden|versturen|verstuur|plaatsen|publiceren|"
+            + "beantwoorden|wyślij|opublikuj|odpowiedz|отправить|опубликовать|ответить|надіслати|відправити|опублікувати|"
+            + "відповісти|gönder|paylaş|yayınla|yanıtla|भेजें|पोस्ट करें|जवाब दें|kirim|balas|送信|送信する|投稿|投稿する|返信|"
+            + "보내기|전송|게시|답장|发送|发布|回复|إرسال|ارسال|أرسل|رد"
+            + ")(?![\\p{L}])");
+    /** A send button known only by its id (see RISKY_ID), as riskyLabel words it ("send", "btn send", "send button"). */
+    private static final Pattern SEND_ID = Pattern.compile("(?i)(^|\\s)(send|sendbutton|post|reply)(\\s|$)");
     /** Resource ids of send buttons that only have an icon (e.g. WhatsApp's "send"). */
     private static final Pattern RISKY_ID = Pattern.compile("(?i)[:/_](send|send_button|sendbutton|btn_send|delete|pay|buy|post|submit|add-to-cart|add_to_cart|addtocart)\\b");
     // long enough for a slow multi-step task between the plan's approval and its risky tap
     private static final long APPROVAL_VALID_MS = 600_000;
 
     private static long approvedAt, planAt;
+    /** The pending approval came from a rule's countdown, not from the user: it covers sending only. */
+    private static boolean approvedAuto;
     /** The last approved confirm's text: the plan the user OK'd, for the smart reviewer. */
     private static String plan;
 
@@ -279,7 +293,18 @@ final class Guard {
 
     /** The agent's confirm was approved: that covers the next risky action. */
     static synchronized void approved(String summary) {
-        approvedAt = planAt = System.currentTimeMillis();
+        approved(summary, false);
+    }
+
+    /**
+     * auto: a notification rule's countdown approved it, not the user. Then it covers the next action only if that
+     * sends something, and it isn't a plan the user OK'd (the smart reviewer doesn't get it as one).
+     */
+    static synchronized void approved(String summary, boolean auto) {
+        approvedAt = System.currentTimeMillis();
+        approvedAuto = auto;
+        if (auto) return;
+        planAt = approvedAt;
         plan = summary;
     }
 
@@ -290,9 +315,43 @@ final class Guard {
 
     /** Use the pending approval, if any (one approval, one action). */
     static synchronized boolean takeApproval() {
-        boolean ok = approvedAt > 0 && System.currentTimeMillis() - approvedAt < APPROVAL_VALID_MS;
+        return takeApproval(true);
+    }
+
+    /** As above; send: the action sends something (a countdown's approval covers nothing else). */
+    static synchronized boolean takeApproval(boolean send) {
+        boolean ok = approvedAt > 0 && System.currentTimeMillis() - approvedAt < APPROVAL_VALID_MS && (send || !approvedAuto);
         approvedAt = 0;
         return ok;
+    }
+
+    /**
+     * Does tapping this send or post a message (and nothing more, like paying or deleting)? Never in an app for money
+     * or shopping, where "Send" can mean sending money.
+     */
+    static boolean sends(android.content.Context c, AccessibilityNodeInfo n) {
+        String l = n == null ? null : riskyLabel(n);
+        if (l == null || moneyApp(c, n.getPackageName())) return false;
+        return SEND.matcher(l.trim()).find() || SEND_ID.matcher(l.trim()).find();
+    }
+
+    private static final java.util.Set<String> MONEY = new java.util.HashSet<>(java.util.Arrays.asList(
+            "com.android.vending", "com.amazon.mShop.android.shopping", "com.ebay.mobile", "com.paypal.android.p2pmobile",
+            "com.revolut.revolut", "de.number26.android", "com.google.android.apps.walletnfcrel", "com.wise.android",
+            "com.transferwise.android", "com.klarna.android", "com.coinbase.android", "com.binance.dev"));
+
+    /** A payment, banking, crypto or shopping app (or one Buddy can't tell). */
+    static boolean moneyApp(android.content.Context c, CharSequence pkg) {
+        if (pkg == null) return true;
+        String p = pkg.toString();
+        if (MONEY.contains(p) || HARD_NAME.matcher(p).find()) return true;
+        try {
+            android.content.pm.PackageManager pm = c.getPackageManager();
+            CharSequence label = pm.getApplicationLabel(pm.getApplicationInfo(p, 0));
+            return label != null && HARD_NAME.matcher(label).find();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /** What a tap at (x, y) would hit: the topmost app window's deepest node there. */

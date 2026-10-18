@@ -1188,6 +1188,12 @@
     <string name="perms_reviewer_sign_in">请先登录 %1$s（在“设置”中）。</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode 对话由 Claude Code（或 Codex）审核。</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">在通知规则的倒计时发送回复之前，它也会检查这些回复。</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku：快速、轻量。推荐使用。</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">小巧快速的模型。推荐使用。</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">按钮规则</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1328,4 +1334,87 @@
     <string name="dictation_codex_stopped">Codex 已停止：%1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">无详细信息</string>
+
+    <!-- Notification rules -->
+    <string name="card_label_countdown">即将自动批准</string>
+    <string name="card_countdown">%1$d 秒后自动批准 · 点按即可停止</string>
+    <string name="card_note_auto_approved">✓ 倒计时结束，已自动批准：%1$s</string>
+    <string name="card_note_countdown_stopped">倒计时已停止：等待你确认</string>
+    <string name="hub_tool_reply_notification">正在回复：%1$s</string>
+    <string name="setup_rules">通知规则</string>
+    <string name="setup_rules_info">收到通知时，让智能体替你处理：回复消息、把快递送达时间加入日历等。</string>
+    <string name="tools_card_reply">在 %2$s 中回复 %1$s：\n“%3$s”</string>
+    <string name="tools_card_open_url">打开 %1$s</string>
+    <string name="rules_service_label">Buddy 通知规则</string>
+    <string name="rules_title">通知规则</string>
+    <string name="rules_intro">收到你所选的通知时，Buddy 会把你的指令交给智能体，就像你亲自输入的消息一样。不匹配任何规则的通知会被忽略。</string>
+    <string name="rules_access_off_title">通知使用权已关闭</string>
+    <string name="rules_access_off_text">Buddy 需要此权限，才能看到你的规则所关注的通知。</string>
+    <string name="rules_access_turn_on">开启</string>
+    <string name="rules_run">运行规则</string>
+    <string name="rules_run_info">关闭后，所有规则都会暂停。</string>
+    <string name="rules_section">规则</string>
+    <string name="rules_empty">还没有规则。例如：客户在 WhatsApp 上给你发消息时，回复你的营业时间。</string>
+    <string name="rules_add">添加规则</string>
+    <string name="rules_any">所有通知</string>
+    <string name="rules_from_summary">来自 %1$s</string>
+    <string name="rules_words_summary">包含“%1$s”</string>
+    <string name="rules_tag_ask">先问你</string>
+    <string name="rules_tag_countdown">倒计时 %1$s</string>
+    <string name="rules_tag_off">已关闭</string>
+    <string name="rules_seconds">%1$d秒</string>
+    <string name="rules_minutes">%1$d分钟</string>
+    <string name="rules_activity">最近活动</string>
+    <string name="rules_activity_empty">暂无记录。</string>
+    <string name="rules_activity_clear">清除</string>
+    <string name="rules_log_replied">已回复：“%1$s”</string>
+    <string name="rules_log_done_empty">已完成，没有回复。</string>
+    <string name="rules_log_limit">已跳过：过去 1 小时内运行次数过多。</string>
+    <string name="rules_log_busy">已跳过：手机长时间处于忙碌状态。</string>
+    <string name="rules_log_error">未运行：%1$s</string>
+    <string name="rules_log_no_service">Buddy 的无障碍服务已关闭</string>
+    <string name="rules_log_not_signed_in">%1$s 未登录</string>
+    <string name="rules_new">新建规则</string>
+    <string name="rules_edit">编辑规则</string>
+    <string name="rules_app">收到以下应用的通知时</string>
+    <string name="rules_pick_app">选择应用</string>
+    <string name="rules_search_apps">搜索应用</string>
+    <string name="rules_from">发送者（可选）</string>
+    <string name="rules_from_hint">任何人，或用逗号分隔的名字</string>
+    <string name="rules_words">包含的词语（可选）</string>
+    <string name="rules_words_hint">任意内容，或用逗号分隔的词语</string>
+    <string name="rules_instruction">要让 Buddy 做什么？</string>
+    <string name="rules_instruction_hint">例如：用我的语气回复。我们早上 8 点到晚上 6 点营业，周日休息。</string>
+    <string name="rules_example_reply">替我回复</string>
+    <string name="rules_example_reply_text">用我的语气回复，简短友好。</string>
+    <string name="rules_example_summary">总结内容</string>
+    <string name="rules_example_summary_text">用一句话告诉我通知的内容，以及我是否需要处理。</string>
+    <string name="rules_example_calendar">添加到日历</string>
+    <string name="rules_example_calendar_text">如果与预约或快递有关，就添加到我的日历。</string>
+    <string name="rules_agent">智能体</string>
+    <string name="rules_approval">执行操作前</string>
+    <string name="rules_approval_ask">问我</string>
+    <string name="rules_approval_countdown">倒计时</string>
+    <string name="rules_approval_ask_info">和普通对话一样，确认卡片会等待你处理。</string>
+    <string name="rules_approval_countdown_info">倒计时结束时，卡片会自动批准，除非你点按停止。这只适用于发送消息，并且要先由另一个 AI 对照你的规则检查。支付、购买、删除和打开链接始终会等待你确认。</string>
+    <string name="rules_checker">审核 AI：%1$s。点按即可在“应用权限”中更改。</string>
+    <string name="rules_model_default">智能体自身的默认设置</string>
+    <string name="rules_on">启用规则</string>
+    <string name="rules_save">保存</string>
+    <string name="rules_delete">删除</string>
+    <string name="rules_delete_title">删除此规则？</string>
+    <string name="rules_need_app">请先选择应用。</string>
+    <string name="rules_need_instruction">请写下要让 Buddy 做什么。</string>
+    <string name="rules_access_title">要授予通知使用权吗？</string>
+    <string name="rules_access_what">Buddy 会将每条通知与你的规则进行比对。不匹配任何规则的通知会被立即忽略：既不会保存，也不会发送到任何地方。</string>
+    <string name="rules_access_data">如果匹配，该通知的应用、发送者和内容会连同你的指令一起发送给该规则的智能体（Claude Code、Codex 或 OpenCode）。</string>
+    <string name="rules_access_reply">Buddy 可以通过通知的“回复”按钮进行回复。除非你为规则设置了倒计时，否则它会先询问你。</string>
+    <string name="rules_chat_shown">🔔 %1$s · %2$s：%3$s\n⚡ %4$s</string>
+    <string name="rules_status_checking">正在对照你的规则检查…</string>
+    <string name="rules_channel_results">通知规则：结果</string>
+    <string name="approvals_channel">确认请求</string>
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <string name="rules_approval_title">需要你确认：%1$s · %2$s</string>
+    <string name="card_locked_title">需要你确认：%1$s</string>
+    <string name="rules_approval_auto">%1$s后将自动批准，除非你将其停止。\n%2$s</string>
 </resources>

@@ -1188,6 +1188,12 @@
     <string name="perms_reviewer_sign_in">Login ke %1$s terlebih dahulu (Setelan).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">Sesi sementara untuk setiap ketukan, tanpa alat: peninjau melihat permintaan Anda, catatan agen, dan layar, lalu menjawab “izinkan”, “tanya Anda”, atau “tidak disarankan”. Sekitar 3 detik per ketukan. Chat OpenCode ditinjau oleh Claude Code (atau Codex).</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">Peninjau juga memeriksa balasan sebelum hitung mundur aturan notifikasi mengirimnya.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku: cepat dan ringan. Disarankan.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">Model kecil dan cepat. Disarankan.</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">Aturan tombol</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1328,4 +1334,87 @@
     <string name="dictation_codex_stopped">Codex berhenti: %1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">tidak ada detail</string>
+
+    <!-- Notification rules -->
+    <string name="card_label_countdown">SEGERA DISETUJUI OTOMATIS</string>
+    <string name="card_countdown">Disetujui otomatis dalam %1$d dtk · Ketuk untuk menghentikan</string>
+    <string name="card_note_auto_approved">✓ Disetujui setelah hitung mundur: %1$s</string>
+    <string name="card_note_countdown_stopped">Hitung mundur dihentikan: menunggu persetujuan Anda</string>
+    <string name="hub_tool_reply_notification">Membalas: %1$s</string>
+    <string name="setup_rules">Aturan notifikasi</string>
+    <string name="setup_rules_info">Biarkan agen bertindak saat notifikasi masuk: membalas pesan, memasukkan jadwal pengiriman paket ke kalender Anda…</string>
+    <string name="tools_card_reply">Balas %1$s di %2$s:\n“%3$s”</string>
+    <string name="tools_card_open_url">Buka %1$s</string>
+    <string name="rules_service_label">Aturan notifikasi Buddy</string>
+    <string name="rules_title">Aturan notifikasi</string>
+    <string name="rules_intro">Saat notifikasi yang Anda pilih masuk, Buddy memberikan arahan Anda ke agen, seperti pesan yang Anda ketik sendiri. Notifikasi yang tidak cocok dengan aturan mana pun akan diabaikan.</string>
+    <string name="rules_access_off_title">Akses notifikasi nonaktif</string>
+    <string name="rules_access_off_text">Buddy memerlukannya untuk melihat notifikasi yang dipantau aturan Anda.</string>
+    <string name="rules_access_turn_on">Aktifkan</string>
+    <string name="rules_run">Jalankan aturan</string>
+    <string name="rules_run_info">Nonaktifkan untuk menjeda semua aturan.</string>
+    <string name="rules_section">Aturan</string>
+    <string name="rules_empty">Belum ada aturan. Misalnya: saat pelanggan mengirim pesan kepada Anda di WhatsApp, balas dengan jam buka Anda.</string>
+    <string name="rules_add">Tambah aturan</string>
+    <string name="rules_any">Semua notifikasi</string>
+    <string name="rules_from_summary">Dari %1$s</string>
+    <string name="rules_words_summary">Berisi “%1$s”</string>
+    <string name="rules_tag_ask">Tanya Anda dulu</string>
+    <string name="rules_tag_countdown">Hitung mundur %1$s</string>
+    <string name="rules_tag_off">Nonaktif</string>
+    <string name="rules_seconds">%1$d dtk</string>
+    <string name="rules_minutes">%1$d mnt</string>
+    <string name="rules_activity">Aktivitas terbaru</string>
+    <string name="rules_activity_empty">Belum ada.</string>
+    <string name="rules_activity_clear">Hapus</string>
+    <string name="rules_log_replied">Balasan terkirim: “%1$s”</string>
+    <string name="rules_log_done_empty">Selesai, tanpa balasan.</string>
+    <string name="rules_log_limit">Dilewati: terlalu banyak dalam satu jam terakhir.</string>
+    <string name="rules_log_busy">Dilewati: ponsel sibuk terlalu lama.</string>
+    <string name="rules_log_error">Tidak dijalankan: %1$s</string>
+    <string name="rules_log_no_service">layanan aksesibilitas Buddy nonaktif</string>
+    <string name="rules_log_not_signed_in">%1$s belum login</string>
+    <string name="rules_new">Aturan baru</string>
+    <string name="rules_edit">Edit aturan</string>
+    <string name="rules_app">Saat notifikasi datang dari</string>
+    <string name="rules_pick_app">Pilih aplikasi</string>
+    <string name="rules_search_apps">Cari aplikasi</string>
+    <string name="rules_from">Dari (opsional)</string>
+    <string name="rules_from_hint">Siapa saja, atau nama yang dipisahkan koma</string>
+    <string name="rules_words">Berisi (opsional)</string>
+    <string name="rules_words_hint">Apa saja, atau kata yang dipisahkan koma</string>
+    <string name="rules_instruction">Apa yang harus dilakukan Buddy?</string>
+    <string name="rules_instruction_hint">Misalnya: Balas dengan gaya saya. Kami buka pukul 8 pagi sampai 6 sore, tutup setiap Minggu.</string>
+    <string name="rules_example_reply">Balas untuk saya</string>
+    <string name="rules_example_reply_text">Balas dengan gaya saya, singkat dan ramah.</string>
+    <string name="rules_example_summary">Ringkas isinya</string>
+    <string name="rules_example_summary_text">Beri tahu saya dalam satu baris apa isinya dan apakah saya perlu melakukan sesuatu.</string>
+    <string name="rules_example_calendar">Tambah ke kalender</string>
+    <string name="rules_example_calendar_text">Jika ini tentang janji temu atau pengiriman, tambahkan ke kalender saya.</string>
+    <string name="rules_agent">Agen</string>
+    <string name="rules_approval">Sebelum bertindak</string>
+    <string name="rules_approval_ask">Tanya saya</string>
+    <string name="rules_approval_countdown">Hitung mundur</string>
+    <string name="rules_approval_ask_info">Kartu persetujuan menunggu Anda, seperti di chat biasa.</string>
+    <string name="rules_approval_countdown_info">Saat hitung mundur selesai, kartu disetujui otomatis kecuali Anda mengetuk untuk menghentikannya. Ini hanya berlaku untuk mengirim pesan, setelah AI terpisah memeriksa kesesuaiannya dengan aturan Anda. Membayar, membeli, menghapus, dan membuka link selalu menunggu persetujuan Anda.</string>
+    <string name="rules_checker">AI peninjau: %1$s. Ketuk untuk mengubahnya di Izin aplikasi.</string>
+    <string name="rules_model_default">Default bawaan agen</string>
+    <string name="rules_on">Aktifkan aturan</string>
+    <string name="rules_save">Simpan</string>
+    <string name="rules_delete">Hapus</string>
+    <string name="rules_delete_title">Hapus aturan ini?</string>
+    <string name="rules_need_app">Pilih aplikasi terlebih dahulu.</string>
+    <string name="rules_need_instruction">Tulis apa yang harus dilakukan Buddy.</string>
+    <string name="rules_access_title">Izinkan akses notifikasi?</string>
+    <string name="rules_access_what">Buddy memeriksa setiap notifikasi dengan aturan Anda. Notifikasi yang tidak cocok dengan aturan mana pun langsung diabaikan: tidak disimpan, tidak dikirim ke mana pun.</string>
+    <string name="rules_access_data">Jika notifikasi cocok, aplikasi, pengirim, dan teksnya dikirim ke agen aturan tersebut (Claude Code, Codex, atau OpenCode) bersama arahan Anda.</string>
+    <string name="rules_access_reply">Buddy dapat menjawab lewat tombol Balas pada notifikasi. Buddy akan bertanya kepada Anda dulu, kecuali Anda menyetel hitung mundur untuk aturan tersebut.</string>
+    <string name="rules_chat_shown">🔔 %1$s · %2$s: %3$s\n⚡ %4$s</string>
+    <string name="rules_status_checking">Memeriksa kesesuaian dengan aturan Anda…</string>
+    <string name="rules_channel_results">Aturan notifikasi: hasil</string>
+    <string name="approvals_channel">Permintaan persetujuan</string>
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <string name="rules_approval_title">Perlu persetujuan Anda: %1$s · %2$s</string>
+    <string name="card_locked_title">Perlu persetujuan Anda: %1$s</string>
+    <string name="rules_approval_auto">Disetujui otomatis dalam %1$s kecuali Anda menghentikannya.\n%2$s</string>
 </resources>

@@ -96,6 +96,26 @@ public class AppPermissionsActivity extends Screen {
                 }, noReviewer, v -> Toast.makeText(this, getString(R.string.perms_reviewer_sign_in, Account.nameOf(v)),
                         Toast.LENGTH_LONG).show()), gap(8));
         body.addView(text(this, getString(R.string.perms_reviewer_about), 12, MUTED), gap(6));
+        body.addView(text(this, getString(R.string.perms_reviewer_rules), 12, MUTED), gap(4));
+        // the reviewer's model on each harness that's signed in: quick by default
+        for (final String h : new String[]{"claude", "codex"}) {
+            if (!SetupState.signedIn(this, h)) continue;
+            String m = Prefs.reviewerModel(this, h);
+            LinearLayout r = row(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(title(this, getString(R.string.chat_model_title, Account.nameOf(h)), 15), weight1());
+            r.addView(single(monoText(this, m.isEmpty() ? ("claude".equals(h) ? "Haiku" : getString(R.string.models_default))
+                    : Models.label(h, m), 13, MUTED)));
+            r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+            r.setOnClickListener(v -> modelSheet(this, h, m, getString("claude".equals(h) ? R.string.reviewer_default_claude
+                    : R.string.reviewer_default_codex), picked -> {
+                Prefs.setReviewerModel(this, h, picked);
+                renderApps();
+            }));
+            body.addView(r, gap(4));
+        }
 
         LinearLayout rules = row(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);

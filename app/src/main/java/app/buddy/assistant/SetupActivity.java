@@ -430,6 +430,22 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             ex.addView(upd, full());
             ex.addView(divider(), lineParams());
         }
+        LinearLayout rules = listRow(this);
+        rules.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout rt = column(this);
+        rt.addView(title(this, getString(R.string.setup_rules), 15));
+        rt.addView(text(this, getString(R.string.setup_rules_info), 13, MUTED), topGap(2));
+        rules.addView(rt, weight1());
+        int ruleCount = Rules.all(this).size();
+        if (ruleCount > 0) {
+            TextView rc = monoText(this, String.valueOf(ruleCount), 13, Prefs.rulesOn(this) ? ACCENT_TEXT : MUTED);
+            rc.setPaddingRelative(dp(this, 12), 0, dp(this, 4), 0);
+            rules.addView(rc);
+        }
+        rules.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        rules.setOnClickListener(v -> startActivity(new android.content.Intent(this, RulesActivity.class)));
+        ex.addView(rules, full());
+        ex.addView(divider(), lineParams());
         LinearLayout perms = listRow(this);
         perms.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout pt = column(this);

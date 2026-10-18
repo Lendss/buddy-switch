@@ -404,6 +404,15 @@
     <string name="card_note_approved">✓ Approved: %1$s</string>
     <string name="card_note_denied">✗ Denied</string>
     <string name="card_note_skipped">Question skipped</string>
+    <!-- A notification rule can let approval cards approve themselves after a countdown (Settings → Notification
+         rules). Small all-caps label at the top of such a card, instead of card_label_approval. -->
+    <string name="card_label_countdown">APPROVES ITSELF SOON</string>
+    <!-- Under the countdown bar on the card; tapping it stops the countdown. %1$d = seconds left. -->
+    <string name="card_countdown">Approves itself in %1$d s · Tap to stop</string>
+    <!-- Note in the chat when the countdown ran out. Keep the mark ✓ and the space after it. %1$s = what was approved (shortened). -->
+    <string name="card_note_auto_approved">✓ Approved after the countdown: %1$s</string>
+    <!-- Note in the chat after the user tapped the countdown to stop it: the card now waits for them. -->
+    <string name="card_note_countdown_stopped">Countdown stopped: waiting for your OK</string>
 
     <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
     <!-- Name of this notification category in Android's notification settings. -->
@@ -606,6 +615,8 @@
     <string name="hub_tool_question_skipped">Question skipped</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">Asking: %1$s</string>
+    <!-- Step in the chat: the agent answers a notification through its reply field. %1$s = the reply (shortened). -->
+    <string name="hub_tool_reply_notification">Replying: %1$s</string>
     <string name="hub_tool_update_download">Downloading the Buddy update</string>
     <string name="hub_tool_update_check">Checking for a Buddy update</string>
     <!-- %1$s = what is searched for. -->
@@ -1063,6 +1074,9 @@
     <string name="setup_app_permissions">App permissions</string>
     <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
     <string name="setup_app_permissions_info">Choose per app: Trust lets the agent work there without popups; Hard means Buddy itself asks you before Send, Pay, Delete…</string>
+    <!-- Settings row that opens the notification rules: when a notification from an app arrives, an agent acts on it. -->
+    <string name="setup_rules">Notification rules</string>
+    <string name="setup_rules_info">Let an agent act when a notification arrives: answer a message, put a delivery in your calendar…</string>
     <string name="setup_dev_mode">Developer mode</string>
     <string name="setup_dev_mode_info">The bubble\'s agent may run commands and edit files in ~/.buddy/work, so it can build and install apps.</string>
     <string name="setup_agents_tap">Let agents tap Buddy\'s screens</string>
@@ -1201,6 +1215,12 @@
     <string name="perms_reviewer_sign_in">Sign in to %1$s first (Settings).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">A temporary session per tap, without tools: it sees your request, the agent\'s note and the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode chats are reviewed by Claude Code (or Codex).</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">It also checks replies before a notification rule\'s countdown sends them.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku: quick and light. Recommended.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">A small, quick model. Recommended.</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">Button rules</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1262,6 +1282,11 @@
     <string name="tools_card_enter">Press Enter to send</string>
     <!-- Same, %1$s = the app's name. -->
     <string name="tools_card_enter_in">Press Enter to send in %1$s</string>
+    <!-- The agent answers a notification through its reply field (a notification rule). %1$s = the person or
+         conversation, e.g. Sarah; %2$s = the app, e.g. WhatsApp; %3$s = the reply. Use your language's quotation marks. -->
+    <string name="tools_card_reply">Reply to %1$s in %2$s:\n“%3$s”</string>
+    <!-- A notification rule's run wants to open a link (it always asks first). %1$s = the link. -->
+    <string name="tools_card_open_url">Open %1$s</string>
     <!-- %1$s = the action (e.g. Tap “Send” in WhatsApp); on the next line, %2$s = what it would send, or why Buddy asks. -->
     <string name="tools_card_detail">%1$s:\n%2$s</string>
     <!-- Quotation marks around text on the card (a draft message, a reason). Use your language's quotation marks. -->
@@ -1340,4 +1365,123 @@
     <string name="dictation_codex_stopped">Codex stopped: %1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">no details</string>
+
+    <!-- Notification rules (Settings → Notification rules): when a notification from an app the user picks arrives
+         (optionally from someone, or containing some words), Buddy gives the user's instruction to an agent. -->
+    <!-- Name of Buddy's entry in Android's notification access settings. -->
+    <string name="rules_service_label">Buddy notification rules</string>
+    <string name="rules_title">Notification rules</string>
+    <string name="rules_intro">When a notification you pick arrives, Buddy gives your instruction to an agent, like a message you\'d type. Notifications that no rule matches are ignored.</string>
+    <string name="rules_access_off_title">Notification access is off</string>
+    <string name="rules_access_off_text">Buddy needs it to see the notifications your rules watch.</string>
+    <!-- Button: opens Android's notification access setting for Buddy. -->
+    <string name="rules_access_turn_on">Turn on</string>
+    <!-- Switch: off pauses every rule. -->
+    <string name="rules_run">Run rules</string>
+    <string name="rules_run_info">Turn off to pause every rule.</string>
+    <!-- Heading above the list of rules. -->
+    <string name="rules_section">Rules</string>
+    <string name="rules_empty">No rules yet. For example: when a customer writes to you on WhatsApp, reply with your opening hours.</string>
+    <string name="rules_add">Add rule</string>
+    <!-- After the app's name in the list, for a rule without sender or word filters. -->
+    <string name="rules_any">Every notification</string>
+    <!-- After the app's name in the list. %1$s = names, as the user typed them (comma-separated). -->
+    <string name="rules_from_summary">From %1$s</string>
+    <!-- After the app's name in the list. %1$s = words, as the user typed them (comma-separated). -->
+    <string name="rules_words_summary">With “%1$s”</string>
+    <!-- Small tag on a rule in the list: its approval cards wait for the user. -->
+    <string name="rules_tag_ask">Asks you first</string>
+    <!-- Small tag on a rule in the list: its approval cards approve themselves. %1$s = the countdown, e.g. 30 s. -->
+    <string name="rules_tag_countdown">Countdown %1$s</string>
+    <!-- Small tag on a rule that is switched off. -->
+    <string name="rules_tag_off">Off</string>
+    <!-- A countdown length. %1$d = seconds. Keep it short (it's on a small button). -->
+    <string name="rules_seconds">%1$d s</string>
+    <!-- A countdown length. %1$d = minutes. Keep it short (it's on a small button). -->
+    <string name="rules_minutes">%1$d min</string>
+    <!-- Heading above what the rules did lately. -->
+    <string name="rules_activity">Recent activity</string>
+    <string name="rules_activity_empty">Nothing yet.</string>
+    <!-- Link: empties the recent activity. -->
+    <string name="rules_activity_clear">Clear</string>
+    <!-- What a rule did. %1$s = the reply it sent. Use your language's quotation marks. -->
+    <string name="rules_log_replied">Replied: “%1$s”</string>
+    <!-- What a rule did: the agent finished without saying anything. -->
+    <string name="rules_log_done_empty">Done, without a reply.</string>
+    <string name="rules_log_limit">Skipped: too many in the last hour.</string>
+    <string name="rules_log_busy">Skipped: the phone was busy for too long.</string>
+    <!-- %1$s = why: rules_log_no_service, rules_log_not_signed_in, or a technical error (often English). -->
+    <string name="rules_log_error">Didn\'t run: %1$s</string>
+    <!-- A reason after “Didn't run:”, so it starts lowercase. -->
+    <string name="rules_log_no_service">Buddy\'s accessibility service is off</string>
+    <!-- A reason after “Didn't run:”. %1$s = the agent, e.g. Claude Code. -->
+    <string name="rules_log_not_signed_in">%1$s isn\'t signed in</string>
+
+    <!-- The rule editor. -->
+    <string name="rules_new">New rule</string>
+    <string name="rules_edit">Edit rule</string>
+    <!-- Field label above the app picker. -->
+    <string name="rules_app">When a notification comes from</string>
+    <string name="rules_pick_app">Pick an app</string>
+    <!-- Hint in the search box of the app picker. -->
+    <string name="rules_search_apps">Search apps</string>
+    <string name="rules_from">From (optional)</string>
+    <string name="rules_from_hint">Anyone, or names separated by commas</string>
+    <!-- Field label: words the notification must contain. -->
+    <string name="rules_words">Containing (optional)</string>
+    <string name="rules_words_hint">Anything, or words separated by commas</string>
+    <string name="rules_instruction">What should Buddy do?</string>
+    <string name="rules_instruction_hint">For example: Reply in my style. We\'re open 8 to 6, closed on Sundays.</string>
+    <!-- Example chips under the instruction box: a tap puts the matching *_text in it. Keep the chips short. -->
+    <string name="rules_example_reply">Reply for me</string>
+    <string name="rules_example_reply_text">Reply in my style, short and friendly.</string>
+    <string name="rules_example_summary">Summarize it</string>
+    <string name="rules_example_summary_text">Tell me in one line what it says and whether I need to do anything.</string>
+    <string name="rules_example_calendar">Add to calendar</string>
+    <string name="rules_example_calendar_text">If it\'s about an appointment or a delivery, add it to my calendar.</string>
+    <!-- Field label above the choice of Claude Code, Codex or OpenCode. -->
+    <string name="rules_agent">Agent</string>
+    <!-- Field label above "Ask me" / "Countdown". -->
+    <string name="rules_approval">Before acting</string>
+    <!-- Choice: the rule's approval cards wait for the user. Keep it short. -->
+    <string name="rules_approval_ask">Ask me</string>
+    <!-- Choice: the rule's approval cards approve themselves after a countdown. Keep it short. -->
+    <string name="rules_approval_countdown">Countdown</string>
+    <string name="rules_approval_ask_info">Approval cards wait for you, as in any chat.</string>
+    <string name="rules_approval_countdown_info">When the countdown ends, the card approves itself unless you tap to stop it. That only works for sending a message, after a second AI checks it against your rule. Paying, buying, deleting and opening links always wait for you.</string>
+    <!-- Under the countdown explanation, tappable (opens App permissions). %1$s = the reviewer, e.g. Claude Code · Haiku. -->
+    <string name="rules_checker">Second AI: %1$s. Tap to change it in App permissions.</string>
+    <!-- In the model picker of a rule, the first choice ("Default"), described. -->
+    <string name="rules_model_default">The agent\'s own default</string>
+    <!-- Switch: the rule runs, or not. -->
+    <string name="rules_on">Rule on</string>
+    <string name="rules_save">Save</string>
+    <string name="rules_delete">Delete</string>
+    <string name="rules_delete_title">Delete this rule?</string>
+    <string name="rules_need_app">Pick an app first.</string>
+    <string name="rules_need_instruction">Write what Buddy should do.</string>
+
+    <!-- Shown before Android's notification access setting (an explicit choice, as Google Play requires). -->
+    <string name="rules_access_title">Allow notification access?</string>
+    <string name="rules_access_what">Buddy checks each notification against your rules. Notifications that no rule matches are ignored right away: not stored, not sent anywhere.</string>
+    <string name="rules_access_data">When one matches, its app, sender and text go to the rule\'s agent (Claude Code, Codex or OpenCode) together with your instruction.</string>
+    <string name="rules_access_reply">Buddy can answer through a notification\'s Reply button. It asks you first, unless you give the rule a countdown.</string>
+
+    <!-- The chat a rule's run happens in shows this as the first line of each run. %1$s = the person or conversation,
+         e.g. Sarah; %2$s = the app; %3$s = the notification's text; %4$s = the rule's instruction. Keep 🔔 and ⚡. -->
+    <string name="rules_chat_shown">🔔 %1$s · %2$s: %3$s\n⚡ %4$s</string>
+    <!-- Status in the bubble while a second AI checks an action against the rule, before its countdown starts. -->
+    <string name="rules_status_checking">Checking it against your rule…</string>
+    <!-- Names of Buddy's notification categories in Android's settings (approvals_channel: cards waiting for the user). -->
+    <string name="rules_channel_results">Notification rules: results</string>
+    <string name="approvals_channel">Approvals</string>
+    <!-- Title of the notification saying what a rule's run did. %1$s = the person or conversation; %2$s = the app. -->
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <!-- Title of the notification when a rule's run waits for the user's OK while the phone is locked.
+         %1$s = the person or conversation; %2$s = the app. -->
+    <string name="rules_approval_title">Needs your OK: %1$s · %2$s</string>
+    <!-- Title of the notification when any chat waits for the user's OK while the phone is locked (the card stays hidden until unlock). %1$s = the chat's name. -->
+    <string name="card_locked_title">Needs your OK: %1$s</string>
+    <!-- Its text, with a countdown. %1$s = the countdown length, e.g. 30 s; %2$s = what it would do. -->
+    <string name="rules_approval_auto">Approves itself in %1$s unless you stop it.\n%2$s</string>
 </resources>

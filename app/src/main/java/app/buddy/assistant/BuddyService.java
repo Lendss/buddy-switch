@@ -342,8 +342,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     void onToolActivity(final String tool) {
         main.post(() -> {
             bubble.onToolActivity(tool);
-            // asking for approval, asking a question or posting a note isn't operating the phone
-            if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool)) control.onActivity();
+            // asking for approval, asking a question, posting a note or answering in a notification isn't operating the phone
+            if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)) {
+                control.onActivity();
+            }
         });
     }
 
@@ -473,8 +475,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      * out or it was stopped): a card nobody waits for would keep blocking every tap.
      */
     private static boolean awaitAnswer(CountDownLatch done) throws InterruptedException {
+        return awaitAnswer(done, 0);
+    }
+
+    /** As above, for a card with a countdown of that many seconds: it waits at least until the countdown is over. */
+    private static boolean awaitAnswer(CountDownLatch done, int countdown) throws InterruptedException {
         java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
-        long end = System.currentTimeMillis() + 5 * 60_000;
+        long end = System.currentTimeMillis() + Math.max(5 * 60_000, (countdown + 60) * 1000L);
         while (System.currentTimeMillis() < end) {
             if (done.await(1, TimeUnit.SECONDS)) return true;
             if (gone != null && gone.getAsBoolean()) return false;
@@ -482,21 +489,63 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return false;
     }
 
+    /** How a card that approved itself (a notification rule's countdown ran out) answers the agent. */
+    static final String AUTO_APPROVED = "APPROVED after the countdown: the user didn't stop it, though they may not be "
+            + "watching. Go ahead with this, and only this.";
+
     /** Blocks the calling (tool) thread until the user answers in the bubble. */
     String askConfirm(final String summary) throws InterruptedException {
+        return askConfirm(summary, false);
+    }
+
+    /**
+     * As above. canAuto: the card may approve itself when its chat is a notification rule's run with a countdown
+     * (sending a message may; paying, buying or deleting never does).
+     */
+    String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Boolean> answer = new AtomicReference<>();
         final AtomicReference<String> change = new AtomicReference<>();
+        final java.util.concurrent.atomic.AtomicBoolean auto = new java.util.concurrent.atomic.AtomicBoolean();
         final String chat = McpServer.CALLER_CHAT.get();
-        main.post(() -> bubble.askConfirm(summary, chat, (approved, wanted) -> {
-            answer.set(approved);
-            change.set(wanted);
-            done.countDown();
+        int cd = canAuto ? Triggers.countdown(chat) : 0;
+        String shown = summary;
+        if (cd > 0) { // a second agent checks it against the rule first; if it objects, the card waits for the user
+            showStatus(getString(R.string.rules_status_checking));
+            String why = Triggers.review(this, chat, summary);
+            if (why != null) {
+                cd = 0;
+                shown = getString(R.string.tools_card_detail, summary, why);
+            }
+        }
+        final int countdown = cd;
+        final String text = shown;
+        main.post(() -> bubble.askConfirm(text, chat, countdown, new Bubble.ConfirmCallback() {
+            @Override
+            public void onAnswer(boolean approved, String wanted) {
+                answer.set(approved);
+                change.set(wanted);
+                done.countDown();
+            }
+
+            @Override
+            public void onAutoApproved() {
+                auto.set(true);
+                onAnswer(true, null);
+            }
         }));
-        if (!awaitAnswer(done)) {
+        Triggers.approvalShown(this, chat, text, countdown);
+        boolean answered;
+        try {
+            answered = awaitAnswer(done, countdown);
+        } finally {
+            Triggers.approvalDone(this, chat);
+        }
+        if (!answered) {
             main.post(() -> bubble.cancelConfirm());
             return "DENIED: the user did not answer within 5 minutes. Do not do it.";
         }
+        if (auto.get()) return AUTO_APPROVED;
         if (change.get() != null) {
             return "CHANGES REQUESTED by the user: \u201c" + change.get() + "\u201d. Don't do it as it was; "
                     + "make these changes (for example, rewrite the text), then call confirm again with the "
@@ -518,7 +567,14 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             answer.set(text);
             done.countDown();
         }));
-        if (!awaitAnswer(done)) {
+        Triggers.approvalShown(this, chat, question, 0);
+        boolean answered;
+        try {
+            answered = awaitAnswer(done);
+        } finally {
+            Triggers.approvalDone(this, chat);
+        }
+        if (!answered) {
             main.post(() -> bubble.cancelConfirm());
             return "NO ANSWER: the user did not answer within 5 minutes. Don't guess; stop and ask in your reply.";
         }

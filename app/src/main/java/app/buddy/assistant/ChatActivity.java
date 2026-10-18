@@ -539,7 +539,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         BuddyService svc = BuddyService.get();
         String ask = svc != null && svc.bubble() != null && svc.bubble().pendingChat() == ses ? svc.bubble().pendingConfirmText() : null;
         java.util.List<String> options = ask == null ? null : svc.bubble().pendingOptions();
-        String key = ask == null ? null : ask + (options == null ? "" : "\u0000" + options);
+        long[] countdown = ask == null ? new long[]{0, 0} : svc.bubble().countdown();
+        String key = ask == null ? null : ask + (options == null ? "" : "\u0000" + options) + (countdown[0] > 0 ? "\u0001" : "");
         if (key == null ? shownApproval == null : key.equals(shownApproval)) return;
         shownApproval = key;
         approval.removeAllViews();
@@ -576,6 +577,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             approval.addView(card, full());
             return;
         }
+        if (countdown[0] > 0) card.addView(countdownView(countdown), full());
         LinearLayout btns = row(this);
         Button deny = button(this, getString(R.string.chat_deny), false);
         deny.setTextColor(ERR);
@@ -638,6 +640,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
 
     /** answering: the same box types an answer to a question instead. */
     private void askChange(LinearLayout card, LinearLayout btns, boolean answering) {
+        BuddyService bs = BuddyService.get();
+        if (bs != null && bs.bubble() != null) bs.bubble().stopCountdown(); // no approving itself while the user writes
         btns.setVisibility(View.GONE);
         EditText what = new EditText(this);
         what.setHint(answering ? R.string.chat_answer_hint : R.string.chat_change_hint);
@@ -683,6 +687,42 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         what.requestFocus();
         what.postDelayed(() -> getSystemService(android.view.inputmethod.InputMethodManager.class)
                 .showSoftInput(what, 0), 150);
+    }
+
+    /** A notification rule's countdown on the card, as in the bubble: it approves itself at the end; a tap stops it. */
+    private View countdownView(long[] cd) {
+        LinearLayout box = column(this);
+        box.setPaddingRelative(0, 0, 0, dp(this, 12));
+        android.widget.ProgressBar bar = new android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(1000);
+        bar.setProgressTintList(android.content.res.ColorStateList.valueOf(ACCENT));
+        bar.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(CARD2));
+        box.addView(bar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 6)));
+        TextView t = text(this, "", 13, MUTED);
+        t.setPaddingRelative(0, dp(this, 6), 0, 0);
+        box.addView(t);
+        box.setOnClickListener(v -> {
+            BuddyService svc = BuddyService.get();
+            if (svc != null && svc.bubble() != null) svc.bubble().stopCountdown();
+        });
+        Runnable tick = new Runnable() {
+            @Override
+            public void run() {
+                BuddyService svc = BuddyService.get();
+                long[] now = svc == null || svc.bubble() == null ? new long[]{0, 0} : svc.bubble().countdown();
+                long left = now[0] - android.os.SystemClock.elapsedRealtime();
+                if (now[0] == 0 || left <= 0) {
+                    box.setVisibility(View.GONE);
+                    return;
+                }
+                bar.setProgress((int) (1000 * left / now[1]));
+                t.setText(getString(R.string.card_countdown, (int) ((left + 999) / 1000)));
+                if (box.isAttachedToWindow()) box.postDelayed(this, 50);
+            }
+        };
+        tick.run(); // draws it now; the loop starts once it's on screen
+        box.post(tick);
+        return box;
     }
 
     private void answer(boolean approved) {

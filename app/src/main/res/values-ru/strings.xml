@@ -1224,6 +1224,12 @@
     <string name="perms_reviewer_sign_in">Сначала войдите в %1$s (в настройках).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
     <string name="perms_reviewer_about">Для каждого нажатия — временный сеанс без инструментов: он видит ваш запрос, пояснение агента и экран и отвечает «разрешить», «спросить вас» или «не рекомендовать». Около 3 секунд на нажатие. Чаты OpenCode проверяет Claude Code (или Codex).</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">Он также проверяет ответы, прежде чем правило для уведомлений отправит их по таймеру.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku: быстрая и лёгкая. Рекомендуем.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">Небольшая быстрая модель. Рекомендуем.</string>
     <!-- Title of the button rules screen, and of the row that opens it. -->
     <string name="perms_button_rules">Правила для кнопок</string>
     <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
@@ -1364,4 +1370,87 @@
     <string name="dictation_codex_stopped">Codex остановился: %1$s</string>
     <!-- After “Codex stopped:” when its log says nothing. -->
     <string name="dictation_no_details">нет подробностей</string>
+
+    <!-- Notification rules -->
+    <string name="card_label_countdown">ОДОБРИТСЯ АВТОМАТИЧЕСКИ</string>
+    <string name="card_countdown">Одобрится автоматически через %1$d сек · Нажмите, чтобы остановить</string>
+    <string name="card_note_auto_approved">✓ Одобрено по таймеру: %1$s</string>
+    <string name="card_note_countdown_stopped">Таймер остановлен: ждём вашего подтверждения</string>
+    <string name="hub_tool_reply_notification">Ответ на уведомление: %1$s</string>
+    <string name="setup_rules">Правила для уведомлений</string>
+    <string name="setup_rules_info">Пусть агент действует, когда приходит уведомление: ответит на сообщение, добавит доставку в календарь…</string>
+    <string name="tools_card_reply">Ответить: %1$s · %2$s\n«%3$s»</string>
+    <string name="tools_card_open_url">Открыть %1$s</string>
+    <string name="rules_service_label">Правила Buddy для уведомлений</string>
+    <string name="rules_title">Правила для уведомлений</string>
+    <string name="rules_intro">Когда приходит выбранное вами уведомление, Buddy передаёт агенту ваше указание, как будто вы сами написали ему сообщение. Уведомления, которые не подходят ни под одно правило, игнорируются.</string>
+    <string name="rules_access_off_title">Доступ к уведомлениям выключен</string>
+    <string name="rules_access_off_text">Он нужен Buddy, чтобы видеть уведомления, которые отслеживают ваши правила.</string>
+    <string name="rules_access_turn_on">Включить</string>
+    <string name="rules_run">Выполнять правила</string>
+    <string name="rules_run_info">Выключите, чтобы приостановить все правила.</string>
+    <string name="rules_section">Правила</string>
+    <string name="rules_empty">Правил пока нет. Например: если клиент пишет вам в WhatsApp, ответить ему, в какие часы вы работаете.</string>
+    <string name="rules_add">Добавить правило</string>
+    <string name="rules_any">Все уведомления</string>
+    <string name="rules_from_summary">От: %1$s</string>
+    <string name="rules_words_summary">Содержит «%1$s»</string>
+    <string name="rules_tag_ask">Сначала спрашивает</string>
+    <string name="rules_tag_countdown">Таймер %1$s</string>
+    <string name="rules_tag_off">Выкл.</string>
+    <string name="rules_seconds">%1$d сек</string>
+    <string name="rules_minutes">%1$d мин</string>
+    <string name="rules_activity">Недавние действия</string>
+    <string name="rules_activity_empty">Пока ничего нет.</string>
+    <string name="rules_activity_clear">Очистить</string>
+    <string name="rules_log_replied">Отправлен ответ: «%1$s»</string>
+    <string name="rules_log_done_empty">Готово, без ответа.</string>
+    <string name="rules_log_limit">Пропущено: слишком много запусков за последний час.</string>
+    <string name="rules_log_busy">Пропущено: телефон слишком долго был занят.</string>
+    <string name="rules_log_error">Не запущено: %1$s</string>
+    <string name="rules_log_no_service">сервис специальных возможностей Buddy выключен</string>
+    <string name="rules_log_not_signed_in">не выполнен вход в %1$s</string>
+    <string name="rules_new">Новое правило</string>
+    <string name="rules_edit">Изменить правило</string>
+    <string name="rules_app">Когда приходит уведомление от</string>
+    <string name="rules_pick_app">Выберите приложение</string>
+    <string name="rules_search_apps">Поиск приложений</string>
+    <string name="rules_from">От кого (необязательно)</string>
+    <string name="rules_from_hint">Любой отправитель или имена через запятую</string>
+    <string name="rules_words">Содержит (необязательно)</string>
+    <string name="rules_words_hint">Что угодно или слова через запятую</string>
+    <string name="rules_instruction">Что должен сделать Buddy?</string>
+    <string name="rules_instruction_hint">Например: Ответь в моём стиле. Мы работаем с 8 до 18, по воскресеньям выходной.</string>
+    <string name="rules_example_reply">Ответить за меня</string>
+    <string name="rules_example_reply_text">Ответь в моём стиле, коротко и дружелюбно.</string>
+    <string name="rules_example_summary">Кратко пересказать</string>
+    <string name="rules_example_summary_text">Скажи одной строкой, о чём там речь и нужно ли мне что-то делать.</string>
+    <string name="rules_example_calendar">Добавить в календарь</string>
+    <string name="rules_example_calendar_text">Если речь о встрече или доставке, добавь это в мой календарь.</string>
+    <string name="rules_agent">Агент</string>
+    <string name="rules_approval">Перед действием</string>
+    <string name="rules_approval_ask">Спрашивать меня</string>
+    <string name="rules_approval_countdown">Таймер</string>
+    <string name="rules_approval_ask_info">Карточки подтверждения ждут вашего решения, как в любом чате.</string>
+    <string name="rules_approval_countdown_info">Когда таймер дойдёт до нуля, карточка одобрится автоматически, если вы не остановите его нажатием. Это работает только для отправки сообщений и только после того, как второй ИИ сверит сообщение с вашим правилом. Оплата, покупки, удаление и открытие ссылок всегда ждут вашего подтверждения.</string>
+    <string name="rules_checker">Второй ИИ: %1$s. Нажмите, чтобы изменить его в разделе «Разрешения для приложений».</string>
+    <string name="rules_model_default">Модель по умолчанию самого агента</string>
+    <string name="rules_on">Правило включено</string>
+    <string name="rules_save">Сохранить</string>
+    <string name="rules_delete">Удалить</string>
+    <string name="rules_delete_title">Удалить это правило?</string>
+    <string name="rules_need_app">Сначала выберите приложение.</string>
+    <string name="rules_need_instruction">Напишите, что должен сделать Buddy.</string>
+    <string name="rules_access_title">Разрешить доступ к уведомлениям?</string>
+    <string name="rules_access_what">Buddy сверяет каждое уведомление с вашими правилами. Уведомления, которые не подходят ни под одно правило, сразу игнорируются: они нигде не сохраняются и никуда не отправляются.</string>
+    <string name="rules_access_data">Если уведомление подходит, название приложения, отправитель и текст передаются агенту правила (Claude Code, Codex или OpenCode) вместе с вашим указанием.</string>
+    <string name="rules_access_reply">Buddy может отвечать через кнопку «Ответить» в уведомлении. Сначала он спрашивает вас, если только вы не зададите для правила таймер.</string>
+    <string name="rules_chat_shown">🔔 %1$s · %2$s: %3$s\n⚡ %4$s</string>
+    <string name="rules_status_checking">Проверка на соответствие вашему правилу…</string>
+    <string name="rules_channel_results">Правила для уведомлений: результаты</string>
+    <string name="approvals_channel">Подтверждения</string>
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <string name="rules_approval_title">Нужно подтверждение: %1$s · %2$s</string>
+    <string name="card_locked_title">Нужно подтверждение: %1$s</string>
+    <string name="rules_approval_auto">Одобрится автоматически через %1$s, если вы не остановите таймер.\n%2$s</string>
 </resources>

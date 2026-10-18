@@ -1,6 +1,6 @@
 # Buddy privacy policy
 
-*Last updated: 13 October 2026*
+*Last updated: 18 October 2026*
 
 Buddy is an open-source Android app (Apache 2.0) by Hamdi Ghorbel. It lets an AI agent of your choice (Claude Code, Codex or OpenCode) use your phone's apps for you. This policy explains what data Buddy handles. The source code is public at https://github.com/ghorbelhamdi/buddy-android, so every statement here can be checked.
 
@@ -17,9 +17,19 @@ Buddy uses Android's AccessibilityService API so the agent can carry out what yo
 - Before anything that sends, posts, buys or deletes, Buddy shows the action and waits for your approval.
 - You can turn the service off at any time in Android's accessibility settings.
 
+## Notification access (notification rules)
+
+Notification rules are optional. Buddy reads notifications only if you add a rule and give Buddy notification access in Android's settings; Buddy explains this and asks for your agreement in the app first.
+
+- Buddy checks each new notification against your rules on your phone. Notifications that no rule matches are ignored right away: they are not stored and not sent anywhere.
+- When a notification matches a rule, its app name, sender and text are sent to the agent you picked for that rule (and so to that agent's AI service, see below), together with your instruction, to carry out the rule.
+- Buddy can answer through a notification's Reply button. It asks for your approval first, unless you gave the rule a countdown, in which case the reply is sent when the countdown ends unless you stop it.
+- The rule's chat and a short activity list (time, app, sender and what was done) are kept on your phone.
+- You can pause or delete rules in the app, and remove the access in Android's settings at any time.
+
 ## Data sent to the AI service you choose
 
-The agent runs inside the app and talks directly to its own provider. What you type or say, the attachments you add, and the screen content the agent reads are sent to:
+The agent runs inside the app and talks directly to its own provider. What you type or say, the attachments you add, the screen content the agent reads, and the notifications your rules pass on are sent to:
 
 - **Claude Code:** Anthropic, under your Claude account. See https://www.anthropic.com/legal/privacy
 - **Codex:** OpenAI, under your ChatGPT account. See https://openai.com/policies/privacy-policy
@@ -44,6 +54,8 @@ To set up an agent, Buddy downloads a small Linux system from Alpine Linux (dl-c
 - **Accessibility:** described above.
 - **Microphone:** only when you tap the mic.
 - **Notifications:** for task status and approvals.
+- **Notification access:** only for notification rules, described above.
+- **Keep awake (wake lock):** while a notification rule's task runs, so it can finish with the screen off.
 - **Internet:** to reach the AI service you chose and the downloads above.
 
 ## Children

@@ -53,6 +53,11 @@ final class Bubble implements ChatHub.Listener {
          * For a question (ask): change is the answer, and approved says it's one of the buttons (not typed).
          */
         void onAnswer(boolean approved, String change);
+
+        /** A notification rule's countdown ran out: approved without the user. */
+        default void onAutoApproved() {
+            onAnswer(true, null);
+        }
     }
 
 
@@ -74,7 +79,11 @@ final class Bubble implements ChatHub.Listener {
     private LinearLayout panel, messages, confirmCard;
     private ScrollView scroll;
     private TextView header, confirmText, confirmLabel;
-    private LinearLayout confirmOptions, confirmRow;
+    private LinearLayout confirmOptions, confirmRow, countdownRow;
+    private android.widget.ProgressBar countdownBar;
+    private TextView countdownText;
+    /** A card's countdown (a notification rule's): when it ends and how long it is (elapsedRealtime ms), or 0. */
+    private long countdownEnd, countdownLength;
     private Button confirmDeny, confirmChange, confirmApprove;
     /** The card asks a question (the ask tool) rather than for approval; askOptions are its buttons. */
     private boolean asking;
@@ -363,6 +372,24 @@ final class Bubble implements ChatHub.Listener {
         confirmOptions = new LinearLayout(svc);
         confirmOptions.setOrientation(LinearLayout.VERTICAL);
         confirmCard.addView(confirmOptions, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        // a notification rule's countdown: the card approves itself when it runs out; a tap stops it
+        countdownRow = new LinearLayout(svc);
+        countdownRow.setOrientation(LinearLayout.VERTICAL);
+        countdownRow.setPaddingRelative(0, 0, 0, dp(10));
+        countdownBar = new android.widget.ProgressBar(svc, null, android.R.attr.progressBarStyleHorizontal);
+        countdownBar.setMax(1000);
+        countdownBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Ui.ACCENT));
+        countdownBar.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(Ui.CARD2));
+        countdownRow.addView(countdownBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(6)));
+        countdownText = new TextView(svc);
+        countdownText.setTextColor(Ui.MUTED);
+        countdownText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        countdownText.setTypeface(Ui.sans(svc, 500));
+        countdownText.setPaddingRelative(0, dp(6), 0, 0);
+        countdownRow.addView(countdownText);
+        countdownRow.setOnClickListener(v -> stopCountdown());
+        countdownRow.setVisibility(View.GONE);
+        confirmCard.addView(countdownRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         LinearLayout row = new LinearLayout(svc);
         confirmRow = row;
         row.setGravity(Gravity.END);
@@ -1705,6 +1732,7 @@ final class Bubble implements ChatHub.Listener {
 
     private void startChange() {
         if (pendingConfirm == null) return;
+        stopCountdown();
         changing = true;
         // the answer buttons make the card too tall to leave the text field above the keyboard
         confirmOptions.setVisibility(View.GONE);
@@ -1728,6 +1756,7 @@ final class Bubble implements ChatHub.Listener {
     private void answerChange(String change) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
+        endCountdown();
         endChange();
         confirmCard.setVisibility(View.GONE);
         // OpenCode chats show the answer on the approval step itself (it arrives after the answer)
@@ -1742,7 +1771,77 @@ final class Bubble implements ChatHub.Listener {
     }
 
     void askConfirm(String summary, String chat, ConfirmCallback cb) {
+        askConfirm(summary, chat, 0, cb);
+    }
+
+    /** countdown: seconds after which the card approves itself unless the user stops it (0: it waits for the user). */
+    void askConfirm(String summary, String chat, int countdown, ConfirmCallback cb) {
         showCard(summary, null, chat, cb);
+        if (countdown > 0) startCountdown(countdown);
+    }
+
+    // ------------------------------------------------------------ countdown
+
+    private final Runnable countdownTick = new Runnable() {
+        @Override
+        public void run() {
+            if (pendingConfirm == null || countdownEnd == 0) return;
+            long left = countdownEnd - SystemClock.elapsedRealtime();
+            if (left <= 0) {
+                autoApprove();
+                return;
+            }
+            countdownBar.setProgress((int) (1000 * left / countdownLength));
+            countdownText.setText(svc.getString(R.string.card_countdown, (int) ((left + 999) / 1000)));
+            // a handler, not an animator: animations turned off in the phone's settings would end it at once
+            root.postDelayed(this, 50);
+        }
+    };
+
+    private void startCountdown(int seconds) {
+        countdownLength = seconds * 1000L;
+        countdownEnd = SystemClock.elapsedRealtime() + countdownLength;
+        confirmLabel.setText(R.string.card_label_countdown);
+        countdownRow.setVisibility(View.VISIBLE);
+        root.removeCallbacks(countdownTick);
+        countdownTick.run();
+        hub.changed(); // the chat screen's card shows it too
+    }
+
+    /** The user stopped the countdown (a tap on it, or Change): the card now waits for them like any other. */
+    void stopCountdown() {
+        if (countdownEnd == 0) return;
+        endCountdown();
+        confirmLabel.setText(cardChat == null ? svc.getString(R.string.card_label_other_session, svc.getString(R.string.card_label_approval))
+                : svc.getString(R.string.card_label_approval));
+        if (cardChat != null) hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_countdown_stopped));
+        hub.changed();
+    }
+
+    private void endCountdown() {
+        countdownEnd = 0;
+        root.removeCallbacks(countdownTick);
+        countdownRow.setVisibility(View.GONE);
+    }
+
+    /** When the card's countdown ends (elapsedRealtime ms) and its length, or {0, 0} without one (for the chat screen). */
+    long[] countdown() {
+        return pendingConfirm == null || countdownEnd == 0 ? new long[]{0, 0} : new long[]{countdownEnd, countdownLength};
+    }
+
+    private void autoApprove() {
+        ConfirmCallback cb = pendingConfirm;
+        pendingConfirm = null;
+        endCountdown();
+        if (changing) endChange();
+        confirmCard.setVisibility(View.GONE);
+        if (cardChat != null && !"opencode".equals(cardChat.backend)) {
+            hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_auto_approved, clip(confirmText.getText().toString(), 80)));
+        }
+        if (cb != null) cb.onAutoApproved();
+        refreshStatus();
+        collapse();
+        hub.changed();
     }
 
     /** The ask tool: the same card, with a button per answer and one to type an answer instead. */
@@ -1760,6 +1859,7 @@ final class Bubble implements ChatHub.Listener {
 
     private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb) {
         if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
+        endCountdown();
         if (changing) endChange();
         pendingConfirm = cb;
         cardChat = chat == null ? null : sessions.find(chat);
@@ -1785,12 +1885,13 @@ final class Bubble implements ChatHub.Listener {
         confirmApprove.setVisibility(asking ? View.GONE : View.VISIBLE);
         if (asking) confirmRow.setPaddingRelative(0, dp(8), 0, 0);
         else confirmRow.setPaddingRelative(0, 0, 0, 0);
-        root.setVisibility(View.VISIBLE);
         confirmText.setText(text);
         confirmCard.setVisibility(View.VISIBLE);
         refreshStatus();
         vibrate(60);
         expand();
+        // on the lock screen the card waits out of sight (a notification says so): approving needs the phone unlocked
+        applyEnabled();
         hub.changed();
     }
 
@@ -1801,6 +1902,7 @@ final class Bubble implements ChatHub.Listener {
 
     void cancelConfirm() {
         pendingConfirm = null;
+        endCountdown();
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         refreshStatus();
@@ -1826,6 +1928,7 @@ final class Bubble implements ChatHub.Listener {
     private void answerOption(String option) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
+        endCountdown();
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
@@ -1840,6 +1943,7 @@ final class Bubble implements ChatHub.Listener {
     private void answerConfirm(boolean approved) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
+        endCountdown();
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {

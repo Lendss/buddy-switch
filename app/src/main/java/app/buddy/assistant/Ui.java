@@ -373,6 +373,76 @@ final class Ui {
         return box;
     }
 
+    /** A radio button's look (for lists of choices in sheets). */
+    static View radio(Context c, boolean on) {
+        FrameLayout f = new FrameLayout(c);
+        f.setBackground(outlined(c, 0x00000000, 11, on ? ACCENT : MUTED, 2));
+        if (on) {
+            View in = new View(c);
+            in.setBackground(oval(ACCENT));
+            f.addView(in, new FrameLayout.LayoutParams(dp(c, 10), dp(c, 10), Gravity.CENTER));
+        }
+        f.setLayoutParams(new LinearLayout.LayoutParams(dp(c, 22), dp(c, 22)));
+        return f;
+    }
+
+    /**
+     * Pick a model for an agent: its list ("" first, described by defaultHint) or any model name typed in. The pick goes
+     * to l; nothing happens if the sheet is closed.
+     */
+    static void modelSheet(Activity a, String backend, String current, String defaultHint, Pick l) {
+        Models.refresh(a);
+        LinearLayout c = column(a);
+        TextView h = title(a, a.getString(R.string.chat_model_title, Account.nameOf(backend)), 18);
+        h.setPaddingRelative(0, 0, 0, dp(a, 8));
+        c.addView(h);
+        final Dialog[] d = new Dialog[1];
+        boolean known = false;
+        for (final String[] o : Models.forBackend(backend)) {
+            boolean on = o[0].equals(current);
+            known |= on;
+            LinearLayout r = row(a);
+            r.setPaddingRelative(dp(a, 4), dp(a, 10), dp(a, 4), dp(a, 10));
+            r.setBackgroundResource(ripple(a, false));
+            r.addView(radio(a, on));
+            LinearLayout t = column(a);
+            t.setPaddingRelative(dp(a, 14), 0, 0, 0);
+            t.addView(title(a, o[1], 15));
+            t.addView(single(monoText(a, o[0].isEmpty() ? defaultHint : o[0], 12, MUTED)));
+            r.addView(t, weight1());
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                l.onPick(o[0]);
+            });
+            c.addView(r, full());
+        }
+        LinearLayout other = row(a);
+        other.setPaddingRelative(0, dp(a, 10), 0, 0);
+        final android.widget.EditText et = new android.widget.EditText(a);
+        et.setHint(a.getString(R.string.chat_model_other_hint, "claude".equals(backend) ? "claude-opus-5-5"
+                : "opencode".equals(backend) ? "anthropic/claude-sonnet-5-5" : "gpt-6.1-sol"));
+        et.setHintTextColor(MUTED);
+        et.setTextColor(TEXT);
+        et.setTextSize(14);
+        et.setTypeface(mono(a, 400));
+        et.setSingleLine(true);
+        if (!known) et.setText(current);
+        et.setPaddingRelative(dp(a, 12), dp(a, 10), dp(a, 12), dp(a, 10));
+        et.setBackground(outlined(a, BG, 12, OUTLINE, 1));
+        other.addView(et, weight1());
+        Button use = button(a, a.getString(R.string.chat_model_use), true);
+        LinearLayout.LayoutParams up = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(a, 44));
+        up.setMarginStart(dp(a, 8));
+        other.addView(use, up);
+        use.setOnClickListener(v -> {
+            d[0].dismiss();
+            l.onPick(et.getText().toString().trim());
+        });
+        c.addView(other, full());
+        d[0] = bottomSheet(a, c);
+        d[0].show();
+    }
+
     /** Terminal-style block with an accent "$ " prompt. */
     static TextView codeBlock(Context c, String cmd) {
         TextView t = monoText(c, "", 12, CODE_TEXT);

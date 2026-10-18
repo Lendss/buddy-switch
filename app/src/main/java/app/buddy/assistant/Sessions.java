@@ -88,10 +88,14 @@ final class Sessions {
     }
 
     Session create(String backend) {
+        return create(backend, true);
+    }
+
+    Session create(String backend, boolean select) {
         Session s = new Session(UUID.randomUUID().toString().replace("-", "").substring(0, 12), backend);
         all.add(0, s);
         while (all.size() > MAX_SESSIONS) all.remove(all.size() - 1);
-        current = s;
+        if (select || current == null || !all.contains(current)) current = s;
         save();
         return s;
     }

@@ -85,7 +85,12 @@ final class ChatHub {
     }
 
     Sessions.Session create(String backend) {
-        Sessions.Session s = sessions.create(backend);
+        return create(backend, true);
+    }
+
+    /** A new chat; select: make it the one the bubble shows (a rule's chat doesn't take over the bubble). */
+    Sessions.Session create(String backend, boolean select) {
+        Sessions.Session s = sessions.create(backend, select);
         changed();
         return s;
     }
@@ -112,18 +117,28 @@ final class ChatHub {
 
     /** Sends a message with attachments (ids from Attachments); the helper fetches them before the agent runs. */
     String send(final Sessions.Session ses, String text, List<String> files) {
+        return send(ses, text, files, null);
+    }
+
+    /** A notification rule's run (see Triggers): the chat shows a short line, the agent gets the whole prompt. */
+    String sendFromRule(Sessions.Session ses, String shown, String prompt) {
+        return send(ses, shown, null, prompt);
+    }
+
+    private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
         if (ses.running) {
             if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
         }
         boolean hasFiles = files != null && !files.isEmpty();
         if (text.isEmpty() && !hasFiles) return null;
-        String forAgent = text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
+        String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.allowControl();
         try {
-            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, model(ses),
-                    hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
+            // a rule's run works for someone else's message: no shell, files or web, even in developer mode
+            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : Prefs.devMode(app) ? "1" : "0", forAgent,
+                    model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -510,6 +525,7 @@ final class ChatHub {
             }
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
+            case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, clip(in.optString("text"), 40));
             case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, clip(in.optString("query"), 40));
             case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, clip(in.optString("url"), 40));
             case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, clip(in.optString("command"), 40))

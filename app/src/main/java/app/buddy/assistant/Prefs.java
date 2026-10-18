@@ -356,6 +356,15 @@ final class Prefs {
         sp(c).edit().putString("reviewer", r).apply();
     }
 
+    /** The model the reviewer uses on a harness (claude or codex); "" for the quick default (Haiku, or a small Codex model). */
+    static String reviewerModel(Context c, String harness) {
+        return sp(c).getString("reviewer_model_" + harness, "");
+    }
+
+    static void setReviewerModel(Context c, String harness, String model) {
+        sp(c).edit().putString("reviewer_model_" + harness, model == null ? "" : model.trim()).apply();
+    }
+
     /** The user has opened the bubble's hold menu once (no more hint in the status pill). */
     static boolean menuHinted(Context c) {
         return sp(c).getBoolean("menu_hinted", false);
@@ -424,5 +433,50 @@ final class Prefs {
 
     static void saveBubblePos(Context c, int x, int y) {
         sp(c).edit().putInt("bx", x).putInt("by", y).apply();
+    }
+
+    /** Notification rules as JSON (see Rules). */
+    static String rules(Context c) {
+        return sp(c).getString("rules", "[]");
+    }
+
+    static void setRules(Context c, String json) {
+        sp(c).edit().putString("rules", json).apply();
+    }
+
+    /** The rules screen's main switch: off pauses every rule. */
+    static boolean rulesOn(Context c) {
+        return sp(c).getBoolean("rules_on", true);
+    }
+
+    static void setRulesOn(Context c, boolean on) {
+        sp(c).edit().putBoolean("rules_on", on).apply();
+    }
+
+    /** The user agreed to what notification access is for (Google Play's prominent disclosure). */
+    static boolean noticeConsent(Context c) {
+        return sp(c).getBoolean("notice_consent", false);
+    }
+
+    static void setNoticeConsent(Context c) {
+        sp(c).edit().putBoolean("notice_consent", true).apply();
+    }
+
+    /** What the rules did lately, as JSON (see Triggers.log). */
+    static String rulesLog(Context c) {
+        return sp(c).getString("rules_log", "[]");
+    }
+
+    static void setRulesLog(Context c, String json) {
+        sp(c).edit().putString("rules_log", json).apply();
+    }
+
+    /** The chat each rule conversation continues in, as JSON {key: chat id}. */
+    static String ruleChats(Context c) {
+        return sp(c).getString("rule_chats", "{}");
+    }
+
+    static void setRuleChats(Context c, String json) {
+        sp(c).edit().putString("rule_chats", json).apply();
     }
 }

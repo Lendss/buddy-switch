@@ -1,6 +1,7 @@
 #!/bin/bash
 # Run by the Buddy app inside its built-in Linux (Alpine, through proot).
-#   buddy-run <token> ask <session> <claude|codex|opencode> <dev:0|1> <message> [model] [attachment-ids]
+#   buddy-run <token> ask <session> <claude|codex|opencode> <dev:0|1|rule> <message> [model] [attachment-ids]
+#     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools)
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
 #   buddy-run <token> delete <session>     forget that session
@@ -240,10 +241,13 @@ run_claude() {
   mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
     '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth}}}}')
   tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)")
+  [ "$DEV" = rule ] && tools=("mcp__phone")
+  local deny=()
+  [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
   [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
   local args=(-p "$MSG" --output-format stream-json --verbose
     --mcp-config "$mcp" --strict-mcp-config
-    --allowedTools "${tools[@]}"
+    --allowedTools "${tools[@]}" "${deny[@]}"
     --append-system-prompt "$SYSTEM")
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
@@ -329,7 +333,7 @@ run_opencode() {
   # OpenCode names MCP tools <server>_<tool>; small models otherwise call "read_screen" and give up
   printf '%s\n\n%s\n' "$SYSTEM" "In this app the phone tools are named with a phone_ prefix: phone_read_screen, phone_tap, \
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
-phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
+phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
   local cfg v2=0
   oc2 && v2=1
@@ -348,7 +352,8 @@ these exact names; they are available in every message of this chat." > "$S/syst
     | (if $v2 == "1" then {mcp:{servers:{phone:($phone + {codemode:false, timeout:{execution:310000}})}}}
        else {mcp:{phone:($phone + {timeout:310000})}} end)
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
-    + (if $dev == "1" then {} else {permission:{bash:"ask", edit:"ask"}} end)')
+    + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
+       else {permission:{bash:"ask", edit:"ask"}} end)')
   local args=(run --format json)
   [ "$v2" = 1 ] && args+=(--standalone)
   [ -s "$S/opencode-session" ] && args+=(-s "$(cat "$S/opencode-session")")
