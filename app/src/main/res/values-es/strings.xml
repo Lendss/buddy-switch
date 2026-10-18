@@ -1387,6 +1387,12 @@
     <string name="rules_log_replied">Respuesta enviada: “%1$s”</string>
     <string name="rules_log_done_empty">Listo, sin respuesta.</string>
     <string name="rules_log_limit">Se omitió: demasiadas veces en la última hora.</string>
+    <string name="rules_log_held">En espera: demasiadas veces en la última hora. Los mensajes nuevos se atenderán juntos en una sola ejecución a las %1$s.</string>
+    <string name="rules_limit">Límite por hora</string>
+    <string name="rules_limit_off">Sin límite</string>
+    <string name="rules_limit_info">Máximo de ejecuciones por hora para una conversación, y el triple para toda la regla. Al superarlo, los mensajes nuevos esperan y luego se atienden juntos en una sola ejecución.</string>
+    <string name="rules_tag_limit">%1$d/h</string>
+    <string name="rules_tag_no_limit">Sin límite</string>
     <string name="rules_log_busy">Se omitió: el teléfono estuvo ocupado demasiado tiempo.</string>
     <string name="rules_log_error">No se ejecutó: %1$s</string>
     <string name="rules_log_no_service">el servicio de accesibilidad de Buddy está desactivado</string>

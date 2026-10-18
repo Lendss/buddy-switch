@@ -955,6 +955,12 @@
     <string name="rules_log_replied">जवाब दिया: “%1$s”</string>
     <string name="rules_log_done_empty">हो गया, बिना किसी जवाब के.</string>
     <string name="rules_log_limit">छोड़ दिया गया: पिछले एक घंटे में यह बहुत ज़्यादा बार चला.</string>
+    <string name="rules_log_held">इंतज़ार में: पिछले एक घंटे में यह बहुत ज़्यादा बार चला. नए मैसेज %1$s पर एक साथ, एक ही बार में संभाले जाएंगे.</string>
+    <string name="rules_limit">प्रति घंटा सीमा</string>
+    <string name="rules_limit_off">बंद</string>
+    <string name="rules_limit_info">एक बातचीत के लिए एक घंटे में ज़्यादा से ज़्यादा इतनी बार, और पूरे नियम के लिए इसका तीन गुना. इससे ज़्यादा होने पर नए मैसेज इंतज़ार करते हैं और फिर एक साथ, एक ही बार में संभाले जाते हैं. बंद: कोई सीमा नहीं.</string>
+    <string name="rules_tag_limit">%1$d/घंटा</string>
+    <string name="rules_tag_no_limit">कोई सीमा नहीं</string>
     <string name="rules_log_busy">छोड़ दिया गया: फ़ोन बहुत देर तक व्यस्त रहा.</string>
     <string name="rules_log_error">नहीं चला: %1$s</string>
     <string name="rules_log_no_service">Buddy की सुलभता सेवा बंद है</string>

@@ -962,6 +962,12 @@
     <string name="rules_log_replied">Antwort gesendet: „%1$s“</string>
     <string name="rules_log_done_empty">Fertig, ohne Antwort.</string>
     <string name="rules_log_limit">Übersprungen: zu oft in der letzten Stunde.</string>
+    <string name="rules_log_held">Wartet: zu oft in der letzten Stunde. Die neuen Nachrichten werden um %1$s zusammen in einem Durchlauf bearbeitet.</string>
+    <string name="rules_limit">Stundenlimit</string>
+    <string name="rules_limit_off">Aus</string>
+    <string name="rules_limit_info">Höchstens so viele Durchläufe pro Stunde für eine Unterhaltung, für die ganze Regel dreimal so viele. Darüber hinaus warten neue Nachrichten und werden dann zusammen in einem Durchlauf bearbeitet. Aus: kein Limit.</string>
+    <string name="rules_tag_limit">%1$d/Std.</string>
+    <string name="rules_tag_no_limit">Kein Limit</string>
     <string name="rules_log_busy">Übersprungen: Das Smartphone war zu lange belegt.</string>
     <string name="rules_log_error">Nicht ausgeführt: %1$s</string>
     <string name="rules_log_no_service">Die Bedienungshilfe von Buddy ist aus</string>

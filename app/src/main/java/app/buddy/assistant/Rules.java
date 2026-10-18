@@ -16,6 +16,8 @@ import java.util.Locale;
 final class Rules {
     /** Countdown lengths the editor offers, in seconds. */
     static final int[] SECONDS = {10, 30, 60, 300};
+    /** Hourly limits the editor offers (runs for one conversation); 0 is no limit. */
+    static final int[] LIMITS = {5, 20, 50, 0};
 
     static final class Rule {
         String id = Long.toString(System.currentTimeMillis(), 36);
@@ -29,12 +31,14 @@ final class Rules {
         /** Before acting: "ask" (approval cards wait for the user) or "countdown" (they approve themselves). */
         String approval = "ask";
         int seconds = 30;
+        /** Most runs an hour for one conversation, and three times as many for the whole rule; 0 for no limit. */
+        int limit = 20;
         boolean on = true;
 
         JSONObject json() throws org.json.JSONException {
             return new JSONObject().put("id", id).put("pkg", pkg).put("app", app).put("from", from).put("words", words)
                     .put("instruction", instruction).put("backend", backend).put("model", model).put("approval", approval)
-                    .put("seconds", seconds).put("on", on);
+                    .put("seconds", seconds).put("limit", limit).put("on", on);
         }
 
         static Rule of(JSONObject o) {
@@ -49,6 +53,7 @@ final class Rules {
             r.model = o.optString("model", "");
             r.approval = o.optString("approval", "ask");
             r.seconds = o.optInt("seconds", 30);
+            r.limit = o.optInt("limit", 20);
             r.on = o.optBoolean("on", true);
             return r;
         }

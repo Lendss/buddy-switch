@@ -948,6 +948,12 @@
     <string name="rules_log_replied">답장했어요: “%1$s”</string>
     <string name="rules_log_done_empty">답변 없이 완료했어요.</string>
     <string name="rules_log_limit">건너뜀: 최근 1시간 동안 실행이 너무 많았어요.</string>
+    <string name="rules_log_held">대기 중: 최근 1시간 동안 실행이 너무 많았어요. 새 메시지는 %1$s에 한 번에 모아서 처리해요.</string>
+    <string name="rules_limit">시간당 한도</string>
+    <string name="rules_limit_off">끄기</string>
+    <string name="rules_limit_info">대화 하나당 1시간에 실행할 수 있는 최대 횟수예요. 규칙 전체로는 그 3배까지예요. 한도를 넘으면 새 메시지는 기다렸다가 한 번에 모아서 처리돼요. 끄기: 제한 없음.</string>
+    <string name="rules_tag_limit">시간당 %1$d회</string>
+    <string name="rules_tag_no_limit">제한 없음</string>
     <string name="rules_log_busy">건너뜀: 휴대전화가 너무 오래 사용 중이었어요.</string>
     <string name="rules_log_error">실행 안 됨: %1$s</string>
     <string name="rules_log_no_service">Buddy 접근성 서비스가 꺼져 있음</string>

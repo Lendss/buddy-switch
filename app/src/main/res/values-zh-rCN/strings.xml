@@ -1390,6 +1390,12 @@
     <string name="rules_log_replied">已回复：“%1$s”</string>
     <string name="rules_log_done_empty">已完成，没有回复。</string>
     <string name="rules_log_limit">已跳过：过去 1 小时内运行次数过多。</string>
+    <string name="rules_log_held">等待中：过去 1 小时内运行次数过多。新消息将于 %1$s 合并为一次运行处理。</string>
+    <string name="rules_limit">每小时上限</string>
+    <string name="rules_limit_off">关闭</string>
+    <string name="rules_limit_info">单个对话每小时最多运行的次数，整条规则最多为其 3 倍。超出后，新消息会等待，然后合并为一次运行处理。关闭：不限制。</string>
+    <string name="rules_tag_limit">%1$d 次/小时</string>
+    <string name="rules_tag_no_limit">不限制</string>
     <string name="rules_log_busy">已跳过：手机长时间处于忙碌状态。</string>
     <string name="rules_log_error">未运行：%1$s</string>
     <string name="rules_log_no_service">Buddy 的无障碍服务已关闭</string>

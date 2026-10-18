@@ -1003,6 +1003,12 @@
     <string name="rules_log_replied">تم الرد: «%1$s»</string>
     <string name="rules_log_done_empty">تم التنفيذ دون رد.</string>
     <string name="rules_log_limit">تم التخطي: مرات التشغيل كثيرة جدًا خلال الساعة الأخيرة.</string>
+    <string name="rules_log_held">في الانتظار: مرات التشغيل كثيرة جدًا خلال الساعة الأخيرة. ستُعالَج الرسائل الجديدة معًا في تشغيل واحد عند %1$s.</string>
+    <string name="rules_limit">الحد في الساعة</string>
+    <string name="rules_limit_off">إيقاف</string>
+    <string name="rules_limit_info">أقصى عدد من مرات التشغيل في الساعة لمحادثة واحدة، وثلاثة أضعافه للقاعدة كلها. بعد تجاوزه تنتظر الرسائل الجديدة، ثم تُعالَج معًا في تشغيل واحد. إيقاف: بلا حد.</string>
+    <string name="rules_tag_limit">%1$d/ساعة</string>
+    <string name="rules_tag_no_limit">بلا حد</string>
     <string name="rules_log_busy">تم التخطي: كان الهاتف مشغولًا لفترة طويلة جدًا.</string>
     <string name="rules_log_error">لم يتم التشغيل: %1$s</string>
     <string name="rules_log_no_service">خدمة سهولة الاستخدام في Buddy متوقفة</string>

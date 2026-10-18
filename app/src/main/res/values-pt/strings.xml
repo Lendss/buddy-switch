@@ -1401,6 +1401,12 @@
     <string name="rules_log_replied">Respondeu: “%1$s”</string>
     <string name="rules_log_done_empty">Concluído, sem resposta.</string>
     <string name="rules_log_limit">Ignorada: muitas execuções na última hora.</string>
+    <string name="rules_log_held">Aguardando: muitas execuções na última hora. As novas mensagens serão tratadas juntas em uma única execução às %1$s.</string>
+    <string name="rules_limit">Limite por hora</string>
+    <string name="rules_limit_off">Sem limite</string>
+    <string name="rules_limit_info">Máximo de execuções por hora para uma conversa, e o triplo para a regra inteira. Acima disso, as novas mensagens esperam e depois são tratadas juntas em uma única execução.</string>
+    <string name="rules_tag_limit">%1$d/h</string>
+    <string name="rules_tag_no_limit">Sem limite</string>
     <string name="rules_log_busy">Ignorada: o telefone ficou ocupado por tempo demais.</string>
     <string name="rules_log_error">Não foi possível executar: %1$s</string>
     <string name="rules_log_no_service">o serviço de acessibilidade do Buddy está desativado</string>

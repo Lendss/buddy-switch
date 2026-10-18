@@ -1426,6 +1426,12 @@
     <string name="rules_log_replied">Надіслано відповідь: «%1$s»</string>
     <string name="rules_log_done_empty">Готово, без відповіді.</string>
     <string name="rules_log_limit">Пропущено: забагато запусків за останню годину.</string>
+    <string name="rules_log_held">Очікування: забагато запусків за останню годину. Нові повідомлення буде оброблено разом за один запуск о %1$s.</string>
+    <string name="rules_limit">Ліміт на годину</string>
+    <string name="rules_limit_off">Вимк.</string>
+    <string name="rules_limit_info">Максимум запусків на годину для однієї розмови і втричі більше для всього правила. Понад ліміт нові повідомлення чекають, а потім обробляються разом за один запуск. Вимк.: без обмежень.</string>
+    <string name="rules_tag_limit">%1$d/год</string>
+    <string name="rules_tag_no_limit">Без обмежень</string>
     <string name="rules_log_busy">Пропущено: телефон був зайнятий надто довго.</string>
     <string name="rules_log_error">Не запущено: %1$s</string>
     <string name="rules_log_no_service">сервіс спеціальних можливостей Buddy вимкнено</string>

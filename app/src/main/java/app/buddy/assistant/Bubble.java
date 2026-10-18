@@ -88,6 +88,9 @@ final class Bubble implements ChatHub.Listener {
     /** A card's countdown (a notification rule's): when it ends and how long it is (elapsedRealtime ms), or 0. */
     private long countdownEnd, countdownLength;
     private Button confirmDeny, confirmChange, confirmApprove, confirmOwn;
+    /** The header's Open in the app and Close, and the chat heads' buttons below the panel (see placePanel). */
+    private android.widget.ImageButton expandIcon, closeIcon;
+    private View headButtons;
     /** The card asks a question (the ask tool) rather than for approval; askOptions are its buttons. */
     private boolean asking;
     private java.util.List<String> askOptions;
@@ -310,8 +313,10 @@ final class Bubble implements ChatHub.Listener {
         titles.addView(chip, chp);
         top.addView(titles, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         top.addView(toolIcon(R.drawable.ms_add, svc.getString(R.string.bubble_new_chat), Ui.MUTED, v -> showNewChat()));
-        top.addView(toolIcon(R.drawable.ms_open_in_full, svc.getString(R.string.bubble_open_in_app), Ui.MUTED, v -> openInApp(false)));
-        top.addView(toolIcon(R.drawable.ms_close, svc.getString(R.string.bubble_close), Ui.MUTED, v -> collapse()));
+        expandIcon = toolIcon(R.drawable.ms_open_in_full, svc.getString(R.string.bubble_open_in_app), Ui.MUTED, v -> openInApp(false));
+        top.addView(expandIcon);
+        closeIcon = toolIcon(R.drawable.ms_close, svc.getString(R.string.bubble_close), Ui.MUTED, v -> collapse());
+        top.addView(closeIcon);
         panel.addView(top, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         View line = new View(svc);
@@ -466,7 +471,9 @@ final class Bubble implements ChatHub.Listener {
         android.widget.ImageButton attach = Ui.iconButton(svc, R.drawable.ms_attach_file, svc.getString(R.string.bubble_attach), Ui.MUTED);
         attach.setOnClickListener(v -> openInApp(true));
         inputRow.addView(attach, new LinearLayout.LayoutParams(dp(40), dp(40)));
-        input = new EditText(svc);
+        RichEditText field = new RichEditText(svc);
+        field.onImages(this::pasteImages); // from the keyboard's clipboard, say (issue #6)
+        input = field;
         input.setHint(svc.getString(R.string.bubble_input_hint, "Buddy"));
         input.setHintTextColor(Ui.MUTED);
         input.setTextColor(Ui.TEXT);
@@ -598,6 +605,18 @@ final class Bubble implements ChatHub.Listener {
 
     /** The keyboard's height as the window last reported it (0: hidden, or not reported). */
     private int insetIme;
+    /**
+     * How much the keyboard covered the panel when it was last up, per orientation and panel size (0: not seen yet),
+     * and until when (uptimeMillis) that much room stays for a keyboard the panel just asked for (issue #7).
+     */
+    private final int[] lastKeyboard = new int[4];
+    private long keyboardDue;
+    private final Runnable keyboardLate = this::fitKeyboard;
+
+    private int keyboardSlot() {
+        Rect sc = screen();
+        return (sc.width() > sc.height() ? 2 : 0) + ("compact".equals(Prefs.panelSize(svc)) ? 1 : 0);
+    }
 
     private void applyIme(android.view.WindowInsets insets) {
         insetIme = insets.getInsets(android.view.WindowInsets.Type.ime()).bottom;
@@ -629,7 +648,11 @@ final class Bubble implements ChatHub.Listener {
             root.getLocationOnScreen(loc);
             kb = Math.max(kb, loc[1] + root.getHeight() - imeTop);
         }
+        int slot = keyboardSlot();
+        if (SystemClock.uptimeMillis() < keyboardDue) kb = Math.max(kb, lastKeyboard[slot]); // still on its way
+        else if (kb > 0) lastKeyboard[slot] = kb;
         int pad = kb > 0 ? kb + dp(8) : 0;
+        if (headButtons != null) headButtons.setVisibility(pad > 0 ? View.GONE : View.VISIBLE); // room for the chat
         if (root.getPaddingBottom() != pad) {
             root.setPaddingRelative(0, 0, 0, pad);
             scrollToEnd();
@@ -654,24 +677,88 @@ final class Bubble implements ChatHub.Listener {
         boolean compact = "compact".equals(Prefs.panelSize(svc));
         int side = compact ? Math.max(Math.max(edges.left, edges.right) + dp(8), usable.width() / 8) : 0;
         lp.width = usable.width() - 2 * side;
-        // full height (or about three quarters in "compact", in portrait: landscape is short already); the keyboard
-        // is made room for by padding (fitKeyboard), only when it's for Buddy's own text field (not another app's,
-        // e.g. while the agent types in Messenger)
-        lp.height = Math.max(dp(220), shortPanel() ? usable.height() * 3 / 4 : usable.height() - dp(8) - dp(8));
+        // full height (in "compact", in portrait, that has Buddy's face above the panel and two buttons below it); the
+        // keyboard is made room for by padding (fitKeyboard), only when it's for Buddy's own text field (not another
+        // app's, e.g. while the agent types in Messenger)
+        lp.height = Math.max(dp(220), usable.height() - dp(8) - dp(8));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
         lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
-                | (passThrough ? WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE : 0);
+                | (passThrough ? WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE : 0) | dimFlags();
+        lp.dimAmount = 0.45f;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) lp.setBlurBehindRadius(dp(16));
         // Buddy moves the panel itself (followKeyboard), so the system must not resize the window too
         lp.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING;
     }
 
-    /** "compact" panel in portrait: about three quarters of the height. */
-    private boolean shortPanel() {
+    /**
+     * "compact" in portrait looks like a messenger's chat heads: Buddy's face above the panel, Close and Open in the
+     * app below it, and the screen behind dimmed. Only the look: the window stays clear of the screen edges, and a
+     * touch outside it still reaches the app behind, so side gestures keep working (issue #3).
+     */
+    private boolean heads() {
         Rect sc = screen();
         return "compact".equals(Prefs.panelSize(svc)) && sc.height() > sc.width();
+    }
+
+    /** The open chat heads dim (and, where the phone can, blur) what's behind; never while an agent looks or acts. */
+    private int dimFlags() {
+        if (!expanded || passThrough || !heads()) return 0;
+        int f = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && wm.isCrossWindowBlurEnabled()) {
+            f |= WindowManager.LayoutParams.FLAG_BLUR_BEHIND;
+        }
+        return f;
+    }
+
+    /** The screen behind is dimmed now (an agent's screenshot waits for that to go). */
+    boolean dimming() {
+        return (lp.flags & WindowManager.LayoutParams.FLAG_DIM_BEHIND) != 0;
+    }
+
+    /** Puts the panel in the window: on its own, or between Buddy's face and the two buttons (heads()). */
+    private void placePanel() {
+        boolean heads = heads();
+        if (panel.getParent() != null) ((android.view.ViewGroup) panel.getParent()).removeView(panel);
+        root.removeAllViews();
+        expandIcon.setVisibility(heads ? View.GONE : View.VISIBLE);
+        closeIcon.setVisibility(heads ? View.GONE : View.VISIBLE);
+        headButtons = null;
+        if (!heads) {
+            root.addView(panel);
+            return;
+        }
+        LinearLayout col = new LinearLayout(svc);
+        col.setOrientation(LinearLayout.VERTICAL);
+        ImageView head = new ImageView(svc);
+        head.setImageResource(R.drawable.bubble_face);
+        head.setContentDescription(svc.getString(R.string.bubble_close));
+        head.setOnClickListener(v -> collapse());
+        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(dp(52), dp(52));
+        hp.gravity = Gravity.CENTER_HORIZONTAL;
+        hp.bottomMargin = dp(10);
+        col.addView(head, hp);
+        col.addView(panel, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        LinearLayout buttons = new LinearLayout(svc);
+        buttons.addView(headButton(svc.getString(R.string.bubble_close), v -> collapse()));
+        buttons.addView(new View(svc), new LinearLayout.LayoutParams(0, 1, 1));
+        buttons.addView(headButton(svc.getString(R.string.bubble_open_in_app), v -> openInApp(false)));
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp.topMargin = dp(12);
+        col.addView(buttons, bp);
+        headButtons = buttons;
+        root.addView(col);
+    }
+
+    private Button headButton(String label, View.OnClickListener l) {
+        Button b = actionButton(label, Ui.CARD2);
+        b.setBackground(rounded(Ui.CARD2, 24, Ui.OUTLINE, 1));
+        b.setPaddingRelative(dp(20), dp(10), dp(20), dp(10));
+        b.setOnClickListener(l);
+        return b;
     }
 
     /**
@@ -684,7 +771,7 @@ final class Bubble implements ChatHub.Listener {
             @Override
             public void onGlobalLayout() {
                 root.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                if (!expanded || shortPanel()) return;
+                if (!expanded) return;
                 int[] loc = new int[2];
                 root.getLocationOnScreen(loc);
                 int h = Math.max(dp(220), usable().bottom - dp(8) - loc[1]);
@@ -698,8 +785,12 @@ final class Bubble implements ChatHub.Listener {
     /** The screen rotated: size the panel (or place the bubble) for the new orientation. */
     void onRotated() {
         layoutOptions();
-        if (expanded) applyExpandedParams();
-        else applyCollapsedParams();
+        if (expanded) {
+            placePanel(); // compact's chat heads are for portrait only
+            applyExpandedParams();
+        } else {
+            applyCollapsedParams();
+        }
         wm.updateViewLayout(root, lp);
         if (expanded) {
             fitPanelHeight();
@@ -712,14 +803,25 @@ final class Bubble implements ChatHub.Listener {
         expanded = true;
         root.setVisibility(View.VISIBLE);
         badge.setVisibility(View.GONE);
-        root.removeAllViews();
-        root.addView(panel);
+        placePanel();
+        // with Back/Home/Recents buttons the keyboard would cover them (it's layered above Buddy's overlay, so
+        // above the navigation bar): open it only when the text field is tapped
+        boolean keyboard = pendingConfirm == null && !sessions.current.running && !showingList && !navButtons();
+        int room = keyboard ? lastKeyboard[keyboardSlot()] : 0;
+        if (room > 0) {
+            // room for the keyboard before it slides in, as much as it took last time: it can be slow to say where it
+            // is, and the composer would sit under it until then (issue #7)
+            keyboardDue = SystemClock.uptimeMillis() + 1200;
+            root.setPaddingRelative(0, 0, 0, room + dp(8));
+            root.removeCallbacks(keyboardLate);
+            root.postDelayed(keyboardLate, 1250); // it didn't come after all: the room goes
+        }
         applyExpandedParams();
         Voice.prepare(svc); // so the mic is quick
         wm.updateViewLayout(root, lp);
         fitPanelHeight();
         boolean right = Prefs.bubblePos(svc)[0] != 0;
-        panel.setPivotX(right ? lp.width : 0);
+        panel.setPivotX(headButtons != null ? lp.width / 2f : right ? lp.width : 0); // chat heads: from Buddy's face
         panel.setPivotY(0);
         panel.setScaleX(0.85f);
         panel.setScaleY(0.85f);
@@ -729,9 +831,7 @@ final class Bubble implements ChatHub.Listener {
         scrollToEnd();
         root.post(this::registerBack);
         updateViewing();
-        // with Back/Home/Recents buttons the keyboard would cover them (it's layered above Buddy's overlay, so
-        // above the navigation bar): open it only when the text field is tapped
-        if (pendingConfirm == null && !sessions.current.running && !showingList && !navButtons()) {
+        if (keyboard) {
             input.requestFocus();
             input.postDelayed(() -> {
                 InputMethodManager imm = svc.getSystemService(InputMethodManager.class);
@@ -747,6 +847,8 @@ final class Bubble implements ChatHub.Listener {
         updateViewing();
         unregisterBack();
         hideKeyboard();
+        keyboardDue = 0;
+        root.removeCallbacks(keyboardLate);
         root.removeAllViews();
         root.setPaddingRelative(0, 0, 0, 0);
         root.addView(collapsed);
@@ -1086,6 +1188,8 @@ final class Bubble implements ChatHub.Listener {
         root.setAlpha(on ? 0f : 1f);
         if (on) lp.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         else lp.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        lp.flags = (lp.flags & ~(WindowManager.LayoutParams.FLAG_DIM_BEHIND | WindowManager.LayoutParams.FLAG_BLUR_BEHIND))
+                | dimFlags();
         try {
             wm.updateViewLayout(root, lp);
         } catch (Exception ignored) {
@@ -1757,12 +1861,18 @@ final class Bubble implements ChatHub.Listener {
 
     /** Open this chat in the app (with what's typed so far); attach: straight to the attachment sheet. */
     private void openInApp(boolean attach) {
+        openInApp(attach, null);
+    }
+
+    /** files: attachments already in Buddy's storage (pasted images), to go with the draft. */
+    private void openInApp(boolean attach, java.util.ArrayList<String> files) {
         String draft = input.getText().toString();
         android.content.Intent i = new android.content.Intent(svc, ChatActivity.class)
                 .putExtra("id", sessions.current.id)
                 .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
         if (!draft.trim().isEmpty()) i.putExtra("draft", draft);
         if (attach) i.putExtra("attach", true);
+        if (files != null) i.putStringArrayListExtra("files", files);
         input.setText("");
         collapse();
         svc.startActivity(i);
@@ -2222,18 +2332,55 @@ final class Bubble implements ChatHub.Listener {
     private void updatePaste() {
         ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
         android.content.ClipDescription d = input.hasFocus() ? cm.getPrimaryClipDescription() : null;
-        boolean text = d != null && (d.hasMimeType("text/*") || d.hasMimeType("text/uri-list"));
-        paste.setVisibility(text ? View.VISIBLE : View.GONE);
+        boolean can = d != null && (d.hasMimeType("text/*") || d.hasMimeType("text/uri-list") || d.hasMimeType("image/*"));
+        paste.setVisibility(can ? View.VISIBLE : View.GONE);
     }
 
     private void pasteClip() {
         ClipData clip = svc.getSystemService(ClipboardManager.class).getPrimaryClip();
-        CharSequence t = clip == null || clip.getItemCount() == 0 ? null : clip.getItemAt(0).coerceToText(svc);
+        if (clip == null || clip.getItemCount() == 0) return;
+        // a copied screenshot or photo is attached, not pasted as its address
+        java.util.List<android.net.Uri> images = new java.util.ArrayList<>();
+        for (int i = 0; i < clip.getItemCount(); i++) {
+            android.net.Uri u = clip.getItemAt(i).getUri();
+            if (u != null && RichEditText.isImage(svc, u, clip.getDescription())) images.add(u);
+        }
+        if (!images.isEmpty()) {
+            pasteImages(images, () -> { });
+            return;
+        }
+        CharSequence t = clip.getItemAt(0).coerceToText(svc);
         if (t == null || t.length() == 0) return;
         int a = Math.max(0, Math.min(input.getSelectionStart(), input.getSelectionEnd()));
         int b = Math.max(0, Math.max(input.getSelectionStart(), input.getSelectionEnd()));
         input.getText().replace(a, b, t);
         input.setSelection(a + t.length());
+    }
+
+    /**
+     * Images pasted here, or picked in the keyboard's clipboard: copied into Buddy's storage, then the chat opens in
+     * the app with them attached and the draft kept, to check or remove them before sending (issue #6).
+     */
+    private void pasteImages(java.util.List<android.net.Uri> uris, Runnable done) {
+        toast(uris.size() == 1 ? svc.getString(R.string.chat_adding)
+                : svc.getResources().getQuantityString(R.plurals.chat_adding_files, uris.size(), uris.size()));
+        new Thread(() -> {
+            java.util.ArrayList<String> ids = new java.util.ArrayList<>();
+            String err = null;
+            for (android.net.Uri u : uris) {
+                try {
+                    ids.add(Attachments.importUri(svc, u));
+                } catch (Exception e) {
+                    err = e.getMessage();
+                }
+            }
+            final String error = err;
+            input.post(() -> {
+                done.run();
+                if (error != null) toast(error);
+                if (!ids.isEmpty()) openInApp(false, ids);
+            });
+        }).start();
     }
 
     private void copyOnLongPress(View v, String text) {

@@ -962,6 +962,12 @@
     <string name="rules_log_replied">Geantwoord: “%1$s”</string>
     <string name="rules_log_done_empty">Klaar, zonder antwoord.</string>
     <string name="rules_log_limit">Overgeslagen: te vaak in het afgelopen uur.</string>
+    <string name="rules_log_held">Wacht: te vaak in het afgelopen uur. De nieuwe berichten worden om %1$s samen in één keer afgehandeld.</string>
+    <string name="rules_limit">Limiet per uur</string>
+    <string name="rules_limit_off">Uit</string>
+    <string name="rules_limit_info">Hoogstens zoveel keer per uur voor één gesprek, en drie keer zoveel voor de hele regel. Daarboven wachten nieuwe berichten en worden ze daarna samen in één keer afgehandeld. Uit: geen limiet.</string>
+    <string name="rules_tag_limit">%1$d/u</string>
+    <string name="rules_tag_no_limit">Geen limiet</string>
     <string name="rules_log_busy">Overgeslagen: de telefoon was te lang in gebruik.</string>
     <string name="rules_log_error">Niet uitgevoerd: %1$s</string>
     <string name="rules_log_no_service">de toegankelijkheidsservice van Buddy staat uit</string>

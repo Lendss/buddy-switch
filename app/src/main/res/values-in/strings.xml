@@ -1390,6 +1390,12 @@
     <string name="rules_log_replied">Balasan terkirim: “%1$s”</string>
     <string name="rules_log_done_empty">Selesai, tanpa balasan.</string>
     <string name="rules_log_limit">Dilewati: terlalu banyak dalam satu jam terakhir.</string>
+    <string name="rules_log_held">Menunggu: terlalu banyak dalam satu jam terakhir. Pesan baru akan diproses bersama dalam satu kali jalan pada %1$s.</string>
+    <string name="rules_limit">Batas per jam</string>
+    <string name="rules_limit_off">Nonaktif</string>
+    <string name="rules_limit_info">Jumlah maksimum jalan per jam untuk satu percakapan, dan tiga kali lipatnya untuk seluruh aturan. Jika terlewati, pesan baru menunggu lalu diproses bersama dalam satu kali jalan. Nonaktif: tanpa batas.</string>
+    <string name="rules_tag_limit">%1$d/jam</string>
+    <string name="rules_tag_no_limit">Tanpa batas</string>
     <string name="rules_log_busy">Dilewati: ponsel sibuk terlalu lama.</string>
     <string name="rules_log_error">Tidak dijalankan: %1$s</string>
     <string name="rules_log_no_service">layanan aksesibilitas Buddy nonaktif</string>

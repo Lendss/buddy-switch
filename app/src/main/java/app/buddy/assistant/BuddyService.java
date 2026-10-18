@@ -468,13 +468,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     void setBubblePassThrough(final boolean on) {
         final CountDownLatch done = new CountDownLatch(1);
+        final boolean[] dimmed = {false};
         main.post(() -> {
+            dimmed[0] = bubble.dimming();
             bubble.setPassThrough(on);
             done.countDown();
         });
         try {
             done.await(1, TimeUnit.SECONDS);
-            if (on) Thread.sleep(120);
+            if (on) Thread.sleep(dimmed[0] ? 350 : 120); // the compact panel's dimming fades out first
         } catch (InterruptedException ignored) {
         }
     }

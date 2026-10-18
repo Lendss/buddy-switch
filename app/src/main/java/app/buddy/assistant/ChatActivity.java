@@ -140,7 +140,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         attach.setOnClickListener(v -> attachSheet());
         pill.addView(attach);
         pill.setBackground(outlined(this, CARD, 26, OUTLINE, 1));
-        input = new EditText(this);
+        RichEditText field = new RichEditText(this);
+        field.onImages(this::addFiles); // pasted, or from the keyboard's clipboard (issue #6)
+        input = field;
         input.setHint(getString(R.string.chat_input_hint, ses.brainName()));
         input.setHintTextColor(MUTED);
         input.setTextColor(TEXT);
@@ -216,8 +218,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             input.setText(draft);
             input.setSelection(draft.length());
         }
-        // from the bubble's attach button
+        // from the bubble's attach button, or images pasted there (already copied into Buddy's storage)
         if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
+        java.util.ArrayList<String> files = getIntent().getStringArrayListExtra("files");
+        if (state == null && files != null) {
+            pending.addAll(files);
+            renderTray();
+        }
     }
 
     /** The chat's messages from scratch. */
@@ -847,7 +854,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 uris.add(data.getData());
             }
         }
-        if (uris.isEmpty()) return;
+        if (!uris.isEmpty()) addFiles(uris, null);
+    }
+
+    /** Copies picked or pasted files into Buddy's storage and adds them to the next message; then done, if any. */
+    private void addFiles(java.util.List<android.net.Uri> uris, Runnable done) {
         Toast.makeText(this, uris.size() == 1 ? getString(R.string.chat_adding)
                 : getResources().getQuantityString(R.plurals.chat_adding_files, uris.size(), uris.size()), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
@@ -862,6 +873,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             }
             final String error = err;
             runOnUiThread(() -> {
+                if (done != null) done.run();
                 if (isFinishing()) return;
                 pending.addAll(ids);
                 renderTray();

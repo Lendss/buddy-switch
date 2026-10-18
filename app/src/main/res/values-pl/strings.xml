@@ -988,6 +988,12 @@
     <string name="rules_log_replied">Odpowiedziano: „%1$s”</string>
     <string name="rules_log_done_empty">Gotowe, bez odpowiedzi.</string>
     <string name="rules_log_limit">Pominięto: zbyt wiele uruchomień w ostatniej godzinie.</string>
+    <string name="rules_log_held">Czeka: zbyt wiele uruchomień w ostatniej godzinie. Nowe wiadomości zostaną obsłużone razem w jednym uruchomieniu o %1$s.</string>
+    <string name="rules_limit">Limit na godzinę</string>
+    <string name="rules_limit_off">Bez limitu</string>
+    <string name="rules_limit_info">Maksymalna liczba uruchomień na godzinę dla jednej rozmowy i trzy razy tyle dla całej reguły. Po jej przekroczeniu nowe wiadomości czekają, a potem są obsługiwane razem w jednym uruchomieniu.</string>
+    <string name="rules_tag_limit">%1$d/godz.</string>
+    <string name="rules_tag_no_limit">Bez limitu</string>
     <string name="rules_log_busy">Pominięto: telefon był zbyt długo zajęty.</string>
     <string name="rules_log_error">Nie uruchomiono: %1$s</string>
     <string name="rules_log_no_service">usługa ułatwień dostępu Buddy jest wyłączona</string>

@@ -1429,6 +1429,12 @@
     <!-- What a rule did: the agent finished without saying anything. -->
     <string name="rules_log_done_empty">Done, without a reply.</string>
     <string name="rules_log_limit">Skipped: too many in the last hour.</string>
+    <string name="rules_log_held">Waiting: too many in the last hour. The new messages get one run together at %1$s.</string>
+    <string name="rules_limit">Hourly limit</string>
+    <string name="rules_limit_off">Off</string>
+    <string name="rules_limit_info">Most runs an hour for one conversation, and three times as many for the whole rule. Past it, new messages wait and then get one run together. Off: no limit.</string>
+    <string name="rules_tag_limit">%1$d/h</string>
+    <string name="rules_tag_no_limit">No limit</string>
     <string name="rules_log_busy">Skipped: the phone was busy for too long.</string>
     <!-- %1$s = why: rules_log_no_service, rules_log_not_signed_in, or a technical error (often English). -->
     <string name="rules_log_error">Didn\'t run: %1$s</string>

@@ -196,7 +196,8 @@ public class RulesActivity extends Screen {
         String tag = (r.on ? "" : getString(R.string.rules_tag_off) + " · ") + Account.nameOf(r.backend)
                 + (r.model.isEmpty() ? "" : " · " + Models.label(r.backend, r.model)) + " · "
                 + (r.countdown() ? getString(R.string.rules_tag_countdown, Rules.Rule.duration(this, r.seconds))
-                : getString(R.string.rules_tag_ask));
+                : getString(R.string.rules_tag_ask)) + " · "
+                + (r.limit == 0 ? getString(R.string.rules_tag_no_limit) : getString(R.string.rules_tag_limit, r.limit));
         TextView tg = monoText(this, tag, 12, r.on ? ACCENT_TEXT : MUTED);
         tg.setPaddingRelative(0, dp(this, 4), 0, 0);
         col.addView(tg);
@@ -216,7 +217,8 @@ public class RulesActivity extends Screen {
         String line;
         switch (e.optString("kind")) {
             case "replied": line = getString(R.string.rules_log_replied, d); break;
-            case "limit": line = getString(R.string.rules_log_limit); break;
+            case "limit": line = getString(R.string.rules_log_limit); break; // before 2.2.3, a limit dropped the run
+            case "held": line = getString(R.string.rules_log_held, d); break;
             case "busy": line = getString(R.string.rules_log_busy); break;
             case "error": line = getString(R.string.rules_log_error, d); break;
             default: line = d.isEmpty() ? getString(R.string.rules_log_done_empty) : d;
@@ -234,7 +236,7 @@ public class RulesActivity extends Screen {
     private TextView appName;
     private ImageView appIcon;
     private EditText instruction;
-    private FrameLayout approvalSlot;
+    private FrameLayout approvalSlot, limitSlot;
 
     private void renderEditor() {
         body.removeAllViews();
@@ -322,6 +324,11 @@ public class RulesActivity extends Screen {
         body.addView(approvalSlot, gap(8));
         renderApproval();
 
+        body.addView(label(getString(R.string.rules_limit)), gap(20));
+        limitSlot = new FrameLayout(this);
+        body.addView(limitSlot, gap(8));
+        renderLimit();
+
         if (!isNew) {
             LinearLayout sw = switchRow(this, getString(R.string.rules_on), null, draft.on, on -> draft.on = on);
             sw.setPaddingRelative(0, dp(this, 14), 0, dp(this, 14));
@@ -381,6 +388,24 @@ public class RulesActivity extends Screen {
         approvalSlot.addView(box);
     }
 
+    /** Runs an hour for one conversation; past it, the conversation's messages wait and get one run together. */
+    private void renderLimit() {
+        limitSlot.removeAllViews();
+        LinearLayout box = column(this);
+        String[][] limits = new String[Rules.LIMITS.length][];
+        for (int i = 0; i < limits.length; i++) {
+            int n = Rules.LIMITS[i];
+            limits[i] = new String[]{String.valueOf(n), n == 0 ? getString(R.string.rules_limit_off)
+                    : String.format(java.util.Locale.getDefault(), "%d", n)};
+        }
+        box.addView(segmented(this, limits, String.valueOf(draft.limit), true, v -> {
+            draft.limit = Integer.parseInt(v);
+            renderLimit();
+        }), full());
+        box.addView(text(this, getString(R.string.rules_limit_info), 12, MUTED), gap(8));
+        limitSlot.addView(box);
+    }
+
     private void showApp() {
         if (draft.pkg.isEmpty()) {
             appName.setText(R.string.rules_pick_app);
@@ -412,6 +437,7 @@ public class RulesActivity extends Screen {
         draft.from = draft.from.trim();
         draft.words = draft.words.trim();
         Rules.put(this, draft);
+        Triggers.get(this).rulesChanged();
         if (NotificationWatcher.enabled(this)) finish();
         else openAccess(); // the rule can't see anything yet
     }

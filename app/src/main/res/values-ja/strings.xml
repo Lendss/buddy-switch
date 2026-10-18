@@ -948,6 +948,12 @@
     <string name="rules_log_replied">返信しました：「%1$s」</string>
     <string name="rules_log_done_empty">完了しました（応答なし）。</string>
     <string name="rules_log_limit">スキップ：過去 1 時間の実行回数が多すぎます。</string>
+    <string name="rules_log_held">待機中：過去 1 時間の実行回数が多すぎます。新しいメッセージは %1$s にまとめて 1 回で処理します。</string>
+    <string name="rules_limit">1 時間あたりの上限</string>
+    <string name="rules_limit_off">オフ</string>
+    <string name="rules_limit_info">1 つの会話で 1 時間に実行できる最大回数です。ルール全体ではその 3 倍までです。上限を超えると、新しいメッセージは待機し、あとでまとめて 1 回で処理されます。オフ：制限なし。</string>
+    <string name="rules_tag_limit">%1$d 回/時</string>
+    <string name="rules_tag_no_limit">制限なし</string>
     <string name="rules_log_busy">スキップ：スマートフォンが長時間ふさがっていました。</string>
     <string name="rules_log_error">実行されませんでした：%1$s</string>
     <string name="rules_log_no_service">Buddy のユーザー補助サービスがオフです</string>

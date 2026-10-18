@@ -1388,6 +1388,12 @@
     <string name="rules_log_replied">Réponse envoyée : « %1$s »</string>
     <string name="rules_log_done_empty">Terminé, sans réponse.</string>
     <string name="rules_log_limit">Ignoré : trop de déclenchements au cours de la dernière heure.</string>
+    <string name="rules_log_held">En attente : trop de déclenchements au cours de la dernière heure. Les nouveaux messages seront traités ensemble en une seule fois à %1$s.</string>
+    <string name="rules_limit">Limite par heure</string>
+    <string name="rules_limit_off">Illimité</string>
+    <string name="rules_limit_info">Nombre maximal de déclenchements par heure pour une conversation, et trois fois plus pour toute la règle. Au-delà, les nouveaux messages attendent, puis sont traités ensemble en une seule fois.</string>
+    <string name="rules_tag_limit">%1$d/h</string>
+    <string name="rules_tag_no_limit">Illimité</string>
     <string name="rules_log_busy">Ignoré : le téléphone est resté occupé trop longtemps.</string>
     <string name="rules_log_error">Non exécuté : %1$s</string>
     <string name="rules_log_no_service">le service d\'accessibilité de Buddy est désactivé</string>

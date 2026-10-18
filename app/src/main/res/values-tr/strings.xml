@@ -964,6 +964,12 @@
     <string name="rules_log_replied">Yanıtlandı: “%1$s”</string>
     <string name="rules_log_done_empty">Tamamlandı, yanıt verilmedi.</string>
     <string name="rules_log_limit">Atlandı: son bir saatte çok fazla çalıştırıldı.</string>
+    <string name="rules_log_held">Bekliyor: son bir saatte çok fazla çalıştırıldı. Yeni mesajlar tek seferde birlikte işlenecek (saat %1$s).</string>
+    <string name="rules_limit">Saatlik sınır</string>
+    <string name="rules_limit_off">Kapalı</string>
+    <string name="rules_limit_info">Bir konuşma için saatte en fazla çalıştırma sayısı; kuralın tamamı için bunun üç katı. Aşılırsa yeni mesajlar bekler, sonra tek seferde birlikte işlenir. Kapalı: sınır yok.</string>
+    <string name="rules_tag_limit">%1$d/sa</string>
+    <string name="rules_tag_no_limit">Sınırsız</string>
     <string name="rules_log_busy">Atlandı: telefon çok uzun süre meşguldü.</string>
     <string name="rules_log_error">Çalıştırılamadı: %1$s</string>
     <string name="rules_log_no_service">Buddy\'nin erişilebilirlik hizmeti kapalı</string>
