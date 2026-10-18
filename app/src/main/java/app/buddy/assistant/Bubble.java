@@ -610,10 +610,18 @@ final class Bubble implements ChatHub.Listener {
         // between the status bar and the navigation bar: an accessibility overlay is drawn above the navigation
         // bar, so a panel reaching into it hid Back, Home and Recents with 3-button navigation (issue #1)
         Rect usable = usable();
-        lp.width = usable.width() - dp(20);
-        // full height; the keyboard is made room for by padding (fitKeyboard), only when it's for Buddy's own
-        // text field (not another app's, e.g. while the agent types in Messenger)
-        lp.height = Math.max(dp(220), usable.height() - dp(8) - dp(8));
+        // "full" goes edge to edge (Android's own Back swipe still works over it: the system takes it first);
+        // "compact" keeps clear of the edges, past the system's gesture areas, for apps with their own side gestures
+        // (issue #3)
+        android.graphics.Insets edges = wm.getCurrentWindowMetrics().getWindowInsets()
+                .getInsets(android.view.WindowInsets.Type.systemGestures());
+        boolean compact = "compact".equals(Prefs.panelSize(svc));
+        int side = compact ? Math.max(Math.max(edges.left, edges.right) + dp(8), usable.width() / 8) : 0;
+        lp.width = usable.width() - 2 * side;
+        // full height (or about three quarters in "compact"); the keyboard is made room for by padding
+        // (fitKeyboard), only when it's for Buddy's own text field (not another app's, e.g. while the agent types
+        // in Messenger)
+        lp.height = Math.max(dp(220), compact ? usable.height() * 3 / 4 : usable.height() - dp(8) - dp(8));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
         lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
@@ -2470,8 +2478,12 @@ final class Bubble implements ChatHub.Listener {
                         });
                     } else {
                         maybeTip();
-                        // Tap to talk: listen with the chat closed (waves under the bubble), then send
-                        if (Prefs.tapToTalk(svc) && hub.runningCount() == 0) talk();
+                        // the user's choice: talk (listen with the chat closed, waves under the bubble, then send),
+                        // the chat in the app, or the panel; a waiting card always opens the panel
+                        String action = Prefs.tapAction(svc);
+                        if (pendingConfirm != null) expand();
+                        else if ("talk".equals(action) && hub.runningCount() == 0) talk();
+                        else if ("app".equals(action)) openInApp(false);
                         else expand();
                     }
                     return true;

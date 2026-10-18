@@ -142,7 +142,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 | | |
 |---|---|
-| Tap the bubble | Open the chat panel |
+| Tap the bubble | Open the chat panel, or (Settings → Experience → Tapping the bubble) start talking or open the chat full screen in the app. The panel goes edge to edge; **Compact** makes it smaller and keeps clear of the screen edges, for side gestures |
 | Spinning ring | An agent is working |
 | **Hold the bubble** | Its actions fan out: **Stop task**, **Pause**/**Resume**, **Add instruction** (by voice), **Stop voice**, **Talk**, **Open chat**, **Hide**. Slide onto one and let go, or let go and tap |
 | Drag the bubble | Move it; it snaps to the nearest edge |
@@ -153,7 +153,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 ## Developer mode: building apps
 
-Off by default. When it's on, the agent may run commands and create or edit files in `~/.buddy/work` inside Buddy's Linux. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it sets up a toolchain the first time (OpenJDK, aapt2, d8, apksigner; about 400 MB), writes plain Java, builds a signed APK on the phone without Gradle, and opens Android's installer for you to confirm. The first time, Android asks you to allow Buddy to install apps.
+Off by default. When it's on, the agent may run commands in Buddy's Linux (including installing packages with `apk`) and create or edit files in `~/.buddy/work`. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it sets up a toolchain the first time (OpenJDK, aapt2, d8, apksigner; about 400 MB), writes plain Java, builds a signed APK on the phone without Gradle, and opens Android's installer for you to confirm. The first time, Android asks you to allow Buddy to install apps.
 
 Leave it off for everyday use: with it on, text on screen that tries to trick the agent could lead to commands being run.
 

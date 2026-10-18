@@ -1048,10 +1048,19 @@
     <string name="setup_chat_bubble">Burbuja de chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flota sobre otras apps. Arrástrala hasta la ✕ para ocultarla; las tarjetas de aprobación seguirán apareciendo cuando un agente necesite que apruebes algo.</string>
-    <string name="setup_tap_to_talk">Toca la burbuja para hablar</string>
+    <string name="setup_tap_action">Al tocar la burbuja</string>
+    <string name="setup_tap_panel">Panel</string>
+    <string name="setup_tap_talk">Hablar</string>
+    <string name="setup_tap_app">App completa</string>
+    <string name="setup_tap_panel_info">Abre el chat flotante sobre la app en la que estás. Mantén presionada la burbuja para ver más opciones.</string>
+    <string name="setup_tap_app_info">Abre el chat en pantalla completa en Buddy. Mantén presionada la burbuja para ver más opciones.</string>
+    <string name="setup_panel_size">Tamaño del panel de chat</string>
+    <string name="setup_panel_full">Grande</string>
+    <string name="setup_panel_compact">Compacto</string>
+    <string name="setup_panel_size_info">Grande ocupa la pantalla de borde a borde. Compacto es más pequeño y deja libres los bordes de la pantalla, para que los gestos laterales sigan funcionando.</string>
     <string name="setup_tap_to_talk_info">Un toque abre el micrófono: di lo que quieras y se enviará cuando hagas una pausa. Mantén presionada la burbuja para ver el chat y más.</string>
     <string name="setup_read_aloud">Leer respuestas en voz alta</string>
-    <string name="setup_read_aloud_info">Habla con el micrófono en cualquier chat; se envía cuando dejas de hablar.</string>
+    <string name="setup_read_aloud_info">Buddy lee en voz alta las respuestas de los agentes, con la voz que elijas en la sección Voz.</string>
     <string name="setup_update_notices">Avisos de actualización</string>
     <string name="setup_update_notices_info">Buddy consulta GitHub una vez al día y te avisa cuando sale una nueva versión.</string>
     <string name="setup_check_updates">Buscar actualizaciones</string>

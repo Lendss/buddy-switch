@@ -1061,10 +1061,30 @@
     <string name="setup_chat_bubble">Chat bubble</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Floats over other apps. Drag it onto the ✕ to hide it; approval cards still pop up when an agent needs your OK.</string>
-    <string name="setup_tap_to_talk">Tap the bubble to talk</string>
+    <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
+    <string name="setup_tap_action">Tapping the bubble</string>
+    <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
+    <string name="setup_tap_panel">Chat panel</string>
+    <!-- Choice: a tap starts the microphone. Keep it short. -->
+    <string name="setup_tap_talk">Talk</string>
+    <!-- Choice: a tap opens the chat full screen in the app. Keep it short. -->
+    <string name="setup_tap_app">Full app</string>
+    <!-- Explains the "Chat panel" choice. -->
+    <string name="setup_tap_panel_info">Opens the floating chat over the app you\'re in. Hold the bubble for more.</string>
+    <!-- Explains the "Full app" choice. -->
+    <string name="setup_tap_app_info">Opens the chat full screen in Buddy. Hold the bubble for more.</string>
+    <!-- Setting: the size of the floating chat panel. Title above two short choices. -->
+    <string name="setup_panel_size">Chat panel size</string>
+    <!-- Choice: the panel fills the screen. Keep it short. -->
+    <string name="setup_panel_full">Full</string>
+    <!-- Choice: a smaller panel. Keep it short. -->
+    <string name="setup_panel_compact">Compact</string>
+    <string name="setup_panel_size_info">Full goes edge to edge. Compact is smaller and keeps clear of the screen edges, so side gestures keep working.</string>
+    <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">One tap opens the mic: say what you want and it sends when you pause. Hold the bubble for the chat and more.</string>
     <string name="setup_read_aloud">Read replies aloud</string>
-    <string name="setup_read_aloud_info">Talk with the mic in any chat; it sends when you stop speaking.</string>
+    <!-- "Voice" = the Settings section of that name (setup_voice). -->
+    <string name="setup_read_aloud_info">Buddy reads the agents\' replies out loud, in the voice you pick under Voice.</string>
     <string name="setup_update_notices">Update notices</string>
     <string name="setup_update_notices_info">Buddy checks GitHub once a day and notifies you when a new version is out.</string>
     <string name="setup_check_updates">Check for updates</string>

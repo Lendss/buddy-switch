@@ -146,13 +146,26 @@ final class Prefs {
         sp(c).edit().putBoolean("bubble", on).apply();
     }
 
-    /** A tap on the bubble starts the microphone (when no task runs) instead of only opening the chat. */
-    static boolean tapToTalk(Context c) {
-        return sp(c).getBoolean("tap_to_talk", false);
+    /**
+     * What a tap on the bubble does: "panel" (open the chat panel), "talk" (start the microphone when no task runs)
+     * or "app" (open the chat in the app). Before this was a choice, a switch turned "talk" on.
+     */
+    static String tapAction(Context c) {
+        String a = sp(c).getString("tap_action", null);
+        return a != null ? a : sp(c).getBoolean("tap_to_talk", false) ? "talk" : "panel";
     }
 
-    static void setTapToTalk(Context c, boolean on) {
-        sp(c).edit().putBoolean("tap_to_talk", on).apply();
+    static void setTapAction(Context c, String action) {
+        sp(c).edit().putString("tap_action", action).apply();
+    }
+
+    /** The chat panel: "full" (the screen, clear of the edge gestures) or "compact" (smaller, more room at the edges). */
+    static String panelSize(Context c) {
+        return sp(c).getString("panel_size", "full");
+    }
+
+    static void setPanelSize(Context c, String size) {
+        sp(c).edit().putString("panel_size", size).apply();
     }
 
     /** Read replies aloud with text-to-speech. */

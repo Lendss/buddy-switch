@@ -1049,10 +1049,19 @@
     <string name="setup_chat_bubble">Bulle de discussion</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flotte au-dessus des autres applis. Faites-la glisser sur le ✕ pour la masquer ; les cartes d\'approbation s\'affichent quand même lorsqu\'un agent a besoin de votre accord.</string>
-    <string name="setup_tap_to_talk">Appuyer sur la bulle pour parler</string>
+    <string name="setup_tap_action">Appui sur la bulle</string>
+    <string name="setup_tap_panel">Panneau</string>
+    <string name="setup_tap_talk">Parler</string>
+    <string name="setup_tap_app">Plein écran</string>
+    <string name="setup_tap_panel_info">Ouvre la discussion flottante par-dessus l\'appli en cours. Appuyez longuement sur la bulle pour plus d\'options.</string>
+    <string name="setup_tap_app_info">Ouvre la discussion en plein écran dans Buddy. Appuyez longuement sur la bulle pour plus d\'options.</string>
+    <string name="setup_panel_size">Taille du panneau</string>
+    <string name="setup_panel_full">Grand</string>
+    <string name="setup_panel_compact">Compact</string>
+    <string name="setup_panel_size_info">L\'option Grand s\'étend d\'un bord à l\'autre de l\'écran. L\'option Compact est plus petite et laisse les bords libres, pour que les gestes latéraux fonctionnent toujours.</string>
     <string name="setup_tap_to_talk_info">Un appui ouvre le micro : dites ce que vous voulez, le message part dès que vous marquez une pause. Appuyez longuement sur la bulle pour la discussion et plus encore.</string>
     <string name="setup_read_aloud">Lire les réponses à voix haute</string>
-    <string name="setup_read_aloud_info">Parlez avec le micro dans n\'importe quelle discussion ; le message part dès que vous arrêtez de parler.</string>
+    <string name="setup_read_aloud_info">Buddy lit les réponses des agents à voix haute, avec la voix que vous choisissez dans la section Voix.</string>
     <string name="setup_update_notices">Notifications de mise à jour</string>
     <string name="setup_update_notices_info">Buddy consulte GitHub une fois par jour et vous prévient quand une nouvelle version est disponible.</string>
     <string name="setup_check_updates">Rechercher des mises à jour</string>

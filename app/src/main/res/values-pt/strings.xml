@@ -1048,10 +1048,30 @@
     <string name="setup_chat_bubble">Balão de chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flutua sobre outros apps. Arraste-o até o ✕ para ocultá-lo; os cartões de aprovação continuam aparecendo quando um agente precisa do seu OK.</string>
-    <string name="setup_tap_to_talk">Toque no balão para falar</string>
+    <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
+    <string name="setup_tap_action">Ao tocar no balão</string>
+    <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
+    <string name="setup_tap_panel">Painel</string>
+    <!-- Choice: a tap starts the microphone. Keep it short. -->
+    <string name="setup_tap_talk">Falar</string>
+    <!-- Choice: a tap opens the chat full screen in the app. Keep it short. -->
+    <string name="setup_tap_app">App completo</string>
+    <!-- Explains the "Chat panel" choice. -->
+    <string name="setup_tap_panel_info">Abre o chat flutuante sobre o app em que você está. Toque e segure o balão para ver mais.</string>
+    <!-- Explains the "Full app" choice. -->
+    <string name="setup_tap_app_info">Abre o chat em tela cheia no Buddy. Toque e segure o balão para ver mais.</string>
+    <!-- Setting: the size of the floating chat panel. Title above two short choices. -->
+    <string name="setup_panel_size">Tamanho do painel de chat</string>
+    <!-- Choice: the panel fills the screen. Keep it short. -->
+    <string name="setup_panel_full">Tela cheia</string>
+    <!-- Choice: a smaller panel. Keep it short. -->
+    <string name="setup_panel_compact">Compacto</string>
+    <string name="setup_panel_size_info">Tela cheia vai de uma borda à outra. Compacto é menor e fica longe das bordas da tela, para que os gestos laterais continuem funcionando.</string>
+    <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Um toque abre o microfone: diga o que você quer e a mensagem é enviada quando você faz uma pausa. Toque e segure o balão para ver o chat e mais.</string>
     <string name="setup_read_aloud">Ler respostas em voz alta</string>
-    <string name="setup_read_aloud_info">Fale pelo microfone em qualquer chat; a mensagem é enviada quando você para de falar.</string>
+    <!-- "Voice" = the Settings section of that name (setup_voice). -->
+    <string name="setup_read_aloud_info">O Buddy lê em voz alta as respostas dos agentes, com a voz que você escolher na seção Voz.</string>
     <string name="setup_update_notices">Avisos de atualização</string>
     <string name="setup_update_notices_info">O Buddy verifica o GitHub uma vez por dia e avisa você quando sai uma nova versão.</string>
     <string name="setup_check_updates">Verificar atualizações</string>

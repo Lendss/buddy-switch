@@ -188,9 +188,13 @@ final class CodexSpeech {
                     return;
                 }
                 next();
-            } else if (reading && current != null && now - sentAt > 60_000) {
-                fail(); // never read
+            } else if (reading && current != null && lastSound < sentAt && now - sentAt > 30_000) {
+                fail(); // the voice never started on it
                 return;
+            } else if (reading && current != null && lastSound >= sentAt && !playing && now - lastSound > 8_000) {
+                // it spoke, then went quiet without saying it was done: count it as read (a long text can take
+                // minutes to say, so the time since it was sent says nothing)
+                current = null;
             } else if (!connected && now - opened > 20_000) {
                 fail(); // never connected
                 return;
@@ -201,11 +205,11 @@ final class CodexSpeech {
 
     private static long opened;
 
-    /** Hand whatever wasn't spoken to the phone's voice. */
+    /** Hand whatever wasn't spoken to the phone's voice; a text the voice already started isn't read again. */
     private static void fail() {
         if (web == null) return;
         StringBuilder rest = new StringBuilder();
-        if (current != null) rest.append(current);
+        if (current != null && lastSound < sentAt) rest.append(current);
         for (String t : queue) rest.append(rest.length() > 0 ? "\n" : "").append(t);
         queue.clear();
         close();

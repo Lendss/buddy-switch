@@ -1049,10 +1049,19 @@
     <string name="setup_chat_bubble">Bolla della chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Resta sopra le altre app. Trascinala sulla ✕ per nasconderla; le schede di approvazione compaiono comunque quando un agente ha bisogno del tuo OK.</string>
-    <string name="setup_tap_to_talk">Tocca la bolla per parlare</string>
+    <string name="setup_tap_action">Tocco sulla bolla</string>
+    <string name="setup_tap_panel">Pannello</string>
+    <string name="setup_tap_talk">Parla</string>
+    <string name="setup_tap_app">App completa</string>
+    <string name="setup_tap_panel_info">Apre la chat fluttuante sopra l\'app in cui ti trovi. Tieni premuta la bolla per altre opzioni.</string>
+    <string name="setup_tap_app_info">Apre la chat a schermo intero in Buddy. Tieni premuta la bolla per altre opzioni.</string>
+    <string name="setup_panel_size">Dimensioni del pannello</string>
+    <string name="setup_panel_full">Grande</string>
+    <string name="setup_panel_compact">Compatto</string>
+    <string name="setup_panel_size_info">Grande occupa lo schermo da bordo a bordo. Compatto è più piccolo e lascia liberi i bordi dello schermo, così i gesti laterali continuano a funzionare.</string>
     <string name="setup_tap_to_talk_info">Un tocco apre il microfono: di\' cosa vuoi e il messaggio parte quando fai una pausa. Tieni premuta la bolla per la chat e altro.</string>
     <string name="setup_read_aloud">Leggi le risposte ad alta voce</string>
-    <string name="setup_read_aloud_info">Parla con il microfono in qualsiasi chat; il messaggio parte quando smetti di parlare.</string>
+    <string name="setup_read_aloud_info">Buddy legge ad alta voce le risposte degli agenti, con la voce che scegli nella sezione Voce.</string>
     <string name="setup_update_notices">Avvisi di aggiornamento</string>
     <string name="setup_update_notices_info">Buddy controlla GitHub una volta al giorno e ti avvisa quando esce una nuova versione.</string>
     <string name="setup_check_updates">Cerca aggiornamenti</string>

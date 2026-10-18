@@ -402,8 +402,26 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             if (svc != null) svc.applyBubbleSetting();
         }), full());
         ex.addView(divider(), lineParams());
-        ex.addView(switchRow(this, getString(R.string.setup_tap_to_talk), getString(R.string.setup_tap_to_talk_info),
-                Prefs.tapToTalk(this), on -> Prefs.setTapToTalk(this, on)), full());
+        // what a tap on the bubble does, and how big the chat panel is (issue #3)
+        LinearLayout tap = column(this);
+        tap.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        tap.addView(title(this, getString(R.string.setup_tap_action), 15));
+        String action = Prefs.tapAction(this);
+        tap.addView(segmented(this, new String[][]{{"panel", getString(R.string.setup_tap_panel)},
+                {"talk", getString(R.string.setup_tap_talk)}, {"app", getString(R.string.setup_tap_app)}}, action, false, v -> {
+            Prefs.setTapAction(this, v);
+            render();
+        }), topGap(10));
+        tap.addView(text(this, getString("talk".equals(action) ? R.string.setup_tap_to_talk_info : "app".equals(action)
+                ? R.string.setup_tap_app_info : R.string.setup_tap_panel_info), 13, MUTED), topGap(8));
+        tap.addView(title(this, getString(R.string.setup_panel_size), 15), topGap(18));
+        tap.addView(segmented(this, new String[][]{{"full", getString(R.string.setup_panel_full)},
+                {"compact", getString(R.string.setup_panel_compact)}}, Prefs.panelSize(this), false, v -> {
+            Prefs.setPanelSize(this, v);
+            render();
+        }), topGap(10));
+        tap.addView(text(this, getString(R.string.setup_panel_size_info), 13, MUTED), topGap(8));
+        ex.addView(tap, full());
         ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),
                 Prefs.speakReplies(this), on -> {

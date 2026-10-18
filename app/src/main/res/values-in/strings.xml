@@ -1038,10 +1038,30 @@
     <string name="setup_chat_bubble">Balon chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Mengambang di atas aplikasi lain. Tarik ke ✕ untuk menyembunyikannya; kartu persetujuan tetap muncul saat agen memerlukan persetujuan Anda.</string>
-    <string name="setup_tap_to_talk">Ketuk balon untuk bicara</string>
+    <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
+    <string name="setup_tap_action">Saat balon diketuk</string>
+    <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
+    <string name="setup_tap_panel">Panel chat</string>
+    <!-- Choice: a tap starts the microphone. Keep it short. -->
+    <string name="setup_tap_talk">Bicara</string>
+    <!-- Choice: a tap opens the chat full screen in the app. Keep it short. -->
+    <string name="setup_tap_app">Aplikasi</string>
+    <!-- Explains the "Chat panel" choice. -->
+    <string name="setup_tap_panel_info">Membuka chat mengambang di atas aplikasi yang sedang Anda gunakan. Tekan lama balon untuk opsi lainnya.</string>
+    <!-- Explains the "Full app" choice. -->
+    <string name="setup_tap_app_info">Membuka chat dalam layar penuh di Buddy. Tekan lama balon untuk opsi lainnya.</string>
+    <!-- Setting: the size of the floating chat panel. Title above two short choices. -->
+    <string name="setup_panel_size">Ukuran panel chat</string>
+    <!-- Choice: the panel fills the screen. Keep it short. -->
+    <string name="setup_panel_full">Layar penuh</string>
+    <!-- Choice: a smaller panel. Keep it short. -->
+    <string name="setup_panel_compact">Ringkas</string>
+    <string name="setup_panel_size_info">Layar penuh membentang dari tepi ke tepi. Ringkas lebih kecil dan tidak menutupi tepi layar, sehingga gestur samping tetap berfungsi.</string>
+    <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Satu ketukan membuka mikrofon: ucapkan keinginan Anda dan pesan terkirim saat Anda berhenti sejenak. Tekan lama balon untuk membuka chat dan lainnya.</string>
     <string name="setup_read_aloud">Bacakan balasan</string>
-    <string name="setup_read_aloud_info">Bicara lewat mikrofon di chat mana pun; pesan terkirim saat Anda berhenti berbicara.</string>
+    <!-- "Voice" = the Settings section of that name (setup_voice). -->
+    <string name="setup_read_aloud_info">Buddy membacakan balasan agen dengan suara yang Anda pilih di bagian Suara.</string>
     <string name="setup_update_notices">Notifikasi update</string>
     <string name="setup_update_notices_info">Buddy memeriksa GitHub sekali sehari dan memberi tahu Anda saat ada versi baru.</string>
     <string name="setup_check_updates">Periksa update</string>

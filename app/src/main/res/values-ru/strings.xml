@@ -1071,10 +1071,30 @@
     <string name="setup_chat_bubble">Пузырёк чата</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Отображается поверх других приложений. Чтобы скрыть пузырёк, перетащите его на ✕; карточки подтверждения всё равно появятся, когда агенту понадобится ваше согласие.</string>
-    <string name="setup_tap_to_talk">Говорить по нажатию на пузырёк</string>
+    <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
+    <string name="setup_tap_action">Нажатие на пузырёк</string>
+    <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
+    <string name="setup_tap_panel">Панель</string>
+    <!-- Choice: a tap starts the microphone. Keep it short. -->
+    <string name="setup_tap_talk">Голос</string>
+    <!-- Choice: a tap opens the chat full screen in the app. Keep it short. -->
+    <string name="setup_tap_app">Приложение</string>
+    <!-- Explains the "Chat panel" choice. -->
+    <string name="setup_tap_panel_info">Открывает плавающий чат поверх текущего приложения. Удерживайте пузырёк, чтобы открыть другие действия.</string>
+    <!-- Explains the "Full app" choice. -->
+    <string name="setup_tap_app_info">Открывает чат во весь экран в Buddy. Удерживайте пузырёк, чтобы открыть другие действия.</string>
+    <!-- Setting: the size of the floating chat panel. Title above two short choices. -->
+    <string name="setup_panel_size">Размер панели чата</string>
+    <!-- Choice: the panel fills the screen. Keep it short. -->
+    <string name="setup_panel_full">Полный</string>
+    <!-- Choice: a smaller panel. Keep it short. -->
+    <string name="setup_panel_compact">Компактный</string>
+    <string name="setup_panel_size_info">«Полный» — от края до края. «Компактный» — панель меньше и не заходит на края экрана, так что боковые жесты продолжают работать.</string>
+    <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Одно нажатие включает микрофон: скажите, что нужно, и сообщение отправится, когда вы сделаете паузу. Удерживайте пузырёк, чтобы открыть чат и не только.</string>
     <string name="setup_read_aloud">Читать ответы вслух</string>
-    <string name="setup_read_aloud_info">Говорите через микрофон в любом чате: сообщение отправится, когда вы замолчите.</string>
+    <!-- "Voice" = the Settings section of that name (setup_voice). -->
+    <string name="setup_read_aloud_info">Buddy читает ответы агентов вслух — тем голосом, который вы выбрали в разделе «Голос».</string>
     <string name="setup_update_notices">Уведомления об обновлениях</string>
     <string name="setup_update_notices_info">Buddy раз в день проверяет GitHub и сообщает, когда выходит новая версия.</string>
     <string name="setup_check_updates">Проверить обновления</string>
