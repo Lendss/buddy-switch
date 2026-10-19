@@ -492,4 +492,13 @@ final class Prefs {
     static void setRuleChats(Context c, String json) {
         sp(c).edit().putString("rule_chats", json).apply();
     }
+
+    /** The rules' replies waiting for the user's OK, as JSON (see Waiting). */
+    static String waiting(Context c) {
+        return sp(c).getString("waiting", "[]");
+    }
+
+    static void setWaiting(Context c, String json) {
+        sp(c).edit().putString("waiting", json).apply();
+    }
 }

@@ -147,7 +147,13 @@ final class Account {
                         return;
                     }
                     version = ver(out);
-                    JSONObject j = new JSONObject(out.substring(out.indexOf('{'), out.lastIndexOf('}') + 1));
+                    int from = out.indexOf('{'), to = out.lastIndexOf('}');
+                    if (from < 0 || to < from) { // no status: a slow phone hit the timeout, or claude failed
+                        if (out.contains("[timed out")) throw new Exception("it took too long, please try again.");
+                        set(Step.SIGNED_OUT, "");
+                        return;
+                    }
+                    JSONObject j = new JSONObject(out.substring(from, to + 1));
                     if (j.optBoolean("loggedIn")) {
                         email = j.optString("email", j.optString("emailAddress", ""));
                         plan = j.optString("subscriptionType", "");
@@ -160,15 +166,17 @@ final class Account {
                     // 1.x keeps connected providers in auth.json; 2 in its database (it imports auth.json on upgrade)
                     String out = Linux.exec(app, "command -v opencode >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "if readlink -f \"$(command -v opencode)\" | grep -q /@opencode/cli/; then echo OC_V2; "
-                            + "opencode auth list --standalone --format json 2>/dev/null | jq -r '[.[].name] | join(\", \")'; "
+                            + "timeout 45 opencode auth list --standalone --format json 2>/dev/null | jq -r '[.[].name] | join(\", \")'; "
                             + "else jq -r 'keys | join(\", \")' /root/.local/share/opencode/auth.json 2>/dev/null; fi; echo OC_OK; "
-                            + "echo VER=$(opencode --version 2>/dev/null)", 60);
+                            + "echo VER=$(timeout 45 opencode --version 2>/dev/null)", 120);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");
                     } else {
                         opencode2 = out.contains("OC_V2");
                         version = ver(out);
-                        String providers = out.substring(0, out.indexOf("OC_OK")).replace("OC_V2", "").trim();
+                        // a slow phone may hit the timeout before OC_OK (issue #9): installed still means ready
+                        int ok = out.indexOf("OC_OK");
+                        String providers = ok < 0 ? "" : out.substring(0, ok).replace("OC_V2", "").trim();
                         email = "";
                         plan = providers.isEmpty() ? "free models" : providers;
                         set(Step.SIGNED_IN, "");

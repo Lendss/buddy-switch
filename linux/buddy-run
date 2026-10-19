@@ -239,7 +239,7 @@ fi
 run_claude() {
   local mcp tools
   mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
-    '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth}}}}')
+    '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}}')
   tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)")
   [ "$DEV" = rule ] && tools=("mcp__phone")
   local deny=()
@@ -271,7 +271,8 @@ run_codex() {
   local prompt=$MSG
   local cfg=(-c 'mcp_servers.phone.url="'"$URL"'/mcp?chat='"$SID"'"'
     -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"'
-    -c 'mcp_servers.phone.default_tools_approval_mode="approve"')
+    -c 'mcp_servers.phone.default_tools_approval_mode="approve"'
+    -c 'mcp_servers.phone.tool_timeout_sec=600')
   local sandbox=(--sandbox read-only)
   # developer mode: the whole of Buddy's Linux, like Claude Code's Bash and OpenCode (so apk add works too)
   [ "$DEV" = 1 ] && sandbox=(--sandbox danger-full-access)
@@ -350,8 +351,8 @@ these exact names; they are available in every message of this chat." > "$S/syst
   # OpenCode 2 only takes codemode under mcp.servers; without it the phone tools hide behind one "execute" tool
   cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" --arg v2 "$v2" '
     {type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false} as $phone
-    | (if $v2 == "1" then {mcp:{servers:{phone:($phone + {codemode:false, timeout:{execution:310000}})}}}
-       else {mcp:{phone:($phone + {timeout:310000})}} end)
+    | (if $v2 == "1" then {mcp:{servers:{phone:($phone + {codemode:false, timeout:{execution:600000}})}}}
+       else {mcp:{phone:($phone + {timeout:600000})}} end)
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
        else {permission:{bash:"ask", edit:"ask"}} end)')

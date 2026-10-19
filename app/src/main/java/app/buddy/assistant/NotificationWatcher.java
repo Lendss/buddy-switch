@@ -11,6 +11,34 @@ import android.service.notification.StatusBarNotification;
  * its app; everything else is ignored right away, and nothing is kept.
  */
 public class NotificationWatcher extends NotificationListenerService {
+    private static volatile NotificationWatcher instance;
+
+    @Override
+    public void onListenerConnected() {
+        instance = this;
+    }
+
+    @Override
+    public void onListenerDisconnected() {
+        instance = null;
+    }
+
+    /** A conversation's notification as it is now, or null (gone, or no notification access). */
+    static Triggers.Note current(String pkg, String who) {
+        NotificationWatcher w = instance;
+        if (w == null) return null;
+        try {
+            for (StatusBarNotification s : w.getActiveNotifications()) {
+                if (!pkg.equals(s.getPackageName())
+                        || (s.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0) continue;
+                Triggers.Note n = Triggers.Note.of(w, s);
+                if (n != null && who.equals(n.who())) return n;
+            }
+        } catch (Exception ignored) { // not connected right now
+        }
+        return null;
+    }
+
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         try {

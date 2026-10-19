@@ -82,6 +82,13 @@ final class Guard {
     private static boolean approvedAuto;
     /** The last approved confirm's text: the plan the user OK'd, for the smart reviewer. */
     private static String plan;
+    /**
+     * The chat whose confirm the approval and the plan were (null: a session outside Buddy): they cover that chat's
+     * actions only, never another agent's, least of all a notification rule's run for someone else's message.
+     */
+    private static String approvedFor, planFor;
+    /** What the pending approval's confirm said: a message whose text is known must be that one (see takeApproval). */
+    private static String approvedText;
 
     /** Apps that start on "hard limit": messaging, email, social, calls, shopping, payments, banking. */
     private static final java.util.Set<String> HARD_BY_DEFAULT = new java.util.HashSet<>(java.util.Arrays.asList(
@@ -303,14 +310,27 @@ final class Guard {
     static synchronized void approved(String summary, boolean auto) {
         approvedAt = System.currentTimeMillis();
         approvedAuto = auto;
+        approvedFor = McpServer.CALLER_CHAT.get();
+        approvedText = summary;
         if (auto) return;
         planAt = approvedAt;
         plan = summary;
+        planFor = approvedFor;
     }
 
-    /** What the user approved in the last 10 minutes (it stays known after the approval is used), or null. */
+    /**
+     * What the user approved for the calling chat in the last 10 minutes (it stays known after the approval is
+     * used), or null.
+     */
     static synchronized String approvedPlan() {
-        return plan != null && System.currentTimeMillis() - planAt < APPROVAL_VALID_MS ? plan : null;
+        return plan != null && System.currentTimeMillis() - planAt < APPROVAL_VALID_MS
+                && java.util.Objects.equals(planFor, McpServer.CALLER_CHAT.get()) ? plan : null;
+    }
+
+    /** A chat's run starts or ends: what was approved for it before doesn't carry over. */
+    static synchronized void forget(String chat) {
+        if (java.util.Objects.equals(approvedFor, chat)) approvedAt = 0;
+        if (java.util.Objects.equals(planFor, chat)) plan = null;
     }
 
     /** Use the pending approval, if any (one approval, one action). */
@@ -318,11 +338,30 @@ final class Guard {
         return takeApproval(true);
     }
 
-    /** As above; send: the action sends something (a countdown's approval covers nothing else). */
+    /**
+     * As above; send: the action sends something (a countdown's approval covers nothing else). Only the chat that
+     * got the approval can use it: another chat's attempt leaves it in place.
+     */
     static synchronized boolean takeApproval(boolean send) {
-        boolean ok = approvedAt > 0 && System.currentTimeMillis() - approvedAt < APPROVAL_VALID_MS && (send || !approvedAuto);
+        return takeApproval(send, null);
+    }
+
+    /**
+     * As above, for an action whose content Buddy knows (a reply's text, a link): the approval covers it only if
+     * the approved confirm named exactly that, so an OK for one message never sends another. Used up either way.
+     */
+    static synchronized boolean takeApproval(boolean send, String content) {
+        if (approvedAt == 0 || !java.util.Objects.equals(approvedFor, McpServer.CALLER_CHAT.get())) return false;
+        boolean ok = System.currentTimeMillis() - approvedAt < APPROVAL_VALID_MS && (send || !approvedAuto)
+                && (content == null || approvedText != null && plain(approvedText).contains(plain(content)));
         approvedAt = 0;
         return ok;
+    }
+
+    /** For comparing what was approved with what's sent: case, spacing and quote styles don't matter. */
+    private static String plain(String s) {
+        return s.toLowerCase(java.util.Locale.ROOT).replaceAll("[\u201c\u201d\u201e\u00ab\u00bb\u2018\u2019\"']", "")
+                .replaceAll("\\s+", " ").trim();
     }
 
     /**

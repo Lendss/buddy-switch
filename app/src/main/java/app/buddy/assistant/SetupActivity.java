@@ -207,17 +207,20 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 }), topGap(12));
         String token = Prefs.token(this);
         String url = "http://127.0.0.1:" + McpServer.PORT + "/mcp";
+        // each agent gets a 10-minute tool timeout: an approval card may wait for the user (the default is a minute)
         final String cmd = "codex".equals(mcpAgent)
-                // Codex reads the bearer token from an environment variable, so save it in ~/.bashrc too.
+                // Codex reads the bearer token from an environment variable, so save it in ~/.bashrc too; `codex mcp
+                // add` has no timeout option, so that line goes under the table it just wrote
                 ? "codex mcp add phone --url " + url + " --bearer-token-env-var BUDDY_TOKEN"
+                + " && sed -i '/^\\[mcp_servers\\.phone\\]$/a tool_timeout_sec = 600' ~/.codex/config.toml"
                 + " && echo 'export BUDDY_TOKEN=" + token + "' >> ~/.bashrc && export BUDDY_TOKEN=" + token
                 : "opencode".equals(mcpAgent)
                 // OpenCode reads extra config from OPENCODE_CONFIG_CONTENT; keep it for every shell
                 ? "echo 'export OPENCODE_CONFIG_CONTENT='\\''{\"mcp\":{\"phone\":{\"type\":\"remote\",\"url\":\"" + url
-                + "\",\"oauth\":false,\"timeout\":310000,\"headers\":{\"Authorization\":\"Bearer " + token
+                + "\",\"oauth\":false,\"timeout\":600000,\"headers\":{\"Authorization\":\"Bearer " + token
                 + "\"}}}}'\\''' >> ~/.bashrc && . ~/.bashrc"
-                : "claude mcp add --transport http -s user phone " + url
-                + " --header \"Authorization: Bearer " + token + "\"";
+                : "claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
+                + "\",\"headers\":{\"Authorization\":\"Bearer " + token + "\"},\"timeout\":600000}'";
         // the token is masked on screen so screenshots never leak it
         mcp.addView(codeBlock(this, cmd.replace(token, token.substring(0, 4) + "••••••••")), topGap(12));
         Button copy = button(this, getString(R.string.setup_copy_command), false);

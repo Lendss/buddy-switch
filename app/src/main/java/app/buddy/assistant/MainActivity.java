@@ -86,12 +86,15 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         super.onResume();
         if (isFinishing()) return;
         hub.addListener(this);
+        Waiting.listener = waitingChanged;
         render();
         Account.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
     }
+
+    private final Runnable waitingChanged = this::render;
 
     @Override
     public void onAccountChanged() {
@@ -101,6 +104,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
     @Override
     protected void onPause() {
         hub.removeListener(this);
+        if (Waiting.listener == waitingChanged) Waiting.listener = null;
         Account.removeListener(this);
         super.onPause();
     }
@@ -169,6 +173,29 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             wp.topMargin = dp(this, 8);
             wp.bottomMargin = dp(this, 4);
             list.addView(warn, wp);
+        }
+
+        List<Waiting.Item> waiting = Waiting.all(this);
+        if (!waiting.isEmpty()) { // replies the rules wrote that wait for the user's OK
+            List<String> names = new ArrayList<>();
+            for (Waiting.Item it : waiting) if (!names.contains(it.who)) names.add(it.who);
+            LinearLayout wb = row(this);
+            wb.setGravity(Gravity.CENTER_VERTICAL);
+            wb.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+            wb.setBackground(outlined(this, CARD, 16, Theme.withAlpha(ACCENT, 0x59), 1));
+            wb.addView(icon(this, R.drawable.ms_chat_bubble, ACCENT, 24));
+            LinearLayout wt = column(this);
+            wt.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+            wt.addView(title(this, getString(R.string.waiting_title) + " · " + waiting.size(), 15));
+            wt.addView(text(this, getString(R.string.waiting_banner_text, android.text.TextUtils.join(", ", names)), 13, MUTED));
+            wb.addView(wt, weight1());
+            wb.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+            wb.setOnClickListener(v -> go(WaitingActivity.class));
+            LinearLayout.LayoutParams wp = full();
+            wp.leftMargin = wp.rightMargin = dp(this, 16);
+            wp.topMargin = dp(this, 8);
+            wp.bottomMargin = dp(this, 4);
+            list.addView(wb, wp);
         }
 
         List<Sessions.Session> working = new ArrayList<>(), recent = new ArrayList<>();

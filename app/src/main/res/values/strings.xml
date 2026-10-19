@@ -1436,6 +1436,26 @@
     <string name="rules_tag_limit">%1$d/h</string>
     <string name="rules_tag_no_limit">No limit</string>
     <string name="rules_log_busy">Skipped: the phone was busy for too long.</string>
+    <string name="card_note_later">No answer in time: the reply waits in your Waiting list</string>
+    <string name="rules_log_waiting">Waiting for your OK: “%1$s”</string>
+    <string name="rules_log_full">Skipped: too many chats wrote at once.</string>
+    <string name="waiting_title">Waiting for you</string>
+    <string name="waiting_channel">Replies waiting for you</string>
+    <string name="waiting_banner_text">Replies waiting for your OK: %1$s</string>
+    <string name="waiting_empty">Nothing waiting. When a rule\'s reply needs your OK and you don\'t answer in time, it waits here.</string>
+    <string name="waiting_their_messages">Their messages</string>
+    <string name="waiting_reply">Reply</string>
+    <string name="waiting_send">Send</string>
+    <string name="waiting_copy_open">Copy and open %1$s</string>
+    <string name="waiting_edit">Edit</string>
+    <string name="waiting_skip">Skip</string>
+    <string name="waiting_open_chat">Open chat</string>
+    <string name="waiting_state_wrote_again">%1$s wrote again since: this reply may be out of date.</string>
+    <string name="waiting_state_answered">You already answered in %1$s.</string>
+    <string name="waiting_state_gone">The notification is gone: Buddy copies the reply and opens %1$s for you to paste it.</string>
+    <string name="waiting_sent">Sent to %1$s</string>
+    <string name="waiting_copied">Copied. Paste it in %1$s.</string>
+    <string name="waiting_note_sent">✓ Sent from your Waiting list: %1$s</string>
     <!-- %1$s = why: rules_log_no_service, rules_log_not_signed_in, or a technical error (often English). -->
     <string name="rules_log_error">Didn\'t run: %1$s</string>
     <!-- A reason after “Didn't run:”, so it starts lowercase. -->

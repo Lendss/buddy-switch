@@ -482,17 +482,12 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     }
 
     /**
-     * Waits up to 5 minutes for the card's answer. Gives up sooner when the agent stops waiting (its tool call timed
+     * Waits up to 5 minutes for a question's answer. Gives up sooner when the agent stops waiting (its tool call timed
      * out or it was stopped): a card nobody waits for would keep blocking every tap.
      */
     private static boolean awaitAnswer(CountDownLatch done) throws InterruptedException {
-        return awaitAnswer(done, 0);
-    }
-
-    /** As above, for a card with a countdown of that many seconds: it waits at least until the countdown is over. */
-    private static boolean awaitAnswer(CountDownLatch done, int countdown) throws InterruptedException {
         java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
-        long end = System.currentTimeMillis() + Math.max(5 * 60_000, (countdown + 60) * 1000L);
+        long end = System.currentTimeMillis() + 5 * 60_000L;
         while (System.currentTimeMillis() < end) {
             if (done.await(1, TimeUnit.SECONDS)) return true;
             if (gone != null && gone.getAsBoolean()) return false;
@@ -510,15 +505,27 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     }
 
     /**
+     * How an approval in a notification rule's run answers when the user isn't there: such a run doesn't wait on
+     * them (everything else would wait behind it).
+     */
+    static final String NOT_NOW = "NOT ANSWERED: the user isn't answering right now, and a notification rule's run doesn't "
+            + "wait for them. Don't do it; say in your last reply what you wanted to do. For a message, use "
+            + "reply_notification instead: Buddy keeps the reply for them.";
+
+    /** askRuleReply: the user didn't answer in time, so the reply goes to their Waiting list (the rest: why). */
+    static final String LATER = "LATER:";
+    /** askRuleReply: the conversation moved on while the card waited. */
+    static final String STALE = "STALE";
+    private static final String TIMED_OUT = "\u0000timed out";
+
+    /**
      * As above. canAuto: the card may approve itself when its chat is a notification rule's run with a countdown
-     * (sending a message may; paying, buying or deleting never does).
+     * (sending a message may; paying, buying or deleting never does). In a rule's run the card waits a minute at most
+     * after its countdown, and not at all while the phone is locked: then the answer is NOT_NOW.
      */
     String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
-        final CountDownLatch done = new CountDownLatch(1);
-        final AtomicReference<Boolean> answer = new AtomicReference<>();
-        final AtomicReference<String> change = new AtomicReference<>();
-        final java.util.concurrent.atomic.AtomicBoolean auto = new java.util.concurrent.atomic.AtomicBoolean();
         final String chat = McpServer.CALLER_CHAT.get();
+        boolean rule = Triggers.ruleRun(chat);
         int cd = canAuto ? Triggers.countdown(chat) : 0;
         String shown = summary;
         if (cd > 0) { // a second agent checks it against the rule first; if it objects, the card waits for the user
@@ -529,8 +536,48 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 shown = getString(R.string.tools_card_detail, summary, why);
             }
         }
-        final int countdown = cd;
-        final String text = shown;
+        if (rule && cd == 0 && Triggers.locked(this)) return NOT_NOW;
+        String answer = card(shown, chat, cd, rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
+        if (!TIMED_OUT.equals(answer)) return answer;
+        return rule ? NOT_NOW : "DENIED: the user did not answer within 5 minutes. Do not do it.";
+    }
+
+    /**
+     * A notification rule's reply, for the user's OK, without making everything else wait on them: a countdown card
+     * after the second check, or else a card that waits a minute at most, and only while the phone is in use.
+     * Returns askConfirm's answers, LATER + the second check's objection ("" if none) when the user didn't answer in
+     * time, or STALE when stale turns true first (they wrote again, or the user answered them).
+     */
+    String askRuleReply(String summary, String chat, java.util.function.BooleanSupplier stale) throws InterruptedException {
+        int cd = Triggers.countdown(chat);
+        String shown = summary, why = "";
+        if (cd > 0) {
+            showStatus(getString(R.string.rules_status_checking));
+            String objection = Triggers.review(this, chat, summary);
+            if (objection != null) {
+                cd = 0;
+                why = objection;
+                shown = getString(R.string.tools_card_detail, summary, objection);
+            }
+        }
+        if (stale.getAsBoolean()) return STALE;
+        if (cd == 0 && Triggers.locked(this)) return LATER + why;
+        String answer = card(shown, chat, cd, (cd + 60) * 1000L, stale);
+        if (TIMED_OUT.equals(answer)) return LATER + why;
+        return answer;
+    }
+
+    /**
+     * Shows an approval card and waits for its answer, at most waitMs (TIMED_OUT, or sooner when the agent stops
+     * waiting) or until stale turns true (STALE); the card is then taken down. countdown: seconds after which it
+     * approves itself (0: none).
+     */
+    private String card(String text, String chat, int countdown, long waitMs, java.util.function.BooleanSupplier stale)
+            throws InterruptedException {
+        final CountDownLatch done = new CountDownLatch(1);
+        final AtomicReference<Boolean> answer = new AtomicReference<>();
+        final AtomicReference<String> change = new AtomicReference<>();
+        final java.util.concurrent.atomic.AtomicBoolean auto = new java.util.concurrent.atomic.AtomicBoolean();
         main.post(() -> bubble.askConfirm(text, chat, countdown, new Bubble.ConfirmCallback() {
             @Override
             public void onAnswer(boolean approved, String wanted) {
@@ -546,15 +593,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             }
         }));
         Triggers.approvalShown(this, chat, text, countdown);
-        boolean answered;
+        String ended = null;
         try {
-            answered = awaitAnswer(done, countdown);
+            java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
+            long end = System.currentTimeMillis() + waitMs;
+            while (ended == null && !done.await(1, TimeUnit.SECONDS)) {
+                if (stale != null && stale.getAsBoolean()) ended = STALE;
+                else if (System.currentTimeMillis() >= end || gone != null && gone.getAsBoolean()) ended = TIMED_OUT;
+            }
         } finally {
             Triggers.approvalDone(this, chat);
         }
-        if (!answered) {
+        if (ended != null) {
             main.post(() -> bubble.cancelConfirm());
-            return "DENIED: the user did not answer within 5 minutes. Do not do it.";
+            return ended;
         }
         if (auto.get()) return AUTO_APPROVED;
         if (change.get() != null) {
@@ -573,6 +625,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final AtomicReference<Boolean> picked = new AtomicReference<>();
         final AtomicReference<String> answer = new AtomicReference<>();
         final String chat = McpServer.CALLER_CHAT.get();
+        boolean rule = Triggers.ruleRun(chat);
+        if (rule && Triggers.locked(this)) {
+            return "NO ANSWER: the user isn't on the phone right now, and a notification rule's run doesn't wait for "
+                    + "them. Don't guess; say in your last reply what you need to know.";
+        }
         main.post(() -> bubble.askQuestion(question, options, chat, (fromButton, text) -> {
             picked.set(fromButton);
             answer.set(text);
@@ -581,13 +638,14 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Triggers.approvalShown(this, chat, question, 0);
         boolean answered;
         try {
-            answered = awaitAnswer(done);
+            answered = rule ? done.await(60, TimeUnit.SECONDS) : awaitAnswer(done);
         } finally {
             Triggers.approvalDone(this, chat);
         }
         if (!answered) {
             main.post(() -> bubble.cancelConfirm());
-            return "NO ANSWER: the user did not answer within 5 minutes. Don't guess; stop and ask in your reply.";
+            return "NO ANSWER: the user did not answer within " + (rule ? "a minute" : "5 minutes")
+                    + ". Don't guess; stop and ask in your reply.";
         }
         if (answer.get() == null) {
             return "NO ANSWER: the user closed the question. Don't guess; stop and ask what they want.";

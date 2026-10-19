@@ -255,6 +255,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         super.onResume();
         if (ses == null || isFinishing()) return;
         hub.addListener(this);
+        Waiting.listener = waitingChanged;
         hub.setViewing(ses, true);
         hub.select(ses);
         Voice.prepare(this); // so the mic is quick
@@ -270,6 +271,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             hub.setViewing(ses, false);
             hub.removeListener(this);
         }
+        if (Waiting.listener == waitingChanged) Waiting.listener = null;
         super.onPause();
     }
 
@@ -541,16 +543,26 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     }
 
     private String shownApproval;
+    private final Runnable waitingChanged = this::renderApproval;
+
+    /** This chat's reply waiting in the user's list (a notification rule's run), or null. */
+    private Waiting.Item waiting() {
+        for (Waiting.Item it : Waiting.all(this)) if (it.chat.equals(ses.id)) return it;
+        return null;
+    }
 
     private void renderApproval() {
         BuddyService svc = BuddyService.get();
         String ask = svc != null && svc.bubble() != null && svc.bubble().pendingChat() == ses ? svc.bubble().pendingConfirmText() : null;
         java.util.List<String> options = ask == null ? null : svc.bubble().pendingOptions();
         long[] countdown = ask == null ? new long[]{0, 0} : svc.bubble().countdown();
-        String key = ask == null ? null : ask + (options == null ? "" : "\u0000" + options) + (countdown[0] > 0 ? "\u0001" : "");
+        Waiting.Item waiting = ask == null ? waiting() : null; // no card now: its reply may wait in the list
+        String key = ask != null ? ask + (options == null ? "" : "\u0000" + options) + (countdown[0] > 0 ? "\u0001" : "")
+                : waiting != null ? "\u0002" + waiting.at + Waiting.state(waiting) : null;
         if (key == null ? shownApproval == null : key.equals(shownApproval)) return;
         shownApproval = key;
         approval.removeAllViews();
+        if (waiting != null) approval.addView(WaitingActivity.card(this, waiting, true), full());
         if (ask == null) return;
         LinearLayout card = column(this);
         card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));

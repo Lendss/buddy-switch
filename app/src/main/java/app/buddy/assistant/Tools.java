@@ -211,7 +211,7 @@ final class Tools {
             case "list_apps": return text(listApps());
             case "open_url": {
                 // a rule's run works for someone else's message: a link could carry the user's data away
-                if (ruleRun() && !Guard.takeApproval(false)) {
+                if (ruleRun() && !Guard.takeApproval(false, a.getString("url"))) {
                     String answer = svc.askConfirm(svc.getString(R.string.tools_card_open_url, a.getString("url")), false);
                     if (!answer.startsWith("APPROVED")) return text("Not opened. " + answer);
                 }
@@ -301,18 +301,59 @@ final class Tools {
         if (n.reply == null) return "This notification has no reply field. Open " + n.app + " to answer instead.";
         text = text == null ? "" : text.trim();
         if (text.isEmpty()) return "Give the text to send.";
-        // like a tap on Send (in a rule's run, where Trust doesn't apply): the confirm just before covers it, or a card asks now
-        if (!Guard.takeApproval(true)) {
-            String answer = svc.askConfirm(svc.getString(R.string.tools_card_reply, n.who(), n.app, text), true);
+        String sent = Triggers.alreadyReplied(chat);
+        if (sent != null) {
+            return "Not sent: this run already answered with \u201c" + sent + "\u201d, and a run sends one reply. If "
+                    + "something is still missing, tell the user instead.";
+        }
+        if (Triggers.userAnswered(chat)) return answeredItself(n);
+        if (Triggers.wroteAgain(chat)) return wroteAgain(chat, n);
+        // like a tap on Send (in a rule's run, where Trust doesn't apply): the confirm just before covers it, or a card
+        // asks now; if the user doesn't answer in time, the reply waits in their list and the run ends
+        if (!Guard.takeApproval(true, text)) { // an approval covers this reply only if it was for this very text
+            final String forChat = chat;
+            String answer = svc.askRuleReply(svc.getString(R.string.tools_card_reply, n.who(), n.app, text), chat,
+                    () -> Triggers.wroteAgain(forChat) || Triggers.userAnswered(forChat));
+            if (BuddyService.STALE.equals(answer)) return Triggers.userAnswered(chat) ? answeredItself(n) : wroteAgain(chat, n);
+            if (answer.startsWith(BuddyService.LATER)) {
+                Triggers.later(svc, chat, text, answer.substring(BuddyService.LATER.length()));
+                noteInChat(chat, svc.getString(R.string.card_note_later));
+                return "Not sent yet: the user didn't answer in time, so Buddy keeps your reply in their Waiting list, "
+                        + "where they'll send, change or skip it. Don't call reply_notification again; end the run and say "
+                        + "in one line that your reply is waiting for them.";
+            }
             if (answer.startsWith("CHANGES")) return "Not sent: the user wants changes first. " + answer;
             if (!answer.startsWith("APPROVED")) return "Not sent. " + answer;
         }
+        if (Triggers.userAnswered(chat)) return answeredItself(n); // they may have, while the card waited
+        if (Triggers.wroteAgain(chat)) return wroteAgain(chat, n);
         if (!Triggers.sendReply(svc, n.reply, text)) {
             return "Not sent: " + n.app + " no longer takes replies from this notification (it was probably answered or "
                     + "dismissed). Open the app to check before trying again.";
         }
-        Triggers.replied(chat, text);
+        Triggers.replied(svc, chat, text);
         return "Sent to " + n.who() + " through the notification's reply field: \u201c" + text + "\u201d. Don't send it again.";
+    }
+
+    /** They wrote again since the run began: its reply would answer old messages only, so the next run takes them along. */
+    private String wroteAgain(String chat, Triggers.Note n) {
+        Triggers.carryOver(chat);
+        return "Not sent: " + n.who() + " wrote again in " + n.app + " since this run began, so your reply would answer "
+                + "old messages only. Buddy starts a new run for everything together; stop here and say so in one line.";
+    }
+
+    /** A line in the run's chat (main thread). */
+    private void noteInChat(String chat, String text) {
+        svc.runOnMain(() -> {
+            ChatHub hub = ChatHub.get(svc);
+            Sessions.Session s = chat == null ? null : hub.sessions.find(chat);
+            if (s != null) hub.note(s, Bubble.Kind.STEP, text);
+        });
+    }
+
+    private static String answeredItself(Triggers.Note n) {
+        return "Not sent: the user has written to " + n.who() + " in " + n.app + " since, so they answered it themselves. "
+                + "Don't reply; just say so.";
     }
 
     // ---------------------------------------------------------- read_screen

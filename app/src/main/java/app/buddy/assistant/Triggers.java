@@ -9,6 +9,9 @@ import android.app.Person;
 import android.app.RemoteInput;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * own, one per conversation, so the agent remembers what it answered before. A burst of messages makes one run; runs
  * wait while another chat works (they'd both use the screen) and go one at a time, and messages that come in
  * meanwhile join the conversation's waiting run. Past its rule's hourly limit a conversation's messages wait too, and
- * get one run together when the limit allows. Main thread, except the static lookups the phone tools use.
+ * get one run together when the limit allows. Without internet nothing starts: the runs wait until it's back, and
+ * one that fails on a network error goes once more. A reply the user doesn't approve in time goes to their Waiting
+ * list instead of making everything wait on them. Main thread, except the static lookups the phone tools use.
  */
 final class Triggers implements ChatHub.Listener {
     /** One message of a messaging app's notification: who wrote it ("(the user)" for the user's own), and when. */
@@ -148,13 +153,26 @@ final class Triggers implements ChatHub.Listener {
         long from;
         /** Messages that started or joined the job (a messaging app's notification may show only the latest). */
         int count;
-        /** Past the hourly limit: waiting until then (elapsedRealtime) instead of being dropped as stale. */
+        /** Past the hourly limit: waiting until then (elapsedRealtime). */
         long heldUntil;
-        final long queuedAt = SystemClock.elapsedRealtime();
         Runnable go;
         String chat;
         /** What reply_notification sent, if anything. */
         volatile String replied;
+        /** The reply that went to the user's Waiting list instead (they didn't answer in time). */
+        volatile String later;
+        /** A newer message came in while this run went on: a reply now would answer the old ones only. */
+        volatile boolean newer;
+        /** Its reply was held back for that: the conversation's next run answers these messages too. */
+        volatile boolean carry;
+        /** Put back once after failing for lack of internet. */
+        boolean retried;
+        /** It waited for the internet: the agent is told the messages aren't new. */
+        boolean waitedOffline;
+        /** Not to start before this (elapsedRealtime): a retry after a network failure. */
+        long notBefore;
+        /** When its first message came in (wall clock). */
+        long firstAt = System.currentTimeMillis();
 
         Job(Rules.Rule rule, String key) {
             this.rule = rule;
@@ -162,8 +180,8 @@ final class Triggers implements ChatHub.Listener {
         }
     }
 
-    private static final long BURST_MS = 3000, STALE_MS = 15 * 60_000L, HOUR = 3600_000L;
-    private static final int QUEUE_MAX = 10, MAX_CHATS = 6, LOG_MAX = 40;
+    private static final long BURST_MS = 3000, HOUR = 3600_000L, RETRY_MS = 60_000L, OLD_MS = 10 * 60_000L;
+    private static final int QUEUE_MAX = 30, MAX_CHATS = 6, LOG_MAX = 40;
     private static final String RESULTS = "rules", APPROVALS = "rules_ok";
     private static Triggers instance;
     /** Rule runs going on now, by chat id (the phone tools look them up from their own threads). */
@@ -177,6 +195,8 @@ final class Triggers implements ChatHub.Listener {
     private final ArrayDeque<Job> queue = new ArrayDeque<>();
     private final Map<String, String> lastSig = new HashMap<>();
     private final Map<String, ArrayDeque<Long>> starts = new HashMap<>();
+    /** Runs whose reply was held back because a newer message came in, by conversation: the next run takes them along. */
+    private final Map<String, Job> carried = new HashMap<>();
     private PowerManager.WakeLock wake;
     private boolean starting;
 
@@ -188,6 +208,15 @@ final class Triggers implements ChatHub.Listener {
     private Triggers(Context app) {
         this.app = app;
         ChatHub.get(app).addListener(this);
+        try { // runs wait while there's no internet: start them when it's back
+            app.getSystemService(ConnectivityManager.class).registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    main.post(Triggers.this::pump);
+                }
+            });
+        } catch (Exception ignored) {
+        }
     }
 
     // --------------------------------------------------------------- incoming
@@ -197,6 +226,7 @@ final class Triggers implements ChatHub.Listener {
         final String key = rule.id + "|" + note.pkg + "|" + note.who();
         if (note.sig().equals(lastSig.get(key))) return; // the same notification again (updated, or re-posted)
         lastSig.put(key, note.sig());
+        for (Job a : active.values()) if (a.key.equals(key)) a.newer = true; // its reply would answer old messages only
         Job j = bursts.get(key);
         if (j == null) {
             j = new Job(rule, key);
@@ -226,8 +256,9 @@ final class Triggers implements ChatHub.Listener {
                 return;
             }
         }
-        if (queue.size() >= QUEUE_MAX) {
-            log(j, "busy", "");
+        if (queue.size() >= QUEUE_MAX) { // never quietly: the user hears who wasn't handled
+            log(j, "full", "");
+            notifyNote(j, app.getString(R.string.rules_log_full), "rule_full");
             return;
         }
         queue.add(j);
@@ -264,13 +295,6 @@ final class Triggers implements ChatHub.Listener {
     private void pump() {
         if (starting) return;
         long now = SystemClock.elapsedRealtime();
-        for (java.util.Iterator<Job> it = queue.iterator(); it.hasNext(); ) {
-            Job q = it.next();
-            if (q.heldUntil == 0 && now - q.queuedAt > STALE_MS) {
-                it.remove();
-                log(q, "busy", "");
-            }
-        }
         if (queue.isEmpty() || !active.isEmpty()) return;
         BuddyService svc = BuddyService.get();
         if (svc == null) { // its server is how the agent works the phone
@@ -278,11 +302,19 @@ final class Triggers implements ChatHub.Listener {
             return;
         }
         if (ChatHub.get(app).runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())) return;
+        if (!online()) { // the agent needs the internet: the queue keeps until it's back (the network callback pumps)
+            for (Job q : queue) q.waitedOffline = true;
+            return;
+        }
         starting = true;
         try {
             long next = 0;
             for (java.util.Iterator<Job> it = queue.iterator(); it.hasNext() && active.isEmpty(); ) {
                 Job q = it.next();
+                if (q.notBefore > now) { // a retry after a network failure
+                    next = next == 0 ? q.notBefore : Math.min(next, q.notBefore);
+                    continue;
+                }
                 long free = freeAt(q);
                 if (free > now) {
                     if (q.heldUntil == 0) {
@@ -312,10 +344,15 @@ final class Triggers implements ChatHub.Listener {
             return;
         }
         if (j.heldUntil > 0) app.getSystemService(NotificationManager.class).cancel("rule_limit", j.key.hashCode());
+        Job c = carried.remove(j.key);
+        if (c != null) merge(j, c); // the previous run held its reply back for these: they're this run's messages too
+        j.newer = j.carry = false;
+        j.replied = j.later = null;
         ChatHub hub = ChatHub.get(app);
         Sessions.Session ses = chat(hub, j);
         ses.model = r.model; // the rule's choice, also when it changed since the chat's last run
         j.chat = ses.id;
+        Guard.forget(ses.id); // an approval from this chat's earlier run doesn't cover this one
         active.put(ses.id, j);
         String err = hub.sendFromRule(ses, shown(j), prompt(j));
         if (err != null) {
@@ -331,12 +368,68 @@ final class Triggers implements ChatHub.Listener {
 
     private void finished(Job j, Sessions.Session s) {
         active.remove(j.chat);
+        Guard.forget(j.chat);
         if (active.isEmpty()) releaseWake();
         approvalDone(app, j.chat);
         String reply = s == null ? "" : s.lastReply.trim();
+        if (j.replied == null && j.later == null && !j.carry && !j.retried && (!online() || offlineError(s))) {
+            // it failed for lack of internet: once more when it's back, without counting toward the hourly limit
+            ArrayDeque<Long> st = starts.get(j.key);
+            if (st != null && !st.isEmpty()) st.pollLast();
+            j.retried = j.waitedOffline = true;
+            j.notBefore = SystemClock.elapsedRealtime() + RETRY_MS;
+            Job newer = null;
+            for (Job q : queue) if (q.key.equals(j.key)) newer = q;
+            if (newer != null) merge(newer, j); // its newer messages came in meanwhile: one run for all of them
+            else queue.addFirst(j);
+            main.postDelayed(pumpLater, RETRY_MS + 500);
+            return;
+        }
+        if (j.carry && j.replied == null) carried.put(j.key, j);
         if (j.replied != null) log(j, "replied", j.replied);
+        else if (j.later != null) log(j, "waiting", j.later);
         else log(j, "done", reply);
-        if (!reply.isEmpty()) notifyResult(j, reply);
+        if (!reply.isEmpty() && j.later == null) notifyResult(j, reply); // a waiting reply has its own notification
+    }
+
+    /** Takes an earlier job's messages into a later one of the same conversation (which has the newer notification). */
+    private static void merge(Job into, Job earlier) {
+        if (earlier.from > 0 && (into.from == 0 || earlier.from < into.from)) into.from = earlier.from;
+        into.count += earlier.count;
+        into.firstAt = Math.min(into.firstAt, earlier.firstAt);
+        into.retried |= earlier.retried;
+        into.waitedOffline |= earlier.waitedOffline;
+        into.notBefore = Math.max(into.notBefore, earlier.notBefore);
+        LinkedHashSet<String> texts = new LinkedHashSet<>(earlier.texts);
+        texts.addAll(into.texts);
+        into.texts.clear();
+        into.texts.addAll(texts);
+    }
+
+    /** Is there a network to reach the agent's model? (No network at all, or one without internet: no.) */
+    private boolean online() {
+        try {
+            ConnectivityManager cm = app.getSystemService(ConnectivityManager.class);
+            NetworkCapabilities nc = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            return nc != null && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    private static final java.util.regex.Pattern NETWORK = java.util.regex.Pattern.compile("(?i)connection (error|refused|reset|"
+            + "closed)|network|ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ECONNRESET|ETIMEDOUT|getaddrinfo|fetch failed|unable to "
+            + "connect|could not resolve|error sending request|socket hang up|offline");
+
+    /** Did the run end on a network error? (Its last error, among its last few lines.) */
+    private static boolean offlineError(Sessions.Session s) {
+        if (s == null) return false;
+        for (int i = s.messages.size() - 1, seen = 0; i >= 0 && seen < 4; i--, seen++) {
+            Sessions.Msg m = s.messages.get(i);
+            if (m.kind == Bubble.Kind.USER) break; // that's where the run began
+            if (m.kind == Bubble.Kind.ERROR) return NETWORK.matcher(m.text).find();
+        }
+        return false;
     }
 
     /**
@@ -458,10 +551,25 @@ final class Triggers implements ChatHub.Listener {
             p.append(j.count).append(" messages came in since ").append(since).append(", but the notification only shows ")
                     .append("the latest: open the app to read the others if the rule needs them.\n");
         }
+        long waited = System.currentTimeMillis() - j.firstAt;
+        if (waited > OLD_MS) { // offline, held by the hourly limit, or the phone was busy
+            String at = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(new java.util.Date(j.firstAt));
+            p.append("These messages came in at ").append(at).append(", ").append(waited / 60_000L).append(" minutes ago")
+                    .append(j.waitedOffline ? ", while the phone had no internet" : "")
+                    .append(": they're not new, so don't answer as if they had just arrived.\n");
+        }
         p.append(n.reply != null
-                ? "You can answer it without opening the app: call reply_notification with the text (Buddy asks the user "
-                + "to approve it first). Open the app only if the rule needs more, such as earlier messages or a photo.\n"
+                ? "You can answer it without opening the app: call reply_notification with the text, without calling "
+                + "confirm first (Buddy asks the user itself, and if they don't answer in time it keeps your reply in their "
+                + "Waiting list for later). One reply per run: put everything in it. Open the app only if the rule needs "
+                + "more, such as earlier messages or a photo.\n"
                 : "This notification has no reply field: open the app if the rule needs you to answer it.\n");
+        Waiting.Item w = Waiting.find(app, j.key);
+        if (w != null) {
+            p.append("An earlier reply of yours in this conversation is still waiting for the user's OK: \u201c")
+                    .append(ChatHub.clip(w.draft, 500)).append("\u201d. If you reply now, cover everything in one reply: it ")
+                    .append("replaces that one.\n");
+        }
         if (locked()) {
             p.append(n.reply != null ? "The phone is locked right now, so you can't use the screen; reply_notification still works.\n"
                     : "The phone is locked right now, so you can't use the screen: if the rule needs it, stop and say so.\n");
@@ -550,10 +658,80 @@ final class Triggers implements ChatHub.Listener {
         return j == null ? null : j.note;
     }
 
-    /** reply_notification sent text for this chat's run. */
-    static void replied(String chat, String text) {
+    /** What this chat's run already sent through reply_notification, or null: one run sends one reply. */
+    static String alreadyReplied(String chat) {
         Job j = chat == null ? null : active.get(chat);
-        if (j != null) j.replied = text;
+        return j == null ? null : j.replied;
+    }
+
+    /**
+     * Has the user written in this run's conversation since its newest message? Then they've answered it themselves
+     * and the agent stays out of it. Read from the conversation's notification as it is now (gone: can't tell).
+     */
+    static boolean userAnswered(String chat) {
+        Job j = chat == null ? null : active.get(chat);
+        if (j == null || j.note.stamp == 0) return false;
+        Note now = NotificationWatcher.current(j.note.pkg, j.note.who());
+        if (now == null) return false;
+        for (Line l : now.messages) if (l.mine && l.at > j.note.stamp) return true;
+        return false;
+    }
+
+    /** reply_notification sent text for this chat's run: the conversation's waiting reply, if any, is done with. */
+    static void replied(Context c, String chat, String text) {
+        Job j = chat == null ? null : active.get(chat);
+        if (j == null) return;
+        j.replied = text;
+        Waiting.remove(c, j.key);
+    }
+
+    /** Has a newer message come in since this run started? A reply now would answer the old ones only. */
+    static boolean wroteAgain(String chat) {
+        Job j = chat == null ? null : active.get(chat);
+        return j != null && j.newer;
+    }
+
+    /** The run's reply was held back because they wrote again: the conversation's next run answers these messages too. */
+    static void carryOver(String chat) {
+        Job j = chat == null ? null : active.get(chat);
+        if (j != null) j.carry = true;
+    }
+
+    /**
+     * The user didn't approve the run's reply in time: it goes to their Waiting list (replacing the conversation's
+     * earlier one) and the run ends, without making anything else wait on them. why: the second check's objection.
+     */
+    static void later(Context c, String chat, String text, String why) {
+        Job j = chat == null ? null : active.get(chat);
+        if (j == null) return;
+        Waiting.Item it = new Waiting.Item();
+        it.key = j.key;
+        it.pkg = j.note.pkg;
+        it.app = j.note.app;
+        it.who = j.note.who();
+        it.chat = chat;
+        // a reply that replaces the conversation's waiting one answers that one's messages too
+        Waiting.Item before = Waiting.find(c, j.key);
+        String fresh = freshText(j);
+        it.messages = before == null || before.messages.isEmpty() || before.messages.contains(fresh) ? fresh
+                : before.messages + "\n" + fresh;
+        it.draft = text;
+        it.why = why == null ? "" : why;
+        it.stamp = j.note.stamp;
+        it.at = System.currentTimeMillis();
+        Waiting.put(c, it, j.note.reply);
+        j.later = text;
+    }
+
+    /** The user sent a waiting reply from their list: logged like a run's reply, and noted in its chat. */
+    static void sentFromList(Context c, Waiting.Item it, String text) {
+        Triggers t = get(c);
+        t.main.post(() -> {
+            t.log(it.app, it.who, "replied", text);
+            ChatHub hub = ChatHub.get(c);
+            Sessions.Session s = hub.sessions.find(it.chat);
+            if (s != null) hub.note(s, Bubble.Kind.STEP, c.getString(R.string.waiting_note_sent, ChatHub.clip(text, 80)));
+        });
     }
 
     /**
@@ -671,6 +849,26 @@ final class Triggers implements ChatHub.Listener {
         }
     }
 
+    /** A conversation the rules couldn't handle, as a quiet notification that opens the rules (and their log). */
+    private void notifyNote(Job j, String text, String tag) {
+        NotificationManager nm = app.getSystemService(NotificationManager.class);
+        nm.createNotificationChannel(new NotificationChannel(RESULTS, app.getString(R.string.rules_channel_results),
+                NotificationManager.IMPORTANCE_LOW));
+        Notification n = new Notification.Builder(app, RESULTS)
+                .setSmallIcon(R.drawable.ic_launcher_monochrome)
+                .setContentTitle(app.getString(R.string.rules_result_title, j.note.who(), j.note.app))
+                .setContentText(text)
+                .setStyle(new Notification.BigTextStyle().bigText(text + "\n\u201c" + ChatHub.clip(freshText(j), 300) + "\u201d"))
+                .setContentIntent(PendingIntent.getActivity(app, 0, new Intent(app, RulesActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE))
+                .setAutoCancel(true)
+                .build();
+        try {
+            nm.notify(tag, j.key.hashCode(), n);
+        } catch (SecurityException ignored) {
+        }
+    }
+
     private static PendingIntent openChat(Context c, String chat) {
         return PendingIntent.getActivity(c, chat.hashCode(), new Intent(c, ChatActivity.class).putExtra("id", chat)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP),
@@ -690,11 +888,18 @@ final class Triggers implements ChatHub.Listener {
         return out;
     }
 
-    /** kind: replied, done, limit, busy or error; detail: the reply, the agent's last words, or what went wrong. */
+    /**
+     * kind: replied, waiting (the reply went to the Waiting list), done, held, full (too many at once), error, and
+     * from older versions limit and busy; detail: the reply, the agent's last words, or what went wrong.
+     */
     private void log(Job j, String kind, String detail) {
+        log(j.note.app, j.note.who(), kind, detail);
+    }
+
+    private void log(String appName, String who, String kind, String detail) {
         try {
-            JSONArray a = new JSONArray().put(new JSONObject().put("at", System.currentTimeMillis()).put("app", j.note.app)
-                    .put("who", j.note.who()).put("kind", kind).put("detail", ChatHub.clip(detail, 300)));
+            JSONArray a = new JSONArray().put(new JSONObject().put("at", System.currentTimeMillis()).put("app", appName)
+                    .put("who", who).put("kind", kind).put("detail", ChatHub.clip(detail, 300)));
             List<JSONObject> old = log(app);
             for (int i = 0; i < old.size() && i < LOG_MAX - 1; i++) a.put(old.get(i));
             Prefs.setRulesLog(app, a.toString());
@@ -713,7 +918,8 @@ final class Triggers implements ChatHub.Listener {
         return locked(app);
     }
 
-    private static boolean locked(Context c) {
+    /** The phone is locked or its screen is off: the user isn't looking at it. */
+    static boolean locked(Context c) {
         return c.getSystemService(KeyguardManager.class).isKeyguardLocked()
                 || !c.getSystemService(PowerManager.class).isInteractive();
     }
