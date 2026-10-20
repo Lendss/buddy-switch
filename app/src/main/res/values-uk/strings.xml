@@ -264,7 +264,8 @@
          "hold" = long-press the bubble, which opens the hold menu. -->
     <string name="bubble_pill_waiting_answer">Чекаю на вашу відповідь</string>
     <string name="bubble_pill_waiting_approval">Чекаю на ваше схвалення</string>
-    <string name="bubble_pill_paused">Пауза · утримуйте бульбашку, щоб продовжити</string>
+    <string name="bubble_pill_paused">Пауза · торкніться тут, щоб продовжити</string>
+    <string name="bubble_pill_hands_on">%1$s · торкніться тут, щоб відповісти</string>
     <!-- The agent is operating the phone. Also the chat panel's running strip. -->
     <string name="bubble_using_phone">Керую вашим телефоном</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
@@ -421,6 +422,8 @@
     <string name="control_text">Не торкайтеся екрана, доки все не завершиться, або натисніть «Зупинити», щоб узяти керування на себе.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Зупинити</string>
+    <string name="pause_call_ended_title">Дзвінок завершено · Buddy на паузі</string>
+    <string name="pause_call_ended_text">Торкніться, щоб продовжити завдання</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -619,6 +622,8 @@
     <string name="hub_tool_question_skipped">Запитання пропущено</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">Запитую: %1$s</string>
+    <string name="hub_tool_point_out">Позначає: %1$s</string>
+    <string name="hub_tool_point_out_any">Позначає щось на екрані</string>
     <string name="hub_tool_update_download">Завантажую оновлення Buddy</string>
     <string name="hub_tool_update_check">Перевіряю оновлення Buddy</string>
     <!-- %1$s = what is searched for. -->
@@ -680,9 +685,11 @@
     <string name="service_stopped_toast">Зупинено. Телефон знову ваш.</string>
     <!-- Note in the chat when the user pauses the agent. -->
     <string name="service_paused_note">Пауза: телефон ваш, доки ви не продовжите</string>
-    <string name="service_paused_toast">Пауза. Користуйтеся телефоном, а потім утримуйте бульбашку, щоб продовжити.</string>
+    <string name="service_paused_toast">Пауза. Користуйтеся телефоном, а потім торкніться «Пауза» поруч із бульбашкою, щоб продовжити.</string>
     <!-- Note in the chat when the user resumes the agent. -->
     <string name="service_resumed_note">Продовжено</string>
+    <string name="service_autopaused_touch">Пауза: ви торкнулися екрана. Торкніться «Пауза» поруч із бульбашкою, щоб продовжити.</string>
+    <string name="service_autopaused_call">Пауза через дзвінок. Торкніться «Пауза» поруч із бульбашкою, щоб продовжити.</string>
 
     <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
@@ -1436,6 +1443,7 @@
     <string name="card_note_later">Немає відповіді вчасно: відповідь чекає в розділі «Чекає на вас»</string>
     <string name="rules_log_waiting">Чекає вашого підтвердження: «%1$s»</string>
     <string name="rules_log_full">Пропущено: забагато чатів написали одночасно.</string>
+    <string name="rules_log_hidden">Не вдалося прочитати нові повідомлення: Android їх приховав (можливо, у них є код). Відкрийте чат, і наступні повідомлення надходитимуть.</string>
     <string name="waiting_title">Чекає на вас</string>
     <string name="waiting_channel">Відповіді, що чекають на вас</string>
     <string name="waiting_banner_text">Відповіді чекають вашого підтвердження: %1$s</string>

@@ -159,11 +159,28 @@ final class ChatHub {
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
                 ses.running = false;
-                add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer));
+                String err = lastError(ses);
+                add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
+                        + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
+                        + ": " + err));
                 changed();
             }
         }, GIVE_UP_MS);
         return null;
+    }
+
+    /** The end of what the agent wrote to stderr this run (buddy-run keeps it), or "": a hung agent often says why there. */
+    private String lastError(Sessions.Session ses) {
+        java.io.File f = new java.io.File(Linux.root(app), "root/.buddy/sessions/" + ses.id + "/last-error.log");
+        try (java.io.RandomAccessFile r = new java.io.RandomAccessFile(f, "r")) {
+            long n = Math.min(r.length(), 300);
+            byte[] b = new byte[(int) n];
+            r.seek(r.length() - n);
+            r.readFully(b);
+            return new String(b, java.nio.charset.StandardCharsets.UTF_8).trim();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /** Change a chat's model; the next message uses it, and the conversation continues. */
@@ -419,7 +436,7 @@ final class ChatHub {
     }
 
     private void flash(String reply) {
-        final String text = reply.replace('\n', ' ');
+        final String text = Ui.linkText(reply).replace('\n', ' ');
         flash = text.length() > 60 ? text.substring(0, 59) + "…" : text;
         final String mine = flash;
         main.postDelayed(() -> {
@@ -457,7 +474,11 @@ final class ChatHub {
 
     void changed() {
         boolean now = runningCount() > 0;
-        if (wasRunning && !now) lastRunEndedAt = SystemClock.elapsedRealtime();
+        if (wasRunning && !now) {
+            lastRunEndedAt = SystemClock.elapsedRealtime();
+            BuddyService svc = BuddyService.get();
+            if (svc != null) svc.onRunsEnded();
+        }
         wasRunning = now;
         for (Listener l : new ArrayList<>(listeners)) l.onChatsChanged();
     }
@@ -522,6 +543,17 @@ final class ChatHub {
                 }
                 if (ans.startsWith("NO ANSWER")) return BuddyApp.str(R.string.hub_tool_question_skipped);
                 return BuddyApp.str(R.string.hub_tool_asking, clip(in.optString("question"), 80));
+            }
+            case "point_out": {
+                JSONArray marks = in.optJSONArray("marks");
+                StringBuilder labels = new StringBuilder();
+                for (int i = 0; marks != null && i < marks.length(); i++) {
+                    JSONObject m = marks.optJSONObject(i);
+                    String l = m == null ? "" : m.optString("label", "").trim();
+                    if (!l.isEmpty()) labels.append(labels.length() > 0 ? ", " : "").append(l);
+                }
+                return labels.length() > 0 ? BuddyApp.str(R.string.hub_tool_point_out, clip(labels.toString(), 60))
+                        : BuddyApp.str(R.string.hub_tool_point_out_any);
             }
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");

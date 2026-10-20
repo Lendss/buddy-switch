@@ -259,7 +259,8 @@
          "hold" = long-press the bubble, which opens the hold menu. -->
     <string name="bubble_pill_waiting_answer">Waiting for your answer</string>
     <string name="bubble_pill_waiting_approval">Waiting for your approval</string>
-    <string name="bubble_pill_paused">Paused · hold the bubble to resume</string>
+    <string name="bubble_pill_paused">Paused · tap here to resume</string>
+    <string name="bubble_pill_hands_on">%1$s · tap here to answer</string>
     <!-- The agent is operating the phone. Also the chat panel's running strip. -->
     <string name="bubble_using_phone">Using your phone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
@@ -423,6 +424,8 @@
     <string name="control_text">Don\'t touch the screen until it\'s done, or tap Stop to take over.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Stop</string>
+    <string name="pause_call_ended_title">Call ended · Buddy is paused</string>
+    <string name="pause_call_ended_text">Tap to resume the task</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -615,6 +618,8 @@
     <string name="hub_tool_question_skipped">Question skipped</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">Asking: %1$s</string>
+    <string name="hub_tool_point_out">Pointing out: %1$s</string>
+    <string name="hub_tool_point_out_any">Pointing something out on the screen</string>
     <!-- Step in the chat: the agent answers a notification through its reply field. %1$s = the reply (shortened). -->
     <string name="hub_tool_reply_notification">Replying: %1$s</string>
     <string name="hub_tool_update_download">Downloading the Buddy update</string>
@@ -676,9 +681,11 @@
     <string name="service_stopped_toast">Stopped. Your phone is yours again.</string>
     <!-- Note in the chat when the user pauses the agent. -->
     <string name="service_paused_note">Paused: the phone is yours until you resume</string>
-    <string name="service_paused_toast">Paused. Use your phone, then hold the bubble to resume.</string>
+    <string name="service_paused_toast">Paused. Use your phone, then tap Paused next to the bubble to resume.</string>
     <!-- Note in the chat when the user resumes the agent. -->
     <string name="service_resumed_note">Resumed</string>
+    <string name="service_autopaused_touch">Paused because you touched the screen. Tap Paused next to the bubble to resume.</string>
+    <string name="service_autopaused_call">Paused because of a call. Tap Paused next to the bubble to resume.</string>
 
     <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
@@ -1439,6 +1446,7 @@
     <string name="card_note_later">No answer in time: the reply waits in your Waiting list</string>
     <string name="rules_log_waiting">Waiting for your OK: “%1$s”</string>
     <string name="rules_log_full">Skipped: too many chats wrote at once.</string>
+    <string name="rules_log_hidden">Couldn\'t read the new messages: Android hid them (they may contain a code). Open the chat, and the next ones will come through.</string>
     <string name="waiting_title">Waiting for you</string>
     <string name="waiting_channel">Replies waiting for you</string>
     <string name="waiting_banner_text">Replies waiting for your OK: %1$s</string>

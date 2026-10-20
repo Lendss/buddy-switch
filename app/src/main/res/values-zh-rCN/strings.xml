@@ -255,7 +255,8 @@
          "hold" = long-press the bubble, which opens the hold menu. -->
     <string name="bubble_pill_waiting_answer">等待你的回答</string>
     <string name="bubble_pill_waiting_approval">等待你批准</string>
-    <string name="bubble_pill_paused">已暂停 · 长按气泡可继续</string>
+    <string name="bubble_pill_paused">已暂停 · 点按此处继续</string>
+    <string name="bubble_pill_hands_on">%1$s · 点按此处回答</string>
     <!-- The agent is operating the phone. Also the chat panel's running strip. -->
     <string name="bubble_using_phone">正在操作你的手机</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
@@ -409,6 +410,8 @@
     <string name="control_text">完成前请不要触碰屏幕，或点按“停止”来接管。</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">停止</string>
+    <string name="pause_call_ended_title">通话已结束 · Buddy 已暂停</string>
+    <string name="pause_call_ended_text">点按即可继续任务</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -598,6 +601,8 @@
     <string name="hub_tool_question_skipped">已跳过问题</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">正在提问：%1$s</string>
+    <string name="hub_tool_point_out">正在标出：%1$s</string>
+    <string name="hub_tool_point_out_any">正在屏幕上标出位置</string>
     <string name="hub_tool_update_download">正在下载 Buddy 更新</string>
     <string name="hub_tool_update_check">正在检查 Buddy 更新</string>
     <!-- %1$s = what is searched for. -->
@@ -656,9 +661,11 @@
     <string name="service_stopped_toast">已停止。手机重新交给你了。</string>
     <!-- Note in the chat when the user pauses the agent. -->
     <string name="service_paused_note">已暂停：在你继续之前，手机由你使用</string>
-    <string name="service_paused_toast">已暂停。你可以使用手机，之后长按气泡即可继续。</string>
+    <string name="service_paused_toast">已暂停。你可以使用手机，之后点按气泡旁的“已暂停”即可继续。</string>
     <!-- Note in the chat when the user resumes the agent. -->
     <string name="service_resumed_note">已继续</string>
+    <string name="service_autopaused_touch">你触碰了屏幕，已暂停。点按气泡旁的“已暂停”即可继续。</string>
+    <string name="service_autopaused_call">因来电或通话，已暂停。点按气泡旁的“已暂停”即可继续。</string>
 
     <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
@@ -1400,6 +1407,7 @@
     <string name="card_note_later">未及时回应：回复已放入“等你确认”列表</string>
     <string name="rules_log_waiting">等待你确认：“%1$s”</string>
     <string name="rules_log_full">已跳过：同时来消息的对话太多。</string>
+    <string name="rules_log_hidden">无法读取新消息：Android 隐藏了它们（可能含有验证码）。打开聊天后，之后的消息就能收到了。</string>
     <string name="waiting_title">等你确认</string>
     <string name="waiting_channel">等你确认的回复</string>
     <string name="waiting_banner_text">等你确认的回复：%1$s</string>

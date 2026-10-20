@@ -72,6 +72,14 @@ final class Triggers implements ChatHub.Listener {
         Notification.Action reply;
         long when;
 
+        /**
+         * Android blanked it for apps with notification access ("Sensitive notification content hidden"): it may hold a
+         * one-time code. No title, no messages, only that line.
+         */
+        boolean hidden() {
+            return messages.isEmpty() && title.isEmpty() && conversation.isEmpty();
+        }
+
         /** The conversation or sender, for the chat's title and to tell conversations apart. */
         String who() {
             // some apps add a count to the title ("Sarah (2 messages)"), which would split one conversation in several
@@ -222,6 +230,58 @@ final class Triggers implements ChatHub.Listener {
     // --------------------------------------------------------------- incoming
 
     /** A notification matched a rule: run it once the burst of messages is over. */
+    /** The last readable notification of each conversation, by notification key (see hidden; main thread). */
+    private final Map<String, Note> known = new java.util.LinkedHashMap<String, Note>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Note> e) {
+            return size() > 200;
+        }
+    };
+    /** Conversations whose notification Android blanks right now: the user hears it once, not per message. */
+    private final java.util.Set<String> blanked = new java.util.HashSet<>();
+
+    /** A readable notification of an app a rule watches (NotificationWatcher, main thread). */
+    void seen(String key, Note n) {
+        known.put(key, n);
+        if (blanked.remove(key)) app.getSystemService(NotificationManager.class).cancel("rule_hidden", key.hashCode());
+    }
+
+    /**
+     * Android blanked a notification of an app a rule watches (see Note.hidden), so no rule can tell who wrote or what,
+     * and the rule would just go quiet. When it's a conversation a rule handles, say so once, in the log and a quiet
+     * notification. The rule reads it again once the notification is readable: when the user opens the chat, or when
+     * newer messages push the hidden one out (apps keep only the latest few in it).
+     */
+    void hidden(String key) {
+        Note last = known.get(key);
+        if (last == null || Rules.match(app, last) == null || !blanked.add(key)) return;
+        String why = app.getString(R.string.rules_log_hidden);
+        log(last.app, last.who(), "hidden", "");
+        Intent open = app.getPackageManager().getLaunchIntentForPackage(last.pkg);
+        if (open == null) open = new Intent(app, RulesActivity.class);
+        NotificationManager nm = app.getSystemService(NotificationManager.class);
+        nm.createNotificationChannel(new NotificationChannel(RESULTS, app.getString(R.string.rules_channel_results),
+                NotificationManager.IMPORTANCE_LOW));
+        Notification n = new Notification.Builder(app, RESULTS)
+                .setSmallIcon(R.drawable.ic_launcher_monochrome)
+                .setContentTitle(app.getString(R.string.rules_result_title, last.who(), last.app))
+                .setContentText(why)
+                .setStyle(new Notification.BigTextStyle().bigText(why))
+                .setContentIntent(PendingIntent.getActivity(app, key.hashCode(), open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT))
+                .setAutoCancel(true)
+                .build();
+        try {
+            nm.notify("rule_hidden", key.hashCode(), n);
+        } catch (SecurityException ignored) {
+        }
+    }
+
+    /** Whatever held the queue back may have ended (a pause, say): start what waits (main thread). */
+    void wake() {
+        pump();
+    }
+
     void fire(Rules.Rule rule, Note note) {
         final String key = rule.id + "|" + note.pkg + "|" + note.who();
         if (note.sig().equals(lastSig.get(key))) return; // the same notification again (updated, or re-posted)
@@ -253,6 +313,7 @@ final class Triggers implements ChatHub.Listener {
                 q.note = j.note;
                 q.texts.addAll(j.texts);
                 q.count += j.count;
+                pump(); // in case whatever held it back is over
                 return;
             }
         }
@@ -301,7 +362,12 @@ final class Triggers implements ChatHub.Listener {
             while (!queue.isEmpty()) log(queue.poll(), "error", app.getString(R.string.rules_log_no_service));
             return;
         }
-        if (ChatHub.get(app).runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())) return;
+        if (ChatHub.get(app).runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())) {
+            // that can end without a word to the rules (a pause that ran out, say): look again soon
+            main.removeCallbacks(pumpLater);
+            main.postDelayed(pumpLater, 5000);
+            return;
+        }
         if (!online()) { // the agent needs the internet: the queue keeps until it's back (the network callback pumps)
             for (Job q : queue) q.waitedOffline = true;
             return;
@@ -371,7 +437,7 @@ final class Triggers implements ChatHub.Listener {
         Guard.forget(j.chat);
         if (active.isEmpty()) releaseWake();
         approvalDone(app, j.chat);
-        String reply = s == null ? "" : s.lastReply.trim();
+        String reply = s == null ? "" : Ui.linkText(s.lastReply).trim(); // for the log and its notification: plain text
         if (j.replied == null && j.later == null && !j.carry && !j.retried && (!online() || offlineError(s))) {
             // it failed for lack of internet: once more when it's back, without counting toward the hourly limit
             ArrayDeque<Long> st = starts.get(j.key);

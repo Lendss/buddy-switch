@@ -187,7 +187,8 @@
     <!-- Status pill beside the bubble: at most two lines, about 250dp wide. -->
     <string name="bubble_pill_waiting_answer">Wacht op je antwoord</string>
     <string name="bubble_pill_waiting_approval">Wacht op je goedkeuring</string>
-    <string name="bubble_pill_paused">Gepauzeerd · houd de bubbel ingedrukt om te hervatten</string>
+    <string name="bubble_pill_paused">Gepauzeerd · tik hier om te hervatten</string>
+    <string name="bubble_pill_hands_on">%1$s · tik hier om te antwoorden</string>
     <string name="bubble_using_phone">Bedient je telefoon</string>
     <string name="bubble_using_phone_status">Bedient je telefoon · %1$s</string>
     <string name="bubble_pill_hold_hint">houd de bubbel ingedrukt voor Stoppen en meer</string>
@@ -290,6 +291,8 @@
     <string name="control_title">Buddy bedient je telefoon</string>
     <string name="control_text">Raak het scherm niet aan tot Buddy klaar is, of tik op Stoppen om het over te nemen.</string>
     <string name="control_stop">Stoppen</string>
+    <string name="pause_call_ended_title">Gesprek beëindigd · Buddy is gepauzeerd</string>
+    <string name="pause_call_ended_text">Tik om de taak te hervatten</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -415,6 +418,8 @@
     <string name="hub_tool_answered_text">✓ Beantwoord: %1$s</string>
     <string name="hub_tool_question_skipped">Vraag overgeslagen</string>
     <string name="hub_tool_asking">Vraagt: %1$s</string>
+    <string name="hub_tool_point_out">Wijst aan: %1$s</string>
+    <string name="hub_tool_point_out_any">Wijst iets aan op het scherm</string>
     <string name="hub_tool_update_download">Downloadt de Buddy-update</string>
     <string name="hub_tool_update_check">Zoekt naar een Buddy-update</string>
     <string name="hub_tool_web_search">Zoekt op het web: %1$s</string>
@@ -457,8 +462,10 @@
     <string name="service_pause_expired">Na 5 minuten pauze heeft Buddy de taak gestopt.</string>
     <string name="service_stopped_toast">Gestopt. Je telefoon is weer van jou.</string>
     <string name="service_paused_note">Gepauzeerd: de telefoon is van jou tot je hervat</string>
-    <string name="service_paused_toast">Gepauzeerd. Gebruik je telefoon en houd daarna de bubbel ingedrukt om te hervatten.</string>
+    <string name="service_paused_toast">Gepauzeerd. Gebruik je telefoon en tik daarna op ‘Gepauzeerd’ naast de bubbel om te hervatten.</string>
     <string name="service_resumed_note">Hervat</string>
+    <string name="service_autopaused_touch">Gepauzeerd omdat je het scherm aanraakte. Tik op ‘Gepauzeerd’ naast de bubbel om te hervatten.</string>
+    <string name="service_autopaused_call">Gepauzeerd vanwege een oproep. Tik op ‘Gepauzeerd’ naast de bubbel om te hervatten.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy heeft de microfoon nodig. Open de Buddy-app en tik één keer op 🎙 om toegang te geven.</string>
@@ -972,6 +979,7 @@
     <string name="card_note_later">Geen antwoord op tijd: het antwoord wacht in “Wacht op jou”</string>
     <string name="rules_log_waiting">Wacht op je OK: “%1$s”</string>
     <string name="rules_log_full">Overgeslagen: te veel chats schreven tegelijk.</string>
+    <string name="rules_log_hidden">De nieuwe berichten waren niet te lezen: Android heeft ze verborgen (misschien staat er een code in). Open de chat, dan komen de volgende weer door.</string>
     <string name="waiting_title">Wacht op jou</string>
     <string name="waiting_channel">Antwoorden die op jou wachten</string>
     <string name="waiting_banner_text">Antwoorden wachten op je OK: %1$s</string>

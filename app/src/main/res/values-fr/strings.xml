@@ -258,7 +258,8 @@
          "hold" = long-press the bubble, which opens the hold menu. -->
     <string name="bubble_pill_waiting_answer">En attente de votre réponse</string>
     <string name="bubble_pill_waiting_approval">En attente de votre approbation</string>
-    <string name="bubble_pill_paused">En pause · appui long sur la bulle pour reprendre</string>
+    <string name="bubble_pill_paused">En pause · appuyez ici pour reprendre</string>
+    <string name="bubble_pill_hands_on">%1$s · appuyez ici pour répondre</string>
     <!-- The agent is operating the phone. Also the chat panel's running strip. -->
     <string name="bubble_using_phone">Utilisation du téléphone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
@@ -413,6 +414,8 @@
     <string name="control_text">Ne touchez pas l\'écran avant la fin, ou appuyez sur Arrêter pour reprendre la main.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Arrêter</string>
+    <string name="pause_call_ended_title">Appel terminé · Buddy est en pause</string>
+    <string name="pause_call_ended_text">Appuyez pour reprendre la tâche</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -605,6 +608,8 @@
     <string name="hub_tool_question_skipped">Question ignorée</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">Question : %1$s</string>
+    <string name="hub_tool_point_out">Indication : %1$s</string>
+    <string name="hub_tool_point_out_any">Indication à l’écran</string>
     <string name="hub_tool_update_download">Téléchargement de la mise à jour de Buddy</string>
     <string name="hub_tool_update_check">Recherche d\'une mise à jour de Buddy</string>
     <!-- %1$s = what is searched for. -->
@@ -664,9 +669,11 @@
     <string name="service_stopped_toast">Arrêté. Votre téléphone est de nouveau à vous.</string>
     <!-- Note in the chat when the user pauses the agent. -->
     <string name="service_paused_note">En pause : le téléphone est à vous jusqu\'à la reprise</string>
-    <string name="service_paused_toast">En pause. Utilisez votre téléphone, puis appuyez longuement sur la bulle pour reprendre.</string>
+    <string name="service_paused_toast">En pause. Utilisez votre téléphone, puis appuyez sur « En pause » à côté de la bulle pour reprendre.</string>
     <!-- Note in the chat when the user resumes the agent. -->
     <string name="service_resumed_note">Reprise</string>
+    <string name="service_autopaused_touch">En pause, car vous avez touché l’écran. Appuyez sur « En pause » à côté de la bulle pour reprendre.</string>
+    <string name="service_autopaused_call">En pause à cause d’un appel. Appuyez sur « En pause » à côté de la bulle pour reprendre.</string>
 
     <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
@@ -1398,6 +1405,7 @@
     <string name="card_note_later">Pas de réponse à temps : la réponse attend dans « En attente de vous »</string>
     <string name="rules_log_waiting">Attend votre accord : « %1$s »</string>
     <string name="rules_log_full">Ignoré : trop de discussions ont écrit en même temps.</string>
+    <string name="rules_log_hidden">Impossible de lire les nouveaux messages : Android les a masqués (ils contiennent peut-être un code). Ouvrez la discussion, et les suivants passeront.</string>
     <string name="waiting_title">En attente de vous</string>
     <string name="waiting_channel">Réponses en attente de vous</string>
     <string name="waiting_banner_text">Réponses en attente de votre accord : %1$s</string>

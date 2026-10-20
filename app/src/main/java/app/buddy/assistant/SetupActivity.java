@@ -219,7 +219,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 ? "echo 'export OPENCODE_CONFIG_CONTENT='\\''{\"mcp\":{\"phone\":{\"type\":\"remote\",\"url\":\"" + url
                 + "\",\"oauth\":false,\"timeout\":600000,\"headers\":{\"Authorization\":\"Bearer " + token
                 + "\"}}}}'\\''' >> ~/.bashrc && . ~/.bashrc"
-                : "claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
+                // add-json refuses a name that's already there, so the earlier setup goes first (run again to update)
+                : "claude mcp remove -s user phone >/dev/null 2>&1; claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
                 + "\",\"headers\":{\"Authorization\":\"Bearer " + token + "\"},\"timeout\":600000}'";
         // the token is masked on screen so screenshots never leak it
         mcp.addView(codeBlock(this, cmd.replace(token, token.substring(0, 4) + "••••••••")), topGap(12));

@@ -1015,7 +1015,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 r.addView(av, avp);
                 TextView tv = text(this, text, 15, TEXT);
                 tv.setTextIsSelectable(true);
+                tv.setText(Ui.markdownLinks(text, null)); // [text](url): the text, as a link
                 links(tv);
+                Ui.copyWithLinks(tv);
                 tv.setLineSpacing(0, 1.15f);
                 tv.setMaxWidth(maxBubble - dp(this, 32));
                 tv.setBackground(corners(this, CARD, 20, 20, 20, 6));

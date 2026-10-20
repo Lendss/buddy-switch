@@ -51,6 +51,12 @@ public final class HiddenNotice extends BroadcastReceiver {
             if (s != null) s.takeBackControl();
             return;
         }
+        if (AutoPause.ACTION_RESUME.equals(intent.getAction())) { // "Call ended": resume the paused task
+            BuddyService s = BuddyService.get();
+            if (s != null) s.resume();
+            AutoPause.cancelCallEnded(c); // also when it had ended already
+            return;
+        }
         if (!ACTION_SHOW.equals(intent.getAction())) return;
         Prefs.setBubbleEnabled(c, true);
         cancel(c);

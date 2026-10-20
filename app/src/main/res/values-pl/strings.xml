@@ -196,7 +196,8 @@
     <!-- Status pill beside the bubble: at most two lines. -->
     <string name="bubble_pill_waiting_answer">Czekam na twoją odpowiedź</string>
     <string name="bubble_pill_waiting_approval">Czekam na twoją zgodę</string>
-    <string name="bubble_pill_paused">Wstrzymano · przytrzymaj dymek, by wznowić</string>
+    <string name="bubble_pill_paused">Wstrzymano · dotknij tutaj, by wznowić</string>
+    <string name="bubble_pill_hands_on">%1$s · dotknij tutaj, by odpowiedzieć</string>
     <string name="bubble_using_phone">Używam twojego telefonu</string>
     <string name="bubble_using_phone_status">Używam twojego telefonu · %1$s</string>
     <string name="bubble_pill_hold_hint">przytrzymaj dymek, by zatrzymać i nie tylko</string>
@@ -301,6 +302,8 @@
     <string name="control_title">Buddy używa twojego telefonu</string>
     <string name="control_text">Nie dotykaj ekranu, dopóki nie skończy, albo kliknij Zatrzymaj, by przejąć kontrolę.</string>
     <string name="control_stop">Zatrzymaj</string>
+    <string name="pause_call_ended_title">Połączenie zakończone · Buddy wstrzymany</string>
+    <string name="pause_call_ended_text">Dotknij, by wznowić zadanie</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -432,6 +435,8 @@
     <string name="hub_tool_answered_text">✓ Odpowiedziano: %1$s</string>
     <string name="hub_tool_question_skipped">Pominięto pytanie</string>
     <string name="hub_tool_asking">Pytam: %1$s</string>
+    <string name="hub_tool_point_out">Wskazuje: %1$s</string>
+    <string name="hub_tool_point_out_any">Wskazuje coś na ekranie</string>
     <string name="hub_tool_update_download">Pobieram aktualizację Buddy</string>
     <string name="hub_tool_update_check">Sprawdzam, czy jest aktualizacja Buddy</string>
     <string name="hub_tool_web_search">Szukam w sieci: %1$s</string>
@@ -476,8 +481,10 @@
     <string name="service_pause_expired">Pauza trwała 5 minut, więc Buddy zatrzymał zadanie.</string>
     <string name="service_stopped_toast">Zatrzymano. Telefon znowu należy do ciebie.</string>
     <string name="service_paused_note">Wstrzymano: telefon jest twój, dopóki nie wznowisz</string>
-    <string name="service_paused_toast">Wstrzymano. Korzystaj z telefonu, a potem przytrzymaj dymek, by wznowić.</string>
+    <string name="service_paused_toast">Wstrzymano. Korzystaj z telefonu, a potem dotknij „Wstrzymano” obok dymka, by wznowić.</string>
     <string name="service_resumed_note">Wznowiono</string>
+    <string name="service_autopaused_touch">Wstrzymano, bo dotknięto ekranu. Dotknij „Wstrzymano” obok dymka, by wznowić.</string>
+    <string name="service_autopaused_call">Wstrzymano z powodu połączenia. Dotknij „Wstrzymano” obok dymka, by wznowić.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy potrzebuje mikrofonu. Otwórz aplikację Buddy i raz kliknij 🎙, by na to zezwolić.</string>
@@ -998,6 +1005,7 @@
     <string name="card_note_later">Brak odpowiedzi na czas: odpowiedź czeka w „Czeka na Ciebie”</string>
     <string name="rules_log_waiting">Czeka na Twoje OK: „%1$s”</string>
     <string name="rules_log_full">Pominięto: zbyt wiele czatów napisało naraz.</string>
+    <string name="rules_log_hidden">Nie udało się odczytać nowych wiadomości: Android je ukrył (mogą zawierać kod). Otwórz czat, a kolejne będą już docierać.</string>
     <string name="waiting_title">Czeka na Ciebie</string>
     <string name="waiting_channel">Odpowiedzi czekające na Ciebie</string>
     <string name="waiting_banner_text">Odpowiedzi czekają na Twoje OK: %1$s</string>

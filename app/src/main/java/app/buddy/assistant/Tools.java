@@ -103,14 +103,36 @@ final class Tools {
         t.put(tool("ask",
                 "Ask the user a question in the Buddy bubble and wait for the answer: 2 to 4 answer buttons, and "
                         + "the user can always type their own answer instead. Use it when you need the user to choose "
-                        + "or decide (which reply, which item, which time) instead of guessing. Returns ANSWER with "
-                        + "the option picked, ANSWER (typed) with the user's own words, or NO ANSWER. "
-                        + "It is not an approval: still call confirm before anything outward-facing.",
+                        + "or decide (which reply, which item, which time) instead of guessing. With highlight, it also "
+                        + "hands a step over to the user (a password or code, their details in a form, a file picker, a "
+                        + "captcha): e.g. \"Type your password, then tap Done\" with options [\"Done\", \"I can't\"] and the "
+                        + "field in highlight. Returns ANSWER with the option picked, ANSWER (typed) with the user's own "
+                        + "words, or NO ANSWER. It is not an approval: still call confirm before anything outward-facing.",
                 props().put("question", strProp("The question, short and clear"))
                         .put("options", new JSONObject().put("type", "array").put("minItems", 2).put("maxItems", 4)
                                 .put("items", new JSONObject().put("type", "string"))
-                                .put("description", "2 to 4 short answers, one per button")),
+                                .put("description", "2 to 4 short answers, one per button"))
+                        .put("highlight", marksProp("Optional: what the user has to do on the screen before answering "
+                                + "(as in point_out), e.g. the fields to fill in. Buddy marks them, and the question waits "
+                                + "next to the bubble instead of covering the screen; the marks go once they answer. When "
+                                + "every mark is a button or a switch, Buddy closes the question itself once it sees "
+                                + "them done (the result starts with DONE).")),
                 "question", "options"));
+        t.put(tool("point_out",
+                "Show the user where to look or what to do on the screen: a box, circle or arrow with a short label "
+                        + "around up to 6 elements, drawn over the app without blocking their touches. When the user does "
+                        + "what a mark points at (taps that button, flips that switch, fills in that field and moves on), "
+                        + "it turns green and goes. With wait=true the call returns only then (DONE: what they did) or "
+                        + "when they don't (GONE, LEFT, NOT DONE): use it to guide the user step by step through "
+                        + "something they want to learn to do themselves, one step per call, instead of doing it for "
+                        + "them. Marks follow their element as the screen scrolls, and go when it's gone, when the app "
+                        + "changes, when you use another phone action, or after seconds. Call with no marks to remove them.",
+                props().put("marks", marksProp("What to point out, e.g. [{\"element\": 12, \"label\": \"First name\"}, "
+                                + "{\"element\": 14, \"label\": \"Last name\"}]"))
+                        .put("style", enumProp("box", "circle", "arrow"))
+                        .put("wait", boolProp("Wait until the user has done what the marks point at, or until they can't anymore"))
+                        .put("seconds", intProp("How long the marks stay at most: default 60 (180 with wait), max 300")),
+                "marks"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
         t.put(tool("reply_notification",
@@ -175,6 +197,16 @@ final class Tools {
         return new JSONObject().put("type", "string").put("enum", a);
     }
 
+    /** Marks for point_out and ask's highlight: elements from read_screen, or points on the screen. */
+    private static JSONObject marksProp(String d) throws JSONException {
+        JSONObject mark = new JSONObject().put("type", "object").put("properties", props()
+                .put("element", intProp("Element id from the last read_screen"))
+                .put("x", intProp("Or a point in screen pixels, when read_screen can't see it (from screenshot)"))
+                .put("y", intProp("With x"))
+                .put("label", strProp("A few words shown next to it, e.g. \"Your first name\"")));
+        return new JSONObject().put("type", "array").put("maxItems", 6).put("items", mark).put("description", d);
+    }
+
     // ------------------------------------------------------------ dispatch
 
     /** A tool call, plus anything the user added while the agent works (see ChatHub.takeNotes). */
@@ -193,12 +225,15 @@ final class Tools {
     private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
-        // asking the user, posting a note and answering in a notification go on while paused; operating the phone waits
-        if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)) {
+        // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
+        // operating the phone waits
+        if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
+                && !"point_out".equals(name)) {
             String held = svc.awaitResume(name);
             if (held != null) return text(held);
         }
         svc.onToolActivity(name);
+        if (ACTIONS.contains(name)) svc.runOnMain(() -> svc.marks().clear()); // the screen is about to change
         switch (name) {
             case "read_screen": return text(readScreen());
             case "tap": return text(tap(a, false));
@@ -242,8 +277,24 @@ final class Tools {
                     if (!v.isEmpty() && !options.contains(v)) options.add(v);
                 }
                 if (options.size() < 2) return text("Give 2 to 4 options. The user can always type their own answer.");
-                return text(svc.askQuestion(a.getString("question"), options));
+                List<Marks.Mark> marks = marks(a.optJSONArray("highlight"));
+                // when every mark is a tap or a switch, seeing them all done answers the question; typing has no clear
+                // end, so a question with a field waits for the user's answer
+                boolean closes = !marks.isEmpty();
+                for (Marks.Mark m : marks) closes &= m.detectable() && !m.field;
+                final boolean auto = closes;
+                AtomicReference<String> stepDone = new AtomicReference<>();
+                if (!marks.isEmpty()) svc.runOnMain(() -> svc.marks().show(marks, "box", 0, r -> {
+                    if (auto && r.startsWith("DONE")) stepDone.set(r);
+                }));
+                try {
+                    return text(svc.askQuestion(a.getString("question"), options, !marks.isEmpty(), stepDone::get));
+                } finally {
+                    if (!marks.isEmpty()) svc.runOnMain(() -> svc.marks().clear());
+                }
             }
+            case "point_out":
+                return text(pointOut(a));
             case "update_buddy":
             case "install_apk":
             case "wait_for_install":
@@ -273,6 +324,94 @@ final class Tools {
                 return waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
                         Math.max(10, Math.min(300, a.optInt("timeout_s", 120))));
         }
+    }
+
+    /** point_out: shows the marks, and with wait, blocks until the user did what they point at (or why not). */
+    private String pointOut(JSONObject a) throws JSONException, InterruptedException {
+        List<Marks.Mark> marks = marks(a.optJSONArray("marks"));
+        String style = a.optString("style", "box");
+        final String shape = "circle".equals(style) || "arrow".equals(style) ? style : "box";
+        long ms = Math.max(1, Math.min(300, a.optInt("seconds", a.optBoolean("wait") ? 180 : 60))) * 1000L;
+        if (marks.isEmpty()) {
+            svc.runOnMain(() -> svc.marks().clear());
+            return "Marks removed.";
+        }
+        if (!a.optBoolean("wait")) {
+            svc.runOnMain(() -> svc.marks().show(marks, shape, ms, null));
+            return "Showing " + marks.size() + (marks.size() == 1 ? " mark" : " marks") + " for up to " + ms / 1000
+                    + " s; they don't block the user's touches. When the user does what one points at, it turns green and "
+                    + "goes. To wait for that, call point_out with wait=true, or ask with these marks in highlight.";
+        }
+        boolean watchable = false;
+        for (Marks.Mark m : marks) watchable |= m.detectable();
+        if (!watchable) return "Can't wait on these: Buddy can only see the user do it on elements from read_screen, not on bare points.";
+        CountDownLatch over = new CountDownLatch(1);
+        AtomicReference<String> how = new AtomicReference<>();
+        svc.runOnMain(() -> svc.marks().show(marks, shape, ms, r -> {
+            how.set(r);
+            over.countDown();
+        }));
+        java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
+        long end = System.currentTimeMillis() + ms + 3000;
+        while (!over.await(1, TimeUnit.SECONDS)) {
+            if ((gone != null && gone.getAsBoolean()) || System.currentTimeMillis() > end) {
+                svc.runOnMain(() -> svc.marks().clear("NOT DONE: Buddy stopped waiting."));
+                over.await(2, TimeUnit.SECONDS);
+                break;
+            }
+        }
+        svc.screenChangedByUser();
+        String r = how.get() == null ? "NOT DONE: Buddy stopped waiting." : how.get();
+        return r + (r.startsWith("DONE") ? " Call read_screen to see where they are now."
+                : " Call read_screen, then point it out again or ask the user.");
+    }
+
+    /** The switch or checkbox a mark on n is about: n itself, or the only one in its row; else null. */
+    private static AccessibilityNodeInfo toggleOf(AccessibilityNodeInfo n) {
+        if (n.isCheckable()) return n;
+        AccessibilityNodeInfo row = n;
+        for (int i = 0; row != null && !row.isClickable() && i < 2; i++) row = row.getParent();
+        if (row == null || !row.isClickable()) return null;
+        List<AccessibilityNodeInfo> found = new ArrayList<>();
+        findCheckable(row, 3, found);
+        return found.size() == 1 ? found.get(0) : null;
+    }
+
+    private static void findCheckable(AccessibilityNodeInfo n, int depth, List<AccessibilityNodeInfo> out) {
+        if (n == null || out.size() > 1) return;
+        if (n.isCheckable()) {
+            out.add(n);
+            return;
+        }
+        for (int i = 0; depth > 0 && i < n.getChildCount(); i++) findCheckable(n.getChild(i), depth - 1, out);
+    }
+
+    /** Tools that act on the screen: the point_out marks go first, as the screen is about to change. */
+    private static final java.util.Set<String> ACTIONS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url"));
+
+    /** point_out's marks or ask's highlight: elements from the last read_screen, or points on the screen. */
+    private List<Marks.Mark> marks(JSONArray a) throws JSONException {
+        List<Marks.Mark> out = new ArrayList<>();
+        for (int i = 0; a != null && i < a.length() && out.size() < 6; i++) {
+            Object v = a.get(i);
+            JSONObject o = v instanceof JSONObject ? (JSONObject) v
+                    : v instanceof Number ? new JSONObject().put("element", ((Number) v).intValue()) : null;
+            if (o == null) continue;
+            String label = o.optString("label", "");
+            if (o.has("element")) {
+                AccessibilityNodeInfo n = node(o); // says so when it's unknown or gone
+                Rect r = new Rect();
+                n.getBoundsInScreen(r);
+                out.add(new Marks.Mark(n, toggleOf(n), r, label));
+            } else if (o.has("x") && o.has("y")) {
+                int x = o.getInt("x"), y = o.getInt("y"), s = Ui.dp(svc, 22);
+                out.add(new Marks.Mark(null, null, new Rect(x - s, y - s, x + s, y + s), label));
+            } else {
+                throw new IllegalArgumentException("Each mark needs an element id, or x and y.");
+            }
+        }
+        return out;
     }
 
     /** The calling chat is a notification rule's run (see Triggers.ruleRun). */
@@ -374,8 +513,19 @@ final class Tools {
                     continue;
                 }
                 AccessibilityNodeInfo root = w.getRoot();
-                if (root == null) continue;
                 CharSequence title = w.getTitle();
+                if (root == null) {
+                    // an app can hide its windows from accessibility services that aren't assistive tools (Gmail
+                    // does): say so, or the agent taps blind on a screen it can't see
+                    if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION) {
+                        sb.append("\n## App window").append(title != null ? " \"" + title + "\"" : "")
+                                .append(w.isActive() ? " (active)" : "")
+                                .append(": Buddy can't read this window (the app hides its screen, or it's still"
+                                        + " loading). Use screenshot to see it. Taps may not work here; if they"
+                                        + " don't, ask the user to do this step.\n");
+                    }
+                    continue;
+                }
                 sb.append("\n## ").append(windowType(w.getType()))
                         .append(" window").append(root.getPackageName() != null ? " [" + root.getPackageName() + "]" : "")
                         .append(title != null ? " \"" + title + "\"" : "")
@@ -700,6 +850,8 @@ final class Tools {
             final boolean[] ok = {false};
             GestureDescription g = new GestureDescription.Builder()
                     .addStroke(new GestureDescription.StrokeDescription(path, 0, durationMs)).build();
+            if (svc.paused()) return false; // the user took the phone since this call began
+            svc.autoPauser().ownGesture(durationMs); // Buddy's own touch: not the user taking the phone
             boolean dispatched = svc.dispatchGesture(g, new AccessibilityService.GestureResultCallback() {
                 @Override
                 public void onCompleted(GestureDescription d) {

@@ -469,27 +469,126 @@ final class Ui {
      */
     static void linkifyForService(TextView t, Runnable then) {
         android.text.SpannableString s = new android.text.SpannableString(t.getText());
-        if (!android.text.util.Linkify.addLinks(s, android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES)) return;
+        boolean found = android.text.util.Linkify.addLinks(s, android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES);
         for (android.text.style.URLSpan u : s.getSpans(0, s.length(), android.text.style.URLSpan.class)) {
-            final String url = u.getURL();
             int a = s.getSpanStart(u), b = s.getSpanEnd(u);
             s.removeSpan(u);
-            s.setSpan(new android.text.style.ClickableSpan() {
-                @Override
-                public void onClick(android.view.View v) {
-                    if (then != null) then.run();
-                    try {
-                        v.getContext().startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
-                                android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
-                    } catch (Exception e) {
-                        android.widget.Toast.makeText(v.getContext(), R.string.ui_no_app_for_link, android.widget.Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }, a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            s.setSpan(new LinkSpan(u.getURL(), then), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+        // markdown links (see markdownLinks) are LinkSpans already
+        if (!found && s.getSpans(0, s.length(), LinkSpan.class).length == 0) return;
         t.setText(s);
         t.setLinkTextColor(ACCENT_TEXT);
         t.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+    }
+
+    /** A markdown link, [text](https://…); one level of parentheses in the address too (Wikipedia's have them). */
+    private static final java.util.regex.Pattern MD_LINK = java.util.regex.Pattern.compile(
+            "\\[([^\\[\\]\\n]+)\\]\\((https?://[^\\s()]*(?:\\([^\\s()]*\\)[^\\s()]*)*)\\)");
+
+    /**
+     * Agents often write links in markdown: shown as their text alone, which opens the address when tapped. Then runs
+     * before it opens (e.g. to fold the panel). Bare addresses are left to Linkify.
+     */
+    static CharSequence markdownLinks(CharSequence text, Runnable then) {
+        java.util.regex.Matcher m = MD_LINK.matcher(text);
+        if (!m.find()) return text;
+        android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
+        int last = 0;
+        do {
+            out.append(text, last, m.start());
+            int a = out.length();
+            out.append(m.group(1));
+            out.setSpan(new LinkSpan(m.group(2), then), a, out.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            last = m.end();
+        } while (m.find());
+        return out.append(text, last, text.length());
+    }
+
+    /** The same in plain text, for one-line previews: [text](url) becomes text. */
+    static String linkText(String text) {
+        return MD_LINK.matcher(text).replaceAll("$1");
+    }
+
+    /** For copying a whole reply: [text](url) becomes "text (url)", which other apps turn back into a link. */
+    static String linkCopy(String text) {
+        return MD_LINK.matcher(text).replaceAll("$1 ($2)");
+    }
+
+    /**
+     * For copying part of a reply as shown (start to end): a link whose text hides its address gets it after it, as in
+     * linkCopy, so the address isn't lost outside Buddy.
+     */
+    static String linkCopy(CharSequence shown, int start, int end) {
+        if (!(shown instanceof android.text.Spanned)) return shown.subSequence(start, end).toString();
+        android.text.Spanned s = (android.text.Spanned) shown;
+        LinkSpan[] links = s.getSpans(start, end, LinkSpan.class);
+        java.util.Arrays.sort(links, (x, y) -> s.getSpanStart(x) - s.getSpanStart(y));
+        StringBuilder b = new StringBuilder();
+        int at = start;
+        for (LinkSpan l : links) {
+            int a = Math.max(start, s.getSpanStart(l)), z = Math.min(end, s.getSpanEnd(l));
+            String label = s.subSequence(s.getSpanStart(l), s.getSpanEnd(l)).toString();
+            if (a < at || l.url.contains(label)) continue; // a bare address or email shows itself already
+            b.append(s, at, z).append(" (").append(l.url).append(')');
+            at = z;
+        }
+        return b.append(s, at, end).toString();
+    }
+
+    /** Copy in a selectable reply keeps the addresses of its links (see linkCopy). */
+    static void copyWithLinks(TextView t) {
+        t.setCustomSelectionActionModeCallback(new android.view.ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.view.ActionMode mode, android.view.MenuItem item) {
+                if (item.getItemId() != android.R.id.copy) return false;
+                int a = Math.min(t.getSelectionStart(), t.getSelectionEnd()), b = Math.max(t.getSelectionStart(), t.getSelectionEnd());
+                if (a < 0 || b <= a) return false;
+                t.getContext().getSystemService(android.content.ClipboardManager.class)
+                        .setPrimaryClip(android.content.ClipData.newPlainText("Buddy", linkCopy(t.getText(), a, b)));
+                mode.finish();
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+            }
+        });
+    }
+
+    /**
+     * A link that opens with a new task (so it works from the bubble, which isn't an activity). Not a URLSpan: Linkify,
+     * which replaces those, leaves it be. Then runs before it opens.
+     */
+    static final class LinkSpan extends android.text.style.ClickableSpan {
+        final String url;
+        private final Runnable then;
+
+        LinkSpan(String url, Runnable then) {
+            this.url = url;
+            this.then = then;
+        }
+
+        @Override
+        public void onClick(android.view.View v) {
+            if (then != null) then.run();
+            try {
+                v.getContext().startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+            } catch (Exception e) {
+                android.widget.Toast.makeText(v.getContext(), R.string.ui_no_app_for_link, android.widget.Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     static ProgressBar spinner(Context c, int sizeDp) {

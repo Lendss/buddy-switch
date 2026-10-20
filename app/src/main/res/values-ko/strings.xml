@@ -183,7 +183,8 @@
     <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…". -->
     <string name="bubble_pill_waiting_answer">답변을 기다리고 있어요</string>
     <string name="bubble_pill_waiting_approval">승인을 기다리고 있어요</string>
-    <string name="bubble_pill_paused">일시중지됨 · 버블을 길게 눌러 재개하세요</string>
+    <string name="bubble_pill_paused">일시중지됨 · 여기를 탭해 재개하세요</string>
+    <string name="bubble_pill_hands_on">%1$s · 여기를 탭해 답하세요</string>
     <string name="bubble_using_phone">휴대전화 사용 중</string>
     <string name="bubble_using_phone_status">휴대전화 사용 중 · %1$s</string>
     <string name="bubble_pill_hold_hint">‘작업 중지’ 등은 버블을 길게 누르세요</string>
@@ -285,6 +286,8 @@
     <string name="control_title">Buddy가 휴대전화를 사용 중</string>
     <string name="control_text">끝날 때까지 화면을 만지지 마세요. 직접 조작하려면 ‘중지’를 탭하세요.</string>
     <string name="control_stop">중지</string>
+    <string name="pause_call_ended_title">통화 종료 · Buddy 일시중지됨</string>
+    <string name="pause_call_ended_text">탭하여 작업 재개</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -407,6 +410,8 @@
     <string name="hub_tool_answered_text">✓ 답변 완료: %1$s</string>
     <string name="hub_tool_question_skipped">질문을 건너뛰었어요</string>
     <string name="hub_tool_asking">질문하는 중: %1$s</string>
+    <string name="hub_tool_point_out">표시 중: %1$s</string>
+    <string name="hub_tool_point_out_any">화면에 표시하는 중</string>
     <string name="hub_tool_update_download">Buddy 업데이트 다운로드 중</string>
     <string name="hub_tool_update_check">Buddy 업데이트 확인 중</string>
     <string name="hub_tool_web_search">웹 검색 중: %1$s</string>
@@ -448,8 +453,10 @@
     <string name="service_pause_expired">5분 동안 일시중지되어 Buddy가 작업을 중지했어요.</string>
     <string name="service_stopped_toast">중지했어요. 이제 휴대전화를 직접 쓸 수 있어요.</string>
     <string name="service_paused_note">일시중지됨: 재개할 때까지 휴대전화를 직접 쓸 수 있어요</string>
-    <string name="service_paused_toast">일시중지했어요. 휴대전화를 쓴 다음 버블을 길게 눌러 재개하세요.</string>
+    <string name="service_paused_toast">일시중지했어요. 휴대전화를 쓴 다음 버블 옆의 ‘일시중지됨’을 탭해 재개하세요.</string>
     <string name="service_resumed_note">재개했어요</string>
+    <string name="service_autopaused_touch">화면을 터치해서 일시중지했어요. 버블 옆의 ‘일시중지됨’을 탭하면 재개해요.</string>
+    <string name="service_autopaused_call">전화 때문에 일시중지했어요. 버블 옆의 ‘일시중지됨’을 탭하면 재개해요.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy에 마이크 권한이 필요해요. Buddy 앱을 열고 🎙를 한 번 탭해 허용하세요.</string>
@@ -958,6 +965,7 @@
     <string name="card_note_later">제때 응답이 없어서 답장이 ‘확인 대기 중’ 목록에서 기다려요</string>
     <string name="rules_log_waiting">확인을 기다리는 중: “%1$s”</string>
     <string name="rules_log_full">건너뜀: 너무 많은 채팅에서 동시에 메시지가 왔어요.</string>
+    <string name="rules_log_hidden">새 메시지를 읽지 못했어요. Android가 숨겼어요(코드가 들어 있을 수 있어요). 채팅을 열면 다음 메시지부터 받을 수 있어요.</string>
     <string name="waiting_title">확인 대기 중</string>
     <string name="waiting_channel">확인을 기다리는 답장</string>
     <string name="waiting_banner_text">확인을 기다리는 답장: %1$s</string>

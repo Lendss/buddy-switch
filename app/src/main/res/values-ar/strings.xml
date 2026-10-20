@@ -196,7 +196,8 @@
     <!-- Status pill beside the bubble: at most two lines, about 250dp wide. -->
     <string name="bubble_pill_waiting_answer">في انتظار إجابتك</string>
     <string name="bubble_pill_waiting_approval">في انتظار موافقتك</string>
-    <string name="bubble_pill_paused">متوقف مؤقتًا · اضغط مطولًا على الفقاعة للاستئناف</string>
+    <string name="bubble_pill_paused">متوقف مؤقتًا · اضغط هنا للاستئناف</string>
+    <string name="bubble_pill_hands_on">%1$s · اضغط هنا للإجابة</string>
     <string name="bubble_using_phone">يستخدم هاتفك</string>
     <string name="bubble_using_phone_status">يستخدم هاتفك · %1$s</string>
     <string name="bubble_pill_hold_hint">اضغط مطولًا على الفقاعة للإيقاف وخيارات أخرى</string>
@@ -303,6 +304,8 @@
     <string name="control_title">يستخدم Buddy هاتفك</string>
     <string name="control_text">لا تلمس الشاشة حتى ينتهي، أو انقر على «إيقاف» لتتولى التحكم.</string>
     <string name="control_stop">إيقاف</string>
+    <string name="pause_call_ended_title">انتهت المكالمة · Buddy متوقف مؤقتًا</string>
+    <string name="pause_call_ended_text">اضغط لاستئناف المهمة</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -440,6 +443,8 @@
     <string name="hub_tool_answered_text">✓ تمت الإجابة: %1$s</string>
     <string name="hub_tool_question_skipped">تم تخطي السؤال</string>
     <string name="hub_tool_asking">يسأل: %1$s</string>
+    <string name="hub_tool_point_out">يشير إلى: %1$s</string>
+    <string name="hub_tool_point_out_any">يشير إلى شيء على الشاشة</string>
     <string name="hub_tool_update_download">جارٍ تنزيل تحديث Buddy</string>
     <string name="hub_tool_update_check">جارٍ البحث عن تحديث لـ Buddy</string>
     <string name="hub_tool_web_search">جارٍ البحث في الويب: %1$s</string>
@@ -486,8 +491,10 @@
     <string name="service_pause_expired">استمر الإيقاف المؤقت 5 دقائق، لذا أوقف Buddy المهمة.</string>
     <string name="service_stopped_toast">تم الإيقاف. أصبح هاتفك تحت تصرفك مجددًا.</string>
     <string name="service_paused_note">متوقف مؤقتًا: الهاتف تحت تصرفك حتى تستأنف</string>
-    <string name="service_paused_toast">تم الإيقاف المؤقت. استخدم هاتفك، ثم اضغط مطولًا على الفقاعة للاستئناف.</string>
+    <string name="service_paused_toast">تم الإيقاف المؤقت. استخدم هاتفك، ثم اضغط على «متوقف مؤقتًا» بجانب الفقاعة للاستئناف.</string>
     <string name="service_resumed_note">تم الاستئناف</string>
+    <string name="service_autopaused_touch">توقف مؤقتًا لأنك لمست الشاشة. اضغط على «متوقف مؤقتًا» بجانب الفقاعة للاستئناف.</string>
+    <string name="service_autopaused_call">توقف مؤقتًا بسبب مكالمة. اضغط على «متوقف مؤقتًا» بجانب الفقاعة للاستئناف.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">يحتاج Buddy إلى الميكروفون. افتح تطبيق Buddy وانقر على 🎙 مرة واحدة للسماح بذلك.</string>
@@ -1013,6 +1020,7 @@
     <string name="card_note_later">لم يصل رد في الوقت المناسب: الرد ينتظر في «بانتظارك»</string>
     <string name="rules_log_waiting">بانتظار موافقتك: «%1$s»</string>
     <string name="rules_log_full">تم التخطي: كتبت محادثات كثيرة جدًا في الوقت نفسه.</string>
+    <string name="rules_log_hidden">تعذّرت قراءة الرسائل الجديدة: أخفاها Android (ربما تحتوي على رمز). افتح المحادثة، وستصل الرسائل التالية.</string>
     <string name="waiting_title">بانتظارك</string>
     <string name="waiting_channel">ردود بانتظارك</string>
     <string name="waiting_banner_text">ردود بانتظار موافقتك: %1$s</string>

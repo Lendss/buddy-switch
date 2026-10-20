@@ -32,17 +32,33 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private ControlIndicator control;
     /** After the user taps Stop on the control indicator, phone actions are refused until then (elapsedRealtime). */
     private volatile long revokedUntil;
-    /** Pause from the hold menu: phone tools wait (see awaitResume) while the user uses the phone. */
+    /**
+     * Pause (the hold menu, or on its own when the user takes the phone: see AutoPause): phone tools wait (see
+     * awaitResume) while the user uses the phone.
+     */
     private volatile boolean paused, rereadNeeded;
+    /** A phone tool waited in this pause: an agent is still at work behind it. */
+    private volatile boolean heldInPause;
+    /** Phone tools waiting in awaitResume right now (guarded by pauseLock). */
+    private int waiters;
     private final Object pauseLock = new Object();
     private static final long PAUSE_MAX_MS = 5 * 60_000, PAUSE_WAIT_MS = 45_000;
     private final Runnable pauseExpired = () -> {
         if (!paused) return;
+        // nothing waited for it and no chat is running (a session outside Buddy that had finished): just end it
+        if (!heldInPause && ChatHub.get(this).runningCount() == 0) {
+            endPause();
+            return;
+        }
         takeBackControl();
         android.widget.Toast.makeText(this, R.string.service_pause_expired, android.widget.Toast.LENGTH_LONG).show();
     };
     private Tools tools;
     private McpServer server;
+    private AutoPause autoPause;
+    private Marks marks;
+    /** Touches on the screen while a card waited for the user (see onScreenTouched). */
+    private volatile int cardTouches;
 
     static BuddyService get() {
         return instance;
@@ -67,6 +83,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Models.setOpencode(Prefs.opencodeModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
         tools = new Tools(this);
+        autoPause = new AutoPause(this);
+        marks = new Marks(this);
         bubble = new Bubble(this);
         control = new ControlIndicator(this);
         bubble.show();
@@ -108,6 +126,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (bubble == null) return;
         int type = event.getEventType();
+        if (type == AccessibilityEvent.TYPE_VIEW_CLICKED) { // only while a mark waits for a tap (listenForClicks)
+            marks.onClicked(event.getSource(), event.getEventTime());
+            return;
+        }
         if (type != AccessibilityEvent.TYPE_WINDOWS_CHANGED && type != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
         int top = 0;
         AccessibilityWindowInfo app = null;
@@ -131,6 +153,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         String front = pkg.toString();
         // Recents may belong to another launcher than Home (e.g. the phone's own while Nova handles Home)
         if (!front.equals(frontApp) && isLauncher(front)) bubble.onLauncherShown();
+        if (!front.equals(frontApp)) { // what they pointed at was in the app that's gone
+            marks.clear("LEFT: the user switched to another app before doing it.");
+        }
         frontApp = front;
     }
 
@@ -171,6 +196,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         RemoteSession.stop();
         main.removeCallbacks(updateCheck);
         if (server != null) server.stop();
+        if (autoPause != null) autoPause.stop();
+        if (marks != null) marks.clear();
         if (bubble != null) bubble.remove();
         if (control != null) control.end();
         instance = null;
@@ -303,6 +330,34 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return bubble;
     }
 
+    AutoPause autoPauser() {
+        return autoPause;
+    }
+
+    /** The point_out tool's marks (main thread). */
+    Marks marks() {
+        return marks;
+    }
+
+    /**
+     * Hear about taps on the screen (main thread): only while a mark waits for the user to tap it, so the rest of the
+     * time Buddy gets no such events.
+     */
+    void listenForClicks(boolean on) {
+        android.accessibilityservice.AccessibilityServiceInfo info = getServiceInfo();
+        if (info == null) return;
+        int types = on ? info.eventTypes | AccessibilityEvent.TYPE_VIEW_CLICKED
+                : info.eventTypes & ~AccessibilityEvent.TYPE_VIEW_CLICKED;
+        if (types == info.eventTypes) return;
+        info.eventTypes = types;
+        setServiceInfo(info);
+    }
+
+    /** The user did something on the screen the agent asked for: the agent re-reads it before acting. */
+    void screenChangedByUser() {
+        rereadNeeded = true;
+    }
+
     // ------------------------------------------------------- MCP handler
 
     @Override
@@ -351,8 +406,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     void onToolActivity(final String tool) {
         main.post(() -> {
             bubble.onToolActivity(tool);
-            // asking for approval, asking a question, posting a note or answering in a notification isn't operating the phone
-            if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)) {
+            // asking for approval, asking a question, posting a note, pointing something out or answering in a
+            // notification isn't operating the phone
+            if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)
+                    && !"point_out".equals(tool)) {
                 control.onActivity();
             }
         });
@@ -389,15 +446,65 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     /** Pause (main thread): the agent's next phone action waits until resume, so the user can use the phone. */
     void pause() {
+        pause(R.string.service_paused_note, R.string.service_paused_toast);
+    }
+
+    /**
+     * The user took the phone while an agent operated it (AutoPause: a touch, a call; main thread): pause, saying why.
+     * Only while a task is under way: a Buddy chat running, or another session that just acted. True if it paused.
+     */
+    boolean autoPause(int why) {
+        if (paused || (ChatHub.get(this).runningCount() == 0 && !control.recent(10_000))) return false;
+        pause(why, why);
+        return true;
+    }
+
+    private void pause(int note, int toast) {
         if (paused) return;
         paused = true;
+        heldInPause = false;
         control.end();
         main.postDelayed(pauseExpired, PAUSE_MAX_MS);
         ChatHub hub = ChatHub.get(this);
         Sessions.Session ses = hub.latestRunning();
-        if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(R.string.service_paused_note));
+        if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(note));
         if (bubble != null) bubble.onPauseChanged();
-        android.widget.Toast.makeText(this, R.string.service_paused_toast, android.widget.Toast.LENGTH_SHORT).show();
+        android.widget.Toast.makeText(this, toast, android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * The user touched the screen outside Buddy while an agent operates the phone (AutoPause, main thread). While a card
+     * waits the agent isn't acting anyway: it re-reads the screen after the answer. Typing in Buddy's panel or app
+     * doesn't count.
+     */
+    void onScreenTouched() {
+        if (bubble == null || paused || bubble.expanded()) return; // the keyboard over Buddy's panel, say
+        if (bubble.confirming() || marks.waiting()) { // the agent waits on them: the touch is them doing their part
+            cardTouches++;
+            return;
+        }
+        if (getPackageName().equals(foregroundPkg()) || onlyRuleRuns()) return;
+        autoPause(R.string.service_autopaused_touch);
+    }
+
+    /** Only notification rules' runs are working: they start on their own, often while the user is on the phone. */
+    private boolean onlyRuleRuns() {
+        boolean any = false;
+        for (Sessions.Session s : ChatHub.get(this).sessions.all) {
+            if (!s.running) continue;
+            if (!Triggers.ruleRun(s.id)) return false;
+            any = true;
+        }
+        return any;
+    }
+
+    /** No Buddy chat is running anymore (main thread): a pause nothing waits in has nothing left to hold. */
+    void onRunsEnded() {
+        if (!paused) return;
+        synchronized (pauseLock) {
+            if (waiters > 0) return;
+        }
+        endPause();
     }
 
     /** Resume (main thread): waiting phone actions go on, after the agent re-reads the screen. */
@@ -420,11 +527,14 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private void endPause() {
         if (!paused) return;
         paused = false;
+        heldInPause = false;
         main.removeCallbacks(pauseExpired);
         synchronized (pauseLock) {
             pauseLock.notifyAll();
         }
+        autoPause.onPauseEnded();
         if (bubble != null) bubble.onPauseChanged();
+        Triggers.get(this).wake(); // rule runs wait while paused
     }
 
     /**
@@ -433,9 +543,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      */
     String awaitResume(String tool) throws InterruptedException {
         long until = android.os.SystemClock.elapsedRealtime() + PAUSE_WAIT_MS;
+        if (paused) heldInPause = true;
         synchronized (pauseLock) {
             long left;
-            while (paused && (left = until - android.os.SystemClock.elapsedRealtime()) > 0) pauseLock.wait(left);
+            waiters++;
+            try {
+                while (paused && (left = until - android.os.SystemClock.elapsedRealtime()) > 0) pauseLock.wait(left);
+            } finally {
+                waiters--;
+            }
         }
         if (paused) {
             return "PAUSED: the user paused you to use the phone themselves. Nothing was done. Don't use other phone "
@@ -446,8 +562,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (rereadNeeded) {
             if ("read_screen".equals(tool) || "screenshot".equals(tool)) rereadNeeded = false;
             else if (!"wait".equals(tool) && !"list_apps".equals(tool)) {
-                return "RESUMED: the user paused you and used the phone, so the screen may have changed and element "
-                        + "ids are stale. Nothing was done. Call read_screen, then continue the task.";
+                return "SCREEN CHANGED: the user used the phone themselves (they paused you, or did something on the "
+                        + "screen while you waited for their answer), so the screen may have changed and element ids are "
+                        + "stale. Nothing was done. Call read_screen, then continue the task.";
             }
         }
         return null;
@@ -472,6 +589,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.post(() -> {
             dimmed[0] = bubble.dimming();
             bubble.setPassThrough(on);
+            marks.setPassThrough(on);
             done.countDown();
         });
         try {
@@ -482,15 +600,18 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     }
 
     /**
-     * Waits up to 5 minutes for a question's answer. Gives up sooner when the agent stops waiting (its tool call timed
-     * out or it was stopped): a card nobody waits for would keep blocking every tap.
+     * Waits up to ms for a question's answer. Gives up sooner when the agent stops waiting (its tool call timed out or
+     * it was stopped): a card nobody waits for would keep blocking every tap. Also as soon as stop has something to
+     * say (see askQuestion).
      */
-    private static boolean awaitAnswer(CountDownLatch done) throws InterruptedException {
+    private static boolean awaitAnswer(CountDownLatch done, long ms, java.util.function.Supplier<String> stop)
+            throws InterruptedException {
         java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
-        long end = System.currentTimeMillis() + 5 * 60_000L;
+        long end = System.currentTimeMillis() + ms;
         while (System.currentTimeMillis() < end) {
             if (done.await(1, TimeUnit.SECONDS)) return true;
             if (gone != null && gone.getAsBoolean()) return false;
+            if (stop != null && stop.get() != null) return false;
         }
         return false;
     }
@@ -578,6 +699,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final AtomicReference<Boolean> answer = new AtomicReference<>();
         final AtomicReference<String> change = new AtomicReference<>();
         final java.util.concurrent.atomic.AtomicBoolean auto = new java.util.concurrent.atomic.AtomicBoolean();
+        final int touches = cardTouches;
         main.post(() -> bubble.askConfirm(text, chat, countdown, new Bubble.ConfirmCallback() {
             @Override
             public void onAnswer(boolean approved, String wanted) {
@@ -604,6 +726,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         } finally {
             Triggers.approvalDone(this, chat);
         }
+        if (cardTouches != touches) rereadNeeded = true; // they used the screen meanwhile: ids may be stale
         if (ended != null) {
             main.post(() -> bubble.cancelConfirm());
             return ended;
@@ -619,8 +742,14 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 : "DENIED by the user. Do not do it; ask what they want instead.";
     }
 
-    /** Blocks the calling (tool) thread until the user picks an option or types an answer in the bubble. */
-    String askQuestion(final String question, final java.util.List<String> options) throws InterruptedException {
+    /**
+     * Blocks the calling (tool) thread until the user picks an option or types an answer in the bubble. handsOn: the
+     * user has a step to do on the screen first (the question comes with marks): the card waits next to the bubble
+     * instead of opening over the screen. stepDone (may be null) says once Buddy saw them do that step: then the
+     * question closes without waiting for an answer.
+     */
+    String askQuestion(final String question, final java.util.List<String> options, boolean handsOn,
+                       java.util.function.Supplier<String> stepDone) throws InterruptedException {
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Boolean> picked = new AtomicReference<>();
         final AtomicReference<String> answer = new AtomicReference<>();
@@ -630,7 +759,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return "NO ANSWER: the user isn't on the phone right now, and a notification rule's run doesn't wait for "
                     + "them. Don't guess; say in your last reply what you need to know.";
         }
-        main.post(() -> bubble.askQuestion(question, options, chat, (fromButton, text) -> {
+        final int touches = cardTouches;
+        main.post(() -> bubble.askQuestion(question, options, chat, handsOn, (fromButton, text) -> {
             picked.set(fromButton);
             answer.set(text);
             done.countDown();
@@ -638,20 +768,27 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Triggers.approvalShown(this, chat, question, 0);
         boolean answered;
         try {
-            answered = rule ? done.await(60, TimeUnit.SECONDS) : awaitAnswer(done);
+            answered = awaitAnswer(done, rule ? 60_000L : 5 * 60_000L, stepDone);
         } finally {
             Triggers.approvalDone(this, chat);
         }
+        boolean usedScreen = handsOn || cardTouches != touches;
+        if (usedScreen) rereadNeeded = true;
         if (!answered) {
             main.post(() -> bubble.cancelConfirm());
+            String step = stepDone == null ? null : stepDone.get();
+            if (step != null) {
+                return step + " Buddy saw it and closed the question for them. Call read_screen before going on.";
+            }
             return "NO ANSWER: the user did not answer within " + (rule ? "a minute" : "5 minutes")
                     + ". Don't guess; stop and ask in your reply.";
         }
         if (answer.get() == null) {
             return "NO ANSWER: the user closed the question. Don't guess; stop and ask what they want.";
         }
-        return Boolean.TRUE.equals(picked.get())
+        String then = usedScreen ? " The user may have changed the screen meanwhile: call read_screen before going on." : "";
+        return (Boolean.TRUE.equals(picked.get())
                 ? "ANSWER: \u201c" + answer.get() + "\u201d"
-                : "ANSWER (typed by the user): \u201c" + answer.get() + "\u201d";
+                : "ANSWER (typed by the user): \u201c" + answer.get() + "\u201d") + then;
     }
 }

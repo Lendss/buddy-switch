@@ -252,7 +252,10 @@ final class Bubble implements ChatHub.Listener {
         plp.setMarginStart(dp(6));
         plp.setMarginEnd(dp(6));
         collapsed.addView(pill, plp);
-        pill.setOnClickListener(v -> expand());
+        pill.setOnClickListener(v -> { // paused, the pill is the Resume button
+            if (svc.paused() && pendingConfirm == null) svc.resume();
+            else expand();
+        });
 
         face.setOnTouchListener(new DragListener());
     }
@@ -801,6 +804,7 @@ final class Bubble implements ChatHub.Listener {
     void expand() {
         if (expanded) return;
         expanded = true;
+        svc.marks().setPanelOpen(true);
         root.setVisibility(View.VISIBLE);
         badge.setVisibility(View.GONE);
         placePanel();
@@ -844,6 +848,7 @@ final class Bubble implements ChatHub.Listener {
         if (!expanded) return;
         if (Voice.listening()) Voice.stopListening();
         expanded = false;
+        svc.marks().setPanelOpen(false);
         updateViewing();
         unregisterBack();
         hideKeyboard();
@@ -906,7 +911,10 @@ final class Bubble implements ChatHub.Listener {
         refreshStatus();
     }
 
-    /** Paused or resumed from the hold menu: the pill says so, and the bubble stays up while paused. */
+    /**
+     * Paused or resumed (the hold menu, the pill, or on its own when the user took the phone): the pill and face say
+     * so, and the bubble stays up while paused.
+     */
     void onPauseChanged() {
         applyEnabled();
         refreshStatus();
@@ -1722,7 +1730,7 @@ final class Bubble implements ChatHub.Listener {
             for (int i = ses.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg m = ses.messages.get(i);
                 if (m.kind == Kind.BUDDY || m.kind == Kind.USER) {
-                    String t = m.label().replace('\n', ' ');
+                    String t = Ui.linkText(m.label()).replace('\n', ' ');
                     last = m.kind == Kind.USER ? svc.getString(R.string.bubble_chat_row_you, t) : t;
                     break;
                 }
@@ -2042,10 +2050,17 @@ final class Bubble implements ChatHub.Listener {
         hub.changed();
     }
 
-    /** The ask tool: the same card, with a button per answer and one to type an answer instead. */
-    void askQuestion(String question, java.util.List<String> options, String chat, ConfirmCallback cb) {
-        showCard(question, options, chat, cb);
+    /**
+     * The ask tool: the same card, with a button per answer and one to type an answer instead. handsOn: the user has a
+     * step to do on the screen first (marks show where), so the card waits by the bubble, the question in its pill,
+     * and opens when they tap it.
+     */
+    void askQuestion(String question, java.util.List<String> options, String chat, boolean handsOn, ConfirmCallback cb) {
+        showCard(question, options, chat, cb, !handsOn);
     }
+
+    /** The waiting card has a step for the user to do on the screen first (see askQuestion). */
+    private boolean handsOn;
 
     /** The Buddy chat the waiting card belongs to, or null when it comes from another session (a terminal…). */
     private Sessions.Session cardChat;
@@ -2056,10 +2071,15 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb) {
+        showCard(text, options, chat, cb, true);
+    }
+
+    private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb, boolean open) {
         if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
         endCountdown();
         if (changing) endChange();
         pendingConfirm = cb;
+        handsOn = !open;
         cardChat = chat == null ? null : sessions.find(chat);
         if (cardChat != null && cardChat != sessions.current) { // show the chat that's asking
             sessions.select(cardChat);
@@ -2086,7 +2106,8 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setVisibility(View.VISIBLE);
         refreshStatus();
         vibrate(60);
-        expand();
+        if (open) expand();
+        else collapse(); // the screen stays free for the step; the pill asks
         // on the lock screen the card waits out of sight (a notification says so): approving needs the phone unlocked
         applyEnabled();
         hub.changed();
@@ -2095,6 +2116,11 @@ final class Bubble implements ChatHub.Listener {
     /** An approval card is waiting for the user (the agent must not tap anything meanwhile). */
     boolean confirming() {
         return pendingConfirm != null;
+    }
+
+    /** The chat panel is open (the user is talking to Buddy). */
+    boolean expanded() {
+        return expanded;
     }
 
     void cancelConfirm() {
@@ -2185,9 +2211,9 @@ final class Bubble implements ChatHub.Listener {
         if (working && !wasWorking) maybePeek();
         wasWorking = working;
         boolean paused = svc.paused();
-        String text = pendingConfirm != null
-                ? svc.getString(asking ? R.string.bubble_pill_waiting_answer : R.string.bubble_pill_waiting_approval)
-                : hub.pillText();
+        String text = pendingConfirm == null ? hub.pillText()
+                : handsOn ? svc.getString(R.string.bubble_pill_hands_on, clip(confirmText.getText().toString(), 90))
+                : svc.getString(asking ? R.string.bubble_pill_waiting_answer : R.string.bubble_pill_waiting_approval);
         if (paused && pendingConfirm == null) {
             text = svc.getString(R.string.bubble_pill_paused);
         } else if (controlling && pendingConfirm == null) {
@@ -2228,7 +2254,8 @@ final class Bubble implements ChatHub.Listener {
     private void setWorking(boolean on, boolean force) {
         ring.setSpinning(on);
         // keep the fired-up / bracing face while the bubble is being dragged
-        if (force || !faceDragging()) face.setImageResource(on ? R.drawable.bubble_face_thinking : R.drawable.bubble_face);
+        if (force || !faceDragging()) face.setImageResource(on ? R.drawable.bubble_face_thinking
+                : svc.paused() ? R.drawable.bubble_face_paused : R.drawable.bubble_face);
         if (on && breathing == null) {
             breathing = ValueAnimator.ofFloat(1f, 0.9f);
             breathing.setDuration(750);
@@ -2299,11 +2326,12 @@ final class Bubble implements ChatHub.Listener {
                 avp.setMarginEnd(dp(8));
                 r.addView(av, avp);
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
+                tv.setText(Ui.markdownLinks(text, this::collapse)); // [text](url): the text, as a link
                 tv.setLineSpacing(0, 1.15f);
                 tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
                 tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
                 Ui.linkifyForService(tv, this::collapse);
-                copyOnLongPress(tv, text);
+                copyOnLongPress(tv, Ui.linkCopy(text)); // links as "text (address)"
                 r.addView(tv);
                 p.setMarginEnd(dp(24));
                 v = r;

@@ -190,7 +190,8 @@
     <!-- Status pill beside the bubble: at most two lines. -->
     <string name="bubble_pill_waiting_answer">Yanıtınız bekleniyor</string>
     <string name="bubble_pill_waiting_approval">Onayınız bekleniyor</string>
-    <string name="bubble_pill_paused">Duraklatıldı · devam etmek için baloncuğa uzun basın</string>
+    <string name="bubble_pill_paused">Duraklatıldı · devam etmek için buraya dokunun</string>
+    <string name="bubble_pill_hands_on">%1$s · yanıtlamak için buraya dokunun</string>
     <string name="bubble_using_phone">Telefonunuz kullanılıyor</string>
     <string name="bubble_using_phone_status">Telefonunuz kullanılıyor · %1$s</string>
     <string name="bubble_pill_hold_hint">durdurmak ve diğer seçenekler için baloncuğa uzun basın</string>
@@ -293,6 +294,8 @@
     <string name="control_title">Buddy telefonunuzu kullanıyor</string>
     <string name="control_text">İşlem bitene kadar ekrana dokunmayın ya da kontrolü almak için Durdur düğmesine dokunun.</string>
     <string name="control_stop">Durdur</string>
+    <string name="pause_call_ended_title">Arama bitti · Buddy duraklatıldı</string>
+    <string name="pause_call_ended_text">Göreve devam etmek için dokunun</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -418,6 +421,8 @@
     <string name="hub_tool_answered_text">✓ Yanıtlandı: %1$s</string>
     <string name="hub_tool_question_skipped">Soru atlandı</string>
     <string name="hub_tool_asking">Soruluyor: %1$s</string>
+    <string name="hub_tool_point_out">Gösteriyor: %1$s</string>
+    <string name="hub_tool_point_out_any">Ekranda bir şey gösteriyor</string>
     <string name="hub_tool_update_download">Buddy güncellemesi indiriliyor</string>
     <string name="hub_tool_update_check">Buddy güncellemesi kontrol ediliyor</string>
     <string name="hub_tool_web_search">Web\'de aranıyor: %1$s</string>
@@ -460,8 +465,10 @@
     <string name="service_pause_expired">5 dakika duraklatıldığı için Buddy görevi durdurdu.</string>
     <string name="service_stopped_toast">Durduruldu. Telefonunuz yeniden sizde.</string>
     <string name="service_paused_note">Duraklatıldı: devam ettirene kadar telefon sizde</string>
-    <string name="service_paused_toast">Duraklatıldı. Telefonunuzu kullanın, ardından devam etmek için baloncuğa uzun basın.</string>
+    <string name="service_paused_toast">Duraklatıldı. Telefonunuzu kullanın, ardından devam etmek için baloncuğun yanındaki “Duraklatıldı” yazısına dokunun.</string>
     <string name="service_resumed_note">Devam ettirildi</string>
+    <string name="service_autopaused_touch">Ekrana dokunduğunuz için duraklatıldı. Devam etmek için baloncuğun yanındaki “Duraklatıldı” yazısına dokunun.</string>
+    <string name="service_autopaused_call">Bir arama nedeniyle duraklatıldı. Devam etmek için baloncuğun yanındaki “Duraklatıldı” yazısına dokunun.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy\'nin mikrofona ihtiyacı var. Buddy uygulamasını açın ve izin vermek için bir kez 🎙 simgesine dokunun.</string>
@@ -974,6 +981,7 @@
     <string name="card_note_later">Zamanında yanıt yok: yanıt “Sizi bekliyor” listesinde bekliyor</string>
     <string name="rules_log_waiting">Onayınızı bekliyor: “%1$s”</string>
     <string name="rules_log_full">Atlandı: aynı anda çok fazla sohbet yazdı.</string>
+    <string name="rules_log_hidden">Yeni mesajlar okunamadı: Android onları gizledi (kod içeriyor olabilirler). Sohbeti açın, sonrakiler gelmeye devam eder.</string>
     <string name="waiting_title">Sizi bekliyor</string>
     <string name="waiting_channel">Sizi bekleyen yanıtlar</string>
     <string name="waiting_banner_text">Onayınızı bekleyen yanıtlar: %1$s</string>

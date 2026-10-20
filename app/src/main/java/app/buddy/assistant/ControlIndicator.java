@@ -35,6 +35,11 @@ final class ControlIndicator {
         return active;
     }
 
+    /** A phone tool was used within the last ms (main thread). */
+    boolean recent(long ms) {
+        return active && SystemClock.elapsedRealtime() - lastActivity < ms;
+    }
+
     /** A phone tool is being used (main thread). */
     void onActivity() {
         lastActivity = SystemClock.elapsedRealtime();
@@ -43,6 +48,7 @@ final class ControlIndicator {
         Bubble b = svc.bubble();
         if (b != null) b.setControlling(true);
         notifyChip();
+        svc.autoPauser().start(); // the user taking the phone back pauses it
         svc.mainHandler().postDelayed(tick, TICK_MS);
     }
 
@@ -68,6 +74,7 @@ final class ControlIndicator {
         if (!active) return;
         active = false;
         svc.mainHandler().removeCallbacks(tick);
+        svc.autoPauser().stop();
         Bubble b = svc.bubble();
         if (b != null) b.setControlling(false);
         svc.getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);

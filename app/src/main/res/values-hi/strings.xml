@@ -184,7 +184,8 @@
     <!-- Status pill beside the bubble: at most two lines, about 250dp wide. -->
     <string name="bubble_pill_waiting_answer">आपके जवाब का इंतज़ार है</string>
     <string name="bubble_pill_waiting_approval">आपकी मंज़ूरी का इंतज़ार है</string>
-    <string name="bubble_pill_paused">पॉज़ है · फिर शुरू करने के लिए बबल को दबाकर रखें</string>
+    <string name="bubble_pill_paused">पॉज़ है · फिर शुरू करने के लिए यहां टैप करें</string>
+    <string name="bubble_pill_hands_on">%1$s · जवाब देने के लिए यहां टैप करें</string>
     <string name="bubble_using_phone">आपका फ़ोन इस्तेमाल कर रहा है</string>
     <string name="bubble_using_phone_status">आपका फ़ोन इस्तेमाल कर रहा है · %1$s</string>
     <string name="bubble_pill_hold_hint">रोकने और दूसरे विकल्पों के लिए बबल को दबाकर रखें</string>
@@ -287,6 +288,8 @@
     <string name="control_title">Buddy आपका फ़ोन इस्तेमाल कर रहा है</string>
     <string name="control_text">काम पूरा होने तक स्क्रीन को न छुएं, या कंट्रोल वापस लेने के लिए “रोकें” पर टैप करें.</string>
     <string name="control_stop">रोकें</string>
+    <string name="pause_call_ended_title">कॉल खत्म · Buddy पॉज़ है</string>
+    <string name="pause_call_ended_text">काम फिर शुरू करने के लिए टैप करें</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -412,6 +415,8 @@
     <string name="hub_tool_answered_text">✓ जवाब दिया: %1$s</string>
     <string name="hub_tool_question_skipped">सवाल छोड़ा गया</string>
     <string name="hub_tool_asking">पूछ रहा है: %1$s</string>
+    <string name="hub_tool_point_out">दिखा रहा है: %1$s</string>
+    <string name="hub_tool_point_out_any">स्क्रीन पर कुछ दिखा रहा है</string>
     <string name="hub_tool_update_download">Buddy का अपडेट डाउनलोड कर रहा है</string>
     <string name="hub_tool_update_check">Buddy के अपडेट की जांच कर रहा है</string>
     <string name="hub_tool_web_search">वेब पर खोज रहा है: %1$s</string>
@@ -454,8 +459,10 @@
     <string name="service_pause_expired">5 मिनट तक पॉज़ रहने की वजह से Buddy ने टास्क रोक दिया.</string>
     <string name="service_stopped_toast">रोक दिया गया. आपका फ़ोन अब फिर से आपके हाथ में है.</string>
     <string name="service_paused_note">पॉज़ किया गया: जब तक आप फिर से शुरू नहीं करते, फ़ोन आपके हाथ में है</string>
-    <string name="service_paused_toast">पॉज़ किया गया. अपना फ़ोन इस्तेमाल करें, फिर दोबारा शुरू करने के लिए बबल को दबाकर रखें.</string>
+    <string name="service_paused_toast">पॉज़ किया गया. अपना फ़ोन इस्तेमाल करें, फिर दोबारा शुरू करने के लिए बबल के पास “पॉज़ है” पर टैप करें.</string>
     <string name="service_resumed_note">फिर से शुरू किया गया</string>
+    <string name="service_autopaused_touch">पॉज़ किया गया, क्योंकि आपने स्क्रीन छुई. फिर शुरू करने के लिए बबल के पास “पॉज़ है” पर टैप करें.</string>
+    <string name="service_autopaused_call">कॉल की वजह से पॉज़ किया गया. फिर शुरू करने के लिए बबल के पास “पॉज़ है” पर टैप करें.</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy को माइक्रोफ़ोन की ज़रूरत है. अनुमति देने के लिए Buddy ऐप खोलें और एक बार 🎙 पर टैप करें.</string>
@@ -965,6 +972,7 @@
     <string name="card_note_later">समय पर जवाब नहीं मिला: जवाब “आपका इंतज़ार” सूची में है</string>
     <string name="rules_log_waiting">आपकी मंज़ूरी का इंतज़ार: “%1$s”</string>
     <string name="rules_log_full">छोड़ दिया गया: एक साथ बहुत सारी चैट में मैसेज आए.</string>
+    <string name="rules_log_hidden">नए मैसेज पढ़े नहीं जा सके: Android ने उन्हें छिपा दिया (उनमें शायद कोई कोड है). चैट खोलें, फिर अगले मैसेज आएंगे.</string>
     <string name="waiting_title">आपका इंतज़ार</string>
     <string name="waiting_channel">आपका इंतज़ार कर रहे जवाब</string>
     <string name="waiting_banner_text">आपकी मंज़ूरी का इंतज़ार कर रहे जवाब: %1$s</string>

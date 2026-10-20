@@ -255,7 +255,8 @@
          "hold" = long-press the bubble, which opens the hold menu. -->
     <string name="bubble_pill_waiting_answer">Menunggu jawaban Anda</string>
     <string name="bubble_pill_waiting_approval">Menunggu persetujuan Anda</string>
-    <string name="bubble_pill_paused">Dijeda · tekan lama balon untuk melanjutkan</string>
+    <string name="bubble_pill_paused">Dijeda · ketuk di sini untuk melanjutkan</string>
+    <string name="bubble_pill_hands_on">%1$s · ketuk di sini untuk menjawab</string>
     <!-- The agent is operating the phone. Also the chat panel's running strip. -->
     <string name="bubble_using_phone">Menggunakan ponsel Anda</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
@@ -409,6 +410,8 @@
     <string name="control_text">Jangan sentuh layar sampai selesai, atau ketuk Hentikan untuk mengambil alih.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Hentikan</string>
+    <string name="pause_call_ended_title">Panggilan berakhir · Buddy dijeda</string>
+    <string name="pause_call_ended_text">Ketuk untuk melanjutkan tugas</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -598,6 +601,8 @@
     <string name="hub_tool_question_skipped">Pertanyaan dilewati</string>
     <!-- %1$s = the agent's question. -->
     <string name="hub_tool_asking">Bertanya: %1$s</string>
+    <string name="hub_tool_point_out">Menunjukkan: %1$s</string>
+    <string name="hub_tool_point_out_any">Menunjukkan sesuatu di layar</string>
     <string name="hub_tool_update_download">Mendownload update Buddy</string>
     <string name="hub_tool_update_check">Memeriksa update Buddy</string>
     <!-- %1$s = what is searched for. -->
@@ -656,9 +661,11 @@
     <string name="service_stopped_toast">Dihentikan. Sekarang ponsel kembali ke tangan Anda.</string>
     <!-- Note in the chat when the user pauses the agent. -->
     <string name="service_paused_note">Dijeda: ponsel bisa Anda pakai sampai tugas dilanjutkan</string>
-    <string name="service_paused_toast">Dijeda. Gunakan ponsel Anda, lalu tekan lama balon untuk melanjutkan.</string>
+    <string name="service_paused_toast">Dijeda. Gunakan ponsel Anda, lalu ketuk “Dijeda” di samping balon untuk melanjutkan.</string>
     <!-- Note in the chat when the user resumes the agent. -->
     <string name="service_resumed_note">Dilanjutkan</string>
+    <string name="service_autopaused_touch">Dijeda karena Anda menyentuh layar. Ketuk “Dijeda” di samping balon untuk melanjutkan.</string>
+    <string name="service_autopaused_call">Dijeda karena ada panggilan. Ketuk “Dijeda” di samping balon untuk melanjutkan.</string>
 
     <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
@@ -1400,6 +1407,7 @@
     <string name="card_note_later">Tidak dijawab tepat waktu: balasan menunggu di “Menunggu Anda”</string>
     <string name="rules_log_waiting">Menunggu OK Anda: “%1$s”</string>
     <string name="rules_log_full">Dilewati: terlalu banyak chat menulis bersamaan.</string>
+    <string name="rules_log_hidden">Tidak bisa membaca pesan baru: Android menyembunyikannya (mungkin berisi kode). Buka chatnya, dan pesan berikutnya akan masuk.</string>
     <string name="waiting_title">Menunggu Anda</string>
     <string name="waiting_channel">Balasan yang menunggu Anda</string>
     <string name="waiting_banner_text">Balasan menunggu OK Anda: %1$s</string>

@@ -183,7 +183,8 @@
     <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…". -->
     <string name="bubble_pill_waiting_answer">回答を待っています</string>
     <string name="bubble_pill_waiting_approval">承認を待っています</string>
-    <string name="bubble_pill_paused">一時停止中 · バブルを長押しして再開</string>
+    <string name="bubble_pill_paused">一時停止中 · ここをタップして再開</string>
+    <string name="bubble_pill_hands_on">%1$s · ここをタップして回答</string>
     <string name="bubble_using_phone">スマートフォンを操作中</string>
     <string name="bubble_using_phone_status">スマートフォンを操作中 · %1$s</string>
     <string name="bubble_pill_hold_hint">バブルを長押しで「タスク停止」など</string>
@@ -285,6 +286,8 @@
     <string name="control_title">Buddy がスマートフォンを操作中</string>
     <string name="control_text">完了するまで画面に触れないでください。自分で操作する場合は「停止」をタップしてください。</string>
     <string name="control_stop">停止</string>
+    <string name="pause_call_ended_title">通話終了 · Buddy は一時停止中</string>
+    <string name="pause_call_ended_text">タップしてタスクを再開</string>
 
     <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
 
@@ -407,6 +410,8 @@
     <string name="hub_tool_answered_text">✓ 回答済み：%1$s</string>
     <string name="hub_tool_question_skipped">質問をスキップしました</string>
     <string name="hub_tool_asking">質問中：%1$s</string>
+    <string name="hub_tool_point_out">マーク表示中：%1$s</string>
+    <string name="hub_tool_point_out_any">画面上にマークを表示中</string>
     <string name="hub_tool_update_download">Buddy のアップデートをダウンロード中</string>
     <string name="hub_tool_update_check">Buddy のアップデートを確認中</string>
     <string name="hub_tool_web_search">ウェブを検索中：%1$s</string>
@@ -448,8 +453,10 @@
     <string name="service_pause_expired">5 分間一時停止したままだったため、Buddy はタスクを停止しました。</string>
     <string name="service_stopped_toast">停止しました。スマートフォンを自由に使えます。</string>
     <string name="service_paused_note">一時停止中：再開するまでスマートフォンを自由に使えます</string>
-    <string name="service_paused_toast">一時停止しました。スマートフォンを使ったら、バブルを長押しして再開してください。</string>
+    <string name="service_paused_toast">一時停止しました。スマートフォンを使ったら、バブルの横の「一時停止中」をタップして再開してください。</string>
     <string name="service_resumed_note">再開しました</string>
+    <string name="service_autopaused_touch">画面に触れたため一時停止しました。バブルの横の「一時停止中」をタップすると再開します。</string>
+    <string name="service_autopaused_call">通話のため一時停止しました。バブルの横の「一時停止中」をタップすると再開します。</string>
 
     <!-- Voice input and output -->
     <string name="voice_mic_needed">Buddy にはマイクが必要です。Buddy アプリを開き、🎙 を一度タップして許可してください。</string>
@@ -958,6 +965,7 @@
     <string name="card_note_later">時間内に応答がなかったため、返信は「確認待ち」リストで待機しています</string>
     <string name="rules_log_waiting">確認待ち：「%1$s」</string>
     <string name="rules_log_full">スキップ：同時にメッセージが来たチャットが多すぎました。</string>
+    <string name="rules_log_hidden">新しいメッセージを読めませんでした。Android が非表示にしました（コードが含まれている可能性があります）。チャットを開くと、次のメッセージから届きます。</string>
     <string name="waiting_title">確認待ち</string>
     <string name="waiting_channel">確認待ちの返信</string>
     <string name="waiting_banner_text">確認を待っている返信：%1$s</string>

@@ -8,7 +8,9 @@ import android.service.notification.StatusBarNotification;
 
 /**
  * Notification access, for the user's notification rules. A notification is read only when a switched-on rule watches
- * its app; everything else is ignored right away, and nothing is kept.
+ * its app; everything else is ignored right away. Of those, only the latest of each conversation is kept, in memory, to
+ * tell which one Android blanked (see Triggers.hidden). Besides, a call's notification pauses an agent that's operating
+ * the phone (AutoPause): for that only the notification's category is looked at.
  */
 public class NotificationWatcher extends NotificationListenerService {
     private static volatile NotificationWatcher instance;
@@ -16,6 +18,15 @@ public class NotificationWatcher extends NotificationListenerService {
     @Override
     public void onListenerConnected() {
         instance = this;
+        try {
+            AutoPause.onNotifications(getActiveNotifications());
+        } catch (Exception ignored) {
+        }
+    }
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn) {
+        AutoPause.onNotification(sbn, false);
     }
 
     @Override
@@ -41,6 +52,7 @@ public class NotificationWatcher extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
+        AutoPause.onNotification(sbn, true);
         try {
             String pkg = sbn.getPackageName();
             if (pkg == null || pkg.equals(getPackageName()) || !Prefs.rulesOn(this) || !Rules.watches(this, pkg)) return;
@@ -49,9 +61,16 @@ public class NotificationWatcher extends NotificationListenerService {
             if ((n.flags & (Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE
                     | Notification.FLAG_GROUP_SUMMARY)) != 0) return;
             Triggers.Note note = Triggers.Note.of(this, sbn);
-            if (note == null || note.fromMe) return; // nothing to read, or the user's own message (e.g. a reply just sent)
+            if (note == null) return; // nothing to read
+            Triggers t = Triggers.get(this);
+            if (note.hidden()) { // Android blanked it (it may hold a code): say so instead of going quiet
+                t.hidden(sbn.getKey());
+                return;
+            }
+            t.seen(sbn.getKey(), note);
+            if (note.fromMe) return; // the user's own message (e.g. a reply just sent)
             Rules.Rule rule = Rules.match(this, note);
-            if (rule != null) Triggers.get(this).fire(rule, note);
+            if (rule != null) t.fire(rule, note);
         } catch (Exception e) {
             android.util.Log.w("Buddy", "notification rule failed", e);
         }

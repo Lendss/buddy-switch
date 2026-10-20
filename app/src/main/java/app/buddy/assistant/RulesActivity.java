@@ -221,6 +221,7 @@ public class RulesActivity extends Screen {
             case "held": line = getString(R.string.rules_log_held, d); break;
             case "waiting": line = getString(R.string.rules_log_waiting, d); break;
             case "full": line = getString(R.string.rules_log_full); break;
+            case "hidden": line = getString(R.string.rules_log_hidden); break;
             case "busy": line = getString(R.string.rules_log_busy); break; // before 2.2.4, a long wait dropped the run
             case "error": line = getString(R.string.rules_log_error, d); break;
             default: line = d.isEmpty() ? getString(R.string.rules_log_done_empty) : d;
