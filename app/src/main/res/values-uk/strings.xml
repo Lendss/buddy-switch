@@ -1061,7 +1061,7 @@
     <string name="setup_remote_open">Відкрити в додатку Claude</string>
     <string name="setup_remote_open_failed">Не вдалося відкрити.</string>
     <string name="setup_codex_session">Сеанс Codex</string>
-    <string name="setup_codex_session_info">Codex з інструментами телефона, що працює в Buddy. Користуйтеся ним у додатку ChatGPT (розділ Codex) на цьому телефоні чи на комп’ютері. Пісочниця Codex тут не працює, тож для чатів, що виконують команди, вибирайте в ChatGPT «Повний доступ».</string>
+    <string name="setup_codex_session_info">Codex з інструментами телефона, що працює в Buddy. Користуйтеся ним у додатку ChatGPT (розділ Codex) на цьому телефоні чи на комп’ютері. Пісочниця Codex тут не працює, тож із типовими дозволами він питає перед кожною командою.</string>
     <string name="setup_codex_active">працює · «localhost» у ChatGPT</string>
     <string name="setup_codex_pair">Під’єднати пристрій</string>
     <string name="setup_ssh">SSH з Termux</string>

@@ -746,7 +746,7 @@
     <string name="setup_remote_open">Otwórz w aplikacji Claude</string>
     <string name="setup_remote_open_failed">Nie udało się otworzyć.</string>
     <string name="setup_codex_session">Sesja Codex</string>
-    <string name="setup_codex_session_info">Codex z narzędziami telefonu, działający w Buddy. Korzystaj z niego w aplikacji ChatGPT (Codex) na tym telefonie lub na komputerze. Piaskownica Codex nie działa tutaj, więc w czatach, które uruchamiają polecenia, wybierz w ChatGPT „Pełny dostęp”.</string>
+    <string name="setup_codex_session_info">Codex z narzędziami telefonu, działający w Buddy. Korzystaj z niego w aplikacji ChatGPT (Codex) na tym telefonie lub na komputerze. Piaskownica Codex nie działa tutaj, więc przy domyślnych uprawnieniach pyta przed każdym poleceniem.</string>
     <string name="setup_codex_active">aktywna · „localhost” w ChatGPT</string>
     <string name="setup_codex_pair">Sparuj urządzenie</string>
     <string name="setup_ssh">SSH z Termux</string>

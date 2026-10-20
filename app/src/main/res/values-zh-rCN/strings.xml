@@ -1034,7 +1034,7 @@
     <string name="setup_remote_open">在 Claude 应用中打开</string>
     <string name="setup_remote_open_failed">无法打开。</string>
     <string name="setup_codex_session">Codex 会话</string>
-    <string name="setup_codex_session_info">在 Buddy 中运行的 Codex，可使用手机工具。你可以在这部手机或电脑上的 ChatGPT 应用（Codex）中使用它。Codex 的沙盒无法在这里运行，因此对于需要运行命令的聊天，请在 ChatGPT 中选择“完全访问”。</string>
+    <string name="setup_codex_session_info">在 Buddy 中运行的 Codex，可使用手机工具。你可以在这部手机或电脑上的 ChatGPT 应用（Codex）中使用它。Codex 的沙盒无法在这里运行，因此在默认权限下，它会在每条命令前询问。</string>
     <string name="setup_codex_active">运行中 · ChatGPT 中的“localhost”</string>
     <string name="setup_codex_pair">配对设备</string>
     <string name="setup_ssh">从 Termux 使用 SSH</string>

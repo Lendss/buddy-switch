@@ -1043,7 +1043,7 @@
     <string name="setup_remote_open">Apri nell\'app Claude</string>
     <string name="setup_remote_open_failed">Impossibile aprirla.</string>
     <string name="setup_codex_session">Sessione Codex</string>
-    <string name="setup_codex_session_info">Codex con gli strumenti del telefono, dentro Buddy. Usalo dall\'app ChatGPT (Codex) su questo telefono o su un computer. La sandbox di Codex qui non funziona, quindi scegli «Accesso completo» in ChatGPT per le chat che eseguono comandi.</string>
+    <string name="setup_codex_session_info">Codex con gli strumenti del telefono, dentro Buddy. Usalo dall\'app ChatGPT (Codex) su questo telefono o su un computer. La sandbox di Codex qui non funziona, quindi con le autorizzazioni predefinite chiede prima di ogni comando.</string>
     <string name="setup_codex_active">attiva · «localhost» in ChatGPT</string>
     <string name="setup_codex_pair">Associa un dispositivo</string>
     <string name="setup_ssh">SSH da Termux</string>

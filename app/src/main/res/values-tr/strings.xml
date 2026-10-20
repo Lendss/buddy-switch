@@ -728,7 +728,7 @@
     <string name="setup_remote_open">Claude uygulamasında aç</string>
     <string name="setup_remote_open_failed">Açılamadı.</string>
     <string name="setup_codex_session">Codex oturumu</string>
-    <string name="setup_codex_session_info">Buddy içinde telefon araçlarıyla çalışan Codex. Bu telefondaki veya bir bilgisayardaki ChatGPT uygulamasından (Codex) kullanın. Codex\'in korumalı alanı burada çalışamaz, bu yüzden komut çalıştıran sohbetler için ChatGPT\'de “Tam erişim”i seçin.</string>
+    <string name="setup_codex_session_info">Buddy içinde telefon araçlarıyla çalışan Codex. Bu telefondaki veya bir bilgisayardaki ChatGPT uygulamasından (Codex) kullanın. Codex\'in korumalı alanı burada çalışamaz, bu yüzden varsayılan izinlerle her komuttan önce sorar.</string>
     <string name="setup_codex_active">çalışıyor · ChatGPT\'de “localhost”</string>
     <string name="setup_codex_pair">Cihaz eşle</string>
     <string name="setup_ssh">Termux\'tan SSH</string>

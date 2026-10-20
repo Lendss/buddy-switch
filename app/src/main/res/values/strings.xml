@@ -1061,8 +1061,8 @@
     <string name="setup_remote_open">Open in the Claude app</string>
     <string name="setup_remote_open_failed">Couldn\'t open it.</string>
     <string name="setup_codex_session">Codex session</string>
-    <!-- "Codex" is a section of the ChatGPT app; "Full access" is a permission choice in ChatGPT. -->
-    <string name="setup_codex_session_info">Codex with the phone tools, running inside Buddy. Use it from the ChatGPT app (Codex) on this phone or on a computer. Codex\'s sandbox can\'t run here, so pick “Full access” in ChatGPT for chats that run commands.</string>
+    <!-- "Codex" is a section of the ChatGPT app; "Default permissions" is a permission choice in ChatGPT. -->
+    <string name="setup_codex_session_info">Codex with the phone tools, running inside Buddy. Use it from the ChatGPT app (Codex) on this phone or on a computer. Codex\'s sandbox can\'t run here, so with Default permissions it asks before each command.</string>
     <!-- Status, lowercase. "localhost" is the name ChatGPT shows for Buddy: keep it as is. -->
     <string name="setup_codex_active">running · “localhost” in ChatGPT</string>
     <string name="setup_codex_pair">Pair a device</string>

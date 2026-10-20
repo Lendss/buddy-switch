@@ -719,7 +719,7 @@
     <string name="setup_remote_open">Claude ऐप में खोलें</string>
     <string name="setup_remote_open_failed">इसे खोला नहीं जा सका.</string>
     <string name="setup_codex_session">Codex सेशन</string>
-    <string name="setup_codex_session_info">फ़ोन टूल के साथ Buddy के अंदर चलने वाला Codex. इसे इस फ़ोन या किसी कंप्यूटर पर ChatGPT ऐप (Codex) से इस्तेमाल करें. Codex का सैंडबॉक्स यहां नहीं चल सकता, इसलिए कमांड चलाने वाली चैट के लिए ChatGPT में “पूरी पहुंच” चुनें.</string>
+    <string name="setup_codex_session_info">फ़ोन टूल के साथ Buddy के अंदर चलने वाला Codex. इसे इस फ़ोन या किसी कंप्यूटर पर ChatGPT ऐप (Codex) से इस्तेमाल करें. Codex का सैंडबॉक्स यहां नहीं चल सकता, इसलिए डिफ़ॉल्ट अनुमतियों में यह हर कमांड से पहले पूछता है.</string>
     <string name="setup_codex_active">चल रहा है · ChatGPT में “localhost”</string>
     <string name="setup_codex_pair">डिवाइस पेयर करें</string>
     <string name="setup_ssh">Termux से SSH</string>

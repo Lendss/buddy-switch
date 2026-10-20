@@ -755,7 +755,7 @@
     <string name="setup_remote_open">فتح في تطبيق Claude</string>
     <string name="setup_remote_open_failed">تعذّر فتحها.</string>
     <string name="setup_codex_session">جلسة Codex</string>
-    <string name="setup_codex_session_info">Codex مع أدوات الهاتف، يعمل داخل Buddy. استخدمه من تطبيق ChatGPT (قسم Codex) على هذا الهاتف أو على كمبيوتر. لا يمكن تشغيل بيئة Codex المعزولة هنا، لذا اختر «الوصول الكامل» في ChatGPT للمحادثات التي تشغّل أوامر.</string>
+    <string name="setup_codex_session_info">Codex مع أدوات الهاتف، يعمل داخل Buddy. استخدمه من تطبيق ChatGPT (قسم Codex) على هذا الهاتف أو على كمبيوتر. لا يمكن تشغيل بيئة Codex المعزولة هنا، لذا مع الأذونات الافتراضية يسأل قبل كل أمر.</string>
     <string name="setup_codex_active">يعمل · «localhost» في ChatGPT</string>
     <string name="setup_codex_pair">إقران جهاز</string>
     <string name="setup_ssh">SSH من Termux</string>

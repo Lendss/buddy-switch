@@ -136,7 +136,7 @@ Settings → **Remote Control → Claude Code session** keeps a Claude Code sess
 
 ### Codex session in the ChatGPT app
 
-Settings → **Remote Control → Codex session** keeps Codex's app-server with remote control running inside Buddy, with the phone tools, so you can use it from the ChatGPT app (Codex) on this phone or on a computer. **Pair a device** shows a one-time code (it works once, for about 10 minutes) to enter in ChatGPT: in Codex on a phone, or under Settings → Connections → Control other devices on a computer. Buddy shows up there as **"localhost"**, because Codex names a host after the system's hostname. Codex keeps its own settings, so you pick each chat's permission in ChatGPT. Codex's sandbox can't run inside Buddy's Linux, so chats that run commands need **Full access**. Buddy restarts the server if it stops, and pairings are kept.
+Settings → **Remote Control → Codex session** keeps Codex's app-server with remote control running inside Buddy, with the phone tools, so you can use it from the ChatGPT app (Codex) on this phone or on a computer. **Pair a device** shows a one-time code (it works once, for about 10 minutes) to enter in ChatGPT: in Codex on a phone, or under Settings → Connections → Control other devices on a computer. Buddy shows up there as **"localhost"**, because Codex names a host after the system's hostname. Codex keeps its own settings, so you pick each chat's permission in ChatGPT. Codex's sandbox can't run inside Buddy's Linux, so with Default permissions Codex asks before running each command outside it (with Full access it doesn't ask). Buddy restarts the server if it stops, and pairings are kept.
 
 ### SSH from Termux
 

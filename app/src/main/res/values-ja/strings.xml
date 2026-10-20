@@ -715,7 +715,7 @@
     <string name="setup_remote_open">Claude アプリで開く</string>
     <string name="setup_remote_open_failed">開けませんでした。</string>
     <string name="setup_codex_session">Codex セッション</string>
-    <string name="setup_codex_session_info">Buddy 内でスマートフォンツールとともに動作する Codex です。このスマートフォンやパソコンの ChatGPT アプリ（Codex）から使えます。Codex のサンドボックスはここでは動かないため、コマンドを実行するチャットでは ChatGPT で「フルアクセス」を選んでください。</string>
+    <string name="setup_codex_session_info">Buddy 内でスマートフォンツールとともに動作する Codex です。このスマートフォンやパソコンの ChatGPT アプリ（Codex）から使えます。Codex のサンドボックスはここでは動かないため、デフォルトの権限ではコマンドごとに確認します。</string>
     <string name="setup_codex_active">実行中 · ChatGPT の「localhost」</string>
     <string name="setup_codex_pair">デバイスをペアリング</string>
     <string name="setup_ssh">Termux から SSH</string>

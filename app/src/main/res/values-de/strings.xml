@@ -725,7 +725,7 @@
     <string name="setup_remote_open">In der Claude-App öffnen</string>
     <string name="setup_remote_open_failed">Öffnen fehlgeschlagen.</string>
     <string name="setup_codex_session">Sitzung mit Codex</string>
-    <string name="setup_codex_session_info">Codex mit den Smartphone-Tools, in Buddy. Nutze es in der ChatGPT-App (Codex) auf diesem Smartphone oder auf einem Computer. Die Sandbox von Codex läuft hier nicht, wähle daher in ChatGPT „Vollzugriff“ für Chats, die Befehle ausführen.</string>
+    <string name="setup_codex_session_info">Codex mit den Smartphone-Tools, in Buddy. Nutze es in der ChatGPT-App (Codex) auf diesem Smartphone oder auf einem Computer. Die Sandbox von Codex läuft hier nicht, daher fragt es mit Standardberechtigungen vor jedem Befehl.</string>
     <string name="setup_codex_active">läuft · „localhost“ in ChatGPT</string>
     <string name="setup_codex_pair">Gerät koppeln</string>
     <string name="setup_ssh">SSH aus Termux</string>

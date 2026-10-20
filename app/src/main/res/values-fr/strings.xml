@@ -1043,7 +1043,7 @@
     <string name="setup_remote_open">Ouvrir dans l\'appli Claude</string>
     <string name="setup_remote_open_failed">Impossible de l\'ouvrir.</string>
     <string name="setup_codex_session">Session Codex</string>
-    <string name="setup_codex_session_info">Codex avec les outils du téléphone, dans Buddy. Utilisez-le depuis l\'appli ChatGPT (Codex), sur ce téléphone ou sur un ordinateur. Le bac à sable de Codex ne fonctionne pas ici : choisissez « Accès complet » dans ChatGPT pour les discussions qui lancent des commandes.</string>
+    <string name="setup_codex_session_info">Codex avec les outils du téléphone, dans Buddy. Utilisez-le depuis l\'appli ChatGPT (Codex), sur ce téléphone ou sur un ordinateur. Le bac à sable de Codex ne fonctionne pas ici : avec les autorisations par défaut, il demande avant chaque commande.</string>
     <string name="setup_codex_active">active · « localhost » dans ChatGPT</string>
     <string name="setup_codex_pair">Associer un appareil</string>
     <string name="setup_ssh">SSH depuis Termux</string>
