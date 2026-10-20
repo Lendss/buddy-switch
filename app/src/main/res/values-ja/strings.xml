@@ -603,6 +603,13 @@
     <string name="remote_restarting">再起動中…</string>
     <string name="remote_start_failed">開始できませんでした：%1$s</string>
     <string name="remote_keeps_stopping">セッションが何度も停止します。一度オフにしてからオンに戻すか、Claude Code のログイン状態を確認してください。</string>
+    <string name="codex_pair_getting">コードを取得中…</string>
+    <string name="codex_pair_text">このコードを ChatGPT に入力してください。スマートフォンでは Codex で、パソコンでは［設定］→［接続］→［他のデバイスを操作］で入力します。%1$s まで 1 回だけ使えます。Buddy は「localhost」として表示されます。</string>
+    <string name="codex_pair_failed">ペアリングコードを取得できませんでした：%1$s</string>
+    <string name="codex_keeps_stopping">Codex セッションが何度も停止します：%1$s</string>
+    <string name="ssh_keeps_stopping">SSH サーバーが何度も停止します：%1$s</string>
+    <string name="ssh_key_added">完了しました。Termux から Buddy の Linux を開くには、ssh buddy と入力してください。</string>
+    <string name="ssh_code_expired">このコマンドは使用済みか、10 分以上経過しています。Buddy の「設定」でもう一度コピーしてください。</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -707,6 +714,14 @@
     <string name="setup_remote_stopped">停止済み</string>
     <string name="setup_remote_open">Claude アプリで開く</string>
     <string name="setup_remote_open_failed">開けませんでした。</string>
+    <string name="setup_codex_session">Codex セッション</string>
+    <string name="setup_codex_session_info">Buddy 内でスマートフォンツールとともに動作する Codex です。このスマートフォンやパソコンの ChatGPT アプリ（Codex）から使えます。Codex のサンドボックスはここでは動かないため、コマンドを実行するチャットでは ChatGPT で「フルアクセス」を選んでください。</string>
+    <string name="setup_codex_active">実行中 · ChatGPT の「localhost」</string>
+    <string name="setup_codex_pair">デバイスをペアリング</string>
+    <string name="setup_ssh">Termux から SSH</string>
+    <string name="setup_ssh_info">SSH で Termux から Buddy の Linux を使えます。接続できるのはこのスマートフォンのアプリだけで、鍵が必要です。</string>
+    <string name="setup_ssh_active">実行中 · ポート %1$d</string>
+    <string name="setup_ssh_how">このコマンドをコピーし、10 分以内に Termux で 1 回実行してください。その後は、Termux で ssh buddy と入力すると Buddy の Linux が開きます。</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">古い Termux のチャットを削除</string>

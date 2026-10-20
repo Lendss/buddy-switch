@@ -616,6 +616,13 @@
     <string name="remote_restarting">Yeniden başlatılıyor…</string>
     <string name="remote_start_failed">Başlatılamadı: %1$s</string>
     <string name="remote_keeps_stopping">Oturum sürekli duruyor. Kapatıp yeniden açın veya Claude Code girişini kontrol edin.</string>
+    <string name="codex_pair_getting">Kod alınıyor…</string>
+    <string name="codex_pair_text">Bu kodu ChatGPT\'ye girin: telefonda Codex\'te, bilgisayarda Ayarlar → Bağlantılar → Diğer cihazları kontrol et bölümünde. %1$s saatine kadar bir kez çalışır. Buddy orada “localhost” olarak görünür.</string>
+    <string name="codex_pair_failed">Eşleme kodu alınamadı: %1$s</string>
+    <string name="codex_keeps_stopping">Codex oturumu sürekli duruyor: %1$s</string>
+    <string name="ssh_keeps_stopping">SSH sunucusu sürekli duruyor: %1$s</string>
+    <string name="ssh_key_added">Tamam. Buddy\'nin Linux\'unu Termux\'tan açmak için ssh buddy yazın.</string>
+    <string name="ssh_code_expired">Bu komut zaten kullanıldı veya 10 dakikadan eski. Buddy\'nin Ayarlar bölümünden yeniden kopyalayın.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -720,6 +727,14 @@
     <string name="setup_remote_stopped">durduruldu</string>
     <string name="setup_remote_open">Claude uygulamasında aç</string>
     <string name="setup_remote_open_failed">Açılamadı.</string>
+    <string name="setup_codex_session">Codex oturumu</string>
+    <string name="setup_codex_session_info">Buddy içinde telefon araçlarıyla çalışan Codex. Bu telefondaki veya bir bilgisayardaki ChatGPT uygulamasından (Codex) kullanın. Codex\'in korumalı alanı burada çalışamaz, bu yüzden komut çalıştıran sohbetler için ChatGPT\'de “Tam erişim”i seçin.</string>
+    <string name="setup_codex_active">çalışıyor · ChatGPT\'de “localhost”</string>
+    <string name="setup_codex_pair">Cihaz eşle</string>
+    <string name="setup_ssh">Termux\'tan SSH</string>
+    <string name="setup_ssh_info">Buddy\'nin Linux\'unu Termux\'tan SSH ile kullanın. Yalnızca bu telefondaki uygulamalar, yalnızca bir anahtarla bağlanabilir.</string>
+    <string name="setup_ssh_active">çalışıyor · port %1$d</string>
+    <string name="setup_ssh_how">Bu komutu kopyalayıp 10 dakika içinde Termux\'ta bir kez çalıştırın. Sonrasında Buddy\'nin Linux\'unu açmak için Termux\'ta ssh buddy yazın.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">Eski Termux sohbetlerini kaldır</string>

@@ -908,6 +908,13 @@
     <!-- %1$s = technical detail in English. -->
     <string name="remote_start_failed">Не удалось запустить: %1$s</string>
     <string name="remote_keeps_stopping">Сеанс постоянно останавливается. Выключите и снова включите его или проверьте вход в Claude Code.</string>
+    <string name="codex_pair_getting">Получение кода…</string>
+    <string name="codex_pair_text">Введите этот код в ChatGPT: на телефоне — в разделе Codex, на компьютере — в «Настройки → Подключения → Управлять другими устройствами». Он срабатывает один раз, до %1$s. Buddy отображается там как «localhost».</string>
+    <string name="codex_pair_failed">Не удалось получить код подключения: %1$s</string>
+    <string name="codex_keeps_stopping">Сеанс Codex постоянно останавливается: %1$s</string>
+    <string name="ssh_keeps_stopping">SSH-сервер постоянно останавливается: %1$s</string>
+    <string name="ssh_key_added">Готово. Чтобы открыть встроенный Linux из Termux, введите ssh buddy.</string>
+    <string name="ssh_code_expired">Эта команда уже использована или ей больше 10 минут. Скопируйте её снова в настройках Buddy.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -1053,6 +1060,14 @@
     <string name="setup_remote_stopped">остановлен</string>
     <string name="setup_remote_open">Открыть в приложении Claude</string>
     <string name="setup_remote_open_failed">Не удалось открыть.</string>
+    <string name="setup_codex_session">Сеанс Codex</string>
+    <string name="setup_codex_session_info">Codex с инструментами телефона внутри Buddy. Пользуйтесь им из приложения ChatGPT (раздел Codex) на этом телефоне или на компьютере. Песочница Codex здесь не работает, поэтому для чатов, которые выполняют команды, выбирайте в ChatGPT «Полный доступ».</string>
+    <string name="setup_codex_active">работает · «localhost» в ChatGPT</string>
+    <string name="setup_codex_pair">Подключить устройство</string>
+    <string name="setup_ssh">SSH из Termux</string>
+    <string name="setup_ssh_info">Пользуйтесь встроенным Linux из Termux по SSH. Подключиться могут только приложения на этом телефоне и только с ключом.</string>
+    <string name="setup_ssh_active">работает · порт %1$d</string>
+    <string name="setup_ssh_how">Скопируйте эту команду и выполните её один раз в Termux в течение 10 минут. После этого вводите ssh buddy в Termux, чтобы открыть встроенный Linux.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">Удалить старые чаты Termux</string>

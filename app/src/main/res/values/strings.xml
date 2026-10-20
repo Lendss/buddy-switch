@@ -902,6 +902,19 @@
     <!-- %1$s = technical detail in English. -->
     <string name="remote_start_failed">Couldn\'t start: %1$s</string>
     <string name="remote_keeps_stopping">The session keeps stopping. Turn it off and on again, or check the Claude Code sign-in.</string>
+    <string name="codex_pair_getting">Getting a code…</string>
+    <!-- %1$s = a time. Settings > Connections > Control other devices is the path in the ChatGPT desktop app. Keep "localhost" as is. -->
+    <string name="codex_pair_text">Enter this code in ChatGPT: in Codex on a phone, or in Settings → Connections → Control other devices on a computer. It works once, until %1$s. Buddy shows up there as “localhost”.</string>
+    <!-- %1$s = technical detail, in English. -->
+    <string name="codex_pair_failed">Couldn\'t get a pairing code: %1$s</string>
+    <!-- %1$s = the last lines Codex printed, in English. -->
+    <string name="codex_keeps_stopping">The Codex session keeps stopping: %1$s</string>
+    <!-- %1$s = the server's last message, in English. -->
+    <string name="ssh_keeps_stopping">The SSH server keeps stopping: %1$s</string>
+    <!-- Shown in Termux after the copied command ran, and as a toast. "ssh buddy" is a command: keep it as is. -->
+    <string name="ssh_key_added">Done. To open Buddy\'s Linux from Termux, type ssh buddy.</string>
+    <!-- Shown in Termux when the copied command was already used or is too old. -->
+    <string name="ssh_code_expired">This command was already used or is more than 10 minutes old. Copy it again in Buddy\'s Settings.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -1047,6 +1060,19 @@
     <string name="setup_remote_stopped">stopped</string>
     <string name="setup_remote_open">Open in the Claude app</string>
     <string name="setup_remote_open_failed">Couldn\'t open it.</string>
+    <string name="setup_codex_session">Codex session</string>
+    <!-- "Codex" is a section of the ChatGPT app; "Full access" is a permission choice in ChatGPT. -->
+    <string name="setup_codex_session_info">Codex with the phone tools, running inside Buddy. Use it from the ChatGPT app (Codex) on this phone or on a computer. Codex\'s sandbox can\'t run here, so pick “Full access” in ChatGPT for chats that run commands.</string>
+    <!-- Status, lowercase. "localhost" is the name ChatGPT shows for Buddy: keep it as is. -->
+    <string name="setup_codex_active">running · “localhost” in ChatGPT</string>
+    <string name="setup_codex_pair">Pair a device</string>
+    <!-- SSH: the standard way to sign in to a computer's terminal from another program. Termux is an Android terminal app. -->
+    <string name="setup_ssh">SSH from Termux</string>
+    <string name="setup_ssh_info">Use Buddy\'s Linux from Termux, over SSH. Only apps on this phone can connect, and only with a key.</string>
+    <!-- Status, lowercase. %1$d = a port number. -->
+    <string name="setup_ssh_active">running · port %1$d</string>
+    <!-- "ssh buddy" is a command: keep it as is. -->
+    <string name="setup_ssh_how">Copy this command and run it once in Termux, within 10 minutes. After that, type ssh buddy in Termux to open Buddy\'s Linux.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">Remove old Termux chats</string>

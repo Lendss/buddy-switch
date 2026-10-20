@@ -127,6 +127,16 @@ final class McpServer {
             byte[] body = readBody(in, headers);
             CALLER_GONE.set(() -> gone(s, in));
 
+            if ("/ssh-key".equals(path) && "POST".equals(method)) {
+                // Settings' Termux command: a one-time code instead of the token, so a key gets in only when the user copied it
+                String auth = headers.get("authorization");
+                String done = auth != null && auth.startsWith("Bearer ")
+                        ? SshServer.addKey(auth.substring(7), new String(body, StandardCharsets.UTF_8)) : null;
+                send(out, done != null ? 200 : 403, "text/plain",
+                        (done != null ? done : BuddyApp.str(R.string.ssh_code_expired)) + "\n");
+                return;
+            }
+
             if (!("Bearer " + token).equals(headers.get("authorization"))) {
                 send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
                 return;
@@ -281,6 +291,7 @@ final class McpServer {
             case 202: return "Accepted";
             case 204: return "No Content";
             case 401: return "Unauthorized";
+            case 403: return "Forbidden";
             case 404: return "Not Found";
             case 405: return "Method Not Allowed";
             default: return "Status";

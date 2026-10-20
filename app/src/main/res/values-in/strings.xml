@@ -881,6 +881,13 @@
     <!-- %1$s = technical detail in English. -->
     <string name="remote_start_failed">Tidak dapat memulai: %1$s</string>
     <string name="remote_keeps_stopping">Sesi terus berhenti. Matikan lalu nyalakan lagi, atau periksa login Claude Code.</string>
+    <string name="codex_pair_getting">Mengambil kode…</string>
+    <string name="codex_pair_text">Masukkan kode ini di ChatGPT: di Codex pada ponsel, atau di Setelan → Koneksi → Kontrol perangkat lain pada komputer. Kode ini berlaku sekali, sampai %1$s. Buddy muncul di sana sebagai “localhost”.</string>
+    <string name="codex_pair_failed">Tidak dapat mengambil kode penyambungan: %1$s</string>
+    <string name="codex_keeps_stopping">Sesi Codex terus berhenti: %1$s</string>
+    <string name="ssh_keeps_stopping">Server SSH terus berhenti: %1$s</string>
+    <string name="ssh_key_added">Selesai. Untuk membuka Linux Buddy dari Termux, ketik ssh buddy.</string>
+    <string name="ssh_code_expired">Perintah ini sudah dipakai atau sudah lebih dari 10 menit. Salin lagi di Setelan Buddy.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -1026,6 +1033,14 @@
     <string name="setup_remote_stopped">berhenti</string>
     <string name="setup_remote_open">Buka di aplikasi Claude</string>
     <string name="setup_remote_open_failed">Tidak dapat membukanya.</string>
+    <string name="setup_codex_session">Sesi Codex</string>
+    <string name="setup_codex_session_info">Codex dengan alat ponsel, berjalan di dalam Buddy. Gunakan dari aplikasi ChatGPT (Codex) di ponsel ini atau di komputer. Sandbox Codex tidak bisa berjalan di sini, jadi pilih “Akses penuh” di ChatGPT untuk chat yang menjalankan perintah.</string>
+    <string name="setup_codex_active">berjalan · “localhost” di ChatGPT</string>
+    <string name="setup_codex_pair">Sambungkan perangkat</string>
+    <string name="setup_ssh">SSH dari Termux</string>
+    <string name="setup_ssh_info">Gunakan Linux Buddy dari Termux, lewat SSH. Hanya aplikasi di ponsel ini yang bisa terhubung, dan hanya dengan kunci.</string>
+    <string name="setup_ssh_active">berjalan · port %1$d</string>
+    <string name="setup_ssh_how">Salin perintah ini dan jalankan sekali di Termux, dalam 10 menit. Setelah itu, ketik ssh buddy di Termux untuk membuka Linux Buddy.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">Hapus chat Termux lama</string>

@@ -25,7 +25,8 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /** Settings: setup checklist, appearance, agents and experience. */
-public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener {
+public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener, SshServer.Listener,
+        CodexRemote.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
@@ -56,6 +57,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         if (isFinishing()) return;
         Account.addListener(this);
         RemoteSession.addListener(this);
+        SshServer.addListener(this);
+        CodexRemote.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
@@ -66,11 +69,23 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     protected void onPause() {
         Account.removeListener(this);
         RemoteSession.removeListener(this);
+        SshServer.removeListener(this);
+        CodexRemote.removeListener(this);
         super.onPause();
     }
 
     @Override
     public void onRemoteChanged() {
+        if (!isFinishing() && !isDestroyed()) render();
+    }
+
+    @Override
+    public void onCodexRemoteChanged() {
+        if (!isFinishing() && !isDestroyed()) render();
+    }
+
+    @Override
+    public void onSshChanged() {
         if (!isFinishing() && !isDestroyed()) render();
     }
 
@@ -366,6 +381,83 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 LinearLayout.LayoutParams op = wrap();
                 op.setMargins(dp(this, 16), 0, dp(this, 16), dp(this, 14));
                 rcc.addView(open, op);
+            }
+        }
+        // a Codex session for the ChatGPT app (CodexRemote)
+        rcc.addView(divider(), lineParams());
+        boolean codexIn = SetupState.signedIn(this, "codex");
+        rcc.addView(switchRow(this, getString(R.string.setup_codex_session), getString(R.string.setup_codex_session_info),
+                Prefs.codexRemote(this), on -> {
+            if (on && !codexIn) {
+                Toast.makeText(this, getString(R.string.setup_set_up_first, "Codex"), Toast.LENGTH_LONG).show();
+                render();
+                return;
+            }
+            Prefs.setCodexRemote(this, on);
+            if (on) CodexRemote.ensure(this);
+            else CodexRemote.stop();
+            render();
+        }), full());
+        if (Prefs.codexRemote(this)) {
+            LinearLayout cs = row(this);
+            cs.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+            CodexRemote.State cr = CodexRemote.state;
+            cs.addView(dot(this, cr == CodexRemote.State.ACTIVE ? OK : cr == CodexRemote.State.ERROR ? ERR : ACCENT, 8));
+            TextView cst = monoText(this, cr == CodexRemote.State.ACTIVE ? getString(R.string.setup_codex_active)
+                    : cr == CodexRemote.State.ERROR ? CodexRemote.detail
+                    : getString(cr == CodexRemote.State.STARTING ? R.string.setup_remote_starting : R.string.setup_remote_stopped),
+                    12, cr == CodexRemote.State.ERROR ? ERR : MUTED);
+            cst.setPaddingRelative(dp(this, 8), 0, 0, 0);
+            cs.addView(cst, weight1());
+            rcc.addView(cs, full());
+            if (cr == CodexRemote.State.ACTIVE) {
+                Button pairBtn = button(this, getString(R.string.setup_codex_pair), false);
+                pairBtn.setOnClickListener(v -> codexPairSheet());
+                LinearLayout.LayoutParams pbp = wrap();
+                pbp.setMargins(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+                rcc.addView(pairBtn, pbp);
+            }
+        }
+        // SSH into Buddy's Linux from Termux (SshServer)
+        rcc.addView(divider(), lineParams());
+        rcc.addView(switchRow(this, getString(R.string.setup_ssh), getString(R.string.setup_ssh_info),
+                Prefs.sshServer(this), on -> {
+            Prefs.setSshServer(this, on);
+            if (on) SshServer.ensure(this);
+            else SshServer.stop();
+            render();
+        }), full());
+        if (Prefs.sshServer(this)) {
+            LinearLayout st = row(this);
+            st.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+            SshServer.State ss = SshServer.state;
+            st.addView(dot(this, ss == SshServer.State.ACTIVE ? OK : ss == SshServer.State.ERROR ? ERR : ACCENT, 8));
+            TextView stt = monoText(this, ss == SshServer.State.ACTIVE ? getString(R.string.setup_ssh_active, SshServer.PORT)
+                    : ss == SshServer.State.ERROR ? SshServer.detail
+                    : getString(ss == SshServer.State.STARTING ? R.string.setup_remote_starting : R.string.setup_remote_stopped),
+                    12, ss == SshServer.State.ERROR ? ERR : MUTED);
+            stt.setPaddingRelative(dp(this, 8), 0, 0, 0);
+            st.addView(stt, weight1());
+            rcc.addView(st, full());
+            if (ss == SshServer.State.ACTIVE) {
+                LinearLayout how = column(this);
+                how.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 16));
+                how.addView(text(this, getString(R.string.setup_ssh_how), 13, MUTED));
+                // the one-time code is made when the command is copied, and masked here
+                how.addView(codeBlock(this, sshCommand("••••••••")), topGap(10));
+                Button sshCopy = button(this, getString(R.string.setup_copy_command), false);
+                sshCopy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
+                sshCopy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
+                sshCopy.setCompoundDrawablePadding(dp(this, 8));
+                sshCopy.setOnClickListener(v -> {
+                    ClipboardManager cm = getSystemService(ClipboardManager.class);
+                    cm.setPrimaryClip(ClipData.newPlainText("Buddy SSH", sshCommand(SshServer.newCode())));
+                    Toast.makeText(this, R.string.setup_command_copied, Toast.LENGTH_SHORT).show();
+                });
+                LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+                sp.topMargin = dp(this, 12);
+                how.addView(sshCopy, sp);
+                rcc.addView(how, full());
             }
         }
         addCard(rcc);
@@ -785,6 +877,69 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     }
 
     /** Chats with messages but no conversation folder in Buddy's Linux: they ran in Termux. */
+    /** A fresh pairing code for the Codex session, to enter in ChatGPT on a phone or a computer. */
+    private void codexPairSheet() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.setup_codex_pair), 18));
+        TextView code = monoText(this, "…", 34, TEXT);
+        code.setTypeface(mono(this, 600));
+        code.setLetterSpacing(0.08f);
+        code.setTextIsSelectable(true);
+        code.setGravity(Gravity.CENTER);
+        code.setPaddingRelative(dp(this, 12), dp(this, 18), dp(this, 12), dp(this, 18));
+        code.setBackground(rounded(this, BG, 16));
+        LinearLayout.LayoutParams cp = full();
+        cp.topMargin = dp(this, 14);
+        c.addView(code, cp);
+        TextView how = text(this, getString(R.string.codex_pair_getting), 13, MUTED);
+        how.setPaddingRelative(0, dp(this, 12), 0, 0);
+        c.addView(how);
+        LinearLayout btns = row(this);
+        Button close = button(this, getString(R.string.terminal_close), false);
+        Button copyCode = button(this, getString(R.string.signin_copy_code), true);
+        copyCode.setEnabled(false);
+        btns.addView(close, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        LinearLayout.LayoutParams ccp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        ccp.setMarginStart(dp(this, 10));
+        btns.addView(copyCode, ccp);
+        LinearLayout.LayoutParams bp = full();
+        bp.topMargin = dp(this, 16);
+        c.addView(btns, bp);
+        Dialog d = bottomSheet(this, c);
+        close.setOnClickListener(v -> d.dismiss());
+        d.show();
+        CodexRemote.pair((json, why) -> {
+            if (isFinishing() || isDestroyed() || !d.isShowing()) return;
+            if (json == null) {
+                d.dismiss();
+                Toast.makeText(this, getString(R.string.codex_pair_failed, why), Toast.LENGTH_LONG).show();
+                return;
+            }
+            String manual = json.optString("manualPairingCode");
+            long until = json.optLong("expiresAt") * 1000;
+            if (until <= System.currentTimeMillis()) until = System.currentTimeMillis() + 10 * 60_000;
+            code.setText(manual);
+            how.setText(getString(R.string.codex_pair_text,
+                    android.text.format.DateFormat.getTimeFormat(this).format(new java.util.Date(until))));
+            copyCode.setEnabled(true);
+            copyCode.setOnClickListener(v -> {
+                getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Codex pairing code", manual));
+                Toast.makeText(this, R.string.signin_code_copied, Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    /** The Termux command that lets Termux in (SshServer): its key, sent with the one-time code, then `ssh buddy`. */
+    private static String sshCommand(String code) {
+        return "{ command -v ssh && command -v curl; } >/dev/null || pkg install -y openssh curl;"
+                + " mkdir -p ~/.ssh && { [ -f ~/.ssh/id_ed25519 ] || ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519; }"
+                + " && curl -sS --fail-with-body -H 'Authorization: Bearer " + code + "' --data-binary @$HOME/.ssh/id_ed25519.pub"
+                + " http://127.0.0.1:" + McpServer.PORT + "/ssh-key"
+                + " && { grep -qx 'Host buddy' ~/.ssh/config 2>/dev/null || printf '\\nHost buddy\\n  HostName 127.0.0.1\\n  Port "
+                + SshServer.PORT + "\\n  User root\\n' >> ~/.ssh/config; }"
+                + " && ssh -o StrictHostKeyChecking=accept-new buddy true";
+    }
+
     private java.util.List<Sessions.Session> termuxChats() {
         java.util.List<Sessions.Session> out = new java.util.ArrayList<>();
         if (!Linux.installed(this)) return out;

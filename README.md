@@ -134,6 +134,14 @@ Buddy's phone tools are a regular MCP server on the phone (`http://127.0.0.1:876
 
 Settings → **Remote Control → Claude Code session** keeps a Claude Code session with [Remote Control](https://docs.claude.com/en/docs/claude-code) running inside Buddy. It appears as **"Buddy"** in the Claude app's Code sessions, on this phone or anywhere else, and it has the phone tools. Buddy restarts it if it stops and continues the same conversation after an update.
 
+### Codex session in the ChatGPT app
+
+Settings → **Remote Control → Codex session** keeps Codex's app-server with remote control running inside Buddy, with the phone tools, so you can use it from the ChatGPT app (Codex) on this phone or on a computer. **Pair a device** shows a one-time code (it works once, for about 10 minutes) to enter in ChatGPT: in Codex on a phone, or under Settings → Connections → Control other devices on a computer. Buddy shows up there as **"localhost"**, because Codex names a host after the system's hostname. Codex keeps its own settings, so you pick each chat's permission in ChatGPT. Codex's sandbox can't run inside Buddy's Linux, so chats that run commands need **Full access**. Buddy restarts the server if it stops, and pairings are kept.
+
+### SSH from Termux
+
+Settings → **Remote Control → SSH from Termux** runs an SSH server (OpenSSH) inside Buddy's Linux, so you can work in it from Termux: `ssh buddy`, `scp`, `sftp`, port forwarding. It listens on `127.0.0.1:8767` only, so only apps on this phone can reach it (from a computer, go through `adb forward tcp:8767 tcp:8767`), and it takes keys only, no passwords. **Copy command** gives a Termux command that makes a key if Termux has none, sends it to Buddy with a one-time code (it works once, within 10 minutes) and adds `Host buddy` to `~/.ssh/config`. Run it once; from then on, `ssh buddy` in Termux opens Buddy's Linux. Buddy keeps the server running, also after an update, until you switch it off.
+
 ### When an agent is using your phone
 
 As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill (hold the bubble for **Pause** or **Stop task**; it shows even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute. **Pause** lets you use the phone in the middle of a task: the agent's next phone action waits until you tap the **Paused** pill next to the bubble (or hold the bubble and tap **Resume**), then it re-reads the screen before going on. Buddy also pauses on its own when you take the phone back: you touch the screen outside the bubble, or a call rings or starts (a phone call, or one in an app like WhatsApp or Messenger). The bubble's face shows it's paused, and after a call a notification offers **Resume** too; nothing resumes by itself. Touches while a question or approval card waits don't pause (the agent re-reads the screen after your answer), and neither do touches while only notification rules are running. Stop while paused ends the task without that action running, and a pause longer than 5 minutes stops the task.
@@ -245,9 +253,12 @@ The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 | `.../Helper.java` | Runs `buddy-run` inside Linux and keeps its files up to date |
 | `.../Account.java`, `SignInActivity.java` | Install, one-tap sign-in and status for Claude Code, Codex and OpenCode |
 | `.../RemoteSession.java` | The Remote Control session |
+| `.../CodexRemote.java` | The Codex session: runs `linux/codex-remote` and passes on pairing requests |
+| `.../SshServer.java` | SSH from Termux: the server in Buddy's Linux and the one-time code that lets a key in |
 | `app/src/main/res/values/strings.xml` | Every text Buddy shows, in English; `values-<language>/` holds the translations |
 | `app/src/main/jniLibs/arm64-v8a/` | proot and its libraries (see [third_party](third_party/README.md)) |
 | `linux/buddy-run` | Runs the agent with the phone tools and streams events back |
+| `linux/codex-remote` | Codex's app-server with remote control and the phone tools; makes pairing codes in the same proot |
 | `linux/system-prompt.md` | Buddy's instructions for the agent |
 | `linux/android-app/` | The developer-mode skill: toolchain setup and `build-apk.sh` |
 | `app/src/main/assets/linux` | Symlink to `linux/`, so the helper ships inside the APK |

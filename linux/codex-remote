@@ -1,0 +1,47 @@
+#!/bin/sh
+# Run by the Buddy app inside its built-in Linux (Settings > Remote Control > Codex session): Codex's app-server with
+# remote control, so Codex here can be used from the ChatGPT app (Codex) on this phone or on a computer. Codex keeps
+# its own settings (each chat's permission is picked in ChatGPT); Buddy only adds the phone tools.
+#   codex-remote <token>
+# Once the server answers, it prints BUDDY_READY, then takes the app's commands on stdin, one per line:
+#   pair    prints "BUDDY_PAIR <json>" (a short-lived pairing code) or "BUDDY_PAIR_ERROR <message>"
+# Pairing runs here because it has to: the server's socket path is too long for Android, so proot moves the socket
+# somewhere only this proot knows (`codex remote-control pair` in Buddy's terminal can't reach it).
+export BUDDY_TOKEN=${1:-}
+export PATH=/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# status changes ("remote control handle status changed ... next_status=Connected") for the app's status line
+export RUST_LOG=warn,codex_app_server_transport::transport::remote_control=info NO_COLOR=1
+# one started by hand would hold the control socket and the same pairing
+pkill -f '[b]in/codex app-server --remote-control' 2>/dev/null && sleep 2
+mkdir -p /root/remote-codex && cd /root/remote-codex || exit 1
+codex app-server --remote-control --listen unix:// \
+  -c 'mcp_servers.phone.url="http://127.0.0.1:8765/mcp"' \
+  -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"' \
+  -c 'mcp_servers.phone.tool_timeout_sec=600' </dev/null &
+server=$!
+# the server stopping ends this script too, so the app sees it and starts it again
+( while kill -0 $server 2>/dev/null; do sleep 3; done; kill $$ 2>/dev/null ) &
+
+i=0
+until codex app-server proxy </dev/null >/dev/null 2>&1; do
+  kill -0 $server 2>/dev/null || exit 1
+  i=$((i + 1))
+  [ $i -ge 90 ] && break
+  sleep 1
+done
+echo BUDDY_READY
+
+while IFS= read -r cmd; do
+  case "$cmd" in
+    pair)
+      out=$(codex remote-control pair --json 2>&1 | grep -v bubblewrap)
+      line=$(printf '%s\n' "$out" | grep '^{' | tail -1)
+      if [ -n "$line" ]; then
+        echo "BUDDY_PAIR $line"
+      else
+        echo "BUDDY_PAIR_ERROR $(printf '%s' "$out" | tr '\n' ' ' | cut -c1-300)"
+      fi ;;
+  esac
+done
+# the app closed stdin: the session was switched off
+kill $server 2>/dev/null

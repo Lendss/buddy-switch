@@ -306,6 +306,24 @@ final class Prefs {
         return sp(c).getString("remote_name", "Buddy");
     }
 
+    /** Keep a Codex session with remote control running inside Buddy's Linux, for the ChatGPT app (CodexRemote). */
+    static boolean codexRemote(Context c) {
+        return sp(c).getBoolean("codex_remote", false);
+    }
+
+    static void setCodexRemote(Context c, boolean on) {
+        sp(c).edit().putBoolean("codex_remote", on).apply();
+    }
+
+    /** Keep an SSH server running in Buddy's Linux, for Termux (SshServer). */
+    static boolean sshServer(Context c) {
+        return sp(c).getBoolean("ssh_server", false);
+    }
+
+    static void setSshServer(Context c, boolean on) {
+        sp(c).edit().putBoolean("ssh_server", on).apply();
+    }
+
     /** Terminal text size in sp (pinch to zoom). */
     static float termFont(Context c) {
         return sp(c).getFloat("term_font", 13f);

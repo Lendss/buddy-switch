@@ -352,7 +352,7 @@ final class Linux {
         return v;
     }
 
-    private static void write(File f, String s) throws IOException {
+    static void write(File f, String s) throws IOException {
         f.getParentFile().mkdirs();
         if (f.exists() || isLink(f)) f.delete();
         try (OutputStream out = new FileOutputStream(f)) {

@@ -19,6 +19,7 @@ final class Helper {
     private static final String[][] FILES = {
             // asset, path inside Linux, mode
             {"linux/buddy-run", "/root/bin/buddy-run", "700"},
+            {"linux/codex-remote", "/root/bin/codex-remote", "700"}, // the Codex session (CodexRemote)
             {"linux/profile.sh", "/etc/profile.d/buddy.sh", "644"},
             {"linux/arecord", "/usr/local/bin/arecord", "755"},
             {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},

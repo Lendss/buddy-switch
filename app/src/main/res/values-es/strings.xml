@@ -889,6 +889,13 @@
     <!-- %1$s = technical detail in English. -->
     <string name="remote_start_failed">No se pudo iniciar: %1$s</string>
     <string name="remote_keeps_stopping">La sesión se detiene una y otra vez. Desactívala y vuelve a activarla, o revisa el inicio de sesión de Claude Code.</string>
+    <string name="codex_pair_getting">Obteniendo un código…</string>
+    <string name="codex_pair_text">Introduce este código en ChatGPT: en Codex en un teléfono, o en Ajustes → Conexiones → Controlar otros dispositivos en un ordenador. Funciona una vez, hasta las %1$s. Buddy aparece allí como “localhost”.</string>
+    <string name="codex_pair_failed">No se pudo obtener un código de vinculación: %1$s</string>
+    <string name="codex_keeps_stopping">La sesión de Codex se detiene una y otra vez: %1$s</string>
+    <string name="ssh_keeps_stopping">El servidor SSH se detiene una y otra vez: %1$s</string>
+    <string name="ssh_key_added">Listo. Para abrir el Linux de Buddy desde Termux, escribe ssh buddy.</string>
+    <string name="ssh_code_expired">Este comando ya se usó o tiene más de 10 minutos. Cópialo de nuevo en Ajustes de Buddy.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -1034,6 +1041,14 @@
     <string name="setup_remote_stopped">detenida</string>
     <string name="setup_remote_open">Abrir en la app de Claude</string>
     <string name="setup_remote_open_failed">No se pudo abrir.</string>
+    <string name="setup_codex_session">Sesión de Codex</string>
+    <string name="setup_codex_session_info">Codex con las herramientas del teléfono, dentro de Buddy. Úsalo desde la app de ChatGPT (Codex) en este teléfono o en un ordenador. El sandbox de Codex no funciona aquí, así que elige «Acceso completo» en ChatGPT para los chats que ejecuten comandos.</string>
+    <string name="setup_codex_active">activa · “localhost” en ChatGPT</string>
+    <string name="setup_codex_pair">Vincular un dispositivo</string>
+    <string name="setup_ssh">SSH desde Termux</string>
+    <string name="setup_ssh_info">Usa el Linux de Buddy desde Termux, por SSH. Solo pueden conectarse las apps de este teléfono, y solo con una clave.</string>
+    <string name="setup_ssh_active">en marcha · puerto %1$d</string>
+    <string name="setup_ssh_how">Copia este comando y ejecútalo una vez en Termux, en menos de 10 minutos. Después, escribe ssh buddy en Termux para abrir el Linux de Buddy.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">Quitar los chats antiguos de Termux</string>

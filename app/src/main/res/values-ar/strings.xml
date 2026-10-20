@@ -645,6 +645,13 @@
     <string name="remote_restarting">جارٍ إعادة التشغيل…</string>
     <string name="remote_start_failed">تعذّر البدء: %1$s</string>
     <string name="remote_keeps_stopping">تتوقف الجلسة باستمرار. أوقفها ثم شغّلها مرة أخرى، أو تحقق من تسجيل الدخول إلى Claude Code.</string>
+    <string name="codex_pair_getting">جارٍ الحصول على رمز…</string>
+    <string name="codex_pair_text">أدخل هذا الرمز في ChatGPT: في Codex على الهاتف، أو في الإعدادات ← الاتصالات ← التحكم في أجهزة أخرى على الكمبيوتر. يعمل مرة واحدة حتى %1$s. يظهر Buddy هناك باسم «localhost».</string>
+    <string name="codex_pair_failed">تعذّر الحصول على رمز إقران: %1$s</string>
+    <string name="codex_keeps_stopping">تتوقف جلسة Codex باستمرار: %1$s</string>
+    <string name="ssh_keeps_stopping">يتوقف خادم SSH باستمرار: %1$s</string>
+    <string name="ssh_key_added">تم. لفتح Linux الخاص بـ Buddy من Termux، اكتب ssh buddy.</string>
+    <string name="ssh_code_expired">سبق استخدام هذا الأمر أو مرّ عليه أكثر من 10 دقائق. انسخه مرة أخرى من الإعدادات في Buddy.</string>
 
     <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
@@ -747,6 +754,14 @@
     <string name="setup_remote_stopped">متوقفة</string>
     <string name="setup_remote_open">فتح في تطبيق Claude</string>
     <string name="setup_remote_open_failed">تعذّر فتحها.</string>
+    <string name="setup_codex_session">جلسة Codex</string>
+    <string name="setup_codex_session_info">Codex مع أدوات الهاتف، يعمل داخل Buddy. استخدمه من تطبيق ChatGPT (قسم Codex) على هذا الهاتف أو على كمبيوتر. لا يمكن تشغيل بيئة Codex المعزولة هنا، لذا اختر «الوصول الكامل» في ChatGPT للمحادثات التي تشغّل أوامر.</string>
+    <string name="setup_codex_active">يعمل · «localhost» في ChatGPT</string>
+    <string name="setup_codex_pair">إقران جهاز</string>
+    <string name="setup_ssh">SSH من Termux</string>
+    <string name="setup_ssh_info">استخدم Linux الخاص بـ Buddy من Termux عبر SSH. لا يمكن الاتصال إلا من تطبيقات هذا الهاتف، وبمفتاح فقط.</string>
+    <string name="setup_ssh_active">يعمل · المنفذ %1$d</string>
+    <string name="setup_ssh_how">انسخ هذا الأمر وشغّله مرة واحدة في Termux خلال 10 دقائق. بعد ذلك، اكتب ssh buddy في Termux لفتح Linux الخاص بـ Buddy.</string>
 
     <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
     <string name="setup_old_chats_title">إزالة محادثات Termux القديمة</string>
