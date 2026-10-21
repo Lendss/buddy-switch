@@ -24,18 +24,18 @@ How fast and how reliably different models operate a real Android phone through 
 
 ## Results
 
-Median time per task over all 10 runs:
+Ranked by correct answers first, then median time per task over all 10 runs (a wrong answer counts worse than a slow one):
 
 | Model | Agent | Median | Correct | Median steps |
 |---|---|---|---|---|
 | Claude Sonnet 5.5 | Claude Code | 25 s | 10/10 | 12 |
 | Claude Opus 5.5 | Claude Code | 27 s | 10/10 | 8 |
-| GPT-6 Luna | Codex | 29 s | 7/10 | 11 |
 | Claude Haiku 5.5 | Claude Code | 30 s | 10/10 | 14 |
 | GPT-6.1 Sol | Codex | 36 s | 10/10 | 13 |
 | Space Bunny (free) | OpenCode | 43 s | 10/10 | 15 |
 | Gemini 3.8 Flash Medium (free) | Antigravity | 46 s | 10/10 | 11 |
 | Big Pickle (free) | OpenCode | 112 s | 10/10 | 12 |
+| GPT-6 Luna | Codex | 29 s | 7/10 | 11 |
 
 Answers were checked by hand. Luna's misses: twice it gave today's high and low instead of the current temperature, and once it couldn't get Calculator to compute and answered from its own math. For YouTube the agent's own report that the video plays was accepted.
 
