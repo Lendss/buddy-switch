@@ -34,7 +34,7 @@ Median time per task over all 10 runs:
 | Claude Haiku 5.5 | Claude Code | 30 s | 10/10 | 14 |
 | GPT-6.1 Sol | Codex | 36 s | 10/10 | 13 |
 | Space Bunny (free) | OpenCode | 43 s | 10/10 | 15 |
-| Gemini 3.8 Flash Medium (free) | Antigravity | 64 s | 10/10 | 11 |
+| Gemini 3.8 Flash Medium (free) | Antigravity | 46 s | 10/10 | 11 |
 | Big Pickle (free) | OpenCode | 112 s | 10/10 | 12 |
 
 Answers were checked by hand. Luna's misses: twice it gave today's high and low instead of the current temperature, and once it couldn't get Calculator to compute and answered from its own math. For YouTube the agent's own report that the video plays was accepted.
@@ -45,7 +45,7 @@ Raw runs: [results.jsonl](results.jsonl) (`ms` = time, `tools` = phone tool call
 
 ## Limits
 
-One phone, one locale, 2 runs per model and task: a first look, not a definitive ranking. Free OpenCode models change often and some fail on and off (beam, for example, failed half its runs with a server error and isn't listed). Antigravity ran on Google's free plan: most of its time is the model (about 3 s per step), plus a few seconds of agy starting for every message. A second round stopped after 4 runs when the free plan's quota ran out (it resets after about a week), so it isn't counted.
+One phone, one locale, 2 runs per model and task: a first look, not a definitive ranking. Free OpenCode models change often and some fail on and off (beam, for example, failed half its runs with a server error and isn't listed). Antigravity ran on Google's free plan: most of its time is the model (about 3 s per step, sometimes slower), plus a few seconds of agy starting for every message. Calculator was its weak spot (127 s and 219 s). An earlier run on a pre-release build, before Buddy told it the phone tools' arguments up front, had a median of 64 s. The free plan's usage limit ran out after an evening of testing; the error said it resets in about a week.
 
 # Shopping traps: Agent Loyalty Index
 
