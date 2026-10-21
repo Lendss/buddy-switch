@@ -725,10 +725,12 @@
     <string name="signin_install_sub_claude">Claude Code працюватиме в Buddy за вашою підпискою Claude.</string>
     <string name="signin_install_sub_opencode">OpenCode працюватиме в Buddy. Його безкоштовні моделі доступні одразу, без облікового запису; власних провайдерів (Anthropic, OpenAI, GitHub Copilot…) можна підключити будь-коли.</string>
     <string name="signin_install_sub_codex">Codex працюватиме в Buddy за вашою підпискою ChatGPT.</string>
+    <string name="signin_install_sub_agy">Antigravity CLI від Google працюватиме в Buddy з вашим обліковим записом Google: безкоштовний тариф, Google AI Pro або Ultra.</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Одноразово завантажується близько 235 МБ: вбудований Linux і Claude Code від Anthropic. За можливості використовуйте Wi-Fi.</string>
     <string name="signin_install_size_opencode">Одноразово завантажується близько 230 МБ: вбудований Linux, Node.js і OpenCode. За можливості використовуйте Wi-Fi.</string>
     <string name="signin_install_size_codex">Одноразово завантажується близько 150 МБ: вбудований Linux, Node.js і Codex від OpenAI. За можливості використовуйте Wi-Fi.</string>
+    <string name="signin_install_size_agy">Одноразово завантажується близько 200 МБ: вбудований Linux і Antigravity CLI від Google. За можливості використовуйте Wi-Fi.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Установлення</string>
@@ -738,11 +740,14 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Вхід у Claude</string>
     <string name="signin_title_chatgpt">Вхід у ChatGPT</string>
+    <string name="signin_title_google">Вхід у Google</string>
     <string name="signin_sub_claude">Використовуйте обліковий запис Claude (Pro або Max). Відкриється браузер: підтвердьте вхід там, і Buddy повернеться сам.</string>
     <string name="signin_sub_chatgpt">Використовуйте обліковий запис ChatGPT (Plus, Pro або Business). Відкриється браузер: підтвердьте вхід там, і Buddy повернеться сам.</string>
+    <string name="signin_sub_agy">Використовуйте обліковий запис Google. Відкриється браузер: увійдіть там, і Buddy сам отримає код. Antigravity чекає близько хвилини.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Увійти через Claude</string>
     <string name="signin_with_chatgpt">Увійти через ChatGPT</string>
+    <string name="signin_with_google">Увійти через Google</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Увійти на іншому пристрої</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -757,6 +762,7 @@
     <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_approve_claude">Натисніть «Authorize» на сторінці Claude. Buddy сам отримає код і повернеться.</string>
     <string name="signin_approve_codex">Увійдіть і надайте доступ Codex. Потім поверніться в Buddy — він завершить усе сам.</string>
+    <string name="signin_approve_agy">Увійдіть і надайте доступ Antigravity. Buddy сам отримає код, який покаже сторінка, і повернеться. Якщо це займе понад хвилину, почніть вхід заново.</string>
     <!-- Button. -->
     <string name="signin_open_again">Знову відкрити сторінку входу</string>
     <!-- Screen title after the code was handed over. -->
@@ -771,6 +777,7 @@
     <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
     <string name="signin_enter_code">Введіть цей код</string>
     <string name="signin_remote_codex">На будь-якому пристрої відкрийте посилання нижче, увійдіть у ChatGPT і введіть код. Buddy завершить усе сам.</string>
+    <string name="signin_remote_agy">Відкрийте це посилання на будь-якому пристрої й увійдіть. Потім скопіюйте код зі сторінки та вставте його нижче — у вас є близько хвилини.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Копіювати код</string>
     <string name="signin_code_copied">Код скопійовано</string>
@@ -791,6 +798,7 @@
     <string name="signin_paste_instead">Вставити код вручну</string>
     <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_paste_help">Якщо Buddy не повертається сам, натисніть «Copy Code» на сторінці Claude і вставте код сюди.</string>
+    <string name="signin_paste_help_agy">Якщо Buddy не повертається сам, натисніть «Copy to Clipboard» на сторінці Antigravity і вставте код сюди.</string>
     <!-- Hint inside the empty text box for the code. Lowercase in English. -->
     <string name="signin_code_hint">код</string>
     <!-- Short button next to the text box: use the pasted code. Verb. -->
@@ -836,6 +844,7 @@
     <string name="account_tagline_claude">Використовує вашу підписку Claude</string>
     <string name="account_tagline_opencode">Безкоштовні моделі або ваші провайдери</string>
     <string name="account_tagline_codex">Використовує вашу підписку ChatGPT</string>
+    <string name="account_tagline_agy">Використовує ваш обліковий запис Google</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Налаштування вбудованого Linux…</string>
     <string name="account_installing_tools">Установлення інструментів…</string>
@@ -872,6 +881,7 @@
     <string name="models_default_claude">Claude Code вибирає її залежно від вашої підписки; з\'явиться тут після першого повідомлення</string>
     <string name="models_default_codex">Codex вибирає її сам; з\'явиться тут після наступної відповіді</string>
     <string name="models_default_opencode">Типова модель OpenCode</string>
+    <string name="models_default_agy">Типова модель Antigravity</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Авто</string>

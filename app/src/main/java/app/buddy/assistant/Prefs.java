@@ -44,7 +44,7 @@ final class Prefs {
         sp(c).edit().putString("helper", status).putLong("helper_at", System.currentTimeMillis()).apply();
     }
 
-    /** Which agent answers the bubble: "claude" (default), "codex" or "opencode". */
+    /** Which agent answers the bubble: "claude" (default), "codex", "opencode" or "agy". */
     static String backend(Context c) {
         return sp(c).getString("backend", "claude");
     }
@@ -237,6 +237,15 @@ final class Prefs {
 
     static void setOpencodeModels(Context c, String json) {
         sp(c).edit().putString("opencode_models", json).apply();
+    }
+
+    /** Antigravity's model list (`agy models`), as JSON [[id, name], …]. */
+    static String agyModels(Context c) {
+        return sp(c).getString("agy_models", "[]");
+    }
+
+    static void setAgyModels(Context c, String json) {
+        sp(c).edit().putString("agy_models", json).apply();
     }
 
     /** First-run guide finished (or skipped). */

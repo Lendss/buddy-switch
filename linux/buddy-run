@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run by the Buddy app inside its built-in Linux (Alpine, through proot).
-#   buddy-run <token> ask <session> <claude|codex|opencode> <dev:0|1|rule> <message> [model] [attachment-ids]
+#   buddy-run <token> ask <session> <claude|codex|opencode|agy> <dev:0|1|rule> <message> [model] [attachment-ids]
 #     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools)
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
@@ -12,7 +12,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=12
+HELPER_VERSION=13
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -47,7 +47,7 @@ descendants() { # print a pid and all its descendants
 }
 
 
-# Is this pid an agent process (the real claude / codex program)?
+# Is this pid an agent process (the real claude / codex / opencode / agy program)?
 agent_of() {
   local cmd
   cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
@@ -55,24 +55,34 @@ agent_of() {
     */claude/versions/*) echo claude ;;
     */codex-linux-*/*|*/bin/codex) echo codex ;;
     */opencode-ai/*|*/@opencode/cli*/*|*/bin/opencode) echo opencode ;;
+    */antigravity-cli/bin/*|*/bin/agy) echo agy ;;
     *) return 1 ;;
   esac
 }
 
 case "$CMD" in
   ping) # setup check: proves RUN_COMMAND, the helper and the callback all work
-    agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; } | paste -sd, -)
+    agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; have agy && echo agy; } \
+      | paste -sd, -)
     # signed in = the agent's saved login exists (OpenCode works without one: its free models)
     signed=$({ [ -s "$HOME/.claude/.credentials.json" ] && echo claude; [ -s "$HOME/.codex/auth.json" ] && echo codex
-      have opencode && echo opencode; } | paste -sd, -)
+      have opencode && echo opencode; [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ] && echo agy
+    } | paste -sd, -)
     cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
     # OpenCode's model list (a second or two; a background refresh got killed when the helper exited, so the list
     # never updated and new free models didn't show). On failure the last good list is kept.
     have opencode && timeout 30 opencode models $(oc2 && echo --standalone) >"$D/opencode-models.new" 2>/dev/null \
       && [ -s "$D/opencode-models.new" ] && mv "$D/opencode-models.new" "$D/opencode-models"
+    # Antigravity's models ("id<TAB>name" lines; the list depends on the account's plan)
+    if have agy && [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ]; then
+      timeout 30 agy models >"$D/agy-models.new" 2>/dev/null && grep -q "$(printf '\t')" "$D/agy-models.new" \
+        && mv "$D/agy-models.new" "$D/agy-models"
+    fi
+    am=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+\t.")) | split("\t") | [.[0], .[1]])' "$D/agy-models" 2>/dev/null)
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
-      --argjson om "${om:-[]}" '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om}' | post
+      --argjson om "${om:-[]}" --argjson am "${am:-[]}" \
+      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om,agy_models:$am}' | post
     exit 0 ;;
   procs)
     # map every process started by a Buddy chat to that chat
@@ -83,7 +93,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode' 2>/dev/null); do
+      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode|antigravity-cli/bin/|/bin/agy' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -114,7 +124,7 @@ case "$CMD" in
     exit 0 ;;
   kill)
     P=${3:-}
-    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode
+    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode/agy
     kill_tree "$P"
     exit 0 ;;
   recent)
@@ -232,7 +242,7 @@ if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 
 Developer mode is ON: you may run shell commands and create or edit files. Work inside $W (one folder per project).
-Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode) in $W and follow it."
+Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity) in $W and follow it."
 fi
 
 # ---------------------------------------------------------------- Claude Code
@@ -417,6 +427,167 @@ stream_opencode() {
   fi
 }
 
+# ---------------------------------------------------------------- Antigravity
+# agy reads MCP servers only from ~/.gemini/config/mcp_config.json and permissions from its settings.json, but each
+# chat needs its own phone address (?chat=) and mode. So every run gets its own HOME: its own config and settings,
+# with everything else (the sign-in, conversations) linked to the real ~/.gemini/antigravity-cli.
+# Only the phone tools (and the chat's attachments) are pre-approved; developer mode skips agy's permission checks,
+# like Codex's full access. timeoutSeconds: an approval card may wait for the user (10 minutes, as for the others).
+AGY_PHONE_TOOLS='["read_screen","tap","long_press","type_text","scroll","swipe","press","open_app","list_apps","open_url",
+"screenshot","wait","confirm","ask","notify","reply_notification","update_buddy","install_apk","wait_for_install","point_out"]'
+run_agy() {
+  local h=$S/agy-home g=$HOME/.gemini/antigravity-cli f list tools sigs
+  mkdir -p "$h/.gemini/config" "$h/.gemini/antigravity-cli" "$g" "$HOME/.gemini/config"
+  for f in "$g"/* "$g"/.[!.]*; do
+    [ -e "$f" ] || continue
+    case "${f##*/}" in settings.json|brain) continue ;; esac
+    ln -sfn "$f" "$h/.gemini/antigravity-cli/${f##*/}"
+  done
+  # agy saves a long tool result (list_apps, …) under brain/<conversation>/ and has the model read it back, but it
+  # only lets the model read inside its own folder, and a link out of it doesn't count: each chat keeps its own brain/
+  [ -L "$h/.gemini/antigravity-cli/brain" ] && rm -f "$h/.gemini/antigravity-cli/brain"
+  mkdir -p "$h/.gemini/antigravity-cli/brain"
+  for f in "$HOME/.gemini/config"/*; do
+    [ -e "$f" ] && [ "${f##*/}" != mcp_config.json ] && ln -sfn "$f" "$h/.gemini/config/${f##*/}"
+  done
+  ( umask 077
+    jq -n --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
+      '{mcpServers:{phone:{url:$url, headers:{Authorization:$auth}, timeoutSeconds:600}}}' > "$h/.gemini/config/mcp_config.json" )
+  # the phone's tools as the server lists them (a newer Buddy may have more); the known list if that fails
+  list=$(curl -s -m 10 -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' --data '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
+    "$URL/mcp?chat=$SID")
+  tools=$(jq -c '[.result.tools[].name] | select(length > 0)' <<<"$list" 2>/dev/null)
+  # and their arguments, "tap(element?, x?, y?)": agy itself only lists tool names, and reads a tool's description
+  # file before using it (a model round trip each), or guesses the arguments
+  sigs=$(jq -r '[.result.tools[] | (.inputSchema.required // []) as $req | "\(.name)(" + ((.inputSchema.properties // {})
+    | keys_unsorted | map(. as $k | if ($req | index($k)) != null then $k else $k + "?" end) | join(", ")) + ")"]
+    | join(", ")' <<<"$list" 2>/dev/null)
+  jq -n --argjson t "${tools:-$AGY_PHONE_TOOLS}" --arg files "$S/files" --arg brain "$h/.gemini/antigravity-cli/brain" \
+    '{permissions:{allow:([$t[] | "mcp(phone/\(.))"] + ["read_file(\($files))", "read_file(\($brain))"])}}' \
+    > "$h/.gemini/antigravity-cli/settings.json"
+  local prompt=$MSG args names note
+  # agy has no system-prompt flag, so Buddy's instructions lead a new conversation's first message (as for Codex).
+  # It also lists MCP tools only by file: say how to call the phone's, or it goes looking (e.g. with ls, which a
+  # normal chat refuses, and then it stops).
+  [ -n "$sigs" ] || sigs=$(jq -r 'join(", ")' <<<"$AGY_PHONE_TOOLS" 2>/dev/null)
+  note="In this app the phone tools are on the MCP server named \"phone\". Call them right away with call_mcp_tool \
+(ServerName \"phone\", the ToolName and its Arguments as listed here; ? marks an optional one): $sigs. You don't need \
+to read their descriptions first; only if an argument is unclear, read_file \
+$h/.gemini/antigravity-cli/mcp/phone/<tool>.json."
+  [ "$DEV" = 1 ] || note="$note Shell commands are not available in this chat; don't try them."
+  [ -s "$S/agy-conversation" ] || prompt="$SYSTEM"$'\n\n'"$note"$'\n\n---\n\nUser message from the Buddy bubble:\n'"$MSG"
+  args=(-p "$prompt" --output-format stream-json)
+  [ -s "$S/agy-conversation" ] && args+=(--conversation "$(cat "$S/agy-conversation")")
+  [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
+  [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
+  [ "$DEV" = 1 ] && args+=(--dangerously-skip-permissions)
+  rm -f "$S/agy-error"
+  cd "$W" && HOME=$h agy "${args[@]}" </dev/null 2>"$S/last-error.log"
+  local status=$?
+  # a token refresh that replaced the link with a file: keep the new token in the real folder
+  f=$h/.gemini/antigravity-cli/antigravity-oauth-token
+  [ -f "$f" ] && [ ! -L "$f" ] && mv -f "$f" "$g/antigravity-oauth-token" && ln -sfn "$g/antigravity-oauth-token" "$f"
+  return $status
+}
+
+# Translate agy's stream-json events (init, step_update, result) into the Claude Code stream format.
+# A step's text arrives in pieces (text_delta) and is shown once the step is done; a tool step shows once.
+# agy ends its turn when a permission is refused (no one to ask), often without a word. Then, unless this is the
+# last try ($1 = last), the result isn't shown and $S/agy-denied says what was refused, for one nudge.
+stream_agy() {
+  local line typ idx state ev t denied="" said=""
+  declare -A text=() shown=()
+  rm -f "$S/agy-denied"
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    typ=$(printf '%s' "$line" | jq -r '.event // empty' 2>/dev/null)
+    case "$typ" in
+      init)
+        printf '%s' "$line" | jq -r '.conversation_id // .init.conversation_id // empty' 2>/dev/null > "$S/agy-conversation.new"
+        if [ -s "$S/agy-conversation.new" ]; then mv "$S/agy-conversation.new" "$S/agy-conversation"; else rm -f "$S/agy-conversation.new"; fi ;;
+      step_update)
+        idx=$(printf '%s' "$line" | jq -r '.step_update.step_index // 0' 2>/dev/null)
+        state=$(printf '%s' "$line" | jq -r '.step_update.state // empty' 2>/dev/null)
+        case "$(printf '%s' "$line" | jq -r '.step_update.step_type // empty' 2>/dev/null)" in
+          user_input) ;;
+          agent_response)
+            text[$idx]+=$(printf '%s' "$line" | jq -j '.step_update.text_delta // ""' 2>/dev/null; printf x)
+            text[$idx]=${text[$idx]%x}
+            if [ "$state" = DONE ] && [ -z "${shown[$idx]:-}" ]; then
+              shown[$idx]=1
+              t=$(printf '%s' "${text[$idx]}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+              [ -n "$t" ] && said=1
+              [ -n "$t" ] && jq -cn --arg t "$t" --arg s "$SID" \
+                '{type:"assistant", message:{content:[{type:"text", text:$t}]}, buddy_session:$s}' | post
+            fi ;;
+          *)
+            # a tool step (step_type "tool"): its tool_info has the name and parameters; a phone tool comes as
+            # call_mcp_tool with {ServerName, ToolName, Arguments}. Before agy first uses an MCP tool it reads the
+            # tool's description file from its own folder (…/antigravity-cli/mcp/<server>/<tool>.json), and it reads a
+            # long result back from …/antigravity-cli/brain/…/output.txt: neither is shown.
+            if [ "$state" = ERROR ]; then
+              # refused by its permissions (a shell command in a normal chat, …): say so under the step
+              t=$(printf '%s' "$line" | jq -r '.step_update as $u | ($u.tool_info // {}) as $i
+                | select(($i.error.message // "") | test("denied permission|permission check failed"; "i"))
+                | ($i.parameters.CommandLine // $u.tool_name // $i.name // "?")' 2>/dev/null)
+              if [ -n "$t" ]; then
+                denied=$t
+                jq -cn --arg t "Not allowed in this chat: $t" --arg s "$SID" '{type:"buddy_step", text:$t, buddy_session:$s}' | post
+              fi
+              continue
+            fi
+            [ -n "${shown[$idx]:-}" ] && continue
+            ev=$(printf '%s' "$line" | jq -c --arg s "$SID" '
+              .step_update as $u | ($u.tool_info // {}) as $i | ($i.parameters // {}) as $p
+              | ($u.tool_name // $i.name // "") as $t
+              | select($t != "")
+              | select(([$t] | inside(["finish", "wait", "wait_5_seconds", "list_permissions", "ask_permission",
+                  "ask_custom_permission"])) | not)
+              | select(($t == "read_file" or $t == "view_file") and (($p.Path // "") | test("/antigravity-cli/(mcp|brain)/")) | not)
+              | (($p.Arguments // {}) | if type == "string" then (fromjson? // {}) else . end) as $args
+              | {type:"assistant", message:{content:[{type:"tool_use",
+                  name:(if $t == "call_mcp_tool" then "mcp__" + ($p.ServerName // "phone") + "__" + ($p.ToolName // "")
+                        elif $t == "run_command" or $t == "send_command_input" then "Bash"
+                        elif ($t | test("^(write_to_file|replace_file_content|multi_replace_file_content|sed_file|notebook_edit)$")) then "Edit"
+                        elif $t == "read_file" or $t == "view_file" then "Read" elif $t == "search_web" then "WebSearch"
+                        elif $t == "read_url_content" then "WebFetch" else $t end),
+                  input:(if $t == "call_mcp_tool" then (if ($args | type) == "object" then $args else {} end)
+                         else ({command:($p.CommandLine // $p.Command // null),
+                                file_path:($p.Path // $p.TargetFile // $p.AbsolutePath // $p.FilePath // null),
+                                query:($p.Query // null), url:($p.Url // $p.URL // null)}
+                               | with_entries(select(.value != null and (.value | type) == "string"))) end)}]},
+                buddy_session:$s}' 2>/dev/null)
+            [ -n "$ev" ] && { printf '%s' "$ev" | post; shown[$idx]=1; }
+            ;;
+        esac ;;
+      result)
+        if [ "$(printf '%s' "$line" | jq -r '.result.status // empty' 2>/dev/null)" = SUCCESS ]; then
+          # a refused file read shows only here, in denied_actions (its step just ends without output)
+          if [ -z "$denied" ]; then
+            denied=$(printf '%s' "$line" | jq -r '[.result.denied_actions[]? | .display_name // .action] | unique | join(", ")' 2>/dev/null)
+            [ -n "$denied" ] && jq -cn --arg t "Not allowed in this chat: $denied" --arg s "$SID" \
+              '{type:"buddy_step", text:$t, buddy_session:$s}' | post
+          fi
+          if [ -n "$denied" ] && [ -z "$said" ]; then
+            if [ "${1:-}" = last ]; then
+              jq -cn --arg s "$SID" --arg d "$denied" '{type:"result", subtype:"error", is_error:true,
+                result:("Antigravity stopped after this chat refused: " + $d), buddy_session:$s}' | post
+            else
+              printf '%s' "$denied" > "$S/agy-denied"
+            fi
+          else
+            jq -cn --arg s "$SID" '{type:"result", subtype:"success", result:"", buddy_session:$s}' | post
+          fi
+        else
+          printf '%s' "$line" | jq -r '.result.error // "the request failed"' 2>/dev/null > "$S/agy-error"
+          jq -cn --arg s "$SID" --arg e "$(cat "$S/agy-error")" \
+            '{type:"result", subtype:"error", is_error:true, result:("Antigravity: " + $e), buddy_session:$s}' | post
+        fi ;;
+    esac
+  done
+}
+
 # ------------------------------------------------------------------------ run
 (
   if [ "$BACKEND" = opencode ]; then
@@ -429,6 +600,29 @@ stream_opencode() {
       status=${PIPESTATUS[0]}
     fi
     name=OpenCode
+  elif [ "$BACKEND" = agy ]; then
+    if ! have agy; then event buddy_error "Antigravity isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
+    # a rule's run must get no shell, files or web; agy's allow list can't promise that yet (see Account.runsRules)
+    if [ "$DEV" = rule ]; then event buddy_error "Antigravity can't run notification rules yet. Pick another agent for this rule."; exit 0; fi
+    # the last run's raw events stay in the session folder, for checking how agy reports its steps
+    run_agy | tee "$S/agy-last.jsonl" | stream_agy
+    status=${PIPESTATUS[0]}
+    # a refusal ended its turn without a word: nudge it on once, in the same conversation
+    if [ -s "$S/agy-denied" ] && [ -s "$S/agy-conversation" ]; then
+      MSG="(From Buddy, not the user) This chat doesn't allow that: $(cat "$S/agy-denied"). Carry on with the phone \
+tools (call_mcp_tool, ServerName \"phone\") and finish the user's request."
+      run_agy | tee -a "$S/agy-last.jsonl" | stream_agy last
+      status=${PIPESTATUS[0]}
+    fi
+    if [ -s "$S/agy-conversation" ] && grep -q -i -E 'conversation.*(not found|no such|unknown)' "$S/agy-error" "$S/last-error.log" 2>/dev/null; then
+      rm -f "$S/agy-conversation"   # old conversation is gone; retry as a new one
+      run_agy | stream_agy
+      status=${PIPESTATUS[0]}
+    fi
+    # a failed turn (quota reached, …) is already in the chat from its result; agy also exits non-zero and prints
+    # the same error with raw JSON, which would show it twice
+    [ -s "$S/agy-error" ] && status=0
+    name=Antigravity
   elif [ "$BACKEND" = codex ]; then
     if ! have codex; then event buddy_error "Codex isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
     run_codex | stream_codex

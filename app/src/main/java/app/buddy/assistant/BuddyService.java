@@ -81,6 +81,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         orientation = getResources().getConfiguration().orientation;
         Models.setCodex(Prefs.codexModels(this));
         Models.setOpencode(Prefs.opencodeModels(this));
+        Models.setAgy(Prefs.agyModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
         tools = new Tools(this);
         autoPause = new AutoPause(this);
@@ -240,25 +241,26 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
     }
 
-    // ---------------------------------------- Claude sign-in (built-in Linux)
+    // ---------------------------------------- Claude / Antigravity sign-in (built-in Linux)
 
     private final Runnable codeWatch = new Runnable() {
         @Override
         public void run() {
-            if (!Account.CLAUDE.waitingForCode() || System.currentTimeMillis() > codeWatchUntil) return;
+            Account acc = Account.waiting();
+            if (acc == null || System.currentTimeMillis() > codeWatchUntil) return;
             String code = null;
             try {
                 for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
                     android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
                     if (r == null) continue;
-                    code = scanForCode(r, new int[]{0});
+                    code = scanForCode(acc, r, new int[]{0});
                     r.recycle();
                     if (code != null) break;
                 }
             } catch (Exception ignored) {
             }
-            if (code != null && Account.CLAUDE.submit(code)) {
-                startActivity(new Intent(BuddyService.this, SignInActivity.class)
+            if (code != null && acc.submit(code)) {
+                startActivity(new Intent(BuddyService.this, SignInActivity.class).putExtra("agent", acc.agent)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return;
             }
@@ -266,7 +268,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
     };
 
-    /** While a Claude sign-in waits for its code, look for it on screen (the browser's confirmation page). */
+    /** While a Claude or Antigravity sign-in waits for its code, look for it on screen (the browser's confirmation page). */
     private long codeWatchUntil;
 
     void watchForLoginCode() {
@@ -275,15 +277,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.postDelayed(codeWatch, 1500);
     }
 
-    private static String scanForCode(android.view.accessibility.AccessibilityNodeInfo n, int[] seen) {
+    private static String scanForCode(Account acc, android.view.accessibility.AccessibilityNodeInfo n, int[] seen) {
         if (n == null || ++seen[0] > 4000) return null;
-        String c = Account.CLAUDE.findCode(n.getText());
-        if (c == null) c = Account.CLAUDE.findCode(n.getContentDescription());
+        String c = acc.findCode(n.getText());
+        if (c == null) c = acc.findCode(n.getContentDescription());
         if (c != null) return c;
         for (int i = 0; i < n.getChildCount(); i++) {
             android.view.accessibility.AccessibilityNodeInfo k = n.getChild(i);
             if (k == null) continue;
-            c = scanForCode(k, seen);
+            c = scanForCode(acc, k, seen);
             k.recycle(); // these are pooled before Android 13; scanning repeats every 0.7 s
             if (c != null) return c;
         }
@@ -394,6 +396,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             if (om != null && om.length() > 0) {
                 Prefs.setOpencodeModels(this, om.toString());
                 Models.setOpencode(om.toString());
+            }
+            org.json.JSONArray am = event.optJSONArray("agy_models");
+            if (am != null && am.length() > 0) {
+                Prefs.setAgyModels(this, am.toString());
+                Models.setAgy(am.toString());
             }
             return;
         }

@@ -708,10 +708,12 @@
     <string name="signin_install_sub_claude">Executa o Claude Code dentro do Buddy com a sua assinatura do Claude.</string>
     <string name="signin_install_sub_opencode">Executa o OpenCode dentro do Buddy. Os modelos gratuitos dele funcionam na hora, sem precisar de conta; conecte seus próprios provedores (Anthropic, OpenAI, GitHub Copilot…) quando quiser.</string>
     <string name="signin_install_sub_codex">Executa o Codex dentro do Buddy com o seu plano do ChatGPT.</string>
+    <string name="signin_install_sub_agy">Executa o Antigravity CLI do Google dentro do Buddy com a sua conta do Google: plano gratuito, Google AI Pro ou Ultra.</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Baixa cerca de 235 MB uma única vez: o Linux do Buddy e o Claude Code da Anthropic. Use o Wi-Fi se puder.</string>
     <string name="signin_install_size_opencode">Baixa cerca de 230 MB uma única vez: o Linux do Buddy, o Node.js e o OpenCode. Use o Wi-Fi se puder.</string>
     <string name="signin_install_size_codex">Baixa cerca de 150 MB uma única vez: o Linux do Buddy, o Node.js e o Codex da OpenAI. Use o Wi-Fi se puder.</string>
+    <string name="signin_install_size_agy">Baixa cerca de 200 MB uma única vez: o Linux do Buddy e o Antigravity CLI do Google. Use o Wi-Fi se puder.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Instalando</string>
@@ -721,11 +723,14 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Faça login no Claude</string>
     <string name="signin_title_chatgpt">Faça login no ChatGPT</string>
+    <string name="signin_title_google">Faça login no Google</string>
     <string name="signin_sub_claude">Use sua conta do Claude (Pro ou Max). O navegador vai abrir; aprove lá e o Buddy volta sozinho.</string>
     <string name="signin_sub_chatgpt">Use sua conta do ChatGPT (Plus, Pro ou Business). O navegador vai abrir; aprove lá e o Buddy volta sozinho.</string>
+    <string name="signin_sub_agy">Use sua conta do Google. O navegador vai abrir; faça login lá e o Buddy pega o código sozinho. O Antigravity espera cerca de um minuto.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Fazer login com o Claude</string>
     <string name="signin_with_chatgpt">Fazer login com o ChatGPT</string>
+    <string name="signin_with_google">Fazer login com o Google</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Fazer login em outro dispositivo</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -740,6 +745,7 @@
     <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_approve_claude">Toque em Autorizar na página do Claude. O Buddy pega o código e volta sozinho.</string>
     <string name="signin_approve_codex">Faça login e autorize o Codex. Depois volte ao Buddy; ele termina sozinho.</string>
+    <string name="signin_approve_agy">Faça login e autorize o Antigravity. O Buddy pega o código que a página mostra e volta sozinho. Se demorar mais de um minuto, inicie o login de novo.</string>
     <!-- Button. -->
     <string name="signin_open_again">Abrir a página de login de novo</string>
     <!-- Screen title after the code was handed over. -->
@@ -754,6 +760,7 @@
     <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
     <string name="signin_enter_code">Digite este código</string>
     <string name="signin_remote_codex">Em qualquer dispositivo, abra o link abaixo, faça login no ChatGPT e digite o código. O Buddy termina sozinho.</string>
+    <string name="signin_remote_agy">Abra este link em qualquer dispositivo e faça login. Depois copie o código que a página mostra e cole abaixo, em até cerca de um minuto.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Copiar código</string>
     <string name="signin_code_copied">Código copiado</string>
@@ -774,6 +781,7 @@
     <string name="signin_paste_instead">Colar o código manualmente</string>
     <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_paste_help">Se o Buddy não voltar sozinho, toque em Copiar código na página do Claude e cole aqui.</string>
+    <string name="signin_paste_help_agy">Se o Buddy não voltar sozinho, toque em “Copy to Clipboard” na página do Antigravity e cole o código aqui.</string>
     <!-- Hint inside the empty text box for the code. Lowercase in English. -->
     <string name="signin_code_hint">código</string>
     <!-- Short button next to the text box: use the pasted code. Verb. -->
@@ -819,6 +827,7 @@
     <string name="account_tagline_claude">Usa seu plano do Claude</string>
     <string name="account_tagline_opencode">Modelos gratuitos ou seus próprios provedores</string>
     <string name="account_tagline_codex">Usa seu plano do ChatGPT</string>
+    <string name="account_tagline_agy">Usa sua conta do Google</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Configurando o Linux do Buddy…</string>
     <string name="account_installing_tools">Instalando ferramentas…</string>
@@ -855,6 +864,7 @@
     <string name="models_default_claude">O Claude Code escolhe com base no seu plano; aparece aqui depois da primeira mensagem</string>
     <string name="models_default_codex">O Codex escolhe; aparece aqui depois da próxima resposta</string>
     <string name="models_default_opencode">Modelo padrão do OpenCode</string>
+    <string name="models_default_agy">Modelo padrão do Antigravity</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Auto</string>

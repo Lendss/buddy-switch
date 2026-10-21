@@ -367,7 +367,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         other.setPaddingRelative(0, dp(this, 10), 0, 0);
         final EditText et = new EditText(this);
         et.setHint(getString(R.string.chat_model_other_hint, "claude".equals(ses.backend) ? "claude-opus-5-5"
-                : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "gpt-6.1-sol"));
+                : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(ses.backend) ? "gemini-3.8-flash-high"
+                : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);

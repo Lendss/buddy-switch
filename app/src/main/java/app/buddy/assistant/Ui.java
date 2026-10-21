@@ -241,10 +241,11 @@ final class Ui {
         return t;
     }
 
-    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex) or "OC" (OpenCode). */
+    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex), "OC" (OpenCode) or "AG" (Antigravity). */
     static TextView agentTile(Context c, String backend) {
-        boolean claude = !"codex".equals(backend) && !"opencode".equals(backend);
-        TextView t = monoText(c, "codex".equals(backend) ? "CX" : "opencode".equals(backend) ? "OC" : "CC", 12,
+        boolean claude = !"codex".equals(backend) && !"opencode".equals(backend) && !"agy".equals(backend);
+        TextView t = monoText(c, "codex".equals(backend) ? "CX" : "opencode".equals(backend) ? "OC"
+                : "agy".equals(backend) ? "AG" : "CC", 12,
                 claude ? ACCENT_TEXT : TEXT);
         t.setTypeface(mono(c, 600));
         t.setGravity(Gravity.CENTER);
@@ -420,7 +421,8 @@ final class Ui {
         other.setPaddingRelative(0, dp(a, 10), 0, 0);
         final android.widget.EditText et = new android.widget.EditText(a);
         et.setHint(a.getString(R.string.chat_model_other_hint, "claude".equals(backend) ? "claude-opus-5-5"
-                : "opencode".equals(backend) ? "anthropic/claude-sonnet-5-5" : "gpt-6.1-sol"));
+                : "opencode".equals(backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(backend) ? "gemini-3.8-flash-high"
+                : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);

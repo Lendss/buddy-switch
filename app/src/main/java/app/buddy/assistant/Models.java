@@ -22,7 +22,14 @@ final class Models {
             {"", "Default"},
             {"opencode/big-pickle", "opencode/big-pickle"},
     };
-    private static String[][] codexLive, opencodeLive;
+    /** Used until Antigravity reports its own list (`agy models`, which depends on the plan). */
+    static final String[][] AGY = {
+            {"", "Default"},
+            {"gemini-3.8-flash-high", "Gemini 3.8 Flash (High)"},
+            {"gemini-3.8-flash-medium", "Gemini 3.8 Flash (Medium)"},
+            {"gemini-3.8-flash-low", "Gemini 3.8 Flash (Low)"},
+    };
+    private static String[][] codexLive, opencodeLive, agyLive;
 
     private Models() {
     }
@@ -43,6 +50,7 @@ final class Models {
 
     static String[][] forBackend(String backend) {
         if ("opencode".equals(backend)) return withDefault(opencodeLive != null ? opencodeLive : OPENCODE);
+        if ("agy".equals(backend)) return withDefault(agyLive != null ? agyLive : AGY);
         if (!"codex".equals(backend)) return withDefault(CLAUDE);
         return withDefault(codexLive != null ? codexLive : CODEX);
     }
@@ -58,6 +66,12 @@ final class Models {
     static void setOpencode(String json) {
         String[][] m = parse(json);
         if (m != null) opencodeLive = m;
+    }
+
+    /** Antigravity's models as JSON [[id, name], …]. */
+    static void setAgy(String json) {
+        String[][] m = parse(json);
+        if (m != null) agyLive = m;
     }
 
     /** Codex's model list as reported by the helper: JSON [[slug, name], …]. */
@@ -91,7 +105,7 @@ final class Models {
         if ("codex".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
                 {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
                 {"high", BuddyApp.str(R.string.models_effort_high)}};
-        return null; // OpenCode: effort ("variants") depends on the model
+        return null; // OpenCode: effort ("variants") depends on the model; Antigravity's model ids include it
     }
 
     /** "agent · model · effort" for a chat's chip. */
@@ -112,6 +126,7 @@ final class Models {
         if (!s.actualModel.isEmpty()) return BuddyApp.str(R.string.models_default_now, nameOf(s.backend, s.actualModel));
         if ("claude".equals(s.backend)) return BuddyApp.str(R.string.models_default_claude);
         if ("codex".equals(s.backend)) return BuddyApp.str(R.string.models_default_codex);
+        if ("agy".equals(s.backend)) return BuddyApp.str(R.string.models_default_agy);
         return BuddyApp.str(R.string.models_default_opencode);
     }
 

@@ -480,9 +480,11 @@
     <string name="signin_install_sub_claude">Claude 구독으로 Buddy 안에서 Claude Code를 실행해요.</string>
     <string name="signin_install_sub_opencode">Buddy 안에서 OpenCode를 실행해요. 무료 모델은 계정 없이 바로 쓸 수 있고, 원하는 제공업체(Anthropic, OpenAI, GitHub Copilot 등)도 언제든지 연결할 수 있어요.</string>
     <string name="signin_install_sub_codex">ChatGPT 플랜으로 Buddy 안에서 Codex를 실행해요.</string>
+    <string name="signin_install_sub_agy">Google 계정(무료 플랜, Google AI Pro 또는 Ultra)으로 Buddy 안에서 Google의 Antigravity CLI를 실행해요.</string>
     <string name="signin_install_size_claude">Buddy의 Linux와 Anthropic의 Claude Code를 처음 한 번만 다운로드해요(약 235MB). 가능하면 Wi-Fi를 사용하세요.</string>
     <string name="signin_install_size_opencode">Buddy의 Linux, Node.js, OpenCode를 처음 한 번만 다운로드해요(약 230MB). 가능하면 Wi-Fi를 사용하세요.</string>
     <string name="signin_install_size_codex">Buddy의 Linux, Node.js, OpenAI의 Codex를 처음 한 번만 다운로드해요(약 150MB). 가능하면 Wi-Fi를 사용하세요.</string>
+    <string name="signin_install_size_agy">Buddy의 Linux와 Google의 Antigravity CLI를 처음 한 번만 다운로드해요(약 200MB). 가능하면 Wi-Fi를 사용하세요.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">설치 중</string>
@@ -492,10 +494,13 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Claude에 로그인</string>
     <string name="signin_title_chatgpt">ChatGPT에 로그인</string>
+    <string name="signin_title_google">Google에 로그인</string>
     <string name="signin_sub_claude">Claude 계정(Pro 또는 Max)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="signin_sub_chatgpt">ChatGPT 계정(Plus, Pro 또는 Business)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="signin_sub_agy">Google 계정을 사용해요. 브라우저가 열리면 거기서 로그인하세요. Buddy가 코드를 자동으로 받아요. Antigravity는 1분 정도 기다려요.</string>
     <string name="signin_with_claude">Claude로 로그인</string>
     <string name="signin_with_chatgpt">ChatGPT로 로그인</string>
+    <string name="signin_with_google">Google로 로그인</string>
     <string name="signin_other_device">다른 기기에서 로그인</string>
     <string name="signin_with_code">코드로 로그인</string>
 
@@ -505,6 +510,7 @@
     <string name="signin_approve_title">브라우저에서 승인하세요</string>
     <string name="signin_approve_claude">Claude 페이지에서 ‘승인’(Authorize)을 탭하세요. Buddy가 코드를 받아 자동으로 돌아와요.</string>
     <string name="signin_approve_codex">로그인하고 Codex를 허용하세요. 그런 다음 Buddy로 돌아오면 자동으로 마무리돼요.</string>
+    <string name="signin_approve_agy">로그인하고 Antigravity를 허용하세요. Buddy가 페이지에 표시된 코드를 받아 자동으로 돌아와요. 1분 넘게 걸리면 로그인을 다시 시작하세요.</string>
     <string name="signin_open_again">로그인 페이지 다시 열기</string>
     <string name="signin_signing_in">로그인 중</string>
     <string name="signin_finishing">로그인 마무리하는 중…</string>
@@ -514,6 +520,7 @@
     <string name="signin_remote_claude">아무 기기에서나 이 링크를 열고 승인하세요. 그런 다음 페이지에 표시된 코드를 복사해 아래에 붙여넣으세요.</string>
     <string name="signin_enter_code">이 코드를 입력하세요</string>
     <string name="signin_remote_codex">아무 기기에서나 아래 링크를 열고 ChatGPT에 로그인한 다음 코드를 입력하세요. 나머지는 Buddy가 알아서 마무리해요.</string>
+    <string name="signin_remote_agy">아무 기기에서나 이 링크를 열고 로그인하세요. 그런 다음 페이지에 표시된 코드를 복사해 약 1분 안에 아래에 붙여넣으세요.</string>
     <string name="signin_copy_code">코드 복사</string>
     <string name="signin_code_copied">코드를 복사했어요</string>
     <string name="signin_code_expiry">코드는 15분 동안 유효해요.</string>
@@ -528,6 +535,7 @@
     <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
     <string name="signin_paste_instead">대신 코드 붙여넣기</string>
     <string name="signin_paste_help">Buddy로 자동으로 돌아오지 않으면 Claude 페이지에서 ‘코드 복사’(Copy Code)를 탭한 다음 여기에 붙여넣으세요.</string>
+    <string name="signin_paste_help_agy">Buddy로 자동으로 돌아오지 않으면 Antigravity 페이지에서 ‘Copy to Clipboard’(클립보드에 복사)를 탭한 다음 코드를 여기에 붙여넣으세요.</string>
     <string name="signin_code_hint">코드</string>
     <string name="signin_use_code">사용</string>
     <string name="signin_start_again">먼저 로그인을 다시 시작하세요.</string>
@@ -557,6 +565,7 @@
     <string name="account_tagline_claude">Claude 플랜 사용</string>
     <string name="account_tagline_opencode">무료 모델 또는 원하는 제공업체</string>
     <string name="account_tagline_codex">ChatGPT 플랜 사용</string>
+    <string name="account_tagline_agy">Google 계정 사용</string>
     <string name="account_setting_up_linux">Buddy의 Linux 설정 중…</string>
     <string name="account_installing_tools">도구 설치 중…</string>
     <string name="account_downloading_claude">Claude Code 다운로드 중(약 230MB)…</string>
@@ -578,6 +587,7 @@
     <string name="models_default_claude">Claude Code가 플랜에 맞춰 골라요. 첫 메시지 후에 여기에 표시돼요</string>
     <string name="models_default_codex">Codex가 골라요. 다음 답변 후에 여기에 표시돼요</string>
     <string name="models_default_opencode">OpenCode 기본 모델</string>
+    <string name="models_default_agy">Antigravity 기본 모델</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
     <string name="models_effort_auto">자동</string>
     <string name="models_effort_low">낮음</string>

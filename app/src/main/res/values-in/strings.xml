@@ -701,10 +701,12 @@
     <string name="signin_install_sub_claude">Menjalankan Claude Code di dalam Buddy dengan langganan Claude Anda.</string>
     <string name="signin_install_sub_opencode">Menjalankan OpenCode di dalam Buddy. Model gratisnya langsung bisa dipakai, tanpa perlu akun; hubungkan penyedia Anda sendiri (Anthropic, OpenAI, GitHub Copilot…) kapan saja.</string>
     <string name="signin_install_sub_codex">Menjalankan Codex di dalam Buddy dengan paket ChatGPT Anda.</string>
+    <string name="signin_install_sub_agy">Menjalankan Antigravity CLI dari Google di dalam Buddy dengan akun Google Anda: paket gratis, Google AI Pro, atau Ultra.</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Mendownload sekitar 235 MB, cukup sekali: Linux Buddy dan Claude Code dari Anthropic. Gunakan Wi-Fi jika bisa.</string>
     <string name="signin_install_size_opencode">Mendownload sekitar 230 MB, cukup sekali: Linux Buddy, Node.js, dan OpenCode. Gunakan Wi-Fi jika bisa.</string>
     <string name="signin_install_size_codex">Mendownload sekitar 150 MB, cukup sekali: Linux Buddy, Node.js, dan Codex dari OpenAI. Gunakan Wi-Fi jika bisa.</string>
+    <string name="signin_install_size_agy">Mendownload sekitar 200 MB, cukup sekali: Linux Buddy dan Antigravity CLI dari Google. Gunakan Wi-Fi jika bisa.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Menginstal</string>
@@ -714,11 +716,14 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Login ke Claude</string>
     <string name="signin_title_chatgpt">Login ke ChatGPT</string>
+    <string name="signin_title_google">Login ke Google</string>
     <string name="signin_sub_claude">Gunakan akun Claude Anda (Pro atau Max). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
     <string name="signin_sub_chatgpt">Gunakan akun ChatGPT Anda (Plus, Pro, atau Business). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
+    <string name="signin_sub_agy">Gunakan akun Google Anda. Browser akan terbuka; login di sana dan Buddy akan mengambil kodenya dengan sendirinya. Antigravity menunggu sekitar satu menit.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Login dengan Claude</string>
     <string name="signin_with_chatgpt">Login dengan ChatGPT</string>
+    <string name="signin_with_google">Login dengan Google</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Login di perangkat lain</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -733,6 +738,7 @@
     <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_approve_claude">Ketuk Authorize di halaman Claude. Buddy akan mengambil kodenya dan kembali dengan sendirinya.</string>
     <string name="signin_approve_codex">Login dan izinkan Codex. Lalu kembali ke Buddy; prosesnya selesai dengan sendirinya.</string>
+    <string name="signin_approve_agy">Login dan izinkan Antigravity. Buddy akan mengambil kode yang muncul di halaman dan kembali dengan sendirinya. Jika prosesnya lebih dari satu menit, mulai ulang login.</string>
     <!-- Button. -->
     <string name="signin_open_again">Buka lagi halaman login</string>
     <!-- Screen title after the code was handed over. -->
@@ -747,6 +753,7 @@
     <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
     <string name="signin_enter_code">Masukkan kode ini</string>
     <string name="signin_remote_codex">Di perangkat mana pun, buka link di bawah, login ke ChatGPT, dan masukkan kodenya. Buddy akan menyelesaikannya dengan sendirinya.</string>
+    <string name="signin_remote_agy">Buka link ini di perangkat mana pun dan login. Lalu salin kode yang muncul di halaman tersebut dan tempel di bawah, dalam waktu sekitar satu menit.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Salin kode</string>
     <string name="signin_code_copied">Kode disalin</string>
@@ -767,6 +774,7 @@
     <string name="signin_paste_instead">Tempel kode secara manual</string>
     <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_paste_help">Jika Buddy tidak kembali dengan sendirinya: ketuk Copy Code di halaman Claude, lalu tempel di sini.</string>
+    <string name="signin_paste_help_agy">Jika Buddy tidak kembali dengan sendirinya: ketuk “Copy to Clipboard” di halaman Antigravity, lalu tempel kodenya di sini.</string>
     <!-- Hint inside the empty text box for the code. Lowercase in English. -->
     <string name="signin_code_hint">kode</string>
     <!-- Short button next to the text box: use the pasted code. Verb. -->
@@ -812,6 +820,7 @@
     <string name="account_tagline_claude">Menggunakan paket Claude Anda</string>
     <string name="account_tagline_opencode">Model gratis, atau penyedia Anda sendiri</string>
     <string name="account_tagline_codex">Menggunakan paket ChatGPT Anda</string>
+    <string name="account_tagline_agy">Menggunakan akun Google Anda</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Menyiapkan Linux Buddy…</string>
     <string name="account_installing_tools">Menginstal alat…</string>
@@ -848,6 +857,7 @@
     <string name="models_default_claude">Claude Code memilihnya dari paket Anda; ditampilkan di sini setelah pesan pertama</string>
     <string name="models_default_codex">Codex yang memilihnya; ditampilkan di sini setelah balasan berikutnya</string>
     <string name="models_default_opencode">Model default OpenCode</string>
+    <string name="models_default_agy">Model default Antigravity</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Auto</string>

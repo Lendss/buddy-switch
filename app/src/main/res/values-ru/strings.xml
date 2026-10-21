@@ -725,10 +725,12 @@
     <string name="signin_install_sub_claude">Claude Code будет работать внутри Buddy по вашей подписке Claude.</string>
     <string name="signin_install_sub_opencode">OpenCode будет работать внутри Buddy. Его бесплатные модели доступны сразу, без аккаунта; своих провайдеров (Anthropic, OpenAI, GitHub Copilot…) можно подключить в любое время.</string>
     <string name="signin_install_sub_codex">Codex будет работать внутри Buddy по вашей подписке ChatGPT.</string>
+    <string name="signin_install_sub_agy">Antigravity CLI от Google будет работать внутри Buddy с вашим аккаунтом Google: бесплатный тариф, Google AI Pro или Ultra.</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Однократная загрузка около 235 МБ: встроенный Linux и Claude Code от Anthropic. По возможности используйте Wi-Fi.</string>
     <string name="signin_install_size_opencode">Однократная загрузка около 230 МБ: встроенный Linux, Node.js и OpenCode. По возможности используйте Wi-Fi.</string>
     <string name="signin_install_size_codex">Однократная загрузка около 150 МБ: встроенный Linux, Node.js и Codex от OpenAI. По возможности используйте Wi-Fi.</string>
+    <string name="signin_install_size_agy">Однократная загрузка около 200 МБ: встроенный Linux и Antigravity CLI от Google. По возможности используйте Wi-Fi.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Установка</string>
@@ -738,11 +740,14 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Вход в Claude</string>
     <string name="signin_title_chatgpt">Вход в ChatGPT</string>
+    <string name="signin_title_google">Вход в Google</string>
     <string name="signin_sub_claude">Используйте аккаунт Claude (Pro или Max). Откроется браузер: подтвердите вход там, и Buddy вернётся сам.</string>
     <string name="signin_sub_chatgpt">Используйте аккаунт ChatGPT (Plus, Pro или Business). Откроется браузер: подтвердите вход там, и Buddy вернётся сам.</string>
+    <string name="signin_sub_agy">Используйте аккаунт Google. Откроется браузер: войдите там, и Buddy сам получит код. Antigravity ждёт около минуты.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Войти через Claude</string>
     <string name="signin_with_chatgpt">Войти через ChatGPT</string>
+    <string name="signin_with_google">Войти через Google</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Войти на другом устройстве</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -757,6 +762,7 @@
     <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_approve_claude">Нажмите «Authorize» на странице Claude. Buddy получит код и вернётся сам.</string>
     <string name="signin_approve_codex">Войдите и разрешите доступ для Codex. Затем вернитесь в Buddy — он завершит вход сам.</string>
+    <string name="signin_approve_agy">Войдите и разрешите доступ для Antigravity. Buddy получит код, который покажет страница, и вернётся сам. Если это займёт больше минуты, начните вход заново.</string>
     <!-- Button. -->
     <string name="signin_open_again">Снова открыть страницу входа</string>
     <!-- Screen title after the code was handed over. -->
@@ -771,6 +777,7 @@
     <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
     <string name="signin_enter_code">Введите этот код</string>
     <string name="signin_remote_codex">На любом устройстве откройте ссылку ниже, войдите в ChatGPT и введите код. Buddy завершит вход сам.</string>
+    <string name="signin_remote_agy">Откройте эту ссылку на любом устройстве и войдите в аккаунт. Затем скопируйте код, который покажет страница, и вставьте его ниже — у вас есть около минуты.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Копировать код</string>
     <string name="signin_code_copied">Код скопирован</string>
@@ -791,6 +798,7 @@
     <string name="signin_paste_instead">Вставить код вручную</string>
     <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_paste_help">Если Buddy не вернётся сам, нажмите «Copy Code» на странице Claude и вставьте код сюда.</string>
+    <string name="signin_paste_help_agy">Если Buddy не вернётся сам, нажмите «Copy to Clipboard» на странице Antigravity и вставьте код сюда.</string>
     <!-- Hint inside the empty text box for the code. Lowercase in English. -->
     <string name="signin_code_hint">код</string>
     <!-- Short button next to the text box: use the pasted code. Verb. -->
@@ -836,6 +844,7 @@
     <string name="account_tagline_claude">Использует подписку Claude</string>
     <string name="account_tagline_opencode">Бесплатные модели или ваши провайдеры</string>
     <string name="account_tagline_codex">Использует подписку ChatGPT</string>
+    <string name="account_tagline_agy">Использует аккаунт Google</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Настройка встроенного Linux…</string>
     <string name="account_installing_tools">Установка инструментов…</string>
@@ -872,6 +881,7 @@
     <string name="models_default_claude">Claude Code выбирает её по вашей подписке; она появится здесь после первого сообщения</string>
     <string name="models_default_codex">Codex выбирает её сам; она появится здесь после следующего ответа</string>
     <string name="models_default_opencode">Модель OpenCode по умолчанию</string>
+    <string name="models_default_agy">Модель Antigravity по умолчанию</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Авто</string>

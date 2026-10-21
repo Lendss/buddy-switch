@@ -508,9 +508,11 @@
     <string name="signin_install_sub_claude">Uruchamia Claude Code w Buddy w ramach twojej subskrypcji Claude.</string>
     <string name="signin_install_sub_opencode">Uruchamia OpenCode w Buddy. Darmowe modele działają od razu, bez konta; własnych dostawców (Anthropic, OpenAI, GitHub Copilot…) możesz podłączyć w dowolnej chwili.</string>
     <string name="signin_install_sub_codex">Uruchamia Codex w Buddy w ramach twojego planu ChatGPT.</string>
+    <string name="signin_install_sub_agy">Uruchamia Antigravity CLI od Google w Buddy na twoim koncie Google: darmowy plan, Google AI Pro lub Ultra.</string>
     <string name="signin_install_size_claude">Jednorazowo pobiera ok. 235 MB: wbudowany Linux i Claude Code od Anthropic. Jeśli możesz, użyj Wi-Fi.</string>
     <string name="signin_install_size_opencode">Jednorazowo pobiera ok. 230 MB: wbudowany Linux, Node.js i OpenCode. Jeśli możesz, użyj Wi-Fi.</string>
     <string name="signin_install_size_codex">Jednorazowo pobiera ok. 150 MB: wbudowany Linux, Node.js i Codex od OpenAI. Jeśli możesz, użyj Wi-Fi.</string>
+    <string name="signin_install_size_agy">Jednorazowo pobiera ok. 200 MB: wbudowany Linux i Antigravity CLI od Google. Jeśli możesz, użyj Wi-Fi.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Instalowanie</string>
@@ -520,10 +522,13 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Zaloguj się do Claude</string>
     <string name="signin_title_chatgpt">Zaloguj się do ChatGPT</string>
+    <string name="signin_title_google">Zaloguj się do Google</string>
     <string name="signin_sub_claude">Użyj konta Claude (Pro lub Max). Otworzy się przeglądarka – zatwierdź tam, a Buddy sam wróci.</string>
     <string name="signin_sub_chatgpt">Użyj konta ChatGPT (Plus, Pro lub Business). Otworzy się przeglądarka – zatwierdź tam, a Buddy sam wróci.</string>
+    <string name="signin_sub_agy">Użyj konta Google. Otworzy się przeglądarka – zaloguj się tam, a Buddy sam odczyta kod. Antigravity czeka około minuty.</string>
     <string name="signin_with_claude">Zaloguj się przez Claude</string>
     <string name="signin_with_chatgpt">Zaloguj się przez ChatGPT</string>
+    <string name="signin_with_google">Zaloguj się przez Google</string>
     <string name="signin_other_device">Zaloguj się na innym urządzeniu</string>
     <string name="signin_with_code">Zaloguj się kodem</string>
 
@@ -533,6 +538,7 @@
     <string name="signin_approve_title">Zatwierdź w przeglądarce</string>
     <string name="signin_approve_claude">Kliknij Autoryzuj na stronie Claude. Buddy odczyta kod i sam wróci.</string>
     <string name="signin_approve_codex">Zaloguj się i zezwól Codex na dostęp. Potem wróć do Buddy – dokończy sam.</string>
+    <string name="signin_approve_agy">Zaloguj się i zezwól Antigravity na dostęp. Buddy odczyta kod widoczny na stronie i sam wróci. Jeśli potrwa to dłużej niż minutę, rozpocznij logowanie od nowa.</string>
     <string name="signin_open_again">Otwórz ponownie stronę logowania</string>
     <string name="signin_signing_in">Trwa logowanie</string>
     <string name="signin_finishing">Kończenie logowania…</string>
@@ -542,6 +548,7 @@
     <string name="signin_remote_claude">Otwórz ten link na dowolnym urządzeniu i zatwierdź. Następnie skopiuj kod widoczny na stronie i wklej go poniżej.</string>
     <string name="signin_enter_code">Wpisz ten kod</string>
     <string name="signin_remote_codex">Na dowolnym urządzeniu otwórz poniższy link, zaloguj się do ChatGPT i wpisz kod. Buddy dokończy sam.</string>
+    <string name="signin_remote_agy">Otwórz ten link na dowolnym urządzeniu i zaloguj się. Następnie skopiuj kod widoczny na stronie i wklej go poniżej w ciągu około minuty.</string>
     <string name="signin_copy_code">Kopiuj kod</string>
     <string name="signin_code_copied">Skopiowano kod</string>
     <string name="signin_code_expiry">Kod jest ważny przez 15 minut.</string>
@@ -556,6 +563,7 @@
     <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
     <string name="signin_paste_instead">Wklej kod ręcznie</string>
     <string name="signin_paste_help">Jeśli Buddy nie wróci sam: kliknij Kopiuj kod na stronie Claude, a potem wklej go tutaj.</string>
+    <string name="signin_paste_help_agy">Jeśli Buddy nie wróci sam: kliknij „Copy to Clipboard” na stronie Antigravity, a potem wklej kod tutaj.</string>
     <string name="signin_code_hint">kod</string>
     <string name="signin_use_code">Użyj</string>
     <string name="signin_start_again">Najpierw ponownie rozpocznij logowanie.</string>
@@ -585,6 +593,7 @@
     <string name="account_tagline_claude">Korzysta z twojego planu Claude</string>
     <string name="account_tagline_opencode">Darmowe modele lub twoi dostawcy</string>
     <string name="account_tagline_codex">Korzysta z twojego planu ChatGPT</string>
+    <string name="account_tagline_agy">Korzysta z twojego konta Google</string>
     <string name="account_setting_up_linux">Przygotowywanie wbudowanego systemu Linux…</string>
     <string name="account_installing_tools">Instalowanie narzędzi…</string>
     <string name="account_downloading_claude">Pobieranie Claude Code (ok. 230 MB)…</string>
@@ -606,6 +615,7 @@
     <string name="models_default_claude">Claude Code wybiera go na podstawie twojego planu; pojawi się tu po pierwszej wiadomości</string>
     <string name="models_default_codex">Codex wybiera go sam; pojawi się tu po następnej odpowiedzi</string>
     <string name="models_default_opencode">Domyślny model OpenCode</string>
+    <string name="models_default_agy">Domyślny model Antigravity</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
     <string name="models_effort_auto">Auto</string>
     <string name="models_effort_low">Niski</string>

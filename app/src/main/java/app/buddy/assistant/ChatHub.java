@@ -161,7 +161,7 @@ final class ChatHub {
                 ses.running = false;
                 String err = lastError(ses);
                 add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
-                        + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
+                        + ses.brainName()
                         + ": " + err));
                 changed();
             }
@@ -290,6 +290,9 @@ final class ChatHub {
                 break;
             case "buddy_stopped":
                 add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_stopped));
+                break;
+            case "buddy_step": // a line from the helper under the steps (Antigravity: a refused step)
+                add(ses, Bubble.Kind.STEP, ev.optString("text"));
                 break;
             case "buddy_done":
                 if (ses.running) {

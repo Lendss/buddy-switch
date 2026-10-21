@@ -492,9 +492,11 @@
     <string name="signin_install_sub_claude">Claude Code\'u Buddy içinde Claude aboneliğinizle çalıştırır.</string>
     <string name="signin_install_sub_opencode">OpenCode\'u Buddy içinde çalıştırır. Ücretsiz modelleri hesap gerekmeden hemen çalışır; kendi sağlayıcılarınızı (Anthropic, OpenAI, GitHub Copilot…) istediğiniz zaman bağlayabilirsiniz.</string>
     <string name="signin_install_sub_codex">Codex\'i Buddy içinde ChatGPT planınızla çalıştırır.</string>
+    <string name="signin_install_sub_agy">Google\'ın Antigravity CLI aracını Buddy içinde Google hesabınızla çalıştırır: ücretsiz plan, Google AI Pro veya Ultra.</string>
     <string name="signin_install_size_claude">Bir kerelik yaklaşık 235 MB indirir: Buddy\'nin Linux\'u ve Anthropic\'ten Claude Code. Mümkünse Wi-Fi kullanın.</string>
     <string name="signin_install_size_opencode">Bir kerelik yaklaşık 230 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenCode. Mümkünse Wi-Fi kullanın.</string>
     <string name="signin_install_size_codex">Bir kerelik yaklaşık 150 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenAI\'dan Codex. Mümkünse Wi-Fi kullanın.</string>
+    <string name="signin_install_size_agy">Bir kerelik yaklaşık 200 MB indirir: Buddy\'nin Linux\'u ve Google\'dan Antigravity CLI. Mümkünse Wi-Fi kullanın.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Yükleniyor</string>
@@ -504,10 +506,13 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">Claude\'a giriş yapın</string>
     <string name="signin_title_chatgpt">ChatGPT\'ye giriş yapın</string>
+    <string name="signin_title_google">Google\'a giriş yapın</string>
     <string name="signin_sub_claude">Claude hesabınızı kullanın (Pro veya Max). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="signin_sub_chatgpt">ChatGPT hesabınızı kullanın (Plus, Pro veya Business). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
+    <string name="signin_sub_agy">Google hesabınızı kullanın. Tarayıcınız açılır; orada giriş yapın, Buddy kodu kendiliğinden alır. Antigravity yaklaşık bir dakika bekler.</string>
     <string name="signin_with_claude">Claude ile giriş yap</string>
     <string name="signin_with_chatgpt">ChatGPT ile giriş yap</string>
+    <string name="signin_with_google">Google ile giriş yap</string>
     <string name="signin_other_device">Başka bir cihazda giriş yap</string>
     <string name="signin_with_code">Kodla giriş yap</string>
 
@@ -517,6 +522,7 @@
     <string name="signin_approve_title">Tarayıcınızda onaylayın</string>
     <string name="signin_approve_claude">Claude sayfasında Yetkilendir düğmesine dokunun. Buddy kodu alır ve kendiliğinden geri döner.</string>
     <string name="signin_approve_codex">Giriş yapın ve Codex\'e izin verin. Ardından Buddy\'ye dönün; işlemi kendisi tamamlar.</string>
+    <string name="signin_approve_agy">Giriş yapın ve Antigravity\'ye izin verin. Buddy sayfada görünen kodu alır ve kendiliğinden geri döner. Bir dakikadan uzun sürerse girişi yeniden başlatın.</string>
     <string name="signin_open_again">Giriş sayfasını yeniden aç</string>
     <string name="signin_signing_in">Giriş yapılıyor</string>
     <string name="signin_finishing">Giriş tamamlanıyor…</string>
@@ -526,6 +532,7 @@
     <string name="signin_remote_claude">Bu bağlantıyı herhangi bir cihazda açıp onaylayın. Ardından sayfada görünen kodu kopyalayıp aşağıya yapıştırın.</string>
     <string name="signin_enter_code">Bu kodu girin</string>
     <string name="signin_remote_codex">Herhangi bir cihazda aşağıdaki bağlantıyı açın, ChatGPT\'ye giriş yapın ve kodu girin. Buddy işlemi kendisi tamamlar.</string>
+    <string name="signin_remote_agy">Bu bağlantıyı herhangi bir cihazda açıp giriş yapın. Ardından sayfada görünen kodu kopyalayıp yaklaşık bir dakika içinde aşağıya yapıştırın.</string>
     <string name="signin_copy_code">Kodu kopyala</string>
     <string name="signin_code_copied">Kod kopyalandı</string>
     <string name="signin_code_expiry">Kod 15 dakika geçerlidir.</string>
@@ -540,6 +547,7 @@
     <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
     <string name="signin_paste_instead">Bunun yerine kodu yapıştırın</string>
     <string name="signin_paste_help">Buddy kendiliğinden geri dönmezse: Claude sayfasında Kodu kopyala düğmesine dokunun, ardından kodu buraya yapıştırın.</string>
+    <string name="signin_paste_help_agy">Buddy kendiliğinden geri dönmezse: Antigravity sayfasında “Copy to Clipboard” düğmesine dokunun, ardından kodu buraya yapıştırın.</string>
     <string name="signin_code_hint">kod</string>
     <string name="signin_use_code">Kullan</string>
     <string name="signin_start_again">Önce girişi yeniden başlatın.</string>
@@ -569,6 +577,7 @@
     <string name="account_tagline_claude">Claude planınızı kullanır</string>
     <string name="account_tagline_opencode">Ücretsiz modeller veya kendi sağlayıcılarınız</string>
     <string name="account_tagline_codex">ChatGPT planınızı kullanır</string>
+    <string name="account_tagline_agy">Google hesabınızı kullanır</string>
     <string name="account_setting_up_linux">Buddy\'nin Linux\'u hazırlanıyor…</string>
     <string name="account_installing_tools">Araçlar yükleniyor…</string>
     <string name="account_downloading_claude">Claude Code indiriliyor (yaklaşık 230 MB)…</string>
@@ -590,6 +599,7 @@
     <string name="models_default_claude">Claude Code planınıza göre seçer; ilk mesajdan sonra burada gösterilir</string>
     <string name="models_default_codex">Codex kendisi seçer; bir sonraki yanıttan sonra burada gösterilir</string>
     <string name="models_default_opencode">OpenCode\'un varsayılan modeli</string>
+    <string name="models_default_agy">Antigravity\'nin varsayılan modeli</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
     <string name="models_effort_auto">Oto</string>
     <string name="models_effort_low">Düşük</string>

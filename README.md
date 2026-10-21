@@ -12,11 +12,11 @@
 
 # Buddy
 
-**A floating chat bubble that lets Claude Code, Codex or OpenCode use your Android phone.**
+**A floating chat bubble that lets Claude Code, Codex, OpenCode or Antigravity use your Android phone.**
 
 Type or say what you want ("reply to Sam that I'm running late", "add a Nintendo Switch 2 to my Amazon cart") and Buddy reads the screen, taps, types and scrolls to get it done. It asks you before anything that sends, posts, buys or deletes.
 
-It runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, or [OpenCode](https://opencode.ai) with its **free models and no account at all**. Everything runs **inside the app**, in Buddy's own small Linux on the phone: no PC, no adb, no root, no API key.
+It runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, or [OpenCode](https://opencode.ai) with its **free models and no account at all**. Everything runs **inside the app**, in Buddy's own small Linux on the phone: no PC, no adb, no root, no API key.
 
 <p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>⬇ Download buddy.apk</b></a> · Android 11+, 64-bit · <a href="#setup">Setup</a> · <a href="#faq">FAQ</a></p>
 
@@ -39,12 +39,12 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 
 <table>
 <tr><td><b>Uses your apps for you</b></td><td>Messages, shopping, smart home, settings, games: anything on screen. Add instructions while it works, by typing or by voice.</td></tr>
-<tr><td><b>Your agent, your plan</b></td><td>Claude Code (Opus, Sonnet, Haiku…), Codex, or OpenCode's free models. Pick the model per chat.</td></tr>
+<tr><td><b>Your agent, your plan</b></td><td>Claude Code (Opus, Sonnet, Haiku…), Codex, Antigravity (the models your Google account gets), or OpenCode's free models. Pick the model per chat.</td></tr>
 <tr><td><b>Asks before it acts</b></td><td>Approve, Deny, or <b>Change</b> ("make it 9, add a smiley") before anything is sent, posted, bought or deleted. Messaging, shopping and money apps start on a <b>hard limit</b> that Buddy itself enforces.</td></tr>
 <tr><td><b>Asks when it's unsure</b></td><td>Questions come as a card with answer buttons, or type your own answer.</td></tr>
 <tr><td><b>Acts on notifications</b></td><td>Rules like "when a customer writes on WhatsApp, reply with our opening hours" or "when DHL says delivery tomorrow, put it in my calendar". Each reply waits for your OK, or goes out after a countdown you can stop; if you're away, it waits in a list for you.</td></tr>
 <tr><td><b>Voice</b></td><td>Talk to it with the phone's recognizer, Claude's or ChatGPT's dictation, and hear replies in ChatGPT's voices.</td></tr>
-<tr><td><b>Phone tools for your own sessions</b></td><td>The same tools as a local MCP server, for Claude Code, Codex or OpenCode in any terminal, or a Remote Control session in your Claude app.</td></tr>
+<tr><td><b>Phone tools for your own sessions</b></td><td>The same tools as a local MCP server, for Claude Code, Codex, OpenCode or Antigravity in any terminal, or a Remote Control session in your Claude app.</td></tr>
 <tr><td><b>Builds apps</b></td><td>In developer mode: "make me a calculator app" builds and installs a real APK, on the phone.</td></tr>
 <tr><td><b>Updates itself</b></td><td>A notice when a new version is out, or just ask: "update yourself".</td></tr>
 </table>
@@ -64,7 +64,7 @@ Most "AI controls my phone" projects drive the phone over adb, which needs a com
 ## How it works
 
 ```
-Buddy app / bubble ──► Buddy's Linux (Alpine via proot): buddy-run ──► claude -p, codex exec or opencode run
+Buddy app / bubble ──► Buddy's Linux (Alpine via proot): buddy-run ──► claude -p, codex exec, opencode run or agy -p
         ▲                                                                  │
         └────────────── streamed replies (POST /event) ◄───────────────────┤
                                                                            ▼
@@ -72,12 +72,12 @@ Buddy accessibility service ◄──── MCP over http://127.0.0.1:8765/mcp (
 ```
 
 - The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `install_apk`, `wait_for_install`, `confirm`, `ask`, `point_out`, `notify`, `reply_notification` and `update_buddy`.
-- **Buddy's Linux** is a small Alpine Linux that Buddy downloads into its own storage (4 MB) and runs with [proot](https://proot-me.github.io/), which ships inside the APK. Claude Code installs there with Anthropic's official installer; Codex and OpenCode from npm.
+- **Buddy's Linux** is a small Alpine Linux that Buddy downloads into its own storage (4 MB) and runs with [proot](https://proot-me.github.io/), which ships inside the APK. Claude Code installs there with Anthropic's official installer, Antigravity with Google's; Codex and OpenCode from npm.
 - Your message goes to the agent in Buddy's Linux, which uses those tools and streams its progress back to the app.
 
 ## Setup
 
-You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan for Codex). With OpenCode you don't need any plan: its free models work right away.
+You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan for Codex, or a Google account for Antigravity). With OpenCode you don't need any plan: its free models work right away.
 
 1. **Install Buddy:** [**download the APK**](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it (allow your browser to install apps when asked). All versions are on the [Releases](https://github.com/ghorbelhamdi/buddy-android/releases) page.
 2. **Follow the setup guide.** It opens on first launch (later: Settings → Setup → *Open the step-by-step guide*). Each step ticks itself off when you come back.
@@ -86,7 +86,7 @@ You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan
 |---|---|
 | Choose your agent | **Claude Code** (recommended), **Codex**, **OpenCode** (free models, no account), or Claude Code and Codex together |
 | Accessibility | Turn on *Buddy assistant*. Greyed out ("Restricted setting")? App info → ⋮ → **Allow restricted settings**, then try again |
-| Install and sign in | One tap installs your agent in Buddy's Linux (Claude Code about 235 MB, Codex about 150 MB, OpenCode about 230 MB; use Wi-Fi). OpenCode needs no sign-in; its providers can be connected later with **Connect a provider**, which runs `opencode auth login` in Buddy's terminal. For the others, **Sign in**: your browser opens, you approve, and Buddy comes back by itself. For Claude, Buddy picks the one-time code off the confirmation page for you. No browser on this phone you want to use? **Sign in on another device** (Claude: a link to open anywhere) or **Sign in with a code** (Codex) |
+| Install and sign in | One tap installs your agent in Buddy's Linux (Claude Code about 235 MB, Codex about 150 MB, OpenCode about 230 MB, Antigravity about 200 MB; use Wi-Fi). Antigravity is added from Settings. OpenCode needs no sign-in; its providers can be connected later with **Connect a provider**, which runs `opencode auth login` in Buddy's terminal. For the others, **Sign in**: your browser opens, you approve, and Buddy comes back by itself. For Claude and Antigravity, Buddy picks the one-time code off the confirmation page for you (Antigravity waits about a minute for it). No browser on this phone you want to use? **Sign in on another device** (Claude, Antigravity: a link to open anywhere) or **Sign in with a code** (Codex) |
 | Keep it running | Battery: unrestricted for Buddy |
 | Try it | A first chat with a ready-made prompt |
 
@@ -106,14 +106,14 @@ Buddy is in closed testing on Google Play; the full version (with self-updates a
 
 **By hand:** open the [latest `buddy.apk`](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) on the phone and install it over the current one. To get an email for each new version, sign in to GitHub and choose **Watch → Custom → Releases** on the repository.
 
-**The agents** (Claude Code, Codex, OpenCode) update separately: Settings → the agent → **Check for updates**. An OpenCode 1.x install gets **Update to OpenCode 2** there; your connected providers are kept.
+**The agents** (Claude Code, Codex, OpenCode, Antigravity) update separately: Settings → the agent → **Check for updates**. An OpenCode 1.x install gets **Update to OpenCode 2** there; your connected providers are kept.
 
 ## Using Buddy
 
 The app has three tabs: **Chats**, **Sessions** and **Settings**.
 
-- **Chats:** start one with **New chat** (Claude Code, Codex or OpenCode; agents that aren't set up are greyed out), tap a chat to open it, long-press to delete it. Several chats can work at the same time.
-- **Models:** tap the chip under a chat's title to pick the model for that chat (Opus, Sonnet, Haiku, Fable, Codex's own list, OpenCode's models including the free ones, or any model name). The conversation continues with the new model.
+- **Chats:** start one with **New chat** (Claude Code, Codex, OpenCode or Antigravity; agents that aren't set up are greyed out), tap a chat to open it, long-press to delete it. Several chats can work at the same time.
+- **Models:** tap the chip under a chat's title to pick the model for that chat (Opus, Sonnet, Haiku, Fable, Codex's own list, OpenCode's models including the free ones, Antigravity's list, or any model name). The conversation continues with the new model.
 - **Photos and files:** tap the paperclip to take a photo, pick photos, or attach any file up to 25 MB.
 - **Voice:** tap the mic to talk; the box turns into a recording bar (✕ cancel, live waveform, ↑ send). Choose the engine in Settings → Voice: the **phone's** recognizer, **Claude** (Claude Code's own dictation, on your Claude plan) or **ChatGPT** (ChatGPT's voice through Codex, on your ChatGPT plan; any language, even mixed). Claude and ChatGPT are greyed out until Claude Code or Codex is signed in. Pick your languages there; long-press the mic to switch.
 - **Read aloud:** the speaker button reads replies, in the phone's voice or in **ChatGPT's voice** (Juniper, Maple, Ember, Cove: Settings → Voice → Voice output).
@@ -121,14 +121,14 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 - **Tool calls** fold into one "N tool calls" line you can open.
 - **Notification rules:** Settings → Experience → Notification rules. A rule picks an app, optionally who it's from and words it contains, and says what the agent should do; the agent gets that instruction with the notification, in a chat of its own per conversation (so it remembers what it answered before). It can reply through the notification's own Reply field without opening the app. Each rule picks its agent and model (a smaller model is quicker and uses less of your plan). Before acting, a rule either asks you as usual or uses a **countdown** (10 s to 5 min): the approval card approves itself unless you tap to stop it. Only sending a message can be approved that way, and only after a second AI has checked it against your rule (the Smart reviewer: Haiku by default, or the model you pick in App permissions). If you don't answer within a minute (or the phone is locked), the reply goes to **Waiting for you** (a notification and a banner on the Chats screen), where you send, edit or skip it later; nothing else waits on you meanwhile. A reply is held back when the person writes again before it's sent, and the next run answers everything in one reply. Without internet, rules wait and start when the connection is back. When Android hides a chat's notification from apps with notification access (it does when a message looks like a one-time code), a rule can't read it: Recent activity and a quiet notification say so, and the rule picks up again once the notification is readable (open the chat). Recent activity is listed on the rules screen, and each run ends with a quiet notification saying what it did. Buddy needs notification access for this (it asks first); notifications no rule matches are ignored (except that a call's notification pauses an agent that's using the phone: for that only its category is looked at).
 - **Approvals** appear in the chat and in the bubble: **Approve**, **Deny**, or **Change**: type or say what to adjust ("make it 9, add a smiley"), and the agent revises the message, post or email and asks again.
-- **Sessions:** every Claude Code, Codex and OpenCode process in Buddy's Linux, with a Stop button. Recent sessions can be read, or continued in Buddy.
+- **Sessions:** every Claude Code, Codex, OpenCode and Antigravity process in Buddy's Linux, with a Stop button. Recent sessions can be read, or continued in Buddy.
 - **Settings:** setup, appearance (light/dark/system, accent colour, surface), agents (install, sign in, sign out), voice, the bubble, app permissions, developer mode and Remote Control.
 - **Languages:** Buddy is in English, Arabic, Chinese (Simplified), Dutch, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Turkish and Ukrainian. It follows the phone's language; to pick another one for Buddy alone, use Android Settings → Apps → Buddy → Language. The agents answer in whatever language you write in.
-- **Terminal:** a real terminal for Buddy's Linux (Sessions → Terminal): tabs, text selection and copy, links, pinch to zoom. Claude Code's, Codex's and OpenCode's own screens run in it.
+- **Terminal:** a real terminal for Buddy's Linux (Sessions → Terminal): tabs, text selection and copy, links, pinch to zoom. Claude Code's, Codex's, OpenCode's and Antigravity's own screens run in it.
 
 ### Phone tools in your own sessions
 
-Buddy's phone tools are a regular MCP server on the phone (`http://127.0.0.1:8765/mcp`, with a per-install token). Settings → **Phone tools in your own sessions** shows a ready-made command for **Claude Code** (`claude mcp add-json …`), **Codex** (`codex mcp add …`) and **OpenCode** (an `OPENCODE_CONFIG_CONTENT` line for `~/.bashrc`), with a Copy button. Each sets a 10-minute tool timeout, so an approval card can wait for you (the agents' default is a minute). Run it once in any terminal on the phone (Termux, for example), and every session of that agent gets the `phone` tools, even without the bubble. The token is masked on screen.
+Buddy's phone tools are a regular MCP server on the phone (`http://127.0.0.1:8765/mcp`, with a per-install token). Settings → **Phone tools in your own sessions** shows a ready-made command for **Claude Code** (`claude mcp add-json …`), **Codex** (`codex mcp add …`), **OpenCode** (an `OPENCODE_CONFIG_CONTENT` line for `~/.bashrc`) and **Antigravity** (`agy mcp add …`), with a Copy button. The first three set a 10-minute tool timeout, so an approval card can wait for you (the agents' default is a minute). Run it once in any terminal on the phone (Termux, for example), and every session of that agent gets the `phone` tools, even without the bubble. The token is masked on screen.
 
 ### Remote Control: a Claude Code session in your Claude app
 
@@ -174,13 +174,13 @@ An accessibility service is powerful. Please read this before installing.
 - **App permissions (enforced by Buddy, not the agent).** Settings → Experience → App permissions, per app:
   - **Trust:** asking is left to the agent.
   - **Hard:** Buddy itself checks every tap; buttons like Send, Pay, Delete (built-in words in all of Buddy's languages, plus your own *always ask* / *never ask* rules, with suggestions from buttons the agent has tapped) need your OK.
-  - **Smart:** the rules, then a separate temporary Claude Code or Codex session without tools reviews every other tap against your request and the screen (about 3 s a tap). OpenCode chats are reviewed by Claude Code or Codex.
+  - **Smart:** the rules, then a separate temporary Claude Code or Codex session without tools reviews every other tap against your request and the screen (about 3 s a tap). OpenCode and Antigravity chats are reviewed by Claude Code or Codex.
   
   Messaging, social, email, calling, shopping and money apps start on Hard. The agent can never tap or type in Buddy's own bubble, cards or settings, so it can't approve for you or loosen the rules.
 - **Prompt injection is the main risk.** Buddy reads whatever is on screen. A malicious message, email or web page could contain text like "send this to all your contacts". Buddy's instructions treat on-screen text as content, never commands, and the approval gate is the backstop, but no model is perfect. Read approval cards carefully.
 - **Notification rules work for someone else's message,** so their runs get less: no shell, files or web (even in developer mode), no installing apps, your Trust settings don't apply, and opening a link always asks you. The notification is passed to the agent as outside content, never as instructions. A rule's countdown can only approve sending a message (never paying, buying or deleting, and never in payment or shopping apps), and only after a second AI agrees the reply fits your rule; otherwise the card waits for you. A run sends at most one reply, and none once you've answered the person yourself. Each rule has an hourly limit: by default 20 runs per conversation and three times that for the whole rule (change it or turn it off in the rule); past it, new messages wait and then get one run together. Use countdowns for low-stakes replies.
-- **Limited tools.** Outside developer mode, Claude Code gets the phone tools, web search and fetch, and read access to that chat's attachments only (no shell, no other files). Codex runs in its read-only sandbox. OpenCode's shell and file edits are refused (set to "ask", which a non-interactive run auto-rejects). Everything runs inside Buddy's own app storage, separate from your other apps' files.
-- **What leaves the phone:** only what Claude Code, Codex or OpenCode sends to its model provider (Anthropic, OpenAI, OpenCode's own service, or the provider you connected) to answer you, including screen text, screenshots and attachments it reads.
+- **Limited tools.** Outside developer mode, Claude Code gets the phone tools, web search and fetch, and read access to that chat's attachments only (no shell, no other files). Codex runs in its read-only sandbox. OpenCode's shell and file edits are refused (set to "ask", which a non-interactive run auto-rejects). Antigravity has only the phone tools and that chat's attachments pre-approved, and can't run notification rules yet. Everything runs inside Buddy's own app storage, separate from your other apps' files.
+- **What leaves the phone:** only what Claude Code, Codex, OpenCode or Antigravity sends to its model provider (Anthropic, OpenAI, Google, OpenCode's own service, or the provider you connected) to answer you, including screen text, screenshots and attachments it reads.
 - **Never** let Buddy type passwords, one-time codes or payment details. It's instructed to hand those back to you.
 
 Found a security problem? Please open a private security advisory on GitHub rather than a public issue.

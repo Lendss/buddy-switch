@@ -19,8 +19,8 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /**
- * Install an agent (Claude Code, Codex or OpenCode) in Buddy's built-in Linux and sign in: one button, approve in the
- * browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
+ * Install an agent (Claude Code, Codex, OpenCode or Antigravity) in Buddy's built-in Linux and sign in: one button,
+ * approve in the browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
  */
 public class SignInActivity extends Screen implements Account.Listener {
     private LinearLayout body, bottom;
@@ -103,9 +103,11 @@ public class SignInActivity extends Screen implements Account.Listener {
                 header(R.drawable.ms_terminal, getString(R.string.signin_install, acc.name()), getString(acc.claude()
                         ? R.string.signin_install_sub_claude
                         : acc.opencode() ? R.string.signin_install_sub_opencode
+                        : acc.agy() ? R.string.signin_install_sub_agy
                         : R.string.signin_install_sub_codex), false);
                 note(getString(acc.claude() ? R.string.signin_install_size_claude
                         : acc.opencode() ? R.string.signin_install_size_opencode
+                        : acc.agy() ? R.string.signin_install_size_agy
                         : R.string.signin_install_size_codex));
                 primary(getString(R.string.signin_install, acc.name()), v -> acc.install(this));
                 break;
@@ -120,10 +122,13 @@ public class SignInActivity extends Screen implements Account.Listener {
                     openCodeReady();
                     break;
                 }
-                header(R.drawable.ms_shield_person, getString(acc.claude() ? R.string.signin_title_claude : R.string.signin_title_chatgpt),
-                        getString(acc.claude() ? R.string.signin_sub_claude : R.string.signin_sub_chatgpt), false);
-                primary(getString(acc.claude() ? R.string.signin_with_claude : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
-                secondary(getString(acc.claude() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
+                header(R.drawable.ms_shield_person, getString(acc.claude() ? R.string.signin_title_claude
+                                : acc.agy() ? R.string.signin_title_google : R.string.signin_title_chatgpt),
+                        getString(acc.claude() ? R.string.signin_sub_claude : acc.agy() ? R.string.signin_sub_agy
+                                : R.string.signin_sub_chatgpt), false);
+                primary(getString(acc.claude() ? R.string.signin_with_claude : acc.agy() ? R.string.signin_with_google
+                        : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
+                secondary(getString(acc.pastesCode() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
@@ -140,12 +145,12 @@ public class SignInActivity extends Screen implements Account.Listener {
                 }
                 openBrowserOnce();
                 header(R.drawable.ms_shield_person, getString(R.string.signin_approve_title), getString(acc.claude()
-                        ? R.string.signin_approve_claude : R.string.signin_approve_codex), false);
+                        ? R.string.signin_approve_claude : acc.agy() ? R.string.signin_approve_agy : R.string.signin_approve_codex), false);
                 primary(getString(R.string.signin_open_again), v -> {
                     openedUrl = null;
                     openBrowserOnce();
                 });
-                if (acc.claude()) pasteBox();
+                if (acc.pastesCode()) pasteBox();
                 secondary(getString(android.R.string.cancel), v -> acc.cancelLogin());
                 break;
             case FINISHING:
@@ -207,9 +212,9 @@ public class SignInActivity extends Screen implements Account.Listener {
     /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */
     private void remoteSignIn() {
         final String link = acc.url;
-        if (acc.claude()) {
+        if (acc.pastesCode()) {
             header(R.drawable.ms_shield_person, getString(R.string.signin_other_device),
-                    getString(R.string.signin_remote_claude), false);
+                    getString(acc.agy() ? R.string.signin_remote_agy : R.string.signin_remote_claude), false);
         } else {
             header(R.drawable.ms_shield_person, getString(R.string.signin_enter_code),
                     getString(R.string.signin_remote_codex), false);
@@ -234,7 +239,7 @@ public class SignInActivity extends Screen implements Account.Listener {
         }
         TextView l = monoText(this, link, 13, ACCENT_TEXT);
         l.setTextIsSelectable(true);
-        l.setMaxLines(acc.claude() ? 3 : 2);
+        l.setMaxLines(acc.pastesCode() ? 3 : 2);
         l.setEllipsize(android.text.TextUtils.TruncateAt.END);
         l.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
         l.setBackground(outlined(this, BG, 12, OUTLINE, 1));
@@ -265,7 +270,7 @@ public class SignInActivity extends Screen implements Account.Listener {
         LinearLayout.LayoutParams bp = full();
         bp.topMargin = dp(this, 10);
         body.addView(btns, bp);
-        if (acc.claude()) pasteBox();
+        if (acc.pastesCode()) pasteBox();
         secondary(getString(android.R.string.cancel), v -> acc.cancelLogin());
     }
 
@@ -303,7 +308,7 @@ public class SignInActivity extends Screen implements Account.Listener {
         });
         c.addView(head, full());
         if (pasteOpen) {
-            c.addView(text(this, getString(R.string.signin_paste_help), 14, MUTED));
+            c.addView(text(this, getString(acc.agy() ? R.string.signin_paste_help_agy : R.string.signin_paste_help), 14, MUTED));
             LinearLayout r = row(this);
             r.setPaddingRelative(0, dp(this, 10), 0, 0);
             EditText et = new EditText(this);

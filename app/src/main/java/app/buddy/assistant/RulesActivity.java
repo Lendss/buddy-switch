@@ -58,7 +58,7 @@ public class RulesActivity extends Screen {
             Rules.Rule r = edit.isEmpty() ? null : Rules.find(this, edit);
             isNew = r == null;
             draft = r == null ? new Rules.Rule() : r;
-            if (isNew) draft.backend = Prefs.backend(this);
+            if (isNew) draft.backend = Account.of(Prefs.backend(this)).runsRules() ? Prefs.backend(this) : "claude";
         }
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
@@ -286,12 +286,13 @@ public class RulesActivity extends Screen {
 
         body.addView(label(getString(R.string.rules_agent)), gap(20));
         java.util.Set<String> notReady = new java.util.HashSet<>();
-        String[][] agents = new String[Account.ALL.length][];
-        for (int i = 0; i < Account.ALL.length; i++) {
-            Account a = Account.ALL[i];
-            agents[i] = new String[]{a.agent, a.name()};
+        java.util.List<String[]> runners = new java.util.ArrayList<>();
+        for (Account a : Account.ALL) {
+            if (!a.runsRules()) continue;
+            runners.add(new String[]{a.agent, a.name()});
             if (!SetupState.signedIn(this, a.agent)) notReady.add(a.agent);
         }
+        String[][] agents = runners.toArray(new String[0][]);
         final FrameLayout agentSlot = new FrameLayout(this);
         final Runnable[] paintAgent = new Runnable[1];
         paintAgent[0] = () -> {

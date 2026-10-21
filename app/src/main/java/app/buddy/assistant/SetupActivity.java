@@ -62,6 +62,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
+        Account.AGY.refresh(this);
         render();
     }
 
@@ -197,7 +198,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         TextView brainInfo = text(this, getString(R.string.setup_default_brain_info), 13, MUTED);
         brainInfo.setPaddingRelative(0, dp(this, 2), 0, 0);
         ag.addView(brainInfo);
-        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}},
+        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"},
+                        {"agy", "Antigravity"}},
                 backend, false, v -> {
                     Prefs.setBackend(this, v);
                     Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(v)),
@@ -215,7 +217,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout mcp = card();
         mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         mcp.addView(text(this, getString(R.string.setup_phone_tools_info), 14, MUTED));
-        mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"}},
+        mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"},
+                        {"agy", "agy"}},
                 mcpAgent, true, v -> {
                     mcpAgent = v;
                     render();
@@ -234,6 +237,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 ? "echo 'export OPENCODE_CONFIG_CONTENT='\\''{\"mcp\":{\"phone\":{\"type\":\"remote\",\"url\":\"" + url
                 + "\",\"oauth\":false,\"timeout\":600000,\"headers\":{\"Authorization\":\"Bearer " + token
                 + "\"}}}}'\\''' >> ~/.bashrc && . ~/.bashrc"
+                : "agy".equals(mcpAgent)
+                // Antigravity keeps it in ~/.gemini/config/mcp_config.json
+                ? "agy mcp add --header 'Authorization: Bearer " + token + "' phone " + url
                 // add-json refuses a name that's already there, so the earlier setup goes first (run again to update)
                 : "claude mcp remove -s user phone >/dev/null 2>&1; claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
                 + "\",\"headers\":{\"Authorization\":\"Bearer " + token + "\"},\"timeout\":600000}'";

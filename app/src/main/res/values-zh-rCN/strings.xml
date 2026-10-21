@@ -701,10 +701,12 @@
     <string name="signin_install_sub_claude">在 Buddy 中通过你的 Claude 订阅运行 Claude Code。</string>
     <string name="signin_install_sub_opencode">在 Buddy 中运行 OpenCode。免费模型立即可用，无需账号；也可以随时连接你自己的模型提供商（Anthropic、OpenAI、GitHub Copilot…）。</string>
     <string name="signin_install_sub_codex">在 Buddy 中通过你的 ChatGPT 套餐运行 Codex。</string>
+    <string name="signin_install_sub_agy">在 Buddy 中通过你的 Google 账号运行 Google 的 Antigravity CLI：免费套餐、Google AI Pro 或 Ultra 均可。</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">需一次性下载约 235 MB：Buddy 的 Linux，以及来自 Anthropic 的 Claude Code。建议使用 WLAN。</string>
     <string name="signin_install_size_opencode">需一次性下载约 230 MB：Buddy 的 Linux、Node.js 和 OpenCode。建议使用 WLAN。</string>
     <string name="signin_install_size_codex">需一次性下载约 150 MB：Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex。建议使用 WLAN。</string>
+    <string name="signin_install_size_agy">需一次性下载约 200 MB：Buddy 的 Linux，以及来自 Google 的 Antigravity CLI。建议使用 WLAN。</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">正在安装</string>
@@ -714,11 +716,14 @@
     <!-- Sign-in screen: installed, not signed in. -->
     <string name="signin_title_claude">登录 Claude</string>
     <string name="signin_title_chatgpt">登录 ChatGPT</string>
+    <string name="signin_title_google">登录 Google</string>
     <string name="signin_sub_claude">使用你的 Claude 账号（Pro 或 Max）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
     <string name="signin_sub_chatgpt">使用你的 ChatGPT 账号（Plus、Pro 或 Business）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <string name="signin_sub_agy">使用你的 Google 账号。浏览器会打开，在那里登录后，Buddy 会自动获取代码。Antigravity 会等待约 1 分钟。</string>
     <!-- Main button. -->
     <string name="signin_with_claude">使用 Claude 登录</string>
     <string name="signin_with_chatgpt">使用 ChatGPT 登录</string>
+    <string name="signin_with_google">使用 Google 登录</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">在其他设备上登录</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -733,6 +738,7 @@
     <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_approve_claude">在 Claude 页面上点按“Authorize”（授权）。Buddy 会自动获取代码并返回。</string>
     <string name="signin_approve_codex">登录并允许 Codex 访问，然后返回 Buddy，它会自动完成。</string>
+    <string name="signin_approve_agy">登录并允许 Antigravity 访问。Buddy 会自动获取页面上显示的代码并返回。如果超过 1 分钟，请重新开始登录。</string>
     <!-- Button. -->
     <string name="signin_open_again">重新打开登录页面</string>
     <!-- Screen title after the code was handed over. -->
@@ -747,6 +753,7 @@
     <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
     <string name="signin_enter_code">输入此代码</string>
     <string name="signin_remote_codex">在任意设备上打开下方链接，登录 ChatGPT 并输入代码。Buddy 会自动完成。</string>
+    <string name="signin_remote_agy">在任意设备上打开此链接并登录，然后复制页面上显示的代码，在约 1 分钟内粘贴到下方。</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">复制代码</string>
     <string name="signin_code_copied">代码已复制</string>
@@ -767,6 +774,7 @@
     <string name="signin_paste_instead">改为粘贴代码</string>
     <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
     <string name="signin_paste_help">如果 Buddy 没有自动返回：请在 Claude 页面上点按“Copy Code”（复制代码），然后粘贴到这里。</string>
+    <string name="signin_paste_help_agy">如果 Buddy 没有自动返回：请在 Antigravity 页面上点按“Copy to Clipboard”（复制到剪贴板），然后将代码粘贴到这里。</string>
     <!-- Hint inside the empty text box for the code. Lowercase in English. -->
     <string name="signin_code_hint">代码</string>
     <!-- Short button next to the text box: use the pasted code. Verb. -->
@@ -812,6 +820,7 @@
     <string name="account_tagline_claude">使用你的 Claude 套餐</string>
     <string name="account_tagline_opencode">免费模型，或你自己的提供商</string>
     <string name="account_tagline_codex">使用你的 ChatGPT 套餐</string>
+    <string name="account_tagline_agy">使用你的 Google 账号</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">正在设置 Buddy 的 Linux…</string>
     <string name="account_installing_tools">正在安装工具…</string>
@@ -848,6 +857,7 @@
     <string name="models_default_claude">由 Claude Code 根据你的套餐选择；发送第一条消息后会显示在这里</string>
     <string name="models_default_codex">由 Codex 选择；下次回复后会显示在这里</string>
     <string name="models_default_opencode">OpenCode 的默认模型</string>
+    <string name="models_default_agy">Antigravity 的默认模型</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">自动</string>

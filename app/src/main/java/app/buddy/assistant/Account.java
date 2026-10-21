@@ -18,10 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * One agent (Claude Code, Codex or OpenCode) inside Buddy's built-in Linux: install it, sign in, check the account.
- * Claude Code's sign-in shows a one-time code in the browser; Buddy reads it off the screen (accessibility),
- * the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by itself.
- * OpenCode needs no sign-in (its free models work right away); providers are connected in the terminal.
+ * One agent (Claude Code, Codex, OpenCode or Antigravity) inside Buddy's built-in Linux: install it, sign in, check
+ * the account. Claude Code's and Antigravity's sign-ins show a one-time code in the browser; Buddy reads it off the
+ * screen (accessibility), the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by
+ * itself. OpenCode needs no sign-in (its free models work right away); providers are connected in the terminal.
  */
 final class Account {
     enum Step { CHECKING, NEED_INSTALL, INSTALLING, SIGNED_OUT, WAITING_BROWSER, FINISHING, SIGNED_IN, ERROR }
@@ -33,20 +33,26 @@ final class Account {
     static final Account CLAUDE = new Account("claude");
     static final Account CODEX = new Account("codex");
     static final Account OPENCODE = new Account("opencode");
-    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE};
+    static final Account AGY = new Account("agy");
+    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE, AGY};
 
     static Account of(String agent) {
-        return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : CLAUDE;
+        return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : "agy".equals(agent) ? AGY : CLAUDE;
     }
 
-    /** The agent's display name: "Claude Code", "Codex" or "OpenCode". */
+    /** Is this one of Buddy's agents ("claude", "codex", "opencode" or "agy")? */
+    static boolean known(String agent) {
+        return of(agent).agent.equals(agent);
+    }
+
+    /** The agent's display name: "Claude Code", "Codex", "OpenCode" or "Antigravity". */
     static String nameOf(String agent) {
         return of(agent).name();
     }
 
-    /** Its command-line name, shown in mono labels: "claude-code", "codex" or "opencode". */
+    /** Its command-line name, shown in mono labels: "claude-code", "codex", "opencode" or "agy". */
     static String cliOf(String agent) {
-        return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "claude-code";
+        return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "agy".equals(agent) ? "agy" : "claude-code";
     }
 
     final String agent;
@@ -71,6 +77,7 @@ final class Account {
     private static final List<Listener> listeners = new ArrayList<>();
     private Process login;
     private OutputStream loginIn;
+    private volatile long codeSentAt;
 
     private Account(String agent) {
         this.agent = agent;
@@ -84,8 +91,12 @@ final class Account {
         return "opencode".equals(agent);
     }
 
+    boolean agy() {
+        return "agy".equals(agent);
+    }
+
     String name() {
-        return claude() ? "Claude Code" : opencode() ? "OpenCode" : "Codex";
+        return claude() ? "Claude Code" : opencode() ? "OpenCode" : agy() ? "Antigravity" : "Codex";
     }
 
     /** The plan to show: OpenCode's "free models" marker in the user's language, anything else as it is. */
@@ -96,7 +107,7 @@ final class Account {
     /** One line on what the agent runs on, for pickers. */
     String tagline() {
         return BuddyApp.str(claude() ? R.string.account_tagline_claude : opencode() ? R.string.account_tagline_opencode
-                : R.string.account_tagline_codex);
+                : agy() ? R.string.account_tagline_agy : R.string.account_tagline_codex);
     }
 
     static void addListener(Listener l) {
@@ -193,6 +204,41 @@ final class Account {
                             Models.setOpencode(a.toString());
                         }
                     }
+                } else if (agy()) {
+                    // signed in = its saved Google login (a file: Buddy's Linux has no keyring)
+                    String out = Linux.exec(app, "[ -x " + AGY_BIN + " ] || { echo NOTINSTALLED; exit 0; }; "
+                            + "[ -s " + AGY_TOKEN + " ] && echo AGY_SIGNED; echo VER=$(" + AGY_BIN + " --version 2>/dev/null)", 60);
+                    version = ver(out);
+                    if (out.contains("NOTINSTALLED")) {
+                        set(Step.NEED_INSTALL, "");
+                    } else if (out.contains("AGY_SIGNED")) {
+                        email = "";
+                        plan = "";
+                        set(Step.SIGNED_IN, "");
+                        // its model list (depends on the plan), for the model picker: one lookup at a time, at most
+                        // every 10 minutes (each screen refreshes the account; the helper's ping also updates it)
+                        long now = System.currentTimeMillis();
+                        if (agyModelsBusy || now - agyModelsAt < 600_000) return;
+                        agyModelsBusy = true;
+                        String list;
+                        try {
+                            list = Linux.exec(app, "timeout 40 " + AGY_BIN + " models 2>/dev/null", 50);
+                        } finally {
+                            agyModelsBusy = false;
+                        }
+                        org.json.JSONArray a = new org.json.JSONArray();
+                        for (String line : list.split("\n")) {
+                            String[] f = line.trim().split("\t");
+                            if (f.length == 2 && f[0].matches("[A-Za-z0-9._-]+")) a.put(new org.json.JSONArray().put(f[0]).put(f[1].trim()));
+                        }
+                        if (a.length() > 0) {
+                            agyModelsAt = now;
+                            Prefs.setAgyModels(app, a.toString());
+                            Models.setAgy(a.toString());
+                        }
+                    } else {
+                        set(Step.SIGNED_OUT, "");
+                    }
                 } else {
                     String out = Linux.exec(app, "command -v codex >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "codex login status 2>&1; echo VER=$(codex --version 2>/dev/null)", 60);
@@ -227,7 +273,8 @@ final class Account {
                     Helper.sync(app);
                     set(Step.INSTALLING, app.getString(R.string.account_installing_tools));
                     String o = Linux.exec(app, "apk update -q && apk add -q bash curl jq libgcc libstdc++ ripgrep git "
-                            + "ca-certificates procps coreutils findutils" + (claude() ? "" : " nodejs npm")
+                            + "ca-certificates procps coreutils findutils" + (claude() || agy() ? "" : " nodejs npm")
+                            + (agy() ? " util-linux-misc" : "") // script: Antigravity's sign-in needs a terminal
                             + " && echo TOOLS_OK", 900);
                     if (!o.contains("TOOLS_OK")) throw new IOException(tail(o));
                 }
@@ -235,6 +282,12 @@ final class Account {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading_claude));
                     String o = Linux.exec(app, "curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && bash /tmp/install.sh"
                             + " && /root/.local/bin/claude --version && echo AGENT_OK", 1800);
+                    if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                } else if (agy()) {
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    // Google's installer picks the Alpine (musl) build and puts agy in ~/.local/bin
+                    String o = Linux.exec(app, "curl -fsSL https://antigravity.google/cli/install.sh -o /tmp/agy-install.sh"
+                            + " && bash /tmp/agy-install.sh 2>&1 | tail -5 && " + AGY_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
@@ -269,6 +322,11 @@ final class Account {
     /** npm also fetches OpenCode's glibc build; Buddy's Alpine only runs the musl one, so drop the other (~200 MB). */
     private static final String OC_GLIBC = " rm -rf /usr/local/lib/node_modules/@opencode/cli/node_modules/@opencode/cli-linux-arm64;";
 
+    private static final String AGY_BIN = "/root/.local/bin/agy";
+    private static volatile boolean agyModelsBusy;
+    private static volatile long agyModelsAt;
+    private static final String AGY_TOKEN = "/root/.gemini/antigravity-cli/antigravity-oauth-token";
+
     private static String ver(String out) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("VER=\\D*(\\d+\\.\\d+\\.\\d+)").matcher(out);
         return m.find() ? m.group(1) : "";
@@ -295,6 +353,8 @@ final class Account {
             try {
                 if (claude()) {
                     o = Linux.exec(app, "/root/.local/bin/claude update 2>&1 | tail -3; echo VER=$(/root/.local/bin/claude --version)", 900);
+                } else if (agy()) {
+                    o = Linux.exec(app, AGY_BIN + " update 2>&1 | tail -3; echo VER=$(" + AGY_BIN + " --version)", 900);
                 } else if (opencode()) {
                     // Reinstalls only when npm has a newer version (1.x counts: OpenCode 2 is a new npm package that
                     // keeps 1.x's connected providers). The install removes the old copy first (OC_REMOVE), so it
@@ -331,7 +391,10 @@ final class Account {
         startLogin(c, false);
     }
 
-    /** remote = sign in on another device: Codex uses its device code; Claude shows its link to open elsewhere. */
+    /** remote = sign in on another device: Codex uses its device code; Claude and Antigravity show their link to open
+     *  elsewhere. Antigravity has no login command: a one-line prompt asks for the sign-in first, then answers. It only
+     *  offers the sign-in on a terminal ("no controlling terminal; cannot complete interactive login"), so it runs
+     *  under script, which gives it one. */
     void startLogin(Context c, boolean onOtherDevice) {
         app = c.getApplicationContext();
         if (busy() || opencode()) return; // OpenCode: providers are connected in the terminal (opencode auth login)
@@ -346,14 +409,30 @@ final class Account {
             try {
                 Process p = (claude()
                         ? Linux.builder(app, "/root/.local/bin/claude", "auth", "login", "--claudeai")
+                        : agy() ? Linux.builder(app, "/bin/sh", "-c", "command -v script >/dev/null || apk add -q util-linux-misc;"
+                                + " exec script -qec \"" + AGY_BIN + " -p 'Reply with just: ok'\" /dev/null")
                         : onOtherDevice ? Linux.builder(app, "codex", "login", "--device-auth")
                         : Linux.builder(app, "codex", "login")).start();
                 synchronized (this) {
                     login = p;
                     loginIn = p.getOutputStream();
                 }
-                Pattern u = Pattern.compile(onOtherDevice && !claude()
-                        ? "https://\\S*/codex/device\\S*" : "https://\\S*/oauth/authorize\\?\\S+");
+                if (agy()) new Thread(() -> {
+                    // signed in but agy still busy on its terminal (a first-run question nobody sees): stop it
+                    try {
+                        while (p.isAlive()) {
+                            Thread.sleep(3000);
+                            if (step == Step.FINISHING && System.currentTimeMillis() - codeSentAt > 20_000
+                                    && Linux.exec(app, "[ -s " + AGY_TOKEN + " ] && echo AGY_SIGNED", 20).contains("AGY_SIGNED")) {
+                                p.destroy();
+                            }
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }).start();
+                boolean device = onOtherDevice && !claude() && !agy(); // Codex's device code
+                Pattern u = Pattern.compile(agy() ? "https://accounts\\.google\\.com/o/oauth2/auth\\?\\S+"
+                        : device ? "https://\\S*/codex/device\\S*" : "https://\\S*/oauth/authorize\\?\\S+");
                 Pattern code = Pattern.compile("one-time code[^\\n]*\\n\\s*([A-Z0-9][A-Z0-9-]{4,15})");
                 try (InputStream in = p.getInputStream()) {
                     byte[] buf = new byte[4096];
@@ -367,10 +446,10 @@ final class Account {
                                 url = m.group();
                                 state = Uri.parse(url).getQueryParameter("state");
                                 // Codex's device flow also needs its code before the screen is useful
-                                if (!(onOtherDevice && !claude())) set(Step.WAITING_BROWSER, "");
+                                if (!device) set(Step.WAITING_BROWSER, "");
                             }
                         }
-                        if (onOtherDevice && !claude() && userCode == null) {
+                        if (device && userCode == null) {
                             Matcher m = code.matcher(plain);
                             if (!m.find()) {
                                 m = Pattern.compile("\\b([A-Z0-9]{4,5}-[A-Z0-9]{4,6})\\b").matcher(plain);
@@ -416,8 +495,10 @@ final class Account {
     synchronized boolean submit(String code) {
         if (loginIn == null || code == null || code.trim().isEmpty()) return false;
         try {
-            loginIn.write((code.trim() + "\n").getBytes(StandardCharsets.UTF_8));
+            // Antigravity reads it on a terminal (see startLogin), where Enter is a carriage return
+            loginIn.write((code.trim() + (agy() ? "\r" : "\n")).getBytes(StandardCharsets.UTF_8));
             loginIn.flush();
+            codeSentAt = System.currentTimeMillis();
             set(Step.FINISHING, BuddyApp.str(R.string.signin_finishing));
             return true;
         } catch (IOException e) {
@@ -433,23 +514,47 @@ final class Account {
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {
-                if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
+                if (agy()) Linux.exec(app, "rm -f " + AGY_TOKEN, 60); // agy only signs out from its own screen (/logout)
+                else if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
             } catch (Exception ignored) {
             }
             refresh(app);
         }).start();
     }
 
-    /** Claude's confirmation code if this text contains it ("&lt;code&gt;#&lt;state&gt;"), else null. */
+    /** The confirmation code if this text contains it, else null: Claude's "&lt;code&gt;#&lt;state&gt;", or the Google
+     *  authorization code Antigravity's page shows ("4/0A…"; in the address bar it's URL-encoded, so not matched). */
     String findCode(CharSequence text) {
+        if (text == null) return null;
+        if (agy()) {
+            Matcher m = Pattern.compile("(?<![A-Za-z0-9_/-])4/[0-9A-Za-z_-]{30,}").matcher(text);
+            return m.find() ? m.group() : null;
+        }
         String s = state;
-        if (!claude() || text == null || s == null || s.isEmpty()) return null;
+        if (!claude() || s == null || s.isEmpty()) return null;
         Matcher m = Pattern.compile("[A-Za-z0-9_\\-]{16,}#" + Pattern.quote(s)).matcher(text);
         return m.find() ? m.group() : null;
     }
 
+    /** Can run notification rules? A rule's run works for someone else's message and gets no shell, files or web;
+     *  Buddy can't yet hold Antigravity to that (only its allow list is known), so its chats are for the user only. */
+    boolean runsRules() {
+        return !agy();
+    }
+
+    /** Signs in with a code pasted from the browser page (Claude Code, Antigravity). */
+    boolean pastesCode() {
+        return claude() || agy();
+    }
+
     boolean waitingForCode() {
-        return claude() && step == Step.WAITING_BROWSER && url != null;
+        return pastesCode() && step == Step.WAITING_BROWSER && url != null;
+    }
+
+    /** The account whose sign-in waits for its code, or null. */
+    static Account waiting() {
+        for (Account a : ALL) if (a.waitingForCode()) return a;
+        return null;
     }
 
     private static String stripAnsi(String s) {
