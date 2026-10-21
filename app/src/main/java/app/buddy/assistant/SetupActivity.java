@@ -25,8 +25,7 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /** Settings: setup checklist, appearance, agents and experience. */
-public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener, SshServer.Listener,
-        CodexRemote.Listener {
+public class SetupActivity extends Screen implements Account.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
@@ -56,9 +55,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         super.onResume();
         if (isFinishing()) return;
         Account.addListener(this);
-        RemoteSession.addListener(this);
-        SshServer.addListener(this);
-        CodexRemote.addListener(this);
         Account.CLAUDE.refresh(this);
         render();
     }
@@ -66,25 +62,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     @Override
     protected void onPause() {
         Account.removeListener(this);
-        RemoteSession.removeListener(this);
-        SshServer.removeListener(this);
-        CodexRemote.removeListener(this);
         super.onPause();
-    }
-
-    @Override
-    public void onRemoteChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
-    }
-
-    @Override
-    public void onCodexRemoteChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
-    }
-
-    @Override
-    public void onSshChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
     }
 
     @Override
@@ -286,33 +264,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }
         while (chipRow != null && inRow++ < 3) chipRow.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
         addCard(vc);
-
-        // Remote control, the Codex session and SSH ran in Buddy's built-in Linux: not in this fork (yet)
-
-        // chats from the Termux days: their conversations stayed in Termux, so agents can't continue them
-        final java.util.List<Sessions.Session> old = termuxChats();
-        if (!old.isEmpty()) {
-            LinearLayout oc = card();
-            LinearLayout r = listRow(this);
-            r.setGravity(Gravity.CENTER_VERTICAL);
-            r.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
-            LinearLayout t = column(this);
-            t.addView(title(this, getString(R.string.setup_old_chats_title), 15));
-            t.addView(text(this, getResources().getQuantityString(R.plurals.setup_old_chats_body, old.size(), old.size()),
-                    13, MUTED));
-            r.addView(t, weight1());
-            r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-            r.setOnClickListener(v -> confirmSheet(this,
-                    getResources().getQuantityString(R.plurals.setup_old_chats_remove, old.size(), old.size()),
-                    getString(R.string.setup_old_chats_remove_body), getString(R.string.setup_remove), true, () -> {
-                        ChatHub hub = ChatHub.get(this);
-                        for (Sessions.Session s : old) hub.delete(s);
-                        Toast.makeText(this, R.string.setup_removed, Toast.LENGTH_SHORT).show();
-                        render();
-                    }));
-            oc.addView(r, full());
-            addCard(oc);
-        }
 
         // ----------------------------------------------------------- experience
         list.addView(sectionLabel(this, getString(R.string.setup_experience)));
@@ -703,84 +654,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         return p;
     }
 
-    /** Chats with messages but no conversation folder in Buddy's Linux: they ran in Termux. */
-    /** A fresh pairing code for the Codex session, to enter in ChatGPT on a phone or a computer. */
-    private void codexPairSheet() {
-        LinearLayout c = column(this);
-        c.addView(title(this, getString(R.string.setup_codex_pair), 18));
-        TextView code = monoText(this, "…", 34, TEXT);
-        code.setTypeface(mono(this, 600));
-        code.setLetterSpacing(0.08f);
-        code.setTextIsSelectable(true);
-        code.setGravity(Gravity.CENTER);
-        code.setPaddingRelative(dp(this, 12), dp(this, 18), dp(this, 12), dp(this, 18));
-        code.setBackground(rounded(this, BG, 16));
-        LinearLayout.LayoutParams cp = full();
-        cp.topMargin = dp(this, 14);
-        c.addView(code, cp);
-        TextView how = text(this, getString(R.string.codex_pair_getting), 13, MUTED);
-        how.setPaddingRelative(0, dp(this, 12), 0, 0);
-        c.addView(how);
-        LinearLayout btns = row(this);
-        Button close = button(this, getString(R.string.terminal_close), false);
-        Button copyCode = button(this, getString(R.string.signin_copy_code), true);
-        copyCode.setEnabled(false);
-        btns.addView(close, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
-        LinearLayout.LayoutParams ccp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
-        ccp.setMarginStart(dp(this, 10));
-        btns.addView(copyCode, ccp);
-        LinearLayout.LayoutParams bp = full();
-        bp.topMargin = dp(this, 16);
-        c.addView(btns, bp);
-        Dialog d = bottomSheet(this, c);
-        close.setOnClickListener(v -> d.dismiss());
-        d.show();
-        CodexRemote.pair((json, why) -> {
-            if (isFinishing() || isDestroyed() || !d.isShowing()) return;
-            if (json == null) {
-                d.dismiss();
-                Toast.makeText(this, getString(R.string.codex_pair_failed, why), Toast.LENGTH_LONG).show();
-                return;
-            }
-            String manual = json.optString("manualPairingCode");
-            long until = json.optLong("expiresAt") * 1000;
-            if (until <= System.currentTimeMillis()) until = System.currentTimeMillis() + 10 * 60_000;
-            code.setText(manual);
-            how.setText(getString(R.string.codex_pair_text,
-                    android.text.format.DateFormat.getTimeFormat(this).format(new java.util.Date(until))));
-            copyCode.setEnabled(true);
-            copyCode.setOnClickListener(v -> {
-                getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Codex pairing code", manual));
-                Toast.makeText(this, R.string.signin_code_copied, Toast.LENGTH_SHORT).show();
-            });
-        });
-    }
-
-    /** The Termux command that lets Termux in (SshServer): its key, sent with the one-time code, then `ssh buddy`. */
-    private static String sshCommand(String code) {
-        return "{ command -v ssh && command -v curl; } >/dev/null || pkg install -y openssh curl;"
-                + " mkdir -p ~/.ssh && { [ -f ~/.ssh/id_ed25519 ] || ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519; }"
-                + " && curl -sS --fail-with-body -H 'Authorization: Bearer " + code + "' --data-binary @$HOME/.ssh/id_ed25519.pub"
-                + " http://127.0.0.1:" + McpServer.PORT + "/ssh-key"
-                + " && { grep -qx 'Host buddy' ~/.ssh/config 2>/dev/null || printf '\\nHost buddy\\n  HostName 127.0.0.1\\n  Port "
-                + SshServer.PORT + "\\n  User root\\n' >> ~/.ssh/config; }"
-                + " && ssh -o StrictHostKeyChecking=accept-new buddy true";
-    }
-
-    private java.util.List<Sessions.Session> termuxChats() {
-        java.util.List<Sessions.Session> out = new java.util.ArrayList<>();
-        if (!Linux.installed(this)) return out;
-        java.io.File dir = new java.io.File(Linux.root(this), "root/.buddy/sessions");
-        for (Sessions.Session s : ChatHub.get(this).sessions.all) {
-            if (!s.messages.isEmpty() && !s.running && !new java.io.File(dir, s.id).isDirectory()) out.add(s);
-        }
-        return out;
-    }
-
     /** The bundled components (third_party/ in the repo, packed into the APK) and their licence texts. */
     private void licences() {
         StringBuilder sb = new StringBuilder();
-        for (String f : new String[]{"README.md", "proot-LICENSE.txt", "talloc-LICENSE.txt", "libandroid-shmem-LICENSE.txt"}) {
+        for (String f : new String[]{"README.md"}) {
             try (java.io.InputStream in = getAssets().open("third_party/" + f)) {
                 java.io.ByteArrayOutputStream o = new java.io.ByteArrayOutputStream();
                 byte[] buf = new byte[8192];

@@ -274,15 +274,6 @@ final class Prefs {
         sp(c).edit().putString("agents", a).apply();
     }
 
-    /** Unused since Buddy has its own Linux (was: Termux setup watch). */
-    static long setupWatchUntil(Context c) {
-        return sp(c).getLong("watch_until", 0);
-    }
-
-    static void setSetupWatchUntil(Context c, long t) {
-        sp(c).edit().putLong("watch_until", t).apply();
-    }
-
     /** Last known state of an agent in Buddy's Linux: NEED_INSTALL, SIGNED_OUT or SIGNED_IN (null = never checked). */
     static String agentState(Context c, String agent) {
         return sp(c).getString("agent_" + agent, null);
@@ -292,7 +283,7 @@ final class Prefs {
         sp(c).edit().putString("agent_" + agent, state).apply();
     }
 
-    /** Keep a Claude Code session with Remote Control running inside Buddy's Linux. */
+    /** Keep Claude Code's Remote Control running (not used yet: SWITCH.md step 6 moves it to Termux). */
     static boolean remoteSession(Context c) {
         return sp(c).getBoolean("remote_session", false);
     }
@@ -304,51 +295,6 @@ final class Prefs {
     /** Its name in the Claude app. */
     static String remoteName(Context c) {
         return sp(c).getString("remote_name", "Buddy");
-    }
-
-    /** Keep a Codex session with remote control running inside Buddy's Linux, for the ChatGPT app (CodexRemote). */
-    static boolean codexRemote(Context c) {
-        return sp(c).getBoolean("codex_remote", false);
-    }
-
-    static void setCodexRemote(Context c, boolean on) {
-        sp(c).edit().putBoolean("codex_remote", on).apply();
-    }
-
-    /** Keep an SSH server running in Buddy's Linux, for Termux (SshServer). */
-    static boolean sshServer(Context c) {
-        return sp(c).getBoolean("ssh_server", false);
-    }
-
-    static void setSshServer(Context c, boolean on) {
-        sp(c).edit().putBoolean("ssh_server", on).apply();
-    }
-
-    /** Terminal text size in sp (pinch to zoom). */
-    static float termFont(Context c) {
-        return sp(c).getFloat("term_font", 13f);
-    }
-
-    static void setTermFont(Context c, float sp) {
-        sp(c).edit().putFloat("term_font", sp).apply();
-    }
-
-    /** Keep the screen on while the Terminal is open. */
-    static boolean termAwake(Context c) {
-        return sp(c).getBoolean("term_awake", false);
-    }
-
-    static void setTermAwake(Context c, boolean on) {
-        sp(c).edit().putBoolean("term_awake", on).apply();
-    }
-
-    /** Voice input engine: "phone" (Android's recognizer), "claude" (Claude Code's dictation) or "chatgpt". */
-    static String voiceEngine(Context c) {
-        return "phone"; // this fork: Claude's and ChatGPT's voice need Buddy's built-in Linux
-    }
-
-    static void setVoiceEngine(Context c, String e) {
-        sp(c).edit().putString("voice_engine", e).apply();
     }
 
     /** The user's choice for an app: "trust" or "hard" (hard limit), or null for the default (see Guard.mode). */
@@ -420,24 +366,6 @@ final class Prefs {
 
     static void addTip(Context c) {
         sp(c).edit().putInt("menu_tips", tipCount(c) + 1).apply();
-    }
-
-    /** Who reads replies aloud: "phone" (Android's voices) or "chatgpt" (ChatGPT's voice through Codex). */
-    static String speechEngine(Context c) {
-        return "phone"; // this fork: ChatGPT's voice needs Buddy's built-in Linux
-    }
-
-    static void setSpeechEngine(Context c, String e) {
-        sp(c).edit().putString("speech_engine", e).apply();
-    }
-
-    /** Which ChatGPT voice reads replies. */
-    static String speechVoice(Context c) {
-        return sp(c).getString("speech_voice", "juniper");
-    }
-
-    static void setSpeechVoice(Context c, String v) {
-        sp(c).edit().putString("speech_voice", v).apply();
     }
 
     /** The user's voice languages, comma-separated BCP-47 tags (first = default). */

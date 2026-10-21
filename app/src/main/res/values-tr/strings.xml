@@ -4,8 +4,6 @@
     <string name="service_label">Buddy asistanı</string>
     <string name="service_description">Buddy sohbet baloncuğunu gösterir; bu telefonda Buddy içinde çalışan Claude Code veya Codex\'in ekranı okumasını ve sizin yerinize dokunmasını, yazmasını ve kaydırmasını sağlar. Ajanın kendisinin Anthropic\'e veya OpenAI\'a gönderdikleri dışında hiçbir şey telefondan çıkmaz.</string>
 
-    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
-
     <!-- First-run setup guide: top bar and buttons shared by several steps. -->
     <string name="onboarding_skip_setup">Kurulumu atla</string>
     <string name="onboarding_skip_title">Kurulum rehberi atlansın mı?</string>
@@ -51,37 +49,11 @@
     <string name="onboarding_app_info">Uygulama bilgileri</string>
 
     <!-- Guide, step: install the agent inside Buddy and sign in. -->
-    <string name="onboarding_agents_title">Yükleyin ve giriş yapın</string>
-    <string name="onboarding_agents_done_title">Hazır</string>
-    <string name="onboarding_agents_done">%1$s yüklendi ve giriş yapıldı.</string>
-    <string name="onboarding_agents_done_both">Claude Code ve Codex yüklendi ve giriş yapıldı.</string>
-    <string name="onboarding_agents_text">%1$s, Buddy tarafından uygulamanın içine yüklenir; ardından bir kez giriş yaparsınız. Termux gerekmez.</string>
     <string name="onboarding_agent_names_both">Claude Code ve Codex</string>
     <!-- Agent card status lines: small lowercase mono text, one line. -->
-    <string name="onboarding_agent_ready">hazır · %1$s</string>
     <string name="onboarding_agent_free_models">ücretsiz modeller</string>
     <string name="onboarding_agent_signed_in">giriş yapıldı</string>
     <string name="onboarding_agent_signed_in_as">giriş yapıldı · %1$s</string>
-    <string name="onboarding_agent_installing">yükleniyor…</string>
-    <string name="onboarding_agent_installed">yüklü · giriş yapılmadı</string>
-    <string name="onboarding_agent_not_installed">yüklü değil</string>
-    <!-- Agent card help text. -->
-    <string name="onboarding_agent_sign_in_claude">Claude hesabınızla giriş yapın. Tarayıcınız açılır; Yetkilendir düğmesine dokunun, Buddy kendiliğinden geri döner.</string>
-    <string name="onboarding_agent_checking_opencode">OpenCode kontrol ediliyor…</string>
-    <string name="onboarding_agent_sign_in_codex">Tarayıcıda ChatGPT hesabınızla giriş yapın, sonra geri dönün.</string>
-    <string name="onboarding_agent_download_claude">Bir kerelik yaklaşık 235 MB indirir (Buddy\'nin Linux\'u ve Anthropic\'ten Claude Code).</string>
-    <string name="onboarding_agent_download_opencode">Bir kerelik yaklaşık 230 MB indirir (Buddy\'nin Linux\'u, Node.js ve OpenCode). Hesap gerekmez.</string>
-    <string name="onboarding_agent_download_codex">Bir kerelik yaklaşık 150 MB indirir (Buddy\'nin Linux\'u, Node.js ve OpenAI\'dan Codex).</string>
-    <!-- Buttons on the agent card. -->
-    <string name="onboarding_sign_in_claude">Claude ile giriş yap</string>
-    <string name="onboarding_sign_in_chatgpt">ChatGPT ile giriş yap</string>
-    <string name="onboarding_install_agent">%1$s ajanını yükle</string>
-    <string name="onboarding_agents_wifi">Mümkünse Wi-Fi kullanın. Yükleme sürerken bu ekrandan çıkabilirsiniz.</string>
-    <!-- Help questions and answers under "Stuck?". -->
-    <string name="onboarding_stuck_sign_in_q">Giriş yaptıktan sonra geri dönmedi mi?</string>
-    <string name="onboarding_stuck_sign_in_a">Claude: Claude sayfasında Kodu kopyala düğmesine dokunun, sonra Buddy\'ye dönün; kodu panodan kendisi alır.</string>
-    <string name="onboarding_stuck_install_q">Yükleme başarısız mı oldu?</string>
-    <string name="onboarding_stuck_install_a">Bağlantınızı kontrol edip yükleme düğmesine tekrar dokunun; kaldığı yerden devam eder.</string>
 
     <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
     <string name="onboarding_background_title">Arka planda çalışsın</string>
@@ -180,8 +152,6 @@
     <string name="prefs_accent_violet">Menekşe</string>
     <string name="prefs_accent_rose">Gül</string>
     <string name="prefs_accent_amber">Kehribar</string>
-
-    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
 
     <!-- Floating bubble, read by TalkBack. -->
     <string name="bubble_face_description">Buddy. Açmak için dokunun, işlemler için uzun basın</string>
@@ -297,8 +267,6 @@
     <string name="pause_call_ended_title">Arama bitti · Buddy duraklatıldı</string>
     <string name="pause_call_ended_text">Göreve devam etmek için dokunun</string>
 
-    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
-
     <!-- Chat screen: app bar -->
     <string name="chat_back">Geri</string>
     <string name="chat_read_aloud">Yanıtları sesli oku</string>
@@ -331,7 +299,6 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Konuşma dili</string>
     <string name="chat_speak_in_help">Dillerinizi Ayarlar → Ses bölümünden seçin.</string>
-    <string name="chat_phone_voice">telefon sesi</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
     <string name="chat_card_question">SORU</string>
@@ -481,85 +448,18 @@
     <string name="voice_link">bağlantı</string>
     <string name="voice_stop_and_send">Durdur ve gönder</string>
 
-    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
-
     <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). -->
     <string name="signin_back">Geri</string>
     <string name="signin_checking">Kontrol ediliyor…</string>
 
-    <!-- Sign-in screen: the agent isn't installed yet. -->
-    <string name="signin_install">%1$s ajanını yükle</string>
-    <string name="signin_install_sub_claude">Claude Code\'u Buddy içinde Claude aboneliğinizle çalıştırır.</string>
-    <string name="signin_install_sub_opencode">OpenCode\'u Buddy içinde çalıştırır. Ücretsiz modelleri hesap gerekmeden hemen çalışır; kendi sağlayıcılarınızı (Anthropic, OpenAI, GitHub Copilot…) istediğiniz zaman bağlayabilirsiniz.</string>
-    <string name="signin_install_sub_codex">Codex\'i Buddy içinde ChatGPT planınızla çalıştırır.</string>
-    <string name="signin_install_size_claude">Bir kerelik yaklaşık 235 MB indirir: Buddy\'nin Linux\'u ve Anthropic\'ten Claude Code. Mümkünse Wi-Fi kullanın.</string>
-    <string name="signin_install_size_opencode">Bir kerelik yaklaşık 230 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenCode. Mümkünse Wi-Fi kullanın.</string>
-    <string name="signin_install_size_codex">Bir kerelik yaklaşık 150 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenAI\'dan Codex. Mümkünse Wi-Fi kullanın.</string>
-
-    <!-- Sign-in screen: install or update in progress (screen titles). -->
-    <string name="signin_installing">Yükleniyor</string>
-    <string name="signin_updating">Güncelleniyor</string>
-    <string name="signin_install_wait">Bu birkaç dakika sürer. Bu ekrandan çıkabilirsiniz; işlem devam eder.</string>
-
-    <!-- Sign-in screen: installed, not signed in. -->
-    <string name="signin_title_claude">Claude\'a giriş yapın</string>
-    <string name="signin_title_chatgpt">ChatGPT\'ye giriş yapın</string>
-    <string name="signin_sub_claude">Claude hesabınızı kullanın (Pro veya Max). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
-    <string name="signin_sub_chatgpt">ChatGPT hesabınızı kullanın (Plus, Pro veya Business). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
-    <string name="signin_with_claude">Claude ile giriş yap</string>
-    <string name="signin_with_chatgpt">ChatGPT ile giriş yap</string>
-    <string name="signin_other_device">Başka bir cihazda giriş yap</string>
-    <string name="signin_with_code">Kodla giriş yap</string>
-
-    <!-- Sign-in screen: sign-in in progress. -->
-    <string name="signin_sign_in">Giriş yap</string>
-    <string name="signin_starting">Giriş başlatılıyor…</string>
-    <string name="signin_approve_title">Tarayıcınızda onaylayın</string>
-    <string name="signin_approve_claude">Claude sayfasında Yetkilendir düğmesine dokunun. Buddy kodu alır ve kendiliğinden geri döner.</string>
-    <string name="signin_approve_codex">Giriş yapın ve Codex\'e izin verin. Ardından Buddy\'ye dönün; işlemi kendisi tamamlar.</string>
-    <string name="signin_open_again">Giriş sayfasını yeniden aç</string>
-    <string name="signin_signing_in">Giriş yapılıyor</string>
-    <string name="signin_finishing">Giriş tamamlanıyor…</string>
-    <string name="signin_not_finished">Giriş tamamlanmadı. %1$s</string>
-
     <!-- Sign-in screen: signing in from another device. -->
-    <string name="signin_remote_claude">Bu bağlantıyı herhangi bir cihazda açıp onaylayın. Ardından sayfada görünen kodu kopyalayıp aşağıya yapıştırın.</string>
-    <string name="signin_enter_code">Bu kodu girin</string>
-    <string name="signin_remote_codex">Herhangi bir cihazda aşağıdaki bağlantıyı açın, ChatGPT\'ye giriş yapın ve kodu girin. Buddy işlemi kendisi tamamlar.</string>
-    <string name="signin_copy_code">Kodu kopyala</string>
-    <string name="signin_code_copied">Kod kopyalandı</string>
-    <string name="signin_code_expiry">Kod 15 dakika geçerlidir.</string>
-    <string name="signin_copy_link">Bağlantıyı kopyala</string>
-    <string name="signin_link_copied">Bağlantı kopyalandı</string>
-    <string name="signin_share">Paylaş</string>
-    <string name="signin_open_here">Burada aç</string>
     <string name="signin_no_browser">Tarayıcı bulunamadı.</string>
-    <string name="signin_no_browser_page">Giriş sayfasını açacak bir tarayıcı bulunamadı.</string>
-    <string name="signin_clip_label">Giriş</string>
-
-    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
-    <string name="signin_paste_instead">Bunun yerine kodu yapıştırın</string>
-    <string name="signin_paste_help">Buddy kendiliğinden geri dönmezse: Claude sayfasında Kodu kopyala düğmesine dokunun, ardından kodu buraya yapıştırın.</string>
-    <string name="signin_code_hint">kod</string>
-    <string name="signin_use_code">Kullan</string>
-    <string name="signin_start_again">Önce girişi yeniden başlatın.</string>
 
     <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
     <string name="signin_signed_in">Giriş yapıldı</string>
     <string name="signin_agent_ready">%1$s hazır.</string>
     <string name="signin_done">Bitti</string>
-    <string name="signin_sign_out">Çıkış yap</string>
-    <string name="signin_sign_out_title">%1$s hesabından çıkış yapılsın mı?</string>
-    <string name="signin_sign_out_text">Yeniden giriş yapana kadar Buddy\'deki %1$s çalışmaz.</string>
-    <string name="signin_opencode_ready">OpenCode hazır</string>
-    <string name="signin_opencode_free">OpenCode\'un ücretsiz modelleri kullanılıyor. Model çipiyle her sohbet için birini seçin veya kendi sağlayıcınızı bağlayın.</string>
-    <string name="signin_opencode_connected">Bağlı: %1$s. OpenCode\'un ücretsiz modelleri de kullanılabilir olmaya devam eder.</string>
-    <string name="signin_opencode_connect_note">Sağlayıcı bağlamak, Buddy\'nin terminalini %1$s komutuyla açar: bir sağlayıcı seçip adımları izleyin. Daha sonra kaldırmak için orada %2$s komutunu çalıştırın.</string>
-    <string name="signin_connect_provider">Sağlayıcı bağla</string>
     <string name="signin_version">%1$s %2$s.</string>
-    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2 çıktı: yeni sürümleri almaya devam etmek için güncelleyin. Bağlı sağlayıcılarınız korunur.</string>
-    <string name="signin_update_opencode2">OpenCode 2\'ye güncelle</string>
-    <string name="signin_check_updates">Güncellemeleri kontrol et</string>
 
     <!-- Sign-in screen: error. -->
     <string name="signin_error_title">Bir şeyler ters gitti</string>
@@ -569,18 +469,7 @@
     <string name="account_tagline_claude">Claude planınızı kullanır</string>
     <string name="account_tagline_opencode">Ücretsiz modeller veya kendi sağlayıcılarınız</string>
     <string name="account_tagline_codex">ChatGPT planınızı kullanır</string>
-    <string name="account_setting_up_linux">Buddy\'nin Linux\'u hazırlanıyor…</string>
-    <string name="account_installing_tools">Araçlar yükleniyor…</string>
-    <string name="account_downloading_claude">Claude Code indiriliyor (yaklaşık 230 MB)…</string>
-    <string name="account_downloading">%1$s indiriliyor…</string>
     <string name="account_check_failed">%1$s kontrol edilemedi: %2$s</string>
-    <string name="account_install_failed">Yükleme başarısız: %1$s</string>
-    <string name="account_update_checking">Yeni %1$s sürümü aranıyor…</string>
-    <string name="account_update_latest">En son sürüme sahipsiniz (%1$s).</string>
-    <string name="account_updated">%1$s sürümüne güncellendi.</string>
-    <string name="account_updated_from">%1$s sürümüne güncellendi (önceki: %2$s).</string>
-    <string name="account_update_opencode2_failed">OpenCode 2\'ye güncellenemedi; hâlâ %1$s sürümündesiniz. Wi-Fi bağlantısıyla tekrar deneyin.</string>
-    <string name="account_update_failed">Güncelleme başarısız: %1$s</string>
 
     <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort"). -->
     <string name="models_default">Varsayılan</string>
@@ -616,15 +505,6 @@
     <string name="remote_restarting">Yeniden başlatılıyor…</string>
     <string name="remote_start_failed">Başlatılamadı: %1$s</string>
     <string name="remote_keeps_stopping">Oturum sürekli duruyor. Kapatıp yeniden açın veya Claude Code girişini kontrol edin.</string>
-    <string name="codex_pair_getting">Kod alınıyor…</string>
-    <string name="codex_pair_text">Bu kodu ChatGPT\'ye girin: telefonda Codex\'te, bilgisayarda Ayarlar → Bağlantılar → Diğer cihazları kontrol et bölümünde. %1$s saatine kadar bir kez çalışır. Buddy orada “localhost” olarak görünür.</string>
-    <string name="codex_pair_failed">Eşleme kodu alınamadı: %1$s</string>
-    <string name="codex_keeps_stopping">Codex oturumu sürekli duruyor: %1$s</string>
-    <string name="ssh_keeps_stopping">SSH sunucusu sürekli duruyor: %1$s</string>
-    <string name="ssh_key_added">Tamam. Buddy\'nin Linux\'unu Termux\'tan açmak için ssh buddy yazın.</string>
-    <string name="ssh_code_expired">Bu komut zaten kullanıldı veya 10 dakikadan eski. Buddy\'nin Ayarlar bölümünden yeniden kopyalayın.</string>
-
-    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Ayarlar</string>
@@ -640,20 +520,9 @@
     <string name="setup_step_a11y_restricted">Anahtar gri mi görünüyor (“Kısıtlanmış ayar”)? Android, dosyadan yüklenen uygulamalarda bunu engeller. Uygulama bilgileri düğmesine, ardından sağ üstteki ⋮ → Kısıtlanmış ayarlara izin ver seçeneğine dokunun ve tekrar deneyin.</string>
     <string name="setup_open_settings">Ayarları aç</string>
     <string name="setup_app_info">Uygulama bilgileri</string>
-    <string name="setup_step_install_title">%1$s ajanını yükleyin</string>
-    <string name="setup_step_install_done">%1$s, Buddy\'ye yüklendi.</string>
-    <string name="setup_step_install_claude">Buddy kendi küçük Linux\'unu ve Anthropic\'ten %1$s ajanını indirir (yaklaşık 235 MB).</string>
-    <string name="setup_step_install_opencode">Buddy kendi küçük Linux\'unu ve %1$s ajanını indirir (Node.js ile yaklaşık 230 MB).</string>
-    <string name="setup_step_install_codex">Buddy kendi küçük Linux\'unu ve OpenAI\'dan %1$s ajanını indirir (yaklaşık 150 MB).</string>
-    <string name="setup_install">Yükle</string>
     <string name="setup_step_signin_title">Giriş yapın</string>
-    <string name="setup_step_signin_opencode_done">Giriş gerekmez: OpenCode\'un ücretsiz modelleri hemen çalışır. Kendi sağlayıcılarınızı istediğiniz zaman bağlayabilirsiniz.</string>
-    <string name="setup_step_signin_opencode">OpenCode\'un ücretsiz modelleri için giriş gerekmez.</string>
     <string name="setup_step_signin_done">Giriş yapıldı.</string>
     <string name="setup_step_signin_done_email">%1$s olarak giriş yapıldı.</string>
-    <string name="setup_step_signin_claude">Claude hesabınızla (Pro veya Max). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
-    <string name="setup_step_signin_codex">ChatGPT hesabınızla. Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
-    <string name="setup_sign_in">Giriş yap</string>
     <string name="setup_step_background_title">Buddy\'nin arka planda çalışmasına izin verin</string>
     <string name="setup_step_background_done">İzin verildi.</string>
     <string name="setup_step_background_body">Böylece ajan çalışırken telefonunuz pil tasarrufu için Buddy\'yi durdurmaz.</string>
@@ -680,13 +549,8 @@
 
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Ajan</string>
-    <string name="setup_default_brain">Varsayılan ajan</string>
-    <string name="setup_default_brain_info">Baloncuktan veya Yeni sohbet düğmesiyle başlatılan yeni sohbetleri yanıtlayan ajan. Claude Code Claude planınızı, Codex ChatGPT planınızı, OpenCode ise kendi ücretsiz modellerini veya sizin sağlayıcılarınızı kullanır. Yalnızca kurulmuş ajanlar seçilebilir.</string>
-    <string name="setup_default_brain_set">Yeni sohbetlerde %1$s kullanılacak. Yeni sohbet düğmesiyle her sohbet için ayrı seçim yapabilirsiniz.</string>
-    <string name="setup_set_up_first">Önce %1$s kurulumunu yapın.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
     <string name="setup_agent_installing">yükleniyor…</string>
-    <string name="setup_agent_not_installed">yüklü değil</string>
     <string name="setup_agent_ready">hazır</string>
     <string name="setup_agent_ready_plan">hazır · %1$s</string>
     <string name="setup_agent_signed_in">giriş yapıldı</string>
@@ -702,14 +566,9 @@
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Ses</string>
     <string name="setup_voice_input">Sesle giriş</string>
-    <string name="setup_voice_phone">Telefon</string>
-    <string name="setup_voice_input_claude">Claude planınızla Claude Code\'un dikte özelliği: çok doğru. İngilizce, Fransızca, Almanca, İspanyolca, İtalyanca, Portekizce, Felemenkçe, Türkçe, Rusça, Japonca ve daha fazlasını destekler, ancak Arapçayı desteklemez: Arapça için Buddy telefonun tanıyıcısını kullanır. Siz duraklayınca kelimeler görünür.</string>
-    <string name="setup_voice_input_chatgpt">ChatGPT planınızla, Codex üzerinden ChatGPT\'nin sesi. Her dili, hatta tek cümlede karışık dilleri bile anlar. Yalnızca sözleriniz kullanılır: ChatGPT\'nin sesli yanıtları kapalıdır ve hiçbir şey çalıştıramaz.</string>
     <string name="setup_voice_input_phone">Telefonunuzun konuşma tanıması (çoğu telefonda Google). Siz konuşurken metin canlı görünür; dillerinizden hangisini konuştuğunuzu algılar.</string>
     <string name="setup_voice_output">Sesli yanıt</string>
-    <string name="setup_voice_output_chatgpt">Yanıtlar ChatGPT\'nin doğal sesiyle okunur (ChatGPT planınızla, Codex üzerinden). ChatGPT ses kullanımınızdan düşülür; kullanılamıyorsa telefonun sesi okur.</string>
     <string name="setup_voice_output_phone">Telefonunuzun metin okuma sesleri, yanıtın dilinde.</string>
-    <string name="setup_voice_sample">Bonjour ! Merhaba, ben Buddy. Sesim böyle.</string>
     <string name="setup_languages">Diller</string>
     <string name="setup_languages_hint">Konuştuğunuz dilleri seçmek için dokunun. Varsayılan yapmak için bir dile uzun basın. Sohbette dil değiştirmek için mikrofona uzun basın.</string>
     <string name="setup_sign_in_first">Önce %1$s hesabına giriş yapın</string>
@@ -727,28 +586,6 @@
     <string name="setup_remote_stopped">durduruldu</string>
     <string name="setup_remote_open">Claude uygulamasında aç</string>
     <string name="setup_remote_open_failed">Açılamadı.</string>
-    <string name="setup_codex_session">Codex oturumu</string>
-    <string name="setup_codex_session_info">Buddy içinde telefon araçlarıyla çalışan Codex. Bu telefondaki veya bir bilgisayardaki ChatGPT uygulamasından (Codex) kullanın. Codex\'in korumalı alanı burada çalışamaz, bu yüzden varsayılan izinlerle her komuttan önce sorar.</string>
-    <string name="setup_codex_active">çalışıyor · ChatGPT\'de “localhost”</string>
-    <string name="setup_codex_pair">Cihaz eşle</string>
-    <string name="setup_ssh">Termux\'tan SSH</string>
-    <string name="setup_ssh_info">Buddy\'nin Linux\'unu Termux\'tan SSH ile kullanın. Yalnızca bu telefondaki uygulamalar, yalnızca bir anahtarla bağlanabilir.</string>
-    <string name="setup_ssh_active">çalışıyor · port %1$d</string>
-    <string name="setup_ssh_how">Bu komutu kopyalayıp 10 dakika içinde Termux\'ta bir kez çalıştırın. Sonrasında Buddy\'nin Linux\'unu açmak için Termux\'ta ssh buddy yazın.</string>
-
-    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
-    <string name="setup_old_chats_title">Eski Termux sohbetlerini kaldır</string>
-    <plurals name="setup_old_chats_body">
-        <item quantity="one">Buddy\'nin kendi Linux\'u olmadan önceki %1$d sohbet. Ajanlar buna devam edemez.</item>
-        <item quantity="other">Buddy\'nin kendi Linux\'u olmadan önceki %1$d sohbet. Ajanlar bunlara devam edemez.</item>
-    </plurals>
-    <plurals name="setup_old_chats_remove">
-        <item quantity="one">%1$d eski sohbet kaldırılsın mı?</item>
-        <item quantity="other">%1$d eski sohbet kaldırılsın mı?</item>
-    </plurals>
-    <string name="setup_old_chats_remove_body">Bunları Buddy\'nin sohbet listesinden kaldırır. Bu işlem geri alınamaz.</string>
-    <string name="setup_remove">Kaldır</string>
-    <string name="setup_removed">Kaldırıldı.</string>
 
     <!-- Settings screen: Experience. -->
     <string name="setup_experience">Deneyim</string>
@@ -774,7 +611,7 @@
     <string name="setup_app_permissions">Uygulama izinleri</string>
     <string name="setup_app_permissions_info">Uygulama bazında seçin: Güven modunda ajan orada açılır pencere olmadan çalışır; Katı modda ise Gönder, Öde, Sil… öncesinde Buddy size kendisi sorar.</string>
     <string name="setup_dev_mode">Geliştirici modu</string>
-    <string name="setup_dev_mode_info">Baloncuğun ajanı ~/.buddy/work içinde komut çalıştırabilir ve dosya düzenleyebilir; böylece uygulama geliştirip yükleyebilir.</string>
+    <string name="setup_dev_mode_info">Baloncuğun ajanı Termux içinde komut çalıştırabilir ve dosya düzenleyebilir; böylece uygulama geliştirip yükleyebilir.</string>
     <string name="setup_agents_tap">Ajanların Buddy ekranlarına dokunmasına izin ver</string>
     <string name="setup_agents_tap_info">Buddy\'yi bir ajanla test etmek için (örneğin telefon araçlarıyla Termux\'ta Claude Code). Baloncuk, onay kartları, Uygulama izinleri ve bu anahtarlar erişime kapalı kalır.</string>
     <string name="setup_dev_mode_warning">Günlük kullanımda kapalı tutun: açıkken ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
@@ -783,53 +620,12 @@
     <string name="setup_licences">Açık kaynak lisansları</string>
     <string name="setup_privacy_policy">Gizlilik politikası</string>
 
-    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
-    <string name="linux_download_corrupt">Alpine indirmesi bozuk (sha256 %1$s)</string>
-    <string name="linux_move_failed">Alpine yerine taşınamadı</string>
-    <string name="linux_download_failed_http">İndirme başarısız: HTTP %1$d</string>
-    <string name="linux_unsafe_path">Arşivde güvenli olmayan yol: %1$s</string>
-    <string name="linux_symlink_failed">symlink %1$s: %2$s</string>
-    <string name="linux_truncated_archive">Arşiv eksik</string>
-
     <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
     <string name="terminal_title">Terminal</string>
-    <string name="terminal_back">Geri</string>
-    <string name="terminal_hide_keyboard">Klavyeyi gizle</string>
-    <string name="terminal_menu">Menü</string>
-    <plurals name="terminal_sessions_count">
-        <item quantity="one">%1$d oturum · buddy linux</item>
-        <item quantity="other">%1$d oturum · buddy linux</item>
-    </plurals>
-    <string name="terminal_listening">dinleniyor · mikrofon açık</string>
-    <string name="terminal_session_ended">Oturum sona erdi</string>
-    <string name="terminal_session_ended_code">Oturum sona erdi · çıkış %1$d</string>
-    <string name="terminal_close">Kapat</string>
-    <string name="terminal_restart">Yeniden başlat</string>
-    <string name="terminal_needs_linux">Önce Ayarlar\'dan Claude Code, Codex veya OpenCode\'u yükleyin: bu, Buddy\'nin Linux\'unu kurar.</string>
-    <string name="terminal_start_failed">Terminal başlatılamadı: %1$s</string>
-    <string name="terminal_close_title">%1$s kapatılsın mı?</string>
-    <string name="terminal_close_running">Hâlâ çalışıyor. Kapatmak onu ve başlattığı her şeyi durdurur.</string>
-    <string name="terminal_shell_name">kabuk %1$d</string>
-    <string name="terminal_new_session">Yeni oturum</string>
-    <string name="terminal_paste">Yapıştır</string>
-    <string name="terminal_select_all">Tümünü seç</string>
-    <string name="terminal_larger_text">Daha büyük metin</string>
-    <string name="terminal_smaller_text">Daha küçük metin</string>
-    <string name="terminal_screen_sleep">Ekranın uyumasına izin ver</string>
-    <string name="terminal_keep_screen_on">Ekranı açık tut</string>
-    <string name="terminal_close_session">Bu oturumu kapat</string>
-    <string name="terminal_tips">Metin veya bağlantı seçmek için uzun basın. Yakınlaştırmak için iki parmakla sıkıştırın, geri kaydırmak için sürükleyin. Bir sekmeyi kapatmak için ona uzun basın.</string>
-
-    <!-- Terminal: floating toolbar over selected text. Keep short. -->
-    <string name="terminal_copy">Kopyala</string>
-    <string name="terminal_open_link">Bağlantıyı aç</string>
-    <string name="terminal_share">Paylaş</string>
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Oturumlar</string>
     <string name="monitor_subtitle">Bu telefondaki tüm Claude Code ve Codex oturumları.</string>
-    <string name="monitor_terminal_running">Bir kabuk çalışıyor · dönmek için dokunun</string>
-    <string name="monitor_terminal_idle">Buddy\'nin Linux\'unda bir kabuk</string>
     <string name="monitor_running_now">Şu an çalışanlar</string>
     <string name="monitor_refresh">yenileme 3 sn</string>
     <string name="monitor_checking">Kontrol ediliyor…</string>
@@ -854,8 +650,6 @@
     <string name="monitor_service_meta">pid %1$d · çalışma süresi %2$s · arka plan oturumlarını barındırır</string>
     <string name="monitor_no_history">Geçmiş bulunamadı.</string>
     <string name="monitor_no_messages">(mesaj yok)</string>
-
-    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
 
     <!-- App permissions screen (Settings → App permissions). Mode names: Güven (Trust), Katı (Hard), Akıllı (Smart). -->
     <string name="perms_title">Uygulama izinleri</string>
@@ -921,35 +715,6 @@
     <!-- Smart reviewer: its reason when it fails (starts lowercase). -->
     <string name="reviewer_failed">denetçi yanıt veremedi (%1$s)</string>
     <string name="reviewer_no_answer">yanıt yok</string>
-    <string name="reviewer_timed_out">zaman aşımı</string>
-
-    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
-    <string name="helper_linux_missing">Buddy\'nin Linux\'u henüz yüklü değil. Kurmak için Ayarlar\'ı açın.</string>
-
-    <!-- Voice input (dictation): "Claude sesi" and "ChatGPT sesi" are the two voice input options. -->
-    <string name="dictation_claude_sign_in">Claude sesini kullanmak için Ayarlar\'dan Claude Code\'a giriş yapın.</string>
-    <string name="dictation_codex_sign_in">ChatGPT sesini kullanmak için Ayarlar\'dan Codex\'e giriş yapın.</string>
-    <string name="dictation_starting">Başlatılıyor…</string>
-    <string name="dictation_starting_claude">Claude başlatılıyor…</string>
-    <string name="dictation_transcribing">Metne dönüştürülüyor…</string>
-    <string name="dictation_no_speech">Anlaşılamadı.</string>
-    <string name="dictation_mic_failed">Mikrofon açılamadı.</string>
-    <string name="dictation_claude_start_failed">Claude sesi başlatılamadı: %1$s</string>
-    <string name="dictation_claude_no_start">Claude sesi başlamadı.</string>
-    <string name="dictation_claude_code_no_start">Claude Code başlamadı</string>
-    <string name="dictation_chatgpt_start_failed">ChatGPT sesi başlatılamadı: %1$s</string>
-    <string name="dictation_chatgpt_no_connect">ChatGPT sesi bağlanamadı (%1$s).</string>
-    <string name="dictation_chatgpt_error">ChatGPT sesi: %1$s</string>
-    <string name="dictation_connection_failed">bağlantı başarısız oldu</string>
-    <string name="dictation_stage_page">sayfa başlatılıyor</string>
-    <string name="dictation_stage_codex">Codex bekleniyor</string>
-    <string name="dictation_stage_call">arama başlatılıyor</string>
-    <string name="dictation_stage_answer">ChatGPT\'nin yanıtı bekleniyor</string>
-    <string name="dictation_stage_connecting">bağlanıyor</string>
-    <string name="dictation_codex_no_start">Codex başlamadı</string>
-    <string name="dictation_request_timed_out">%1$s zaman aşımına uğradı</string>
-    <string name="dictation_codex_stopped">Codex durdu: %1$s</string>
-    <string name="dictation_no_details">ayrıntı yok</string>
 
     <!-- Notification rules -->
     <string name="card_label_countdown">BİRAZDAN OTOMATİK ONAYLANACAK</string>

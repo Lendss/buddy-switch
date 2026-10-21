@@ -265,4 +265,4 @@ The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 
 ## License
 
-[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0). Bundled proot (GPL-2.0), talloc (LGPL-3.0) and libandroid-shmem (BSD-3-Clause): see [third_party](third_party/README.md) for licences and source.
+[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0). See [third_party](third_party/README.md).

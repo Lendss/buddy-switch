@@ -192,9 +192,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             unregisterReceiver(lockReceiver);
         } catch (Exception ignored) {
         }
-        RemoteSession.stop();
-        SshServer.stop();
-        CodexRemote.stop();
         main.removeCallbacks(updateCheck);
         if (server != null) server.stop();
         if (autoPause != null) autoPause.stop();
@@ -235,56 +232,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 if (bubble != null) bubble.onRotated();
             });
         }
-    }
-
-    // ---------------------------------------- Claude sign-in (built-in Linux)
-
-    private final Runnable codeWatch = new Runnable() {
-        @Override
-        public void run() {
-            if (!Account.CLAUDE.waitingForCode() || System.currentTimeMillis() > codeWatchUntil) return;
-            String code = null;
-            try {
-                for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
-                    android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
-                    if (r == null) continue;
-                    code = scanForCode(r, new int[]{0});
-                    r.recycle();
-                    if (code != null) break;
-                }
-            } catch (Exception ignored) {
-            }
-            if (code != null && Account.CLAUDE.submit(code)) {
-                startActivity(new Intent(BuddyService.this, SignInActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                return;
-            }
-            main.postDelayed(this, 700);
-        }
-    };
-
-    /** While a Claude sign-in waits for its code, look for it on screen (the browser's confirmation page). */
-    private long codeWatchUntil;
-
-    void watchForLoginCode() {
-        codeWatchUntil = System.currentTimeMillis() + 10 * 60_000L; // the old Termux watcher also gave up eventually
-        main.removeCallbacks(codeWatch);
-        main.postDelayed(codeWatch, 1500);
-    }
-
-    private static String scanForCode(android.view.accessibility.AccessibilityNodeInfo n, int[] seen) {
-        if (n == null || ++seen[0] > 4000) return null;
-        String c = Account.CLAUDE.findCode(n.getText());
-        if (c == null) c = Account.CLAUDE.findCode(n.getContentDescription());
-        if (c != null) return c;
-        for (int i = 0; i < n.getChildCount(); i++) {
-            android.view.accessibility.AccessibilityNodeInfo k = n.getChild(i);
-            if (k == null) continue;
-            c = scanForCode(k, seen);
-            k.recycle(); // these are pooled before Android 13; scanning repeats every 0.7 s
-            if (c != null) return c;
-        }
-        return null;
     }
 
     // ------------------------------------------------- first-run guide

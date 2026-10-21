@@ -4,8 +4,6 @@
     <string name="service_label">مساعد Buddy</string>
     <string name="service_description">تعرض فقاعة المحادثة في Buddy، وتتيح لـ Claude Code أو Codex، اللذين يعملان داخل Buddy على هذا الهاتف، قراءة الشاشة والنقر والكتابة والتمرير نيابةً عنك. لا يخرج أي شيء من الهاتف إلا ما يرسله الوكيل نفسه إلى Anthropic أو OpenAI.</string>
 
-    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
-
     <!-- First-run setup guide: top bar and buttons shared by several steps. -->
     <string name="onboarding_skip_setup">تخطي الإعداد</string>
     <string name="onboarding_skip_title">هل تريد تخطي دليل الإعداد؟</string>
@@ -51,33 +49,10 @@
     <string name="onboarding_app_info">معلومات التطبيق</string>
 
     <!-- Guide, step: install the agent inside Buddy and sign in. -->
-    <string name="onboarding_agents_title">التثبيت وتسجيل الدخول</string>
-    <string name="onboarding_agents_done_title">جاهز</string>
-    <string name="onboarding_agents_done">تم تثبيت %1$s وتسجيل الدخول إليه.</string>
-    <string name="onboarding_agents_done_both">تم تثبيت Claude Code وCodex وتسجيل الدخول إليهما.</string>
-    <string name="onboarding_agents_text">يتم تثبيت %1$s داخل التطبيق، ثم تسجّل الدخول مرة واحدة فقط. لا حاجة إلى Termux.</string>
     <string name="onboarding_agent_names_both">Claude Code وCodex</string>
-    <string name="onboarding_agent_ready">جاهز · %1$s</string>
     <string name="onboarding_agent_free_models">نماذج مجانية</string>
     <string name="onboarding_agent_signed_in">تم تسجيل الدخول</string>
     <string name="onboarding_agent_signed_in_as">تم تسجيل الدخول · %1$s</string>
-    <string name="onboarding_agent_installing">جارٍ التثبيت…</string>
-    <string name="onboarding_agent_installed">مثبَّت · لم يتم تسجيل الدخول</string>
-    <string name="onboarding_agent_not_installed">غير مثبَّت</string>
-    <string name="onboarding_agent_sign_in_claude">سجّل الدخول بحسابك في Claude. سيُفتح المتصفح؛ انقر على «Authorize» وسيعود Buddy تلقائيًا.</string>
-    <string name="onboarding_agent_checking_opencode">جارٍ التحقق من OpenCode…</string>
-    <string name="onboarding_agent_sign_in_codex">سجّل الدخول بحسابك في ChatGPT من المتصفح، ثم ارجع إلى هنا.</string>
-    <string name="onboarding_agent_download_claude">يتم تنزيل نحو 235 ميغابايت مرة واحدة (نظام Linux في Buddy وClaude Code من Anthropic).</string>
-    <string name="onboarding_agent_download_opencode">يتم تنزيل نحو 230 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وOpenCode). لا حاجة إلى حساب.</string>
-    <string name="onboarding_agent_download_codex">يتم تنزيل نحو 150 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وCodex من OpenAI).</string>
-    <string name="onboarding_sign_in_claude">تسجيل الدخول باستخدام Claude</string>
-    <string name="onboarding_sign_in_chatgpt">تسجيل الدخول باستخدام ChatGPT</string>
-    <string name="onboarding_install_agent">تثبيت %1$s</string>
-    <string name="onboarding_agents_wifi">استخدم شبكة Wi-Fi إن أمكن. يمكنك مغادرة هذه الشاشة أثناء التثبيت.</string>
-    <string name="onboarding_stuck_sign_in_q">لم يعُد Buddy بعد تسجيل الدخول؟</string>
-    <string name="onboarding_stuck_sign_in_a">بالنسبة إلى Claude: انقر على «Copy Code» في صفحة Claude، ثم ارجع إلى Buddy، وسيأخذ الرمز من الحافظة تلقائيًا.</string>
-    <string name="onboarding_stuck_install_q">فشل التثبيت؟</string>
-    <string name="onboarding_stuck_install_a">تحقق من اتصالك وانقر على «تثبيت» مرة أخرى؛ سيُستأنف التثبيت من حيث توقف.</string>
 
     <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
     <string name="onboarding_background_title">إبقاء Buddy قيد التشغيل</string>
@@ -186,8 +161,6 @@
     <string name="prefs_accent_violet">بنفسجي</string>
     <string name="prefs_accent_rose">وردي</string>
     <string name="prefs_accent_amber">كهرماني</string>
-
-    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
 
     <!-- Floating bubble, read by TalkBack. -->
     <string name="bubble_face_description">فقاعة Buddy. انقر للفتح، واضغط مطولًا لعرض الإجراءات</string>
@@ -307,8 +280,6 @@
     <string name="pause_call_ended_title">انتهت المكالمة · Buddy متوقف مؤقتًا</string>
     <string name="pause_call_ended_text">اضغط لاستئناف المهمة</string>
 
-    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
-
     <!-- Chat screen: app bar -->
     <string name="chat_back">رجوع</string>
     <string name="chat_read_aloud">قراءة الردود بصوت عالٍ</string>
@@ -341,7 +312,6 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">لغة التحدث</string>
     <string name="chat_speak_in_help">اختر لغاتك من الإعدادات ← الصوت.</string>
-    <string name="chat_phone_voice">صوت الهاتف</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
     <string name="chat_card_question">سؤال</string>
@@ -507,85 +477,18 @@
     <string name="voice_link">رابط</string>
     <string name="voice_stop_and_send">إيقاف وإرسال</string>
 
-    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
-
     <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). -->
     <string name="signin_back">رجوع</string>
     <string name="signin_checking">جارٍ التحقق…</string>
 
-    <!-- Sign-in screen: the agent isn't installed yet. -->
-    <string name="signin_install">تثبيت %1$s</string>
-    <string name="signin_install_sub_claude">يشغّل Claude Code داخل Buddy باستخدام اشتراكك في Claude.</string>
-    <string name="signin_install_sub_opencode">يشغّل OpenCode داخل Buddy. تعمل نماذجه المجانية فورًا دون الحاجة إلى حساب، ويمكنك ربط مزوّديك (Anthropic وOpenAI وGitHub Copilot…) في أي وقت.</string>
-    <string name="signin_install_sub_codex">يشغّل Codex داخل Buddy باستخدام اشتراكك في ChatGPT.</string>
-    <string name="signin_install_size_claude">يتم تنزيل نحو 235 ميغابايت مرة واحدة: نظام Linux في Buddy وClaude Code من Anthropic. استخدم شبكة Wi-Fi إن أمكن.</string>
-    <string name="signin_install_size_opencode">يتم تنزيل نحو 230 ميغابايت مرة واحدة: نظام Linux في Buddy وNode.js وOpenCode. استخدم شبكة Wi-Fi إن أمكن.</string>
-    <string name="signin_install_size_codex">يتم تنزيل نحو 150 ميغابايت مرة واحدة: نظام Linux في Buddy وNode.js وCodex من OpenAI. استخدم شبكة Wi-Fi إن أمكن.</string>
-
-    <!-- Sign-in screen: install or update in progress (screen titles). -->
-    <string name="signin_installing">جارٍ التثبيت</string>
-    <string name="signin_updating">جارٍ التحديث</string>
-    <string name="signin_install_wait">يستغرق ذلك بضع دقائق. يمكنك مغادرة هذه الشاشة، وستستمر العملية.</string>
-
-    <!-- Sign-in screen: installed, not signed in. -->
-    <string name="signin_title_claude">تسجيل الدخول إلى Claude</string>
-    <string name="signin_title_chatgpt">تسجيل الدخول إلى ChatGPT</string>
-    <string name="signin_sub_claude">استخدم حسابك في Claude (خطة Pro أو Max). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
-    <string name="signin_sub_chatgpt">استخدم حسابك في ChatGPT (خطة Plus أو Pro أو Business). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
-    <string name="signin_with_claude">تسجيل الدخول باستخدام Claude</string>
-    <string name="signin_with_chatgpt">تسجيل الدخول باستخدام ChatGPT</string>
-    <string name="signin_other_device">تسجيل الدخول على جهاز آخر</string>
-    <string name="signin_with_code">تسجيل الدخول باستخدام رمز</string>
-
-    <!-- Sign-in screen: sign-in in progress. -->
-    <string name="signin_sign_in">تسجيل الدخول</string>
-    <string name="signin_starting">جارٍ بدء تسجيل الدخول…</string>
-    <string name="signin_approve_title">وافِق في المتصفح</string>
-    <string name="signin_approve_claude">انقر على «Authorize» في صفحة Claude. سيأخذ Buddy الرمز ويعود تلقائيًا.</string>
-    <string name="signin_approve_codex">سجّل الدخول واسمح لـ Codex. ثم ارجع إلى Buddy، وسيُكمل العملية تلقائيًا.</string>
-    <string name="signin_open_again">فتح صفحة تسجيل الدخول مرة أخرى</string>
-    <string name="signin_signing_in">جارٍ تسجيل الدخول</string>
-    <string name="signin_finishing">جارٍ إكمال تسجيل الدخول…</string>
-    <string name="signin_not_finished">لم يكتمل تسجيل الدخول. %1$s</string>
-
     <!-- Sign-in screen: signing in from another device. -->
-    <string name="signin_remote_claude">افتح هذا الرابط على أي جهاز ووافِق. ثم انسخ الرمز الذي تعرضه الصفحة والصقه أدناه.</string>
-    <string name="signin_enter_code">أدخِل هذا الرمز</string>
-    <string name="signin_remote_codex">على أي جهاز، افتح الرابط أدناه وسجّل الدخول إلى ChatGPT وأدخِل الرمز. سيُكمل Buddy العملية تلقائيًا.</string>
-    <string name="signin_copy_code">نسخ الرمز</string>
-    <string name="signin_code_copied">تم نسخ الرمز</string>
-    <string name="signin_code_expiry">الرمز صالح لمدة 15 دقيقة.</string>
-    <string name="signin_copy_link">نسخ الرابط</string>
-    <string name="signin_link_copied">تم نسخ الرابط</string>
-    <string name="signin_share">مشاركة</string>
-    <string name="signin_open_here">الفتح هنا</string>
     <string name="signin_no_browser">لم يتم العثور على متصفح.</string>
-    <string name="signin_no_browser_page">لم يتم العثور على متصفح لفتح صفحة تسجيل الدخول.</string>
-    <string name="signin_clip_label">تسجيل الدخول</string>
-
-    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
-    <string name="signin_paste_instead">لصق الرمز بدلًا من ذلك</string>
-    <string name="signin_paste_help">إذا لم يعُد Buddy تلقائيًا: انقر على «Copy Code» في صفحة Claude، ثم الصق الرمز هنا.</string>
-    <string name="signin_code_hint">الرمز</string>
-    <string name="signin_use_code">استخدام</string>
-    <string name="signin_start_again">ابدأ تسجيل الدخول من جديد أولًا.</string>
 
     <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
     <string name="signin_signed_in">تم تسجيل الدخول</string>
     <string name="signin_agent_ready">أصبح %1$s جاهزًا.</string>
     <string name="signin_done">تم</string>
-    <string name="signin_sign_out">تسجيل الخروج</string>
-    <string name="signin_sign_out_title">هل تريد تسجيل الخروج من %1$s؟</string>
-    <string name="signin_sign_out_text">سيتوقف %1$s في Buddy عن العمل حتى تسجّل الدخول مرة أخرى.</string>
-    <string name="signin_opencode_ready">أصبح OpenCode جاهزًا</string>
-    <string name="signin_opencode_free">تستخدم حاليًا نماذج OpenCode المجانية. اختر نموذجًا لكل محادثة من زر النموذج، أو اربط مزوّدك الخاص.</string>
-    <string name="signin_opencode_connected">المزوّدون المرتبطون: %1$s. وتظل نماذج OpenCode المجانية متاحة أيضًا.</string>
-    <string name="signin_opencode_connect_note">يؤدي ربط مزوّد إلى فتح الطرفية في Buddy مع الأمر %1$s: اختر مزوّدًا واتبع خطواته. ولإزالته لاحقًا، شغّل الأمر %2$s هناك.</string>
-    <string name="signin_connect_provider">ربط مزوّد</string>
     <string name="signin_version">الإصدار المثبَّت: %1$s %2$s.</string>
-    <string name="signin_version_old_opencode">الإصدار المثبَّت: OpenCode %1$s. صدر OpenCode 2: حدِّث لمواصلة الحصول على الإصدارات الجديدة. سيتم الاحتفاظ بالمزوّدين المرتبطين.</string>
-    <string name="signin_update_opencode2">التحديث إلى OpenCode 2</string>
-    <string name="signin_check_updates">البحث عن تحديثات</string>
 
     <!-- Sign-in screen: error. -->
     <string name="signin_error_title">حدث خطأ ما</string>
@@ -595,18 +498,7 @@
     <string name="account_tagline_claude">يستخدم اشتراكك في Claude</string>
     <string name="account_tagline_opencode">نماذج مجانية أو مزوّدوك الخاصون</string>
     <string name="account_tagline_codex">يستخدم اشتراكك في ChatGPT</string>
-    <string name="account_setting_up_linux">جارٍ إعداد نظام Linux في Buddy…</string>
-    <string name="account_installing_tools">جارٍ تثبيت الأدوات…</string>
-    <string name="account_downloading_claude">جارٍ تنزيل Claude Code (نحو 230 ميغابايت)…</string>
-    <string name="account_downloading">جارٍ تنزيل %1$s…</string>
     <string name="account_check_failed">تعذّر التحقق من %1$s: %2$s</string>
-    <string name="account_install_failed">فشل التثبيت: %1$s</string>
-    <string name="account_update_checking">جارٍ البحث عن إصدار جديد من %1$s…</string>
-    <string name="account_update_latest">لديك أحدث إصدار (%1$s).</string>
-    <string name="account_updated">تم التحديث إلى %1$s.</string>
-    <string name="account_updated_from">تم التحديث إلى %1$s (كان %2$s).</string>
-    <string name="account_update_opencode2_failed">تعذّر التحديث إلى OpenCode 2، ولا يزال لديك الإصدار %1$s. حاول مرة أخرى عبر شبكة Wi-Fi.</string>
-    <string name="account_update_failed">فشل التحديث: %1$s</string>
 
     <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort"). -->
     <string name="models_default">الافتراضي</string>
@@ -645,15 +537,6 @@
     <string name="remote_restarting">جارٍ إعادة التشغيل…</string>
     <string name="remote_start_failed">تعذّر البدء: %1$s</string>
     <string name="remote_keeps_stopping">تتوقف الجلسة باستمرار. أوقفها ثم شغّلها مرة أخرى، أو تحقق من تسجيل الدخول إلى Claude Code.</string>
-    <string name="codex_pair_getting">جارٍ الحصول على رمز…</string>
-    <string name="codex_pair_text">أدخل هذا الرمز في ChatGPT: في Codex على الهاتف، أو في الإعدادات ← الاتصالات ← التحكم في أجهزة أخرى على الكمبيوتر. يعمل مرة واحدة حتى %1$s. يظهر Buddy هناك باسم «localhost».</string>
-    <string name="codex_pair_failed">تعذّر الحصول على رمز إقران: %1$s</string>
-    <string name="codex_keeps_stopping">تتوقف جلسة Codex باستمرار: %1$s</string>
-    <string name="ssh_keeps_stopping">يتوقف خادم SSH باستمرار: %1$s</string>
-    <string name="ssh_key_added">تم. لفتح Linux الخاص بـ Buddy من Termux، اكتب ssh buddy.</string>
-    <string name="ssh_code_expired">سبق استخدام هذا الأمر أو مرّ عليه أكثر من 10 دقائق. انسخه مرة أخرى من الإعدادات في Buddy.</string>
-
-    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">الإعدادات</string>
@@ -669,20 +552,9 @@
     <string name="setup_step_a11y_restricted">مفتاح التبديل معطّل («إعداد محظور»)؟ يحظر Android ذلك للتطبيقات المثبَّتة من ملف. انقر على «معلومات التطبيق»، ثم على ⋮ في أعلى اليسار ← «السماح بالإعدادات المحظورة»، وحاول مرة أخرى.</string>
     <string name="setup_open_settings">فتح الإعدادات</string>
     <string name="setup_app_info">معلومات التطبيق</string>
-    <string name="setup_step_install_title">تثبيت %1$s</string>
-    <string name="setup_step_install_done">تم تثبيت %1$s في Buddy.</string>
-    <string name="setup_step_install_claude">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s من Anthropic (نحو 235 ميغابايت).</string>
-    <string name="setup_step_install_opencode">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s (نحو 230 ميغابايت مع Node.js).</string>
-    <string name="setup_step_install_codex">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s من OpenAI (نحو 150 ميغابايت).</string>
-    <string name="setup_install">تثبيت</string>
     <string name="setup_step_signin_title">تسجيل الدخول</string>
-    <string name="setup_step_signin_opencode_done">لا حاجة إلى تسجيل الدخول: تعمل نماذج OpenCode المجانية فورًا. يمكنك ربط مزوّديك في أي وقت.</string>
-    <string name="setup_step_signin_opencode">لا حاجة إلى تسجيل الدخول لاستخدام نماذج OpenCode المجانية.</string>
     <string name="setup_step_signin_done">تم تسجيل الدخول.</string>
     <string name="setup_step_signin_done_email">تم تسجيل الدخول بحساب %1$s.</string>
-    <string name="setup_step_signin_claude">باستخدام حسابك في Claude (خطة Pro أو Max). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
-    <string name="setup_step_signin_codex">باستخدام حسابك في ChatGPT. سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
-    <string name="setup_sign_in">تسجيل الدخول</string>
     <string name="setup_step_background_title">السماح لـ Buddy بالعمل في الخلفية</string>
     <string name="setup_step_background_done">تم السماح.</string>
     <string name="setup_step_background_body">حتى لا يوقف هاتفك Buddy لتوفير طاقة البطارية أثناء عمل الوكيل.</string>
@@ -708,12 +580,7 @@
 
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">الوكيل</string>
-    <string name="setup_default_brain">الوكيل الافتراضي</string>
-    <string name="setup_default_brain_info">الوكيل الذي يردّ على المحادثات الجديدة من الفقاعة أو زر «محادثة جديدة». يستخدم Claude Code اشتراكك في Claude، وCodex اشتراكك في ChatGPT، وOpenCode نماذجه المجانية أو مزوّديك الخاصين. لا يمكن اختيار إلا الوكلاء الذين تم إعدادهم.</string>
-    <string name="setup_default_brain_set">ستستخدم المحادثات الجديدة %1$s. ويمكنك الاختيار لكل محادثة باستخدام زر «محادثة جديدة».</string>
-    <string name="setup_set_up_first">أعِدّ %1$s أولًا.</string>
     <string name="setup_agent_installing">جارٍ التثبيت…</string>
-    <string name="setup_agent_not_installed">غير مثبَّت</string>
     <string name="setup_agent_ready">جاهز</string>
     <string name="setup_agent_ready_plan">جاهز · %1$s</string>
     <string name="setup_agent_signed_in">تم تسجيل الدخول</string>
@@ -729,14 +596,9 @@
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">الصوت</string>
     <string name="setup_voice_input">الإدخال الصوتي</string>
-    <string name="setup_voice_phone">الهاتف</string>
-    <string name="setup_voice_input_claude">الإملاء الصوتي في Claude Code باستخدام اشتراكك في Claude: دقيق جدًا. يدعم الإنجليزية والفرنسية والألمانية والإسبانية والإيطالية والبرتغالية والهولندية والتركية والروسية واليابانية وغيرها، لكنه لا يدعم العربية: فللعربية يستخدم Buddy أداة التعرّف على الكلام في الهاتف. تظهر الكلمات عندما تتوقف عن الكلام.</string>
-    <string name="setup_voice_input_chatgpt">صوت ChatGPT عبر Codex، باستخدام اشتراكك في ChatGPT. يفهم أي لغة، حتى لو خلطت بين لغتين في جملة واحدة. تُستخدم كلماتك فقط: ردود ChatGPT الصوتية مكتومة، ولا يمكنه تشغيل أي شيء.</string>
     <string name="setup_voice_input_phone">خدمة التعرّف على الكلام في هاتفك (Google في معظم الهواتف). يظهر النص مباشرةً أثناء حديثك، وتكتشف الخدمة أيّ لغاتك تتحدث بها.</string>
     <string name="setup_voice_output">الإخراج الصوتي</string>
-    <string name="setup_voice_output_chatgpt">تُقرأ الردود بصوت ChatGPT الطبيعي (باستخدام اشتراكك في ChatGPT عبر Codex). ويُحتسب ذلك من استخدامك لميزة الصوت في ChatGPT؛ وإذا لم يكن متاحًا، يقرأ صوت الهاتف بدلًا منه.</string>
     <string name="setup_voice_output_phone">أصوات تحويل النص إلى كلام في هاتفك، بلغة الرد.</string>
-    <string name="setup_voice_sample">Bonjour ! مرحبًا، أنا Buddy. هكذا يبدو صوتي.</string>
     <string name="setup_languages">اللغات</string>
     <string name="setup_languages_hint">انقر لاختيار اللغات التي تتحدث بها. اضغط مطولًا على إحداها لجعلها اللغة الافتراضية. وفي المحادثة، اضغط مطولًا على الميكروفون لتبديل اللغة.</string>
     <string name="setup_sign_in_first">سجّل الدخول إلى %1$s أولًا</string>
@@ -754,36 +616,6 @@
     <string name="setup_remote_stopped">متوقفة</string>
     <string name="setup_remote_open">فتح في تطبيق Claude</string>
     <string name="setup_remote_open_failed">تعذّر فتحها.</string>
-    <string name="setup_codex_session">جلسة Codex</string>
-    <string name="setup_codex_session_info">Codex مع أدوات الهاتف، يعمل داخل Buddy. استخدمه من تطبيق ChatGPT (قسم Codex) على هذا الهاتف أو على كمبيوتر. لا يمكن تشغيل بيئة Codex المعزولة هنا، لذا مع الأذونات الافتراضية يسأل قبل كل أمر.</string>
-    <string name="setup_codex_active">يعمل · «localhost» في ChatGPT</string>
-    <string name="setup_codex_pair">إقران جهاز</string>
-    <string name="setup_ssh">SSH من Termux</string>
-    <string name="setup_ssh_info">استخدم Linux الخاص بـ Buddy من Termux عبر SSH. لا يمكن الاتصال إلا من تطبيقات هذا الهاتف، وبمفتاح فقط.</string>
-    <string name="setup_ssh_active">يعمل · المنفذ %1$d</string>
-    <string name="setup_ssh_how">انسخ هذا الأمر وشغّله مرة واحدة في Termux خلال 10 دقائق. بعد ذلك، اكتب ssh buddy في Termux لفتح Linux الخاص بـ Buddy.</string>
-
-    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
-    <string name="setup_old_chats_title">إزالة محادثات Termux القديمة</string>
-    <plurals name="setup_old_chats_body">
-        <item quantity="zero">%1$d محادثة من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتها.</item>
-        <item quantity="one">محادثة واحدة من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتها.</item>
-        <item quantity="two">محادثتان من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتهما.</item>
-        <item quantity="few">%1$d محادثات من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتها.</item>
-        <item quantity="many">%1$d محادثة من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتها.</item>
-        <item quantity="other">%1$d محادثة من قبل أن يصبح لـ Buddy نظام Linux خاص به. لا يمكن للوكلاء متابعتها.</item>
-    </plurals>
-    <plurals name="setup_old_chats_remove">
-        <item quantity="zero">هل تريد إزالة %1$d محادثة قديمة؟</item>
-        <item quantity="one">هل تريد إزالة محادثة قديمة واحدة؟</item>
-        <item quantity="two">هل تريد إزالة محادثتين قديمتين؟</item>
-        <item quantity="few">هل تريد إزالة %1$d محادثات قديمة؟</item>
-        <item quantity="many">هل تريد إزالة %1$d محادثة قديمة؟</item>
-        <item quantity="other">هل تريد إزالة %1$d محادثة قديمة؟</item>
-    </plurals>
-    <string name="setup_old_chats_remove_body">ستُزال من قائمة المحادثات في Buddy. لا يمكن التراجع عن ذلك.</string>
-    <string name="setup_remove">إزالة</string>
-    <string name="setup_removed">تمت الإزالة.</string>
 
     <!-- Settings screen: Experience. -->
     <string name="setup_experience">التجربة</string>
@@ -809,7 +641,7 @@
     <string name="setup_app_permissions">أذونات التطبيقات</string>
     <string name="setup_app_permissions_info">اختر لكل تطبيق: «موثوق» يتيح للوكيل العمل فيه دون نوافذ منبثقة، و«صارم» يعني أن Buddy نفسه يسألك قبل «إرسال» و«دفع» و«حذف»…</string>
     <string name="setup_dev_mode">وضع المطوّر</string>
-    <string name="setup_dev_mode_info">يمكن لوكيل الفقاعة تنفيذ الأوامر وتعديل الملفات في &#x200E;~/.buddy/work، ليتمكن من إنشاء التطبيقات وتثبيتها.</string>
+    <string name="setup_dev_mode_info">يمكن لوكيل الفقاعة تنفيذ الأوامر وتعديل الملفات في &#x200E;Termux، ليتمكن من إنشاء التطبيقات وتثبيتها.</string>
     <string name="setup_agents_tap">السماح للوكلاء بالنقر على شاشات Buddy</string>
     <string name="setup_agents_tap_info">لاختبار Buddy باستخدام وكيل (مثل Claude Code في Termux مع أدوات الهاتف). تظل الفقاعة وبطاقات الموافقة و«أذونات التطبيقات» وهذه المفاتيح خارج نطاق الوصول.</string>
     <string name="setup_dev_mode_warning">أبقِه متوقفًا في الاستخدام اليومي: عند تفعيله، قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
@@ -818,57 +650,12 @@
     <string name="setup_licences">تراخيص البرامج المفتوحة المصدر</string>
     <string name="setup_privacy_policy">سياسة الخصوصية</string>
 
-    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
-    <string name="linux_download_corrupt">ملف Alpine الذي تم تنزيله تالف (sha256 %1$s)</string>
-    <string name="linux_move_failed">تعذّر نقل Alpine إلى موضعه</string>
-    <string name="linux_download_failed_http">فشل التنزيل: HTTP %1$d</string>
-    <string name="linux_unsafe_path">مسار غير آمن في الأرشيف: &#x200E;%1$s</string>
-    <string name="linux_symlink_failed">تعذّر إنشاء الرابط الرمزي &#x200E;%1$s: %2$s</string>
-    <string name="linux_truncated_archive">الأرشيف غير مكتمل</string>
-
     <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
     <string name="terminal_title">الطرفية</string>
-    <string name="terminal_back">رجوع</string>
-    <string name="terminal_hide_keyboard">إخفاء لوحة المفاتيح</string>
-    <string name="terminal_menu">القائمة</string>
-    <plurals name="terminal_sessions_count">
-        <item quantity="zero">%1$d جلسة · buddy linux</item>
-        <item quantity="one">جلسة واحدة · buddy linux</item>
-        <item quantity="two">جلستان · buddy linux</item>
-        <item quantity="few">%1$d جلسات · buddy linux</item>
-        <item quantity="many">%1$d جلسة · buddy linux</item>
-        <item quantity="other">%1$d جلسة · buddy linux</item>
-    </plurals>
-    <string name="terminal_listening">جارٍ الاستماع · الميكروفون مفعّل</string>
-    <string name="terminal_session_ended">انتهت الجلسة</string>
-    <string name="terminal_session_ended_code">انتهت الجلسة · رمز الخروج %1$d</string>
-    <string name="terminal_close">إغلاق</string>
-    <string name="terminal_restart">إعادة التشغيل</string>
-    <string name="terminal_needs_linux">ثبّت Claude Code أو Codex أو OpenCode من الإعدادات أولًا: سيؤدي ذلك إلى إعداد نظام Linux في Buddy.</string>
-    <string name="terminal_start_failed">تعذّر تشغيل الطرفية: %1$s</string>
-    <string name="terminal_close_title">هل تريد إغلاق %1$s؟</string>
-    <string name="terminal_close_running">لا تزال قيد التشغيل. سيؤدي إغلاقها إلى إيقافها وإيقاف كل ما بدأته.</string>
-    <string name="terminal_shell_name">صدفة %1$d</string>
-    <string name="terminal_new_session">جلسة جديدة</string>
-    <string name="terminal_paste">لصق</string>
-    <string name="terminal_select_all">تحديد الكل</string>
-    <string name="terminal_larger_text">تكبير النص</string>
-    <string name="terminal_smaller_text">تصغير النص</string>
-    <string name="terminal_screen_sleep">السماح بإطفاء الشاشة</string>
-    <string name="terminal_keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
-    <string name="terminal_close_session">إغلاق هذه الجلسة</string>
-    <string name="terminal_tips">اضغط مطولًا لتحديد نص أو رابط. قرّب إصبعيك أو باعِد بينهما للتكبير والتصغير، واسحب لعرض المخرجات السابقة. اضغط مطولًا على علامة تبويب لإغلاقها.</string>
-
-    <!-- Terminal: floating toolbar over selected text. Keep short. -->
-    <string name="terminal_copy">نسخ</string>
-    <string name="terminal_open_link">فتح الرابط</string>
-    <string name="terminal_share">مشاركة</string>
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">الجلسات</string>
     <string name="monitor_subtitle">كل جلسات Claude Code وCodex على هذا الهاتف.</string>
-    <string name="monitor_terminal_running">توجد صدفة قيد التشغيل · انقر للعودة</string>
-    <string name="monitor_terminal_idle">صدفة ضمن نظام Linux في Buddy</string>
     <string name="monitor_running_now">قيد التشغيل الآن</string>
     <string name="monitor_refresh">تحديث كل 3 ثوانٍ</string>
     <string name="monitor_checking">جارٍ التحقق…</string>
@@ -893,8 +680,6 @@
     <string name="monitor_service_meta">المعرّف %1$d · يعمل منذ %2$s · يستضيف جلسات الخلفية</string>
     <string name="monitor_no_history">لم يتم العثور على سجل.</string>
     <string name="monitor_no_messages">(لا توجد رسائل)</string>
-
-    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
 
     <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app. -->
     <string name="perms_title">أذونات التطبيقات</string>
@@ -960,35 +745,6 @@
     <!-- Smart reviewer: its reason when it fails, shown on the approval card. -->
     <string name="reviewer_failed">تعذّر على المراجِع الرد (%1$s)</string>
     <string name="reviewer_no_answer">لا يوجد رد</string>
-    <string name="reviewer_timed_out">انتهت المهلة</string>
-
-    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
-    <string name="helper_linux_missing">لم يتم تثبيت نظام Linux في Buddy بعد. افتح الإعدادات لإعداده.</string>
-
-    <!-- Voice input (dictation). Status lines show in the voice bar, errors as toasts. -->
-    <string name="dictation_claude_sign_in">سجّل الدخول إلى Claude Code من الإعدادات لاستخدام صوت Claude.</string>
-    <string name="dictation_codex_sign_in">سجّل الدخول إلى Codex من الإعدادات لاستخدام صوت ChatGPT.</string>
-    <string name="dictation_starting">جارٍ البدء…</string>
-    <string name="dictation_starting_claude">جارٍ بدء Claude…</string>
-    <string name="dictation_transcribing">جارٍ تحويل الكلام إلى نص…</string>
-    <string name="dictation_no_speech">لم أفهم ما قلته.</string>
-    <string name="dictation_mic_failed">تعذّر فتح الميكروفون.</string>
-    <string name="dictation_claude_start_failed">تعذّر بدء صوت Claude: %1$s</string>
-    <string name="dictation_claude_no_start">لم يبدأ صوت Claude.</string>
-    <string name="dictation_claude_code_no_start">لم يبدأ Claude Code</string>
-    <string name="dictation_chatgpt_start_failed">تعذّر بدء صوت ChatGPT: %1$s</string>
-    <string name="dictation_chatgpt_no_connect">تعذّر اتصال صوت ChatGPT (%1$s).</string>
-    <string name="dictation_chatgpt_error">صوت ChatGPT: %1$s</string>
-    <string name="dictation_connection_failed">فشل الاتصال</string>
-    <string name="dictation_stage_page">بدء الصفحة</string>
-    <string name="dictation_stage_codex">انتظار Codex</string>
-    <string name="dictation_stage_call">إجراء المكالمة</string>
-    <string name="dictation_stage_answer">انتظار رد ChatGPT</string>
-    <string name="dictation_stage_connecting">إنشاء الاتصال</string>
-    <string name="dictation_codex_no_start">لم يبدأ Codex</string>
-    <string name="dictation_request_timed_out">انتهت مهلة %1$s</string>
-    <string name="dictation_codex_stopped">توقف Codex: %1$s</string>
-    <string name="dictation_no_details">لا توجد تفاصيل</string>
 
     <!-- Notification rules -->
     <string name="card_label_countdown">ستتم الموافقة تلقائيًا</string>

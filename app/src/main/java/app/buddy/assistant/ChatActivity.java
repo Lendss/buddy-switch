@@ -477,9 +477,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             TextView t = title(this, Voice.languageName(tag), 15);
             t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             r.addView(t, weight1());
-            if ("claude".equals(Prefs.voiceEngine(this)) && !ClaudeDictation.supports(tag)) {
-                r.addView(monoText(this, getString(R.string.chat_phone_voice), 11, MUTED));
-            }
             r.setOnClickListener(v -> {
                 Prefs.setVoiceLang(this, tag);
                 d[0].dismiss();

@@ -73,7 +73,7 @@ final class Voice {
     }
 
     static boolean listening() {
-        return current != null || ClaudeDictation.active() || CodexDictation.active();
+        return current != null;
     }
 
     /** Languages offered for voice: {BCP-47 tag, name}. */
@@ -88,11 +88,8 @@ final class Voice {
         return tag;
     }
 
-    /** Warm up the chosen engine (a chat or the bubble opened) so the first tap on the mic is quick. */
+    /** Warm up the chosen engine (a chat or the bubble opened). This fork has only the phone's: nothing to do. */
     static void prepare(Context c) {
-        String engine = Prefs.voiceEngine(c), lang = Prefs.voiceLang(c);
-        if ("claude".equals(engine) && ClaudeDictation.supports(lang)) ClaudeDictation.prepare(c, lang);
-        else if ("chatgpt".equals(engine)) CodexDictation.prepare(c);
     }
 
     /** Start listening. Returns an error message, or null when started. */
@@ -101,11 +98,6 @@ final class Voice {
         stopListening();
         stopSpeaking();
         String lang = Prefs.voiceLang(c);
-        // Claude's dictation (on the user's Claude plan) for the languages it supports; otherwise the phone's
-        if ("claude".equals(Prefs.voiceEngine(c)) && ClaudeDictation.supports(lang)) {
-            return ClaudeDictation.listen(c, lang, l);
-        }
-        if ("chatgpt".equals(Prefs.voiceEngine(c))) return CodexDictation.listen(c, l);
         if (!SpeechRecognizer.isRecognitionAvailable(c)) return c.getString(R.string.voice_no_recognizer);
         current = l;
         l.onStatus(c.getString(R.string.voice_starting));
@@ -174,26 +166,10 @@ final class Voice {
 
     /** Stop listening now; whatever was heard so far is delivered as the final result. */
     static void finishListening() {
-        if (ClaudeDictation.active()) {
-            ClaudeDictation.finish();
-            return;
-        }
-        if (CodexDictation.active()) {
-            CodexDictation.finish();
-            return;
-        }
         if (recognizer != null) recognizer.stopListening();
     }
 
     static void stopListening() {
-        if (ClaudeDictation.active()) {
-            ClaudeDictation.cancel();
-            return;
-        }
-        if (CodexDictation.active()) {
-            CodexDictation.cancel();
-            return;
-        }
         Listener l = current;
         if (recognizer != null) recognizer.cancel();
         finish();
@@ -225,11 +201,6 @@ final class Voice {
                 .replaceAll("https?://\\S+", link)
                 .trim();
         if (clean.isEmpty()) return;
-        if ("chatgpt".equals(Prefs.speechEngine(c)) && SetupState.signedIn(c, "codex")) {
-            final Context app = c.getApplicationContext();
-            CodexSpeech.speak(app, clean, t -> phoneSpeak(app, t)); // the phone's voice if ChatGPT's fails
-            return;
-        }
         phoneSpeak(c, clean);
     }
 
@@ -293,13 +264,12 @@ final class Voice {
         return null;
     }
 
-    /** Buddy is reading something aloud (phone voice or ChatGPT's). */
+    /** Buddy is reading something aloud. */
     static boolean isSpeaking() {
-        return CodexSpeech.active() || (tts != null && ttsReady && tts.isSpeaking());
+        return (tts != null && ttsReady && tts.isSpeaking());
     }
 
     static void stopSpeaking() {
-        CodexSpeech.stop();
         if (tts != null && ttsReady) tts.stop();
     }
 }

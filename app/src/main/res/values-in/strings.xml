@@ -4,9 +4,6 @@
     <string name="service_label">Asisten Buddy</string>
     <string name="service_description">Menampilkan balon chat Buddy dan memungkinkan Claude Code atau Codex, yang berjalan di dalam Buddy di ponsel ini, membaca layar serta mengetuk, mengetik, dan menggulir untuk Anda. Tidak ada data yang keluar dari ponsel kecuali yang dikirim agen itu sendiri ke Anthropic atau OpenAI.</string>
 
-    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
-
-    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
     <!-- Button at the top right of every step. Keep short. -->
     <string name="onboarding_skip_setup">Lewati penyiapan</string>
     <string name="onboarding_skip_title">Lewati panduan penyiapan?</string>
@@ -69,48 +66,13 @@
     <!-- Button: opens Android's App info page for Buddy. Use Android's name for that page. -->
     <string name="onboarding_app_info">Info aplikasi</string>
 
-    <!-- Guide, step: install the agent inside Buddy and sign in. -->
-    <string name="onboarding_agents_title">Instal dan login</string>
-    <!-- Title once every chosen agent is installed and signed in. -->
-    <string name="onboarding_agents_done_title">Siap</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
-    <string name="onboarding_agents_done">%1$s sudah terinstal dan login.</string>
-    <!-- Same as onboarding_agents_done, when both Claude Code and Codex are set up. -->
-    <string name="onboarding_agents_done_both">Claude Code dan Codex sudah terinstal dan login.</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode) or onboarding_agent_names_both. -->
-    <string name="onboarding_agents_text">Buddy menginstal %1$s di dalam aplikasi, lalu Anda cukup login sekali. Tidak perlu Termux.</string>
     <!-- Both agents together, inserted as %1$s into onboarding_agents_text. -->
     <string name="onboarding_agent_names_both">Claude Code dan Codex</string>
-    <!-- Agent card status lines: small lowercase mono text, one line. -->
     <!-- OpenCode is ready. %1$s = its model providers, or onboarding_agent_free_models. -->
-    <string name="onboarding_agent_ready">siap · %1$s</string>
     <string name="onboarding_agent_free_models">model gratis</string>
     <string name="onboarding_agent_signed_in">sudah login</string>
     <!-- %1$s = the account's email address. -->
     <string name="onboarding_agent_signed_in_as">sudah login · %1$s</string>
-    <string name="onboarding_agent_installing">menginstal…</string>
-    <string name="onboarding_agent_installed">terinstal · belum login</string>
-    <string name="onboarding_agent_not_installed">belum terinstal</string>
-    <!-- Agent card help text. "Authorize" = the button on Claude's sign-in web page (the page may be in English). -->
-    <string name="onboarding_agent_sign_in_claude">Login dengan akun Claude Anda. Browser akan terbuka; ketuk Authorize, lalu Buddy akan kembali dengan sendirinya.</string>
-    <string name="onboarding_agent_checking_opencode">Memeriksa OpenCode…</string>
-    <string name="onboarding_agent_sign_in_codex">Login dengan akun ChatGPT Anda di browser, lalu kembali ke sini.</string>
-    <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
-    <string name="onboarding_agent_download_claude">Mendownload sekitar 235 MB, cukup sekali (Linux Buddy dan Claude Code dari Anthropic).</string>
-    <string name="onboarding_agent_download_opencode">Mendownload sekitar 230 MB, cukup sekali (Linux Buddy, Node.js, dan OpenCode). Tidak perlu akun.</string>
-    <string name="onboarding_agent_download_codex">Mendownload sekitar 150 MB, cukup sekali (Linux Buddy, Node.js, dan Codex dari OpenAI).</string>
-    <!-- Buttons on the agent card. -->
-    <string name="onboarding_sign_in_claude">Login dengan Claude</string>
-    <string name="onboarding_sign_in_chatgpt">Login dengan ChatGPT</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
-    <string name="onboarding_install_agent">Instal %1$s</string>
-    <string name="onboarding_agents_wifi">Gunakan Wi-Fi jika bisa. Anda dapat meninggalkan layar ini selama proses instal.</string>
-    <!-- Help questions and answers under "Stuck?". "Copy Code" = a button on Claude's web page. -->
-    <string name="onboarding_stuck_sign_in_q">Buddy tidak kembali setelah login?</string>
-    <string name="onboarding_stuck_sign_in_a">Claude: di halaman Claude, ketuk Copy Code, lalu kembali ke Buddy; Buddy akan mengambil kode dari papan klip.</string>
-    <string name="onboarding_stuck_install_q">Instalasi gagal?</string>
-    <!-- "Install" = the Install button on the agent card (onboarding_install_agent). -->
-    <string name="onboarding_stuck_install_a">Periksa koneksi Anda dan ketuk Instal lagi; proses akan berlanjut dari titik terakhir.</string>
 
     <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
     <string name="onboarding_background_title">Tetap berjalan</string>
@@ -144,7 +106,6 @@
     <string name="onboarding_try_now">Coba sekarang</string>
     <string name="onboarding_go_to_chats">Buka chat saya</string>
 
-    <!-- Home screen: the chat list. -->
     <!-- Floating button that starts a chat, and the title of the sheet that picks its agent. Keep short. -->
     <string name="main_new_chat">Chat baru</string>
     <!-- Small lowercase mono status under the app name when Buddy is ready. %1$s = Buddy's local server address (127.0.0.1:8765). -->
@@ -186,7 +147,6 @@
         <item quantity="other">%1$d hr</item>
     </plurals>
 
-    <!-- Notification shown after the bubble is dragged away to hide it. -->
     <!-- Notification category name in Android's notification settings for Buddy. -->
     <string name="notice_channel_name">Balon tersembunyi</string>
     <string name="notice_hidden_title">Buddy disembunyikan</string>
@@ -194,7 +154,6 @@
     <!-- Notification button: opens Buddy's chat list. Keep short. -->
     <string name="notice_open_chats">Buka chat</string>
 
-    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
     <!-- Notification category name in Android's notification settings for Buddy. -->
     <string name="update_channel_name">Update Buddy</string>
     <!-- Notification and sheet title. %1$s = the new version number, e.g. 2.1.14. -->
@@ -227,7 +186,6 @@
     <!-- Message after a failed update. %1$s = what went wrong (an update_error_ sentence); %2$s = the web address of the latest release; %3$s = the web address of the update instructions. Obtainium is an app name. -->
     <string name="update_failed_manual">%1$s Anda juga bisa mendapatkannya di %2$s (buddy.apk), atau dengan Obtainium untuk update otomatis (lihat %3$s).</string>
 
-    <!-- Settings, Appearance: option names. -->
     <!-- Light/dark mode, segmented control: keep short. System = follow the phone's setting. -->
     <string name="prefs_theme_system">Sistem</string>
     <string name="prefs_theme_light">Terang</string>
@@ -243,8 +201,6 @@
     <string name="prefs_accent_violet">Violet</string>
     <string name="prefs_accent_rose">Mawar</string>
     <string name="prefs_accent_amber">Amber</string>
-
-    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
 
     <!-- Floating bubble, read by TalkBack. -->
     <string name="bubble_face_description">Buddy. Ketuk untuk membuka, tekan lama untuk melihat tindakan</string>
@@ -312,7 +268,6 @@
     <!-- The words heard so far. %1$s: the words. Use your language's quotation marks. -->
     <string name="bubble_heard">“%1$s”</string>
 
-    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
     <!-- Starts a new chat: the + button, and the title of the agent picker it opens. -->
     <string name="bubble_new_chat">Chat baru</string>
     <string name="bubble_open_in_app">Buka di aplikasi</string>
@@ -345,7 +300,6 @@
         <item quantity="other">%1$d panggilan alat</item>
     </plurals>
 
-    <!-- List of chats in the panel. -->
     <!-- Status of a running chat, under its title. Lowercase. -->
     <string name="bubble_chat_row_working">bekerja…</string>
     <!-- Preview of the last message when the user wrote it. %1$s: the message. -->
@@ -355,7 +309,6 @@
     <!-- Button: deletes the chat. -->
     <string name="bubble_delete">Hapus</string>
 
-    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
     <!-- Small tag next to the agent that new chats use by default. Lowercase. -->
     <string name="bubble_agent_default">default</string>
     <string name="bubble_agent_not_signed_in">Belum login · ketuk untuk menyiapkan</string>
@@ -371,7 +324,6 @@
     <!-- Section heading, shown in capitals: the AI model. -->
     <string name="bubble_model">Model</string>
 
-    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
     <!-- Small all-caps label at the top of an approval card. -->
     <string name="card_label_approval">PERLU PERSETUJUAN</string>
     <!-- Small all-caps label at the top of a question card. -->
@@ -401,7 +353,6 @@
     <string name="card_note_denied">✗ Ditolak</string>
     <string name="card_note_skipped">Pertanyaan dilewati</string>
 
-    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
     <!-- Name of this notification category in Android's notification settings. -->
     <string name="control_channel_name">Buddy sedang menggunakan ponsel Anda</string>
     <string name="control_channel_description">Muncul di status bar saat agen mengoperasikan ponsel.</string>
@@ -413,9 +364,6 @@
     <string name="pause_call_ended_title">Panggilan berakhir · Buddy dijeda</string>
     <string name="pause_call_ended_text">Ketuk untuk melanjutkan tugas</string>
 
-    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
-
-    <!-- Chat screen: app bar -->
     <!-- Verb, go back. Read by TalkBack for the back arrow at the top of the chat and transcript screens; also a
          button on the approval card that leaves the text box. Keep short. -->
     <string name="chat_back">Kembali</string>
@@ -427,13 +375,11 @@
          "dev" = developer mode. Keep very short. -->
     <string name="chat_chip_dev">%1$s · dev</string>
 
-    <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
     <string name="chat_stop">Hentikan</string>
     <!-- Status while an agent works and has no step to show yet (chat strip, the bubble's status pill). -->
     <string name="chat_working">Sedang bekerja…</string>
 
-    <!-- Chat screen: composer and empty chat -->
     <!-- Read by TalkBack for the paperclip button. -->
     <string name="chat_attach_description">Lampirkan foto atau file</string>
     <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode). -->
@@ -449,7 +395,6 @@
     <!-- Same, when developer mode is on. %1$s = agent name. -->
     <string name="chat_empty_hint_dev">Chat %1$s baru. Minta agen melakukan sesuatu di ponsel Anda, atau membuat aplikasi (mode developer aktif).</string>
 
-    <!-- Model sheet (tap the model chip under the chat title) -->
     <!-- %1$s = agent name, e.g. "Claude Code model". -->
     <string name="chat_model_title">Model %1$s</string>
     <string name="chat_model_subtitle">Untuk chat ini. Percakapan berlanjut dengan model baru.</string>
@@ -464,15 +409,11 @@
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Gunakan</string>
 
-    <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
     <string name="chat_speak_in">Bicara dalam</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Pilih bahasa Anda di Setelan → Suara.</string>
-    <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
-    <string name="chat_phone_voice">suara ponsel</string>
 
-    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
     <!-- Small label in capitals at the top of the card. -->
     <string name="chat_card_question">PERTANYAAN</string>
     <!-- Small label in capitals at the top of the card. -->
@@ -490,7 +431,6 @@
     <string name="chat_send_answer">Kirim jawaban</string>
     <string name="chat_send_change">Kirim perubahan</string>
 
-    <!-- Attachments -->
     <!-- Title of the sheet behind the paperclip button. Verb. -->
     <string name="chat_attach">Lampirkan</string>
     <string name="chat_attach_camera">Ambil foto</string>
@@ -511,7 +451,6 @@
     <!-- %1$s = file name. -->
     <string name="chat_no_app_for_file">Tidak ada aplikasi yang dapat membuka %1$s.</string>
 
-    <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Disalin</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
@@ -519,7 +458,6 @@
         <item quantity="other">%1$d panggilan alat</item>
     </plurals>
 
-    <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Melanjutkan sesi %1$s sebelumnya. Jika masih terbuka di terminal, tutup dulu di sana.</string>
     <string name="hub_still_working_attachments">Chat ini masih berjalan. Kirim lampiran setelah selesai.</string>
@@ -630,7 +568,6 @@
         <item quantity="other">%1$d pesan terakhir · hanya baca</item>
     </plurals>
 
-    <!-- Shared screens: links -->
     <!-- Toast when a tapped link can't be opened. -->
     <string name="ui_no_app_for_link">Tidak ada aplikasi yang dapat membuka link ini</string>
 
@@ -646,7 +583,6 @@
     <!-- Button: agree to the disclosure and open Android's accessibility settings. -->
     <string name="ui_agree_continue">Setuju dan lanjutkan</string>
 
-    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
     <!-- Tab: the list of Buddy chats. -->
     <string name="ui_nav_chats">Chat</string>
     <!-- Tab: every agent session on the phone (running and recent). -->
@@ -654,7 +590,6 @@
     <!-- Tab: Buddy's settings. -->
     <string name="ui_nav_settings">Setelan</string>
 
-    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
     <!-- Toast when a pause runs out after 5 minutes. -->
     <string name="service_pause_expired">Dijeda selama 5 menit, jadi Buddy menghentikan tugas.</string>
     <!-- Toast after the user stops the task to use the phone. -->
@@ -667,7 +602,6 @@
     <string name="service_autopaused_touch">Dijeda karena Anda menyentuh layar. Ketuk “Dijeda” di samping balon untuk melanjutkan.</string>
     <string name="service_autopaused_call">Dijeda karena ada panggilan. Ketuk “Dijeda” di samping balon untuk melanjutkan.</string>
 
-    <!-- Voice input and output -->
     <!-- 🎙 = the mic button. -->
     <string name="voice_mic_needed">Buddy memerlukan mikrofon. Buka aplikasi Buddy dan ketuk 🎙 sekali untuk mengizinkannya.</string>
     <string name="voice_no_recognizer">Tidak ada layanan pengenalan ucapan di ponsel ini.</string>
@@ -686,8 +620,6 @@
     <!-- Read by TalkBack for the send button of the recording bar: stops recording and sends. -->
     <string name="voice_stop_and_send">Hentikan dan kirim</string>
 
-    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
-
     <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). Product and plan names
          (Claude, ChatGPT, Codex, OpenCode, Anthropic, OpenAI, Pro, Max, Plus, Business) stay as they are. -->
     <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
@@ -695,84 +627,8 @@
     <!-- Subtitle while Buddy checks whether the agent is installed and signed in. -->
     <string name="signin_checking">Memeriksa…</string>
 
-    <!-- Sign-in screen: the agent isn't installed yet. -->
-    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex or OpenCode). -->
-    <string name="signin_install">Instal %1$s</string>
-    <string name="signin_install_sub_claude">Menjalankan Claude Code di dalam Buddy dengan langganan Claude Anda.</string>
-    <string name="signin_install_sub_opencode">Menjalankan OpenCode di dalam Buddy. Model gratisnya langsung bisa dipakai, tanpa perlu akun; hubungkan penyedia Anda sendiri (Anthropic, OpenAI, GitHub Copilot…) kapan saja.</string>
-    <string name="signin_install_sub_codex">Menjalankan Codex di dalam Buddy dengan paket ChatGPT Anda.</string>
-    <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
-    <string name="signin_install_size_claude">Mendownload sekitar 235 MB, cukup sekali: Linux Buddy dan Claude Code dari Anthropic. Gunakan Wi-Fi jika bisa.</string>
-    <string name="signin_install_size_opencode">Mendownload sekitar 230 MB, cukup sekali: Linux Buddy, Node.js, dan OpenCode. Gunakan Wi-Fi jika bisa.</string>
-    <string name="signin_install_size_codex">Mendownload sekitar 150 MB, cukup sekali: Linux Buddy, Node.js, dan Codex dari OpenAI. Gunakan Wi-Fi jika bisa.</string>
-
-    <!-- Sign-in screen: install or update in progress (screen titles). -->
-    <string name="signin_installing">Menginstal</string>
-    <string name="signin_updating">Mengupdate</string>
-    <string name="signin_install_wait">Proses ini butuh beberapa menit. Anda dapat meninggalkan layar ini; prosesnya tetap berjalan.</string>
-
-    <!-- Sign-in screen: installed, not signed in. -->
-    <string name="signin_title_claude">Login ke Claude</string>
-    <string name="signin_title_chatgpt">Login ke ChatGPT</string>
-    <string name="signin_sub_claude">Gunakan akun Claude Anda (Pro atau Max). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
-    <string name="signin_sub_chatgpt">Gunakan akun ChatGPT Anda (Plus, Pro, atau Business). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
-    <!-- Main button. -->
-    <string name="signin_with_claude">Login dengan Claude</string>
-    <string name="signin_with_chatgpt">Login dengan ChatGPT</string>
-    <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
-    <string name="signin_other_device">Login di perangkat lain</string>
-    <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
-    <string name="signin_with_code">Login dengan kode</string>
-
-    <!-- Sign-in screen: sign-in in progress. -->
-    <!-- Screen title while the sign-in starts. -->
-    <string name="signin_sign_in">Login</string>
-    <!-- Also shown as status text elsewhere while the sign-in starts. -->
-    <string name="signin_starting">Memulai login…</string>
-    <string name="signin_approve_title">Setujui di browser Anda</string>
-    <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
-    <string name="signin_approve_claude">Ketuk Authorize di halaman Claude. Buddy akan mengambil kodenya dan kembali dengan sendirinya.</string>
-    <string name="signin_approve_codex">Login dan izinkan Codex. Lalu kembali ke Buddy; prosesnya selesai dengan sendirinya.</string>
-    <!-- Button. -->
-    <string name="signin_open_again">Buka lagi halaman login</string>
-    <!-- Screen title after the code was handed over. -->
-    <string name="signin_signing_in">Sedang login</string>
-    <!-- Also shown as status text elsewhere after the code was handed over. -->
-    <string name="signin_finishing">Menyelesaikan login…</string>
-    <!-- Error status. %1$s = the agent's last output (English, technical); may be empty. -->
-    <string name="signin_not_finished">Login tidak selesai. %1$s</string>
-
-    <!-- Sign-in screen: signing in from another device. -->
-    <string name="signin_remote_claude">Buka link ini di perangkat mana pun dan setujui. Lalu salin kode yang muncul di halaman tersebut dan tempel di bawah.</string>
-    <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
-    <string name="signin_enter_code">Masukkan kode ini</string>
-    <string name="signin_remote_codex">Di perangkat mana pun, buka link di bawah, login ke ChatGPT, dan masukkan kodenya. Buddy akan menyelesaikannya dengan sendirinya.</string>
-    <!-- Buttons and the toasts after them. -->
-    <string name="signin_copy_code">Salin kode</string>
-    <string name="signin_code_copied">Kode disalin</string>
-    <string name="signin_code_expiry">Kode berlaku selama 15 menit.</string>
-    <string name="signin_copy_link">Salin link</string>
-    <string name="signin_link_copied">Link disalin</string>
-    <!-- Button: share the sign-in link with another app. Verb. -->
-    <string name="signin_share">Bagikan</string>
-    <!-- Button: open the sign-in link on this phone. -->
-    <string name="signin_open_here">Buka di sini</string>
     <!-- Toasts. -->
     <string name="signin_no_browser">Browser tidak ditemukan.</string>
-    <string name="signin_no_browser_page">Tidak ada browser untuk membuka halaman login.</string>
-    <!-- Label of the copied code or link on the clipboard (rarely shown). -->
-    <string name="signin_clip_label">Login</string>
-
-    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
-    <string name="signin_paste_instead">Tempel kode secara manual</string>
-    <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
-    <string name="signin_paste_help">Jika Buddy tidak kembali dengan sendirinya: ketuk Copy Code di halaman Claude, lalu tempel di sini.</string>
-    <!-- Hint inside the empty text box for the code. Lowercase in English. -->
-    <string name="signin_code_hint">kode</string>
-    <!-- Short button next to the text box: use the pasted code. Verb. -->
-    <string name="signin_use_code">Gunakan</string>
-    <!-- Toast when there is no sign-in waiting for a code. -->
-    <string name="signin_start_again">Mulai ulang login terlebih dahulu.</string>
 
     <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
     <string name="signin_signed_in">Sudah login</string>
@@ -780,59 +636,20 @@
     <string name="signin_agent_ready">%1$s siap.</string>
     <!-- Button that closes the screen. -->
     <string name="signin_done">Selesai</string>
-    <!-- Button, and the button of the confirmation sheet. -->
-    <string name="signin_sign_out">Logout</string>
-    <!-- Confirmation sheet. %1$s = agent name. -->
-    <string name="signin_sign_out_title">Logout dari %1$s?</string>
-    <string name="signin_sign_out_text">%1$s di Buddy tidak akan berfungsi sampai Anda login lagi.</string>
-    <string name="signin_opencode_ready">OpenCode siap</string>
-    <!-- "model chip" = the button at the top of a chat that shows the agent and model. -->
-    <string name="signin_opencode_free">Menggunakan model gratis OpenCode. Pilih model per chat lewat tombol model di bagian atas chat, atau hubungkan penyedia Anda sendiri.</string>
-    <!-- %1$s = connected providers, comma-separated (e.g. "anthropic, openai"). -->
-    <string name="signin_opencode_connected">Terhubung: %1$s. Model gratis OpenCode juga tetap tersedia.</string>
-    <!-- %1$s = the command "opencode auth login", %2$s = the command "opencode auth logout" (both stay as they are). -->
-    <string name="signin_opencode_connect_note">Menghubungkan penyedia akan membuka terminal Buddy dengan %1$s: pilih penyedia dan ikuti langkah-langkahnya. Untuk menghapusnya nanti, jalankan %2$s di sana.</string>
-    <!-- Button. -->
-    <string name="signin_connect_provider">Hubungkan penyedia</string>
     <!-- Installed version. %1$s = agent name, %2$s = version number (e.g. "Claude Code 2.1.40."). -->
     <string name="signin_version">%1$s %2$s.</string>
-    <!-- %1$s = the installed OpenCode 1.x version number. -->
-    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2 sudah rilis: update agar tetap mendapatkan versi baru. Penyedia yang terhubung tetap tersimpan.</string>
-    <!-- Buttons. -->
-    <string name="signin_update_opencode2">Update ke OpenCode 2</string>
-    <string name="signin_check_updates">Periksa update</string>
 
     <!-- Sign-in screen: error. -->
     <string name="signin_error_title">Terjadi masalah</string>
     <!-- Button. -->
     <string name="signin_try_again">Coba lagi</string>
 
-    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <!-- One line under the agent's name in the agent pickers. -->
     <string name="account_tagline_claude">Menggunakan paket Claude Anda</string>
     <string name="account_tagline_opencode">Model gratis, atau penyedia Anda sendiri</string>
     <string name="account_tagline_codex">Menggunakan paket ChatGPT Anda</string>
-    <!-- Install progress. -->
-    <string name="account_setting_up_linux">Menyiapkan Linux Buddy…</string>
-    <string name="account_installing_tools">Menginstal alat…</string>
-    <string name="account_downloading_claude">Mendownload Claude Code (sekitar 230 MB)…</string>
-    <!-- %1$s = what is downloaded: an agent name (Codex, OpenCode) or "OpenCode 2". -->
-    <string name="account_downloading">Mendownload %1$s…</string>
     <!-- Error. %1$s = agent name, %2$s = technical detail in English. -->
     <string name="account_check_failed">Tidak dapat memeriksa %1$s: %2$s</string>
-    <!-- Error. %1$s = technical detail in English. -->
-    <string name="account_install_failed">Instalasi gagal: %1$s</string>
-    <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
-    <string name="account_update_checking">Memeriksa versi baru %1$s…</string>
-    <!-- %1$s = version number. -->
-    <string name="account_update_latest">Anda sudah memiliki versi terbaru (%1$s).</string>
-    <!-- %1$s = new version number. -->
-    <string name="account_updated">Diupdate ke %1$s.</string>
-    <!-- %1$s = new version number, %2$s = previous version number. -->
-    <string name="account_updated_from">Diupdate ke %1$s (sebelumnya %2$s).</string>
-    <!-- %1$s = the OpenCode version that is still installed. -->
-    <string name="account_update_opencode2_failed">Tidak dapat mengupdate ke OpenCode 2; Anda masih memakai %1$s. Coba lagi dengan Wi-Fi.</string>
-    <string name="account_update_failed">Update gagal: %1$s</string>
 
     <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort").
          Model names (Opus 5.5, GPT-6.1-Sol…) stay as they are. -->
@@ -862,7 +679,6 @@
     <!-- Chip, after the model. %1$s = effort level as the agent names it (low, medium, high, xhigh or max); not translated. -->
     <string name="models_chip_effort">upaya %1$s</string>
 
-    <!-- Chats. -->
     <!-- Title of a chat before its first message. %1$s = agent name (e.g. "New Claude Code chat"). -->
     <string name="session_new_chat">Chat %1$s baru</string>
     <!-- Preview of a message with several photos or files (a single one shows its file name instead). -->
@@ -881,21 +697,11 @@
     <!-- %1$s = technical detail in English. -->
     <string name="remote_start_failed">Tidak dapat memulai: %1$s</string>
     <string name="remote_keeps_stopping">Sesi terus berhenti. Matikan lalu nyalakan lagi, atau periksa login Claude Code.</string>
-    <string name="codex_pair_getting">Mengambil kode…</string>
-    <string name="codex_pair_text">Masukkan kode ini di ChatGPT: di Codex pada ponsel, atau di Setelan → Koneksi → Kontrol perangkat lain pada komputer. Kode ini berlaku sekali, sampai %1$s. Buddy muncul di sana sebagai “localhost”.</string>
-    <string name="codex_pair_failed">Tidak dapat mengambil kode penyambungan: %1$s</string>
-    <string name="codex_keeps_stopping">Sesi Codex terus berhenti: %1$s</string>
-    <string name="ssh_keeps_stopping">Server SSH terus berhenti: %1$s</string>
-    <string name="ssh_key_added">Selesai. Untuk membuka Linux Buddy dari Termux, ketik ssh buddy.</string>
-    <string name="ssh_code_expired">Perintah ini sudah dipakai atau sudah lebih dari 10 menit. Salin lagi di Setelan Buddy.</string>
-
-    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Setelan</string>
     <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, atau OpenCode di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode).</string>
 
-    <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
     <string name="setup_card_title">Penyiapan</string>
     <string name="setup_open_guide">Buka panduan langkah demi langkah</string>
@@ -910,29 +716,12 @@
     <string name="setup_open_settings">Buka setelan</string>
     <!-- Button: opens Android's App info page for Buddy (Android's own label). -->
     <string name="setup_app_info">Info aplikasi</string>
-    <!-- %1$s = agent name (Claude Code, Codex or OpenCode). -->
-    <string name="setup_step_install_title">Instal %1$s</string>
-    <!-- %1$s = agent name. -->
-    <string name="setup_step_install_done">%1$s sudah terinstal di Buddy.</string>
-    <!-- %1$s = Claude Code. -->
-    <string name="setup_step_install_claude">Buddy mendownload Linux kecil miliknya sendiri dan %1$s dari Anthropic (sekitar 235 MB).</string>
-    <!-- %1$s = OpenCode. -->
-    <string name="setup_step_install_opencode">Buddy mendownload Linux kecil miliknya sendiri dan %1$s (sekitar 230 MB dengan Node.js).</string>
-    <!-- %1$s = Codex. -->
-    <string name="setup_step_install_codex">Buddy mendownload Linux kecil miliknya sendiri dan %1$s dari OpenAI (sekitar 150 MB).</string>
-    <!-- Button (verb). -->
-    <string name="setup_install">Instal</string>
     <!-- Name of the sign-in setup step. -->
     <string name="setup_step_signin_title">Login</string>
-    <string name="setup_step_signin_opencode_done">Tidak perlu login: model gratis OpenCode langsung bisa dipakai. Hubungkan penyedia Anda sendiri kapan saja.</string>
-    <string name="setup_step_signin_opencode">Model gratis OpenCode tidak perlu login.</string>
     <string name="setup_step_signin_done">Sudah login.</string>
     <!-- %1$s = the account's email address. -->
     <string name="setup_step_signin_done_email">Login sebagai %1$s.</string>
-    <string name="setup_step_signin_claude">Dengan akun Claude Anda (Pro atau Max). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
-    <string name="setup_step_signin_codex">Dengan akun ChatGPT Anda. Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
     <!-- Button (verb). -->
-    <string name="setup_sign_in">Login</string>
     <string name="setup_step_background_title">Izinkan Buddy berjalan di latar belakang</string>
     <string name="setup_step_background_done">Diizinkan.</string>
     <string name="setup_step_background_body">Agar ponsel Anda tidak menghentikan Buddy untuk menghemat baterai saat agen sedang bekerja.</string>
@@ -968,17 +757,8 @@
 
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Agen</string>
-    <!-- Which AI agent answers new chats. -->
-    <string name="setup_default_brain">Agen default</string>
-    <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Agen yang menjawab chat baru dari balon atau tombol Chat baru. Claude Code memakai paket Claude Anda, Codex memakai paket ChatGPT Anda, OpenCode memakai model gratisnya atau penyedia Anda sendiri. Hanya agen yang sudah disiapkan yang bisa dipilih.</string>
-    <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_set">Chat baru akan menggunakan %1$s. Anda dapat memilih per chat dengan tombol Chat baru.</string>
-    <!-- Toast. %1$s = agent name. -->
-    <string name="setup_set_up_first">Siapkan %1$s terlebih dahulu.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
     <string name="setup_agent_installing">menginstal…</string>
-    <string name="setup_agent_not_installed">belum terinstal</string>
     <string name="setup_agent_ready">siap</string>
     <!-- %1$s = the agent's plan or models. -->
     <string name="setup_agent_ready_plan">siap · %1$s</string>
@@ -998,15 +778,10 @@
     <string name="setup_voice">Suara</string>
     <string name="setup_voice_input">Input suara</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
-    <string name="setup_voice_phone">Ponsel</string>
-    <string name="setup_voice_input_claude">Dikte Claude Code dengan paket Claude Anda: sangat akurat. Mendukung bahasa Inggris, Prancis, Jerman, Spanyol, Italia, Portugis, Belanda, Turki, Rusia, Jepang, dan lainnya, tetapi tidak untuk bahasa Arab: untuk bahasa Arab, Buddy menggunakan pengenalan ucapan ponsel. Kata-kata muncul saat Anda berhenti sejenak.</string>
-    <string name="setup_voice_input_chatgpt">Suara ChatGPT melalui Codex, dengan paket ChatGPT Anda. Memahami bahasa apa pun, bahkan yang dicampur dalam satu kalimat. Hanya ucapan Anda yang digunakan: balasan suara ChatGPT dibisukan dan ChatGPT tidak dapat menjalankan apa pun.</string>
     <string name="setup_voice_input_phone">Pengenalan ucapan ponsel Anda (Google di sebagian besar ponsel). Teks muncul langsung saat Anda berbicara; mendeteksi bahasa mana yang sedang Anda gunakan.</string>
     <string name="setup_voice_output">Output suara</string>
-    <string name="setup_voice_output_chatgpt">Balasan dibacakan dengan suara alami ChatGPT (paket ChatGPT Anda, melalui Codex). Ini dihitung dalam penggunaan suara ChatGPT Anda; jika tidak tersedia, suara ponsel yang akan membacakan.</string>
     <string name="setup_voice_output_phone">Suara text-to-speech ponsel Anda, dalam bahasa balasan.</string>
     <!-- Spoken aloud to preview the chosen ChatGPT voice. Mixing two languages is on purpose (it shows the voice switches languages): keep a greeting in another language. -->
-    <string name="setup_voice_sample">Bonjour ! Halo, saya Buddy. Beginilah suara saya.</string>
     <string name="setup_languages">Bahasa</string>
     <string name="setup_languages_hint">Ketuk untuk memilih bahasa yang Anda gunakan. Tekan lama salah satunya untuk menjadikannya default. Di chat, tekan lama mikrofon untuk mengganti bahasa.</string>
     <!-- Sheet title. %1$s = agent name (Claude Code or Codex). -->
@@ -1018,7 +793,6 @@
     <!-- Button. %1$s = agent name. -->
     <string name="setup_set_up_agent">Siapkan %1$s</string>
 
-    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
     <!-- Section label: Remote Control is the name of a Claude Code feature. -->
     <string name="setup_remote_control">Remote Control</string>
     <string name="setup_remote_session">Sesi Claude Code</string>
@@ -1033,27 +807,6 @@
     <string name="setup_remote_stopped">berhenti</string>
     <string name="setup_remote_open">Buka di aplikasi Claude</string>
     <string name="setup_remote_open_failed">Tidak dapat membukanya.</string>
-    <string name="setup_codex_session">Sesi Codex</string>
-    <string name="setup_codex_session_info">Codex dengan alat ponsel, berjalan di dalam Buddy. Gunakan dari aplikasi ChatGPT (Codex) di ponsel ini atau di komputer. Sandbox Codex tidak bisa berjalan di sini, jadi dengan izin default Codex bertanya sebelum setiap perintah.</string>
-    <string name="setup_codex_active">berjalan · “localhost” di ChatGPT</string>
-    <string name="setup_codex_pair">Sambungkan perangkat</string>
-    <string name="setup_ssh">SSH dari Termux</string>
-    <string name="setup_ssh_info">Gunakan Linux Buddy dari Termux, lewat SSH. Hanya aplikasi di ponsel ini yang bisa terhubung, dan hanya dengan kunci.</string>
-    <string name="setup_ssh_active">berjalan · port %1$d</string>
-    <string name="setup_ssh_how">Salin perintah ini dan jalankan sekali di Termux, dalam 10 menit. Setelah itu, ketik ssh buddy di Termux untuk membuka Linux Buddy.</string>
-
-    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
-    <string name="setup_old_chats_title">Hapus chat Termux lama</string>
-    <plurals name="setup_old_chats_body">
-        <item quantity="other">%1$d chat dari sebelum Buddy memiliki Linux sendiri. Agen tidak dapat melanjutkannya.</item>
-    </plurals>
-    <plurals name="setup_old_chats_remove">
-        <item quantity="other">Hapus %1$d chat lama?</item>
-    </plurals>
-    <string name="setup_old_chats_remove_body">Menghapusnya dari daftar chat Buddy. Tindakan ini tidak dapat diurungkan.</string>
-    <!-- Button (verb). -->
-    <string name="setup_remove">Hapus</string>
-    <string name="setup_removed">Dihapus.</string>
 
     <!-- Settings screen: Experience. -->
     <string name="setup_experience">Pengalaman</string>
@@ -1094,83 +847,23 @@
     <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
     <string name="setup_app_permissions_info">Pilih per aplikasi: Percaya membiarkan agen bekerja di sana tanpa pop-up; Ketat berarti Buddy sendiri yang bertanya kepada Anda sebelum Kirim, Bayar, Hapus…</string>
     <string name="setup_dev_mode">Mode developer</string>
-    <string name="setup_dev_mode_info">Agen di balon dapat menjalankan perintah dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi.</string>
+    <string name="setup_dev_mode_info">Agen di balon dapat menjalankan perintah dan mengedit file di Termux, sehingga bisa membuat dan menginstal aplikasi.</string>
     <string name="setup_agents_tap">Izinkan agen mengetuk layar Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Balon, kartu persetujuan, Izin aplikasi, dan tombol-tombol ini tetap tidak bisa diketuk agen.</string>
     <!-- Warning shown while Developer mode is on. -->
     <string name="setup_dev_mode_warning">Biarkan nonaktif untuk penggunaan sehari-hari: saat aktif, pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
 
-    <!-- Settings screen: footer links. -->
     <!-- Link and sheet title. -->
     <string name="setup_licences">Lisensi open source</string>
     <string name="setup_privacy_policy">Kebijakan privasi</string>
 
-    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
-    <!-- %1$s = SHA-256 checksum of the download. -->
-    <string name="linux_download_corrupt">Download Alpine rusak (sha256 %1$s)</string>
-    <string name="linux_move_failed">Tidak dapat memindahkan Alpine ke tempatnya</string>
-    <!-- %1$d = HTTP status code, e.g. 404. -->
-    <string name="linux_download_failed_http">Download gagal: HTTP %1$d</string>
-    <!-- %1$s = a file path inside the downloaded archive. -->
-    <string name="linux_unsafe_path">Jalur tidak aman di arsip: %1$s</string>
-    <!-- Creating a symbolic link failed. %1$s = file path, %2$s = the system's error message. -->
-    <string name="linux_symlink_failed">symlink %1$s: %2$s</string>
-    <string name="linux_truncated_archive">Arsip terpotong</string>
-
-    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
     <!-- Name of Buddy's built-in terminal: title of the Terminal screen and its menu, and of the Terminal card on the Sessions screen. -->
     <string name="terminal_title">Terminal</string>
-    <!-- Read by TalkBack: back button. -->
-    <string name="terminal_back">Kembali</string>
-    <!-- Read by TalkBack: button that hides the on-screen keyboard. -->
-    <string name="terminal_hide_keyboard">Sembunyikan keyboard</string>
-    <!-- Read by TalkBack: button that opens the terminal menu. -->
-    <string name="terminal_menu">Menu</string>
-    <!-- Status line under the title, lowercase. "buddy linux" is the name of Buddy's Linux: keep it. Only shown for 2 or more. -->
-    <plurals name="terminal_sessions_count">
-        <item quantity="other">%1$d sesi · buddy linux</item>
-    </plurals>
-    <!-- Status line under the title while the microphone is in use, lowercase. -->
-    <string name="terminal_listening">mendengarkan · mikrofon aktif</string>
-    <string name="terminal_session_ended">Sesi berakhir</string>
-    <!-- %1$d = the shell's exit code. -->
-    <string name="terminal_session_ended_code">Sesi berakhir · kode keluar %1$d</string>
-    <!-- Button (verb): closes the terminal tab. -->
-    <string name="terminal_close">Tutup</string>
-    <!-- Button (verb): starts a new shell. -->
-    <string name="terminal_restart">Mulai ulang</string>
-    <string name="terminal_needs_linux">Instal Claude Code, Codex, atau OpenCode di Setelan terlebih dahulu: langkah itu akan menyiapkan Linux Buddy.</string>
-    <!-- %1$s = error message. -->
-    <string name="terminal_start_failed">Tidak dapat memulai terminal: %1$s</string>
-    <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
-    <string name="terminal_close_title">Tutup %1$s?</string>
-    <string name="terminal_close_running">Masih berjalan. Menutupnya akan menghentikannya beserta semua yang dijalankannya.</string>
-    <!-- Default name of a terminal tab until the program in it sets a title. Lowercase. %1$d = tab number. -->
-    <string name="terminal_shell_name">shell %1$d</string>
-    <!-- Menu item and "+" tab button: opens a new shell tab. -->
-    <string name="terminal_new_session">Sesi baru</string>
-    <!-- Menu item, selection toolbar item and paste key: pastes the clipboard into the terminal. -->
-    <string name="terminal_paste">Tempel</string>
-    <!-- Menu item and selection toolbar item. -->
-    <string name="terminal_select_all">Pilih semua</string>
-    <string name="terminal_larger_text">Perbesar teks</string>
-    <string name="terminal_smaller_text">Perkecil teks</string>
-    <string name="terminal_screen_sleep">Izinkan layar tidur</string>
-    <string name="terminal_keep_screen_on">Biarkan layar tetap menyala</string>
-    <string name="terminal_close_session">Tutup sesi ini</string>
-    <string name="terminal_tips">Tekan lama untuk memilih teks atau link. Cubit untuk zoom, tarik untuk menggulir ke atas. Tekan lama tab untuk menutupnya.</string>
-
-    <!-- Terminal: floating toolbar over selected text. Keep short. -->
-    <string name="terminal_copy">Salin</string>
-    <string name="terminal_open_link">Buka link</string>
-    <string name="terminal_share">Bagikan</string>
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sesi</string>
     <string name="monitor_subtitle">Semua sesi Claude Code dan Codex di ponsel ini.</string>
-    <string name="monitor_terminal_running">Shell sedang berjalan · ketuk untuk kembali</string>
-    <string name="monitor_terminal_idle">Shell di Linux Buddy</string>
     <string name="monitor_running_now">Sedang berjalan</string>
     <!-- Next to "Running now": the list refreshes every 3 seconds. Lowercase, monospace, keep short. -->
     <string name="monitor_refresh">tiap 3 dtk</string>
@@ -1205,8 +898,6 @@
     <string name="monitor_no_history">Tidak ada riwayat.</string>
     <!-- Title of a past session that has no messages. -->
     <string name="monitor_no_messages">(tidak ada pesan)</string>
-
-    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
 
     <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app.
          The three approval modes are named Trust, Hard and Smart (perms_mode_*): use the same names wherever they appear. -->
@@ -1269,7 +960,6 @@
     <!-- Shown while no buttons were seen yet. Hard and Smart are approval mode names. -->
     <string name="perms_seen_empty">Tombol yang diketuk agen di aplikasi Ketat dan Pintar akan muncul di sini.</string>
 
-    <!-- Button rules and modes, as App permissions shows them. -->
     <!-- A button rule that applies in every app, on a chip and in the suggestions. %1$s = the button's label, e.g. Send. -->
     <string name="guard_rule_all_apps">%1$s · semua aplikasi</string>
     <!-- Why an app has its mode, in small text under the app's name. Here: the user picked it. -->
@@ -1285,7 +975,6 @@
     <!-- The mode comes from the first setup, where the user chose that the agent asks first. -->
     <string name="guard_why_setup">Pilihan penyiapan Anda: tanya dulu</string>
 
-    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
     <!-- %1$s = the button's label, e.g. Send. -->
     <string name="tools_card_tap">Ketuk “%1$s”</string>
     <!-- %1$s = the button's label, e.g. Send; %2$s = the app's name, e.g. WhatsApp. -->
@@ -1309,7 +998,6 @@
     <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
     <string name="tools_card_reviewer_ask">%1$s menyarankan untuk bertanya kepada Anda: %2$s</string>
 
-    <!-- Status line in the bubble while the agent works. -->
     <!-- The smart reviewer is checking a tap. -->
     <string name="tools_status_checking_tap">Memeriksa ketukan ini…</string>
     <!-- Android's installer is open. Install is the installer's button: use the label Android shows in your language. -->
@@ -1326,56 +1014,9 @@
     <string name="reviewer_failed">peninjau tidak dapat menjawab (%1$s)</string>
     <!-- In the parentheses of reviewer_failed: the reviewer's reply had no decision in it. -->
     <string name="reviewer_no_answer">tidak ada jawaban</string>
-    <!-- In the parentheses of reviewer_failed: the reviewer took too long. -->
-    <string name="reviewer_timed_out">waktu habis</string>
-
-    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
-    <string name="helper_linux_missing">Linux Buddy belum terinstal. Buka Setelan untuk menyiapkannya.</string>
 
     <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
          speech-to-text and ChatGPT's voice (through Codex). Status lines show in the voice bar, errors as toasts. -->
-    <string name="dictation_claude_sign_in">Login ke Claude Code di Setelan untuk menggunakan suara Claude.</string>
-    <string name="dictation_codex_sign_in">Login ke Codex di Setelan untuk menggunakan suara ChatGPT.</string>
-    <!-- Status: voice input is starting. -->
-    <string name="dictation_starting">Memulai…</string>
-    <!-- Status: Claude Code, which does the voice input, is starting. -->
-    <string name="dictation_starting_claude">Memulai Claude…</string>
-    <!-- Status: the recorded speech is being turned into text. -->
-    <string name="dictation_transcribing">Mentranskripsikan…</string>
-    <!-- Voice input ended without any words recognized. -->
-    <string name="dictation_no_speech">Tidak terdengar jelas.</string>
-    <string name="dictation_mic_failed">Tidak dapat membuka mikrofon.</string>
-    <!-- %1$s = the reason, often a technical error in English. -->
-    <string name="dictation_claude_start_failed">Suara Claude tidak dapat dimulai: %1$s</string>
-    <string name="dictation_claude_no_start">Suara Claude gagal dimulai.</string>
-    <!-- A reason after “Claude voice couldn't start:”. -->
-    <string name="dictation_claude_code_no_start">Claude Code gagal dimulai</string>
-    <!-- %1$s = the reason, often a technical error in English. -->
-    <string name="dictation_chatgpt_start_failed">Suara ChatGPT tidak dapat dimulai: %1$s</string>
-    <!-- %1$s = how far it got, one of dictation_stage_* below. -->
-    <string name="dictation_chatgpt_no_connect">Suara ChatGPT tidak terhubung (%1$s).</string>
-    <!-- %1$s = what went wrong: dictation_connection_failed, or an error from ChatGPT (often in English). -->
-    <string name="dictation_chatgpt_error">Suara ChatGPT: %1$s</string>
-    <!-- After “ChatGPT voice:”, so it starts lowercase. -->
-    <string name="dictation_connection_failed">koneksi gagal</string>
-    <!-- How far ChatGPT voice got, in the parentheses of dictation_chatgpt_no_connect, so lowercase. -->
-    <string name="dictation_stage_page">memulai halaman</string>
-    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
-    <string name="dictation_stage_codex">menunggu Codex</string>
-    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
-    <string name="dictation_stage_call">melakukan panggilan</string>
-    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
-    <string name="dictation_stage_answer">menunggu ChatGPT menjawab</string>
-    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
-    <string name="dictation_stage_connecting">menghubungkan</string>
-    <!-- A reason after “ChatGPT voice couldn't start:”. -->
-    <string name="dictation_codex_no_start">Codex gagal dimulai</string>
-    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = a technical request name, e.g. thread/start. -->
-    <string name="dictation_request_timed_out">%1$s kehabisan waktu</string>
-    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = the end of Codex's error log (technical, English), or dictation_no_details. -->
-    <string name="dictation_codex_stopped">Codex berhenti: %1$s</string>
-    <!-- After “Codex stopped:” when its log says nothing. -->
-    <string name="dictation_no_details">tidak ada detail</string>
 
     <!-- Notification rules -->
     <string name="card_label_countdown">SEGERA DISETUJUI OTOMATIS</string>

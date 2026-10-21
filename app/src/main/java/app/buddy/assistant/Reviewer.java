@@ -86,9 +86,9 @@ final class Reviewer {
     }
 
     private static Decision decide(Context c, String harness, String system, String prompt) {
-        String name = "codex".equals(harness) ? "Codex" : "Claude";
+        String name = "Claude"; // this fork reviews with Termux's Claude Code, whatever the chat's brain
         try {
-            String out = "codex".equals(harness) ? CodexDictation.review(c, system, prompt, TIMEOUT_MS) : claude(c, system, prompt);
+            String out = claude(c, system, prompt);
             int a = out.indexOf('{'), b = out.lastIndexOf('}');
             if (a < 0 || b < a) throw new Exception(c.getString(R.string.reviewer_no_answer));
             JSONObject j = new JSONObject(out.substring(a, b + 1));

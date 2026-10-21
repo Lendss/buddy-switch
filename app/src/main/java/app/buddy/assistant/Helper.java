@@ -1,13 +1,10 @@
 package app.buddy.assistant;
 
 import android.content.Context;
-import android.system.Os;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,22 +15,7 @@ import java.util.concurrent.Executors;
  * written into it.
  */
 final class Helper {
-    private static final String[][] FILES = {
-            // asset, path inside Linux, mode
-            {"linux/buddy-run", "/root/bin/buddy-run", "700"},
-            {"linux/codex-remote", "/root/bin/codex-remote", "700"}, // the Codex session (CodexRemote)
-            {"linux/profile.sh", "/etc/profile.d/buddy.sh", "644"},
-            {"linux/arecord", "/usr/local/bin/arecord", "755"},
-            {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},
-            {"linux/arecord", "/usr/local/bin/rec", "755"}, // SoX's recorder, same arguments that matter (-r, -c)
-            {"linux/system-prompt.md", "/root/.buddy/system-prompt.md", "600"},
-            {"linux/AGENTS.md", "/root/.buddy/work/AGENTS.md", "600"},
-            {"linux/android-app/SKILL.md", "/root/.buddy/work/.claude/skills/android-app/SKILL.md", "600"},
-            {"linux/android-app/build-apk.sh", "/root/.buddy/work/.claude/skills/android-app/build-apk.sh", "700"},
-            {"linux/android-app/setup-toolchain.sh", "/root/.buddy/work/.claude/skills/android-app/setup-toolchain.sh", "700"},
-    };
     private static final ExecutorService pool = Executors.newCachedThreadPool();
-    private static int syncedFor = -1;
 
     private Helper() {
     }
@@ -140,26 +122,5 @@ final class Helper {
         } catch (Exception e) {
             return pkg;
         }
-    }
-
-    /** Copies the helper files from the APK into Linux once per app version. */
-    static synchronized void sync(Context c) throws IOException {
-        if (syncedFor == BuildInfo.VERSION_CODE && new File(Linux.root(c), "root/bin/buddy-run").exists()) return;
-        File root = Linux.root(c);
-        for (String[] f : FILES) {
-            File out = new File(root, f[1].substring(1));
-            out.getParentFile().mkdirs();
-            try (InputStream in = c.getAssets().open(f[0]); OutputStream o = new FileOutputStream(out)) {
-                byte[] buf = new byte[8192];
-                int n;
-                while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
-            }
-            try {
-                Os.chmod(out.getPath(), Integer.parseInt(f[2], 8));
-            } catch (Exception ignored) {
-            }
-        }
-        new File(root, "root/.buddy/sessions").mkdirs();
-        syncedFor = BuildInfo.VERSION_CODE;
     }
 }

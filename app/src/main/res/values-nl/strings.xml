@@ -4,8 +4,6 @@
     <string name="service_label">Buddy-assistent</string>
     <string name="service_description">Toont de chatbubbel van Buddy en laat Claude Code of Codex, die binnen Buddy op deze telefoon draaien, het scherm lezen en voor je tikken, typen en scrollen. Niets verlaat de telefoon, behalve wat de agent zelf naar Anthropic of OpenAI stuurt.</string>
 
-    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
-
     <!-- First-run setup guide: top bar and buttons shared by several steps. -->
     <string name="onboarding_skip_setup">Overslaan</string>
     <string name="onboarding_skip_title">Instellen overslaan?</string>
@@ -51,34 +49,11 @@
     <string name="onboarding_app_info">App-info</string>
 
     <!-- Guide, step: install the agent inside Buddy and sign in. -->
-    <string name="onboarding_agents_title">Installeren en inloggen</string>
-    <string name="onboarding_agents_done_title">Klaar</string>
-    <string name="onboarding_agents_done">%1$s is geïnstalleerd en ingelogd.</string>
-    <string name="onboarding_agents_done_both">Claude Code en Codex zijn geïnstalleerd en ingelogd.</string>
-    <string name="onboarding_agents_text">Buddy installeert %1$s in de app, daarna log je één keer in. Termux is niet nodig.</string>
     <string name="onboarding_agent_names_both">Claude Code en Codex</string>
     <!-- Agent card status lines: small lowercase mono text, one line. -->
-    <string name="onboarding_agent_ready">klaar · %1$s</string>
     <string name="onboarding_agent_free_models">gratis modellen</string>
     <string name="onboarding_agent_signed_in">ingelogd</string>
     <string name="onboarding_agent_signed_in_as">ingelogd · %1$s</string>
-    <string name="onboarding_agent_installing">installeren…</string>
-    <string name="onboarding_agent_installed">geïnstalleerd · niet ingelogd</string>
-    <string name="onboarding_agent_not_installed">niet geïnstalleerd</string>
-    <string name="onboarding_agent_sign_in_claude">Log in met je Claude-account. Je browser wordt geopend; tik op Autoriseren en Buddy komt vanzelf terug.</string>
-    <string name="onboarding_agent_checking_opencode">OpenCode controleren…</string>
-    <string name="onboarding_agent_sign_in_codex">Log in met je ChatGPT-account in de browser en kom daarna terug.</string>
-    <string name="onboarding_agent_download_claude">Downloadt eenmalig ongeveer 235 MB (Buddy\'s Linux en Claude Code van Anthropic).</string>
-    <string name="onboarding_agent_download_opencode">Downloadt eenmalig ongeveer 230 MB (Buddy\'s Linux, Node.js en OpenCode). Geen account nodig.</string>
-    <string name="onboarding_agent_download_codex">Downloadt eenmalig ongeveer 150 MB (Buddy\'s Linux, Node.js en Codex van OpenAI).</string>
-    <string name="onboarding_sign_in_claude">Inloggen met Claude</string>
-    <string name="onboarding_sign_in_chatgpt">Inloggen met ChatGPT</string>
-    <string name="onboarding_install_agent">%1$s installeren</string>
-    <string name="onboarding_agents_wifi">Gebruik wifi als dat kan. Je kunt dit scherm verlaten tijdens de installatie.</string>
-    <string name="onboarding_stuck_sign_in_q">Kom je na het inloggen niet terug?</string>
-    <string name="onboarding_stuck_sign_in_a">Claude: tik op de Claude-pagina op “Code kopiëren” en ga dan terug naar Buddy; Buddy haalt de code van het klembord.</string>
-    <string name="onboarding_stuck_install_q">Installatie mislukt?</string>
-    <string name="onboarding_stuck_install_a">Controleer je verbinding en installeer opnieuw; het gaat verder waar het gestopt is.</string>
 
     <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
     <string name="onboarding_background_title">Actief houden</string>
@@ -177,8 +152,6 @@
     <string name="prefs_accent_violet">Violet</string>
     <string name="prefs_accent_rose">Roze</string>
     <string name="prefs_accent_amber">Amber</string>
-
-    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
 
     <!-- Floating bubble, read by TalkBack. -->
     <string name="bubble_face_description">Buddy. Tik om te openen, houd ingedrukt voor acties</string>
@@ -294,8 +267,6 @@
     <string name="pause_call_ended_title">Gesprek beëindigd · Buddy is gepauzeerd</string>
     <string name="pause_call_ended_text">Tik om de taak te hervatten</string>
 
-    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
-
     <!-- Chat screen: app bar -->
     <string name="chat_back">Terug</string>
     <string name="chat_read_aloud">Antwoorden voorlezen</string>
@@ -328,7 +299,6 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Spreken in</string>
     <string name="chat_speak_in_help">Kies je talen in Instellingen → Spraak.</string>
-    <string name="chat_phone_voice">via telefoon</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
     <string name="chat_card_question">VRAAG</string>
@@ -478,85 +448,18 @@
     <string name="voice_link">link</string>
     <string name="voice_stop_and_send">Stoppen en verzenden</string>
 
-    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
-
     <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). -->
     <string name="signin_back">Terug</string>
     <string name="signin_checking">Controleren…</string>
 
-    <!-- Sign-in screen: the agent isn't installed yet. -->
-    <string name="signin_install">%1$s installeren</string>
-    <string name="signin_install_sub_claude">Draait Claude Code binnen Buddy met je Claude-abonnement.</string>
-    <string name="signin_install_sub_opencode">Draait OpenCode binnen Buddy. De gratis modellen werken meteen, zonder account; koppel je eigen aanbieders (Anthropic, OpenAI, GitHub Copilot…) wanneer je wilt.</string>
-    <string name="signin_install_sub_codex">Draait Codex binnen Buddy met je ChatGPT-abonnement.</string>
-    <string name="signin_install_size_claude">Downloadt eenmalig ongeveer 235 MB: Buddy\'s Linux en Claude Code van Anthropic. Gebruik wifi als dat kan.</string>
-    <string name="signin_install_size_opencode">Downloadt eenmalig ongeveer 230 MB: Buddy\'s Linux, Node.js en OpenCode. Gebruik wifi als dat kan.</string>
-    <string name="signin_install_size_codex">Downloadt eenmalig ongeveer 150 MB: Buddy\'s Linux, Node.js en Codex van OpenAI. Gebruik wifi als dat kan.</string>
-
-    <!-- Sign-in screen: install or update in progress (screen titles). -->
-    <string name="signin_installing">Installeren</string>
-    <string name="signin_updating">Updaten</string>
-    <string name="signin_install_wait">Dit duurt een paar minuten. Je kunt dit scherm verlaten; het gaat gewoon door.</string>
-
-    <!-- Sign-in screen: installed, not signed in. -->
-    <string name="signin_title_claude">Inloggen bij Claude</string>
-    <string name="signin_title_chatgpt">Inloggen bij ChatGPT</string>
-    <string name="signin_sub_claude">Gebruik je Claude-account (Pro of Max). Je browser wordt geopend; keur het daar goed en Buddy komt vanzelf terug.</string>
-    <string name="signin_sub_chatgpt">Gebruik je ChatGPT-account (Plus, Pro of Business). Je browser wordt geopend; keur het daar goed en Buddy komt vanzelf terug.</string>
-    <string name="signin_with_claude">Inloggen met Claude</string>
-    <string name="signin_with_chatgpt">Inloggen met ChatGPT</string>
-    <string name="signin_other_device">Inloggen op een ander apparaat</string>
-    <string name="signin_with_code">Inloggen met een code</string>
-
-    <!-- Sign-in screen: sign-in in progress. -->
-    <string name="signin_sign_in">Inloggen</string>
-    <string name="signin_starting">Inloggen wordt gestart…</string>
-    <string name="signin_approve_title">Goedkeuren in je browser</string>
-    <string name="signin_approve_claude">Tik op de Claude-pagina op Autoriseren. Buddy pakt de code op en komt vanzelf terug.</string>
-    <string name="signin_approve_codex">Log in en geef Codex toegang. Kom daarna terug naar Buddy; de rest gaat vanzelf.</string>
-    <string name="signin_open_again">Inlogpagina opnieuw openen</string>
-    <string name="signin_signing_in">Bezig met inloggen</string>
-    <string name="signin_finishing">Inloggen afronden…</string>
-    <string name="signin_not_finished">Inloggen is niet voltooid. %1$s</string>
-
     <!-- Sign-in screen: signing in from another device. -->
-    <string name="signin_remote_claude">Open deze link op een willekeurig apparaat en keur het goed. Kopieer daarna de code die de pagina toont en plak die hieronder.</string>
-    <string name="signin_enter_code">Voer deze code in</string>
-    <string name="signin_remote_codex">Open op een willekeurig apparaat de link hieronder, log in bij ChatGPT en voer de code in. Buddy rondt het vanzelf af.</string>
-    <string name="signin_copy_code">Code kopiëren</string>
-    <string name="signin_code_copied">Code gekopieerd</string>
-    <string name="signin_code_expiry">De code is 15 minuten geldig.</string>
-    <string name="signin_copy_link">Link kopiëren</string>
-    <string name="signin_link_copied">Link gekopieerd</string>
-    <string name="signin_share">Delen</string>
-    <string name="signin_open_here">Hier openen</string>
     <string name="signin_no_browser">Geen browser gevonden.</string>
-    <string name="signin_no_browser_page">Geen browser gevonden om de inlogpagina te openen.</string>
-    <string name="signin_clip_label">Inloggen</string>
-
-    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
-    <string name="signin_paste_instead">Code handmatig plakken</string>
-    <string name="signin_paste_help">Komt Buddy niet vanzelf terug? Tik op de Claude-pagina op “Code kopiëren” en plak de code hier.</string>
-    <string name="signin_code_hint">code</string>
-    <string name="signin_use_code">Gebruiken</string>
-    <string name="signin_start_again">Start eerst het inloggen opnieuw.</string>
 
     <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
     <string name="signin_signed_in">Ingelogd</string>
     <string name="signin_agent_ready">%1$s is klaar voor gebruik.</string>
     <string name="signin_done">Klaar</string>
-    <string name="signin_sign_out">Uitloggen</string>
-    <string name="signin_sign_out_title">Uitloggen bij %1$s?</string>
-    <string name="signin_sign_out_text">%1$s werkt in Buddy pas weer als je opnieuw inlogt.</string>
-    <string name="signin_opencode_ready">OpenCode is klaar voor gebruik</string>
-    <string name="signin_opencode_free">Gebruikt de gratis modellen van OpenCode. Kies per chat bovenaan een model, of koppel je eigen aanbieder.</string>
-    <string name="signin_opencode_connected">Gekoppeld: %1$s. De gratis modellen van OpenCode blijven ook beschikbaar.</string>
-    <string name="signin_opencode_connect_note">Een aanbieder koppelen opent Buddy\'s terminal met %1$s: kies een aanbieder en volg de stappen. Voer daar later %2$s uit om er een te verwijderen.</string>
-    <string name="signin_connect_provider">Aanbieder koppelen</string>
     <string name="signin_version">%1$s %2$s.</string>
-    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2 is uit: update om nieuwe versies te blijven krijgen. Je gekoppelde aanbieders blijven behouden.</string>
-    <string name="signin_update_opencode2">Updaten naar OpenCode 2</string>
-    <string name="signin_check_updates">Controleren op updates</string>
 
     <!-- Sign-in screen: error. -->
     <string name="signin_error_title">Er is iets misgegaan</string>
@@ -566,18 +469,7 @@
     <string name="account_tagline_claude">Gebruikt je Claude-abonnement</string>
     <string name="account_tagline_opencode">Gratis modellen of je eigen aanbieders</string>
     <string name="account_tagline_codex">Gebruikt je ChatGPT-abonnement</string>
-    <string name="account_setting_up_linux">Buddy\'s Linux instellen…</string>
-    <string name="account_installing_tools">Tools installeren…</string>
-    <string name="account_downloading_claude">Claude Code downloaden (ongeveer 230 MB)…</string>
-    <string name="account_downloading">%1$s downloaden…</string>
     <string name="account_check_failed">Kan %1$s niet controleren: %2$s</string>
-    <string name="account_install_failed">Installatie mislukt: %1$s</string>
-    <string name="account_update_checking">Zoeken naar een nieuwe versie van %1$s…</string>
-    <string name="account_update_latest">Je hebt de nieuwste versie (%1$s).</string>
-    <string name="account_updated">Bijgewerkt naar %1$s.</string>
-    <string name="account_updated_from">Bijgewerkt naar %1$s (was %2$s).</string>
-    <string name="account_update_opencode2_failed">Updaten naar OpenCode 2 is mislukt; je hebt nog steeds %1$s. Probeer het opnieuw via wifi.</string>
-    <string name="account_update_failed">Update mislukt: %1$s</string>
 
     <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort"). -->
     <string name="models_default">Standaard</string>
@@ -613,15 +505,6 @@
     <string name="remote_restarting">Opnieuw starten…</string>
     <string name="remote_start_failed">Kan niet starten: %1$s</string>
     <string name="remote_keeps_stopping">De sessie stopt steeds. Zet hem uit en weer aan, of controleer of je bij Claude Code bent ingelogd.</string>
-    <string name="codex_pair_getting">Code ophalen…</string>
-    <string name="codex_pair_text">Voer deze code in ChatGPT in: in Codex op een telefoon, of via Instellingen → Verbindingen → Andere apparaten bedienen op een computer. Hij werkt één keer, tot %1$s. Buddy staat daar als “localhost”.</string>
-    <string name="codex_pair_failed">Kan geen koppelcode ophalen: %1$s</string>
-    <string name="codex_keeps_stopping">De Codex-sessie stopt steeds: %1$s</string>
-    <string name="ssh_keeps_stopping">De SSH-server stopt steeds: %1$s</string>
-    <string name="ssh_key_added">Klaar. Typ ssh buddy om Buddy\'s Linux vanuit Termux te openen.</string>
-    <string name="ssh_code_expired">Deze opdracht is al gebruikt of is ouder dan 10 minuten. Kopieer hem opnieuw in de Instellingen van Buddy.</string>
-
-    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Instellingen</string>
@@ -637,20 +520,9 @@
     <string name="setup_step_a11y_restricted">Schakelaar grijs (“Beperkte instelling”)? Android blokkeert dit voor apps die vanuit een bestand zijn geïnstalleerd. Tik op App-info, dan rechtsboven op ⋮ → Beperkte instellingen toestaan, en probeer het opnieuw.</string>
     <string name="setup_open_settings">Instellingen openen</string>
     <string name="setup_app_info">App-info</string>
-    <string name="setup_step_install_title">%1$s installeren</string>
-    <string name="setup_step_install_done">%1$s is geïnstalleerd in Buddy.</string>
-    <string name="setup_step_install_claude">Buddy downloadt zijn eigen kleine Linux en %1$s van Anthropic (ongeveer 235 MB).</string>
-    <string name="setup_step_install_opencode">Buddy downloadt zijn eigen kleine Linux en %1$s (ongeveer 230 MB met Node.js).</string>
-    <string name="setup_step_install_codex">Buddy downloadt zijn eigen kleine Linux en %1$s van OpenAI (ongeveer 150 MB).</string>
-    <string name="setup_install">Installeren</string>
     <string name="setup_step_signin_title">Inloggen</string>
-    <string name="setup_step_signin_opencode_done">Inloggen is niet nodig: de gratis modellen van OpenCode werken meteen. Koppel je eigen aanbieders wanneer je wilt.</string>
-    <string name="setup_step_signin_opencode">Voor de gratis modellen van OpenCode hoef je niet in te loggen.</string>
     <string name="setup_step_signin_done">Ingelogd.</string>
     <string name="setup_step_signin_done_email">Ingelogd als %1$s.</string>
-    <string name="setup_step_signin_claude">Met je Claude-account (Pro of Max). Je browser wordt geopend; keur het daar goed en Buddy komt vanzelf terug.</string>
-    <string name="setup_step_signin_codex">Met je ChatGPT-account. Je browser wordt geopend; keur het daar goed en Buddy komt vanzelf terug.</string>
-    <string name="setup_sign_in">Inloggen</string>
     <string name="setup_step_background_title">Buddy op de achtergrond laten draaien</string>
     <string name="setup_step_background_done">Toegestaan.</string>
     <string name="setup_step_background_body">Zodat je telefoon Buddy niet stopt om batterij te sparen terwijl de agent bezig is.</string>
@@ -677,13 +549,8 @@
 
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Agent</string>
-    <string name="setup_default_brain">Standaardagent</string>
-    <string name="setup_default_brain_info">Wie nieuwe chats beantwoordt die je via de bubbel of de knop “Nieuwe chat” start. Claude Code gebruikt je Claude-abonnement, Codex je ChatGPT-abonnement en OpenCode zijn gratis modellen of je eigen aanbieders. Je kunt alleen agents kiezen die zijn ingesteld.</string>
-    <string name="setup_default_brain_set">Nieuwe chats gebruiken %1$s. Met de knop “Nieuwe chat” kun je per chat kiezen.</string>
-    <string name="setup_set_up_first">Stel eerst %1$s in.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
     <string name="setup_agent_installing">installeren…</string>
-    <string name="setup_agent_not_installed">niet geïnstalleerd</string>
     <string name="setup_agent_ready">klaar</string>
     <string name="setup_agent_ready_plan">klaar · %1$s</string>
     <string name="setup_agent_signed_in">ingelogd</string>
@@ -699,14 +566,9 @@
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Spraak</string>
     <string name="setup_voice_input">Spraakinvoer</string>
-    <string name="setup_voice_phone">Telefoon</string>
-    <string name="setup_voice_input_claude">De dicteerfunctie van Claude Code via je Claude-abonnement: zeer nauwkeurig. Ondersteunt Engels, Frans, Duits, Spaans, Italiaans, Portugees, Nederlands, Turks, Russisch, Japans en meer, maar geen Arabisch: daarvoor gebruikt Buddy de spraakherkenning van de telefoon. De woorden verschijnen als je even pauzeert.</string>
-    <string name="setup_voice_input_chatgpt">De stem van ChatGPT via Codex, met je ChatGPT-abonnement. Begrijpt elke taal, zelfs gemengd in één zin. Alleen je woorden worden gebruikt: de gesproken antwoorden van ChatGPT zijn gedempt en het kan niets uitvoeren.</string>
     <string name="setup_voice_input_phone">De spraakherkenning van je telefoon (op de meeste telefoons die van Google). Live tekst terwijl je praat; herkent welke van je talen je spreekt.</string>
     <string name="setup_voice_output">Spraakuitvoer</string>
-    <string name="setup_voice_output_chatgpt">Antwoorden worden voorgelezen met de natuurlijke stem van ChatGPT (je ChatGPT-abonnement, via Codex). Dit telt mee voor je ChatGPT-spraakgebruik; als die stem niet beschikbaar is, leest de stem van de telefoon voor.</string>
     <string name="setup_voice_output_phone">De tekst-naar-spraakstemmen van je telefoon, in de taal van het antwoord.</string>
-    <string name="setup_voice_sample">Bonjour ! Hoi, ik ben Buddy. Zo klink ik.</string>
     <string name="setup_languages">Talen</string>
     <string name="setup_languages_hint">Tik om de talen te kiezen die je spreekt. Houd er een ingedrukt om die als standaard in te stellen. Houd in een chat de microfoon ingedrukt om van taal te wisselen.</string>
     <string name="setup_sign_in_first">Log eerst in bij %1$s</string>
@@ -724,28 +586,6 @@
     <string name="setup_remote_stopped">gestopt</string>
     <string name="setup_remote_open">Openen in de Claude-app</string>
     <string name="setup_remote_open_failed">Openen is mislukt.</string>
-    <string name="setup_codex_session">Codex-sessie</string>
-    <string name="setup_codex_session_info">Codex met de telefoontools, binnen Buddy. Gebruik het vanuit de ChatGPT-app (Codex) op deze telefoon of op een computer. De sandbox van Codex werkt hier niet, dus met standaardrechten vraagt het voor elke opdracht toestemming.</string>
-    <string name="setup_codex_active">actief · “localhost” in ChatGPT</string>
-    <string name="setup_codex_pair">Apparaat koppelen</string>
-    <string name="setup_ssh">SSH vanuit Termux</string>
-    <string name="setup_ssh_info">Gebruik Buddy\'s Linux vanuit Termux, via SSH. Alleen apps op deze telefoon kunnen verbinden, en alleen met een sleutel.</string>
-    <string name="setup_ssh_active">actief · poort %1$d</string>
-    <string name="setup_ssh_how">Kopieer deze opdracht en voer hem binnen 10 minuten één keer uit in Termux. Typ daarna ssh buddy in Termux om Buddy\'s Linux te openen.</string>
-
-    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
-    <string name="setup_old_chats_title">Oude Termux-chats verwijderen</string>
-    <plurals name="setup_old_chats_body">
-        <item quantity="one">%1$d chat van voordat Buddy een eigen Linux had. Agents kunnen die niet voortzetten.</item>
-        <item quantity="other">%1$d chats van voordat Buddy een eigen Linux had. Agents kunnen ze niet voortzetten.</item>
-    </plurals>
-    <plurals name="setup_old_chats_remove">
-        <item quantity="one">%1$d oude chat verwijderen?</item>
-        <item quantity="other">%1$d oude chats verwijderen?</item>
-    </plurals>
-    <string name="setup_old_chats_remove_body">Hiermee verdwijnen ze uit de chatlijst van Buddy. Dit kan niet ongedaan worden gemaakt.</string>
-    <string name="setup_remove">Verwijderen</string>
-    <string name="setup_removed">Verwijderd.</string>
 
     <!-- Settings screen: Experience. -->
     <string name="setup_experience">Gebruik</string>
@@ -771,7 +611,7 @@
     <string name="setup_app_permissions">App-rechten</string>
     <string name="setup_app_permissions_info">Kies per app: met Vrij werkt de agent daar zonder pop-ups; met Streng vraagt Buddy het je zelf vóór Verzenden, Betalen, Verwijderen…</string>
     <string name="setup_dev_mode">Ontwikkelaarsmodus</string>
-    <string name="setup_dev_mode_info">De agent van de bubbel mag opdrachten uitvoeren en bestanden bewerken in ~/.buddy/work, zodat hij apps kan bouwen en installeren.</string>
+    <string name="setup_dev_mode_info">De agent van de bubbel mag opdrachten uitvoeren en bestanden bewerken in Termux, zodat hij apps kan bouwen en installeren.</string>
     <string name="setup_agents_tap">Agents laten tikken op Buddy\'s schermen</string>
     <string name="setup_agents_tap_info">Om Buddy te testen met een agent (bijvoorbeeld Claude Code in Termux met de telefoontools). De bubbel, goedkeuringskaarten, App-rechten en deze schakelaars blijven verboden terrein.</string>
     <string name="setup_dev_mode_warning">Laat dit uit voor dagelijks gebruik: als het aanstaat, kan een kwaadwillend bericht of een kwaadwillende webpagina op het scherm proberen de agent te misleiden zodat hij opdrachten uitvoert. Goedkeuringskaarten bewaken nog steeds verzenden, plaatsen, kopen en verwijderen.</string>
@@ -780,53 +620,12 @@
     <string name="setup_licences">Open-sourcelicenties</string>
     <string name="setup_privacy_policy">Privacybeleid</string>
 
-    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
-    <string name="linux_download_corrupt">Alpine-download is beschadigd (sha256 %1$s)</string>
-    <string name="linux_move_failed">Kan Alpine niet op zijn plaats zetten</string>
-    <string name="linux_download_failed_http">Downloaden mislukt: HTTP %1$d</string>
-    <string name="linux_unsafe_path">Onveilig pad in archief: %1$s</string>
-    <string name="linux_symlink_failed">symlink %1$s: %2$s</string>
-    <string name="linux_truncated_archive">Archief is onvolledig</string>
-
     <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
     <string name="terminal_title">Terminal</string>
-    <string name="terminal_back">Terug</string>
-    <string name="terminal_hide_keyboard">Toetsenbord verbergen</string>
-    <string name="terminal_menu">Menu</string>
-    <plurals name="terminal_sessions_count">
-        <item quantity="one">%1$d sessie · buddy linux</item>
-        <item quantity="other">%1$d sessies · buddy linux</item>
-    </plurals>
-    <string name="terminal_listening">luistert · microfoon aan</string>
-    <string name="terminal_session_ended">Sessie beëindigd</string>
-    <string name="terminal_session_ended_code">Sessie beëindigd · exitcode %1$d</string>
-    <string name="terminal_close">Sluiten</string>
-    <string name="terminal_restart">Opnieuw starten</string>
-    <string name="terminal_needs_linux">Installeer eerst Claude Code, Codex of OpenCode via Instellingen: daarmee wordt Buddy\'s Linux ingesteld.</string>
-    <string name="terminal_start_failed">Kan de terminal niet starten: %1$s</string>
-    <string name="terminal_close_title">%1$s sluiten?</string>
-    <string name="terminal_close_running">Er draait nog iets. Sluiten stopt het, samen met alles wat het heeft gestart.</string>
-    <string name="terminal_shell_name">shell %1$d</string>
-    <string name="terminal_new_session">Nieuwe sessie</string>
-    <string name="terminal_paste">Plakken</string>
-    <string name="terminal_select_all">Alles selecteren</string>
-    <string name="terminal_larger_text">Grotere tekst</string>
-    <string name="terminal_smaller_text">Kleinere tekst</string>
-    <string name="terminal_screen_sleep">Scherm laten uitgaan</string>
-    <string name="terminal_keep_screen_on">Scherm aan laten</string>
-    <string name="terminal_close_session">Deze sessie sluiten</string>
-    <string name="terminal_tips">Houd ingedrukt om tekst of een link te selecteren. Knijp om te zoomen, sleep om terug te scrollen. Houd een tabblad ingedrukt om het te sluiten.</string>
-
-    <!-- Terminal: floating toolbar over selected text. Keep short. -->
-    <string name="terminal_copy">Kopiëren</string>
-    <string name="terminal_open_link">Link openen</string>
-    <string name="terminal_share">Delen</string>
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sessies</string>
     <string name="monitor_subtitle">Alle sessies van Claude Code en Codex op deze telefoon.</string>
-    <string name="monitor_terminal_running">Er draait een shell · tik om terug te gaan</string>
-    <string name="monitor_terminal_idle">Een shell in Buddy\'s Linux</string>
     <string name="monitor_running_now">Nu actief</string>
     <string name="monitor_refresh">ververst elke 3 s</string>
     <string name="monitor_checking">Controleren…</string>
@@ -851,8 +650,6 @@
     <string name="monitor_service_meta">pid %1$d · looptijd %2$s · voor achtergrondsessies</string>
     <string name="monitor_no_history">Geen geschiedenis gevonden.</string>
     <string name="monitor_no_messages">(geen berichten)</string>
-
-    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
 
     <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app.
          The three approval modes are Trust, Hard and Smart (perms_mode_*): Vrij, Streng and Slim here. -->
@@ -919,35 +716,6 @@
     <!-- Smart reviewer: its reason when it fails, shown on the approval card after "Claude says ask you:", so lowercase. -->
     <string name="reviewer_failed">de beoordelaar kon niet antwoorden (%1$s)</string>
     <string name="reviewer_no_answer">geen antwoord</string>
-    <string name="reviewer_timed_out">time-out</string>
-
-    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
-    <string name="helper_linux_missing">Buddy\'s Linux is nog niet geïnstalleerd. Open Instellingen om het in te stellen.</string>
-
-    <!-- Voice input (dictation): "Claude voice" and "ChatGPT voice" are the two voice input options. -->
-    <string name="dictation_claude_sign_in">Log via Instellingen in bij Claude Code om Claude-spraak te gebruiken.</string>
-    <string name="dictation_codex_sign_in">Log via Instellingen in bij Codex om ChatGPT-spraak te gebruiken.</string>
-    <string name="dictation_starting">Starten…</string>
-    <string name="dictation_starting_claude">Claude starten…</string>
-    <string name="dictation_transcribing">Transcriberen…</string>
-    <string name="dictation_no_speech">Dat heb ik niet verstaan.</string>
-    <string name="dictation_mic_failed">Kan de microfoon niet openen.</string>
-    <string name="dictation_claude_start_failed">Claude-spraak kon niet starten: %1$s</string>
-    <string name="dictation_claude_no_start">Claude-spraak is niet gestart.</string>
-    <string name="dictation_claude_code_no_start">Claude Code is niet gestart</string>
-    <string name="dictation_chatgpt_start_failed">ChatGPT-spraak kon niet starten: %1$s</string>
-    <string name="dictation_chatgpt_no_connect">ChatGPT-spraak kon geen verbinding maken (%1$s).</string>
-    <string name="dictation_chatgpt_error">ChatGPT-spraak: %1$s</string>
-    <string name="dictation_connection_failed">de verbinding is mislukt</string>
-    <string name="dictation_stage_page">bij het starten van de pagina</string>
-    <string name="dictation_stage_codex">bij het wachten op Codex</string>
-    <string name="dictation_stage_call">bij het opzetten van het gesprek</string>
-    <string name="dictation_stage_answer">bij het wachten op antwoord van ChatGPT</string>
-    <string name="dictation_stage_connecting">bij het verbinden</string>
-    <string name="dictation_codex_no_start">Codex is niet gestart</string>
-    <string name="dictation_request_timed_out">time-out bij %1$s</string>
-    <string name="dictation_codex_stopped">Codex is gestopt: %1$s</string>
-    <string name="dictation_no_details">geen details</string>
 
     <!-- Notification rules -->
     <string name="card_label_countdown">WORDT ZO VANZELF TOEGESTAAN</string>

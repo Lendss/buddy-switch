@@ -78,8 +78,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         LinearLayout tt = column(this);
         tt.setPaddingRelative(dp(this, 14), 0, dp(this, 8), 0);
         tt.addView(title(this, getString(R.string.terminal_title), 15));
-        tt.addView(text(this, getString(TermSession.current != null && !TermSession.current.exited
-                ? R.string.monitor_terminal_running : R.string.monitor_terminal_idle), 13, MUTED));
+        tt.addView(text(this, getString(R.string.monitor_terminal_termux), 13, MUTED));
         tc.addView(tt, weight1());
         tc.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         // this fork's terminal is Termux itself

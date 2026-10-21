@@ -159,11 +159,15 @@ final class ChatHub {
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
                 ses.running = false;
-                String err = lastError(ses);
-                add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
-                        + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
-                        + ": " + err));
-                changed();
+                new Thread(() -> {
+                    String err = lastError(ses); // asks Termux: off the main thread
+                    main.post(() -> {
+                        add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
+                                + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
+                                + ": " + err));
+                        changed();
+                    });
+                }).start();
             }
         }, GIVE_UP_MS);
         return null;
@@ -171,13 +175,10 @@ final class ChatHub {
 
     /** The end of what the agent wrote to stderr this run (buddy-run keeps it), or "": a hung agent often says why there. */
     private String lastError(Sessions.Session ses) {
-        java.io.File f = new java.io.File(Linux.root(app), "root/.buddy/sessions/" + ses.id + "/last-error.log");
-        try (java.io.RandomAccessFile r = new java.io.RandomAccessFile(f, "r")) {
-            long n = Math.min(r.length(), 300);
-            byte[] b = new byte[(int) n];
-            r.seek(r.length() - n);
-            r.readFully(b);
-            return new String(b, java.nio.charset.StandardCharsets.UTF_8).trim();
+        if (!ses.id.matches("[A-Za-z0-9_-]+")) return "";
+        try { // the file is in Termux's home, which Buddy can't read itself
+            String out = Termux.exec(app, "tail -c 300 ~/.buddy/sessions/" + ses.id + "/last-error.log 2>/dev/null", 20);
+            return out.replaceAll("\\s*\\[exit \\d+\\]\\s*$", "").trim();
         } catch (Exception e) {
             return "";
         }

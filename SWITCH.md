@@ -83,6 +83,10 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   shows the allow-external-apps line, and sends sign-in/installing to Termux. Codex, OpenCode, the built-in terminal,
   Remote Control/Codex/SSH sessions and Claude/ChatGPT voice are out of the UI (their code stays, unused, for now).
   Self-updates look at this fork's releases.
+- [x] Cleanup: the built-in Linux is gone from the code: `Linux`, the terminal (`Term*`, `Pty`, `TerminalActivity`),
+  `SshServer`, `CodexRemote`, Claude/ChatGPT dictation and voice, `MicServer`, proot and the pty helper (`jniLibs`,
+  `native/`), the Alpine-only helper files, and their settings and strings. `RemoteSession` too: step 6 brings it back
+  from git history, rewritten for Termux. Codex and OpenCode stay only as names in the chat code (never ready).
 - [ ] 5. Idle footprint: Buddy SW itself (~105 MB with a chat screen in Recents).
 - [ ] 6. Remote Control switch.
 - [ ] 7. Joy-Con navigation.
