@@ -920,7 +920,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Настройки</string>
-    <string name="setup_settings_subtitle">Buddy запускает Claude Code, Codex или OpenCode прямо в приложении — по вашей подписке (или на бесплатных моделях OpenCode).</string>
+    <string name="setup_settings_subtitle">Buddy SW запускает Claude Code из Termux — по вашей подписке.</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1366,6 +1366,31 @@
     <string name="reviewer_timed_out">время ожидания истекло</string>
 
     <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <!-- Buddy SW: Termux runs the agent -->
+    <string name="termux_missing_title">Установите Termux</string>
+    <string name="termux_missing_text">Buddy SW запускает Claude Code в Termux. Установите Termux, настройте в нём Claude Code и вернитесь сюда.</string>
+    <string name="termux_missing_short">Termux не установлен.</string>
+    <string name="termux_get">Скачать Termux</string>
+    <string name="termux_check_again">Проверить снова</string>
+    <string name="termux_allow_title">Разрешите Buddy SW работать с Termux</string>
+    <string name="termux_allow_text">Buddy SW передаёт ваши сообщения Claude Code в Termux. Android один раз спросит, можно ли ему запускать команды в Termux.</string>
+    <string name="termux_allow_short">Buddy SW пока не может запускать команды в Termux.</string>
+    <string name="termux_allow">Разрешить</string>
+    <string name="termux_props_note">Ещё Termux принимает команды от других приложений только с этой настройкой. Выполните один раз в Termux:</string>
+    <string name="termux_claude_missing_title">Установите Claude Code в Termux</string>
+    <string name="termux_claude_missing_text">В Termux пока нет команды claude. Установите там Claude Code и вернитесь.</string>
+    <string name="termux_claude_missing_short">Claude Code не установлен в Termux.</string>
+    <string name="termux_signin_title">Войдите в Termux</string>
+    <string name="termux_signin_text">Claude Code в Termux не вошёл в аккаунт. Откройте Termux, запустите claude и войдите (/login), затем вернитесь.</string>
+    <string name="termux_signin_short">Claude Code в Termux не вошёл в аккаунт.</string>
+    <string name="termux_same_claude">Это Claude Code из Termux: вход, обновления, настройки и память — те, что в Termux.</string>
+    <string name="termux_open">Открыть Termux</string>
+    <string name="onboarding_termux_title">Claude Code в Termux</string>
+    <string name="onboarding_termux_text">Buddy SW общается с Claude Code, который у вас в Termux: тот же аккаунт, настройки и память.</string>
+    <string name="onboarding_termux_done">Claude Code в Termux готов.</string>
+    <string name="onboarding_termux_set_up">Настроить</string>
+    <string name="setup_step_termux_title">Termux</string>
+    <string name="setup_step_termux_done">Buddy SW может запускать Claude Code в Termux.</string>
     <string name="helper_termux_missing">Termux не готов: установите Termux, включите allow-external-apps=true в ~/.termux/termux.properties и разрешите Buddy запускать команды в Termux.</string>
     <string name="helper_linux_missing">Встроенный Linux ещё не установлен. Откройте настройки, чтобы установить его.</string>
 

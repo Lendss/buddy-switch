@@ -920,7 +920,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Settings</string>
-    <string name="setup_settings_subtitle">Buddy runs Claude Code, Codex or OpenCode inside the app, on your own subscription (or OpenCode\'s free models).</string>
+    <string name="setup_settings_subtitle">Buddy SW runs the Claude Code you have in Termux, on your own subscription.</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1372,6 +1372,31 @@
     <string name="reviewer_timed_out">timed out</string>
 
     <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <!-- Buddy SW: Termux runs the agent -->
+    <string name="termux_missing_title">Install Termux</string>
+    <string name="termux_missing_text">Buddy SW runs Claude Code in Termux. Install Termux, set up Claude Code in it, then come back here.</string>
+    <string name="termux_missing_short">Termux isn\'t installed.</string>
+    <string name="termux_get">Get Termux</string>
+    <string name="termux_check_again">Check again</string>
+    <string name="termux_allow_title">Let Buddy SW use Termux</string>
+    <string name="termux_allow_text">Buddy SW hands your messages to Claude Code in Termux. Android asks you once to let it run commands in Termux.</string>
+    <string name="termux_allow_short">Buddy SW isn\'t allowed to run commands in Termux yet.</string>
+    <string name="termux_allow">Allow</string>
+    <string name="termux_props_note">Termux also only takes commands from other apps with this setting. Run this once in Termux:</string>
+    <string name="termux_claude_missing_title">Install Claude Code in Termux</string>
+    <string name="termux_claude_missing_text">There\'s no claude command in Termux yet. Install Claude Code there, then come back.</string>
+    <string name="termux_claude_missing_short">Claude Code isn\'t installed in Termux.</string>
+    <string name="termux_signin_title">Sign in in Termux</string>
+    <string name="termux_signin_text">Claude Code in Termux isn\'t signed in. Open Termux, run claude and sign in (/login), then come back.</string>
+    <string name="termux_signin_short">Claude Code in Termux isn\'t signed in.</string>
+    <string name="termux_same_claude">This is the Claude Code from Termux: its sign-in, updates, settings and memory are the ones in Termux.</string>
+    <string name="termux_open">Open Termux</string>
+    <string name="onboarding_termux_title">Claude Code in Termux</string>
+    <string name="onboarding_termux_text">Buddy SW talks to the Claude Code you have in Termux: same account, settings and memory.</string>
+    <string name="onboarding_termux_done">Claude Code in Termux is ready.</string>
+    <string name="onboarding_termux_set_up">Set up</string>
+    <string name="setup_step_termux_title">Termux</string>
+    <string name="setup_step_termux_done">Buddy SW can run Claude Code in Termux.</string>
     <string name="helper_termux_missing">Termux isn\'t ready: install Termux, set allow-external-apps=true in ~/.termux/termux.properties and allow Buddy to run commands in Termux.</string>
     <string name="helper_linux_missing">Buddy\'s Linux isn\'t installed yet. Open Settings to set it up.</string>
 

@@ -82,7 +82,11 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
                 ? R.string.monitor_terminal_running : R.string.monitor_terminal_idle), 13, MUTED));
         tc.addView(tt, weight1());
         tc.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-        tc.setOnClickListener(v -> startActivity(new Intent(this, TerminalActivity.class)));
+        // this fork's terminal is Termux itself
+        tc.setOnClickListener(v -> {
+            Intent t = getPackageManager().getLaunchIntentForPackage(Termux.PACKAGE);
+            if (t != null) startActivity(t);
+        });
         LinearLayout.LayoutParams tp = full();
         tp.setMargins(dp(this, 16), dp(this, 12), dp(this, 16), 0);
         list.addView(tc, tp);

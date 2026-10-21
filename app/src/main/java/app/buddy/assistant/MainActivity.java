@@ -90,8 +90,6 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         render();
         Account.addListener(this);
         Account.CLAUDE.refresh(this);
-        Account.CODEX.refresh(this);
-        Account.OPENCODE.refresh(this);
     }
 
     private final Runnable waitingChanged = this::render;

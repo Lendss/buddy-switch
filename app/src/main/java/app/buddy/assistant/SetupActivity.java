@@ -60,8 +60,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         SshServer.addListener(this);
         CodexRemote.addListener(this);
         Account.CLAUDE.refresh(this);
-        Account.CODEX.refresh(this);
-        Account.OPENCODE.refresh(this);
         render();
     }
 
@@ -137,22 +135,18 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 a11y || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ? null : getString(R.string.setup_app_info),
                 v -> openAppInfo(getPackageName()));
 
-        boolean installed = SetupState.installed(this, backend);
-        steps[1] = step(getString(R.string.setup_step_install_title, acc.name()),
-                installed ? getString(R.string.setup_step_install_done, acc.name())
-                        : acc.step == Account.Step.INSTALLING ? acc.detail
-                        : getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
-                        ? R.string.setup_step_install_opencode : R.string.setup_step_install_codex, acc.name()),
-                installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
+        // this fork: Termux runs the agent (installed and allowed), then Claude Code there is signed in
+        boolean termux = Termux.ready(this);
+        steps[1] = step(getString(R.string.setup_step_termux_title), termux ? getString(R.string.setup_step_termux_done)
+                        : SignInActivity.problem(this), termux, termux ? null : getString(R.string.onboarding_termux_set_up),
                 v -> openAgent(backend), null, null);
 
         boolean signed = SetupState.signedIn(this, backend);
-        steps[2] = step(getString(R.string.setup_step_signin_title), acc.opencode()
-                        ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
-                        : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
+        String claudeProblem = SignInActivity.problem(this);
+        steps[2] = step(acc.name(), signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
                         : getString(R.string.setup_step_signin_done_email, acc.email))
-                        : getString(acc.claude() ? R.string.setup_step_signin_claude : R.string.setup_step_signin_codex),
-                installed ? signed : null, installed && !signed ? getString(R.string.setup_sign_in) : null,
+                        : claudeProblem == null ? getString(R.string.signin_checking) : claudeProblem,
+                termux ? signed : null, termux && !signed ? getString(R.string.onboarding_termux_set_up) : null,
                 v -> openAgent(backend), null, null);
 
         PowerManager pm = getSystemService(PowerManager.class);
@@ -193,21 +187,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         list.addView(sectionLabel(this, getString(R.string.setup_agent)));
         LinearLayout ag = card();
         ag.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        ag.addView(title(this, getString(R.string.setup_default_brain), 15));
-        TextView brainInfo = text(this, getString(R.string.setup_default_brain_info), 13, MUTED);
-        brainInfo.setPaddingRelative(0, dp(this, 2), 0, 0);
-        ag.addView(brainInfo);
-        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}},
-                backend, false, v -> {
-                    Prefs.setBackend(this, v);
-                    Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(v)),
-                            Toast.LENGTH_LONG).show();
-                    render();
-                }, notReady(), v -> {
-                    Toast.makeText(this, getString(R.string.setup_set_up_first, Account.nameOf(v)), Toast.LENGTH_SHORT).show();
-                    openAgent(v);
-                }), topGap(12));
-        for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
+        // this fork's one agent: Claude Code in Termux
+        for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 0 : 4));
         addCard(ag);
 
         // ---------------------------------------------------------- phone tools
@@ -215,11 +196,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout mcp = card();
         mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         mcp.addView(text(this, getString(R.string.setup_phone_tools_info), 14, MUTED));
-        mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"}},
-                mcpAgent, true, v -> {
-                    mcpAgent = v;
-                    render();
-                }), topGap(12));
         String token = Prefs.token(this);
         String url = "http://127.0.0.1:" + McpServer.PORT + "/mcp";
         // each agent gets a 10-minute tool timeout: an approval card may wait for the user (the default is a minute)
@@ -258,38 +234,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout vc = card();
         vc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         vc.addView(fieldLabel(getString(R.string.setup_voice_input), null));
-        String engine = Prefs.voiceEngine(this);
-        // Claude's dictation needs Claude Code signed in, ChatGPT's voice needs Codex: otherwise greyed out
-        java.util.Set<String> noVoice = new java.util.HashSet<>();
-        if (!SetupState.signedIn(this, "claude")) noVoice.add("claude");
-        if (!SetupState.signedIn(this, "codex")) noVoice.add("chatgpt");
-        vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"claude", "Claude"},
-                        {"chatgpt", "ChatGPT"}},
-                engine, false, v -> {
-                    Prefs.setVoiceEngine(this, v);
-                    render();
-                }, noVoice, this::needSignIn), topGap(8));
-        String engineNote = getString("claude".equals(engine) ? R.string.setup_voice_input_claude
-                : "chatgpt".equals(engine) ? R.string.setup_voice_input_chatgpt : R.string.setup_voice_input_phone);
-        vc.addView(text(this, engineNote, 13, MUTED), topGap(8));
+        // this fork has the phone's recognizer and voice only (Claude's and ChatGPT's need Buddy's built-in Linux)
+        vc.addView(text(this, getString(R.string.setup_voice_input_phone), 13, MUTED), topGap(8));
         vc.addView(fieldLabel(getString(R.string.setup_voice_output), null), topGap(16));
-        String speech = Prefs.speechEngine(this);
-        vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"chatgpt", "ChatGPT"}},
-                speech, false, v -> {
-            Prefs.setSpeechEngine(this, v);
-            render();
-        }, noVoice, this::needSignIn), topGap(8));
-        vc.addView(text(this, getString("chatgpt".equals(speech) ? R.string.setup_voice_output_chatgpt
-                : R.string.setup_voice_output_phone), 13, MUTED), topGap(8));
-        if ("chatgpt".equals(speech)) {
-            LinearLayout voices = segmented(this, CodexSpeech.VOICES, Prefs.speechVoice(this), false, v -> {
-                Prefs.setSpeechVoice(this, v);
-                render();
-                Voice.stopSpeaking();
-                Voice.speak(this, getString(R.string.setup_voice_sample));
-            });
-            vc.addView(voices, topGap(8));
-        }
+        vc.addView(text(this, getString(R.string.setup_voice_output_phone), 13, MUTED), topGap(8));
         vc.addView(fieldLabel(getString(R.string.setup_languages), Voice.languageName(Prefs.voiceLang(this))), topGap(16));
         TextView lh = text(this, getString(R.string.setup_languages_hint), 13, MUTED);
         vc.addView(lh, topGap(4));
@@ -339,128 +287,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         while (chipRow != null && inRow++ < 3) chipRow.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
         addCard(vc);
 
-        // ------------------------------------------------------- remote control
-        list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
-        LinearLayout rcc = card();
-        boolean claudeIn = SetupState.signedIn(this, "claude");
-        rcc.addView(switchRow(this, getString(R.string.setup_remote_session), getString(R.string.setup_remote_session_info),
-                Prefs.remoteSession(this), on -> {
-            if (on && !claudeIn) {
-                Toast.makeText(this, R.string.setup_remote_sign_in_first, Toast.LENGTH_LONG).show();
-                render();
-                return;
-            }
-            Prefs.setRemoteSession(this, on);
-            if (on) RemoteSession.ensure(this);
-            else RemoteSession.stop();
-            render();
-        }), full());
-        if (Prefs.remoteSession(this)) {
-            LinearLayout st = row(this);
-            st.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
-            RemoteSession.State rs = RemoteSession.state;
-            st.addView(dot(this, rs == RemoteSession.State.ACTIVE ? OK : rs == RemoteSession.State.ERROR ? ERR : ACCENT, 8));
-            TextView stt = monoText(this, rs == RemoteSession.State.ACTIVE
-                    ? getString(R.string.setup_remote_active, Prefs.remoteName(this))
-                    : rs == RemoteSession.State.ERROR ? RemoteSession.detail
-                    : getString(rs == RemoteSession.State.STARTING ? R.string.setup_remote_starting
-                    : R.string.setup_remote_stopped), 12,
-                    rs == RemoteSession.State.ERROR ? ERR : MUTED);
-            stt.setPaddingRelative(dp(this, 8), 0, 0, 0);
-            st.addView(stt, weight1());
-            rcc.addView(st, full());
-            if (rs == RemoteSession.State.ACTIVE && RemoteSession.url != null) {
-                Button open = button(this, getString(R.string.setup_remote_open), false);
-                open.setOnClickListener(v -> {
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RemoteSession.url)));
-                    } catch (Exception e) {
-                        Toast.makeText(this, R.string.setup_remote_open_failed, Toast.LENGTH_SHORT).show();
-                    }
-                });
-                LinearLayout.LayoutParams op = wrap();
-                op.setMargins(dp(this, 16), 0, dp(this, 16), dp(this, 14));
-                rcc.addView(open, op);
-            }
-        }
-        // a Codex session for the ChatGPT app (CodexRemote)
-        rcc.addView(divider(), lineParams());
-        boolean codexIn = SetupState.signedIn(this, "codex");
-        rcc.addView(switchRow(this, getString(R.string.setup_codex_session), getString(R.string.setup_codex_session_info),
-                Prefs.codexRemote(this), on -> {
-            if (on && !codexIn) {
-                Toast.makeText(this, getString(R.string.setup_set_up_first, "Codex"), Toast.LENGTH_LONG).show();
-                render();
-                return;
-            }
-            Prefs.setCodexRemote(this, on);
-            if (on) CodexRemote.ensure(this);
-            else CodexRemote.stop();
-            render();
-        }), full());
-        if (Prefs.codexRemote(this)) {
-            LinearLayout cs = row(this);
-            cs.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
-            CodexRemote.State cr = CodexRemote.state;
-            cs.addView(dot(this, cr == CodexRemote.State.ACTIVE ? OK : cr == CodexRemote.State.ERROR ? ERR : ACCENT, 8));
-            TextView cst = monoText(this, cr == CodexRemote.State.ACTIVE ? getString(R.string.setup_codex_active)
-                    : cr == CodexRemote.State.ERROR ? CodexRemote.detail
-                    : getString(cr == CodexRemote.State.STARTING ? R.string.setup_remote_starting : R.string.setup_remote_stopped),
-                    12, cr == CodexRemote.State.ERROR ? ERR : MUTED);
-            cst.setPaddingRelative(dp(this, 8), 0, 0, 0);
-            cs.addView(cst, weight1());
-            rcc.addView(cs, full());
-            if (cr == CodexRemote.State.ACTIVE) {
-                Button pairBtn = button(this, getString(R.string.setup_codex_pair), false);
-                pairBtn.setOnClickListener(v -> codexPairSheet());
-                LinearLayout.LayoutParams pbp = wrap();
-                pbp.setMargins(dp(this, 16), 0, dp(this, 16), dp(this, 14));
-                rcc.addView(pairBtn, pbp);
-            }
-        }
-        // SSH into Buddy's Linux from Termux (SshServer)
-        rcc.addView(divider(), lineParams());
-        rcc.addView(switchRow(this, getString(R.string.setup_ssh), getString(R.string.setup_ssh_info),
-                Prefs.sshServer(this), on -> {
-            Prefs.setSshServer(this, on);
-            if (on) SshServer.ensure(this);
-            else SshServer.stop();
-            render();
-        }), full());
-        if (Prefs.sshServer(this)) {
-            LinearLayout st = row(this);
-            st.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 14));
-            SshServer.State ss = SshServer.state;
-            st.addView(dot(this, ss == SshServer.State.ACTIVE ? OK : ss == SshServer.State.ERROR ? ERR : ACCENT, 8));
-            TextView stt = monoText(this, ss == SshServer.State.ACTIVE ? getString(R.string.setup_ssh_active, SshServer.PORT)
-                    : ss == SshServer.State.ERROR ? SshServer.detail
-                    : getString(ss == SshServer.State.STARTING ? R.string.setup_remote_starting : R.string.setup_remote_stopped),
-                    12, ss == SshServer.State.ERROR ? ERR : MUTED);
-            stt.setPaddingRelative(dp(this, 8), 0, 0, 0);
-            st.addView(stt, weight1());
-            rcc.addView(st, full());
-            if (ss == SshServer.State.ACTIVE) {
-                LinearLayout how = column(this);
-                how.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 16));
-                how.addView(text(this, getString(R.string.setup_ssh_how), 13, MUTED));
-                // the one-time code is made when the command is copied, and masked here
-                how.addView(codeBlock(this, sshCommand("••••••••")), topGap(10));
-                Button sshCopy = button(this, getString(R.string.setup_copy_command), false);
-                sshCopy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
-                sshCopy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
-                sshCopy.setCompoundDrawablePadding(dp(this, 8));
-                sshCopy.setOnClickListener(v -> {
-                    ClipboardManager cm = getSystemService(ClipboardManager.class);
-                    cm.setPrimaryClip(ClipData.newPlainText("Buddy SSH", sshCommand(SshServer.newCode())));
-                    Toast.makeText(this, R.string.setup_command_copied, Toast.LENGTH_SHORT).show();
-                });
-                LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-                sp.topMargin = dp(this, 12);
-                how.addView(sshCopy, sp);
-                rcc.addView(how, full());
-            }
-        }
-        addCard(rcc);
+        // Remote control, the Codex session and SSH ran in Buddy's built-in Linux: not in this fork (yet)
 
         // chats from the Termux days: their conversations stayed in Termux, so agents can't continue them
         final java.util.List<Sessions.Session> old = termuxChats();
@@ -1005,8 +832,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account a = Account.of(agent);
         String st = Prefs.agentState(this, agent);
         boolean busy = a.step == Account.Step.INSTALLING;
+        // this fork: say what's missing in Termux, if anything
+        String problem = SignInActivity.problem(this);
         String state = busy ? getString(R.string.setup_agent_installing)
-                : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? getString(R.string.setup_agent_not_installed)
+                : problem != null && !"SIGNED_IN".equals(st) ? problem
                 : a.opencode() ? (a.plan.isEmpty() ? getString(R.string.setup_agent_ready)
                 : getString(R.string.setup_agent_ready_plan, a.planLabel()))
                 : "SIGNED_IN".equals(st) ? (a.email.isEmpty() ? getString(R.string.setup_agent_signed_in)

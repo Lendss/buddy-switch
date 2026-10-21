@@ -125,13 +125,14 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         }
     }
 
+    /** This fork has one agent: Claude Code in Termux. */
     static String[] wanted(Context c) {
-        String a = Prefs.agents(c);
-        if ("both".equals(a)) return new String[]{"claude", "codex"};
-        return new String[]{"codex".equals(a) || "opencode".equals(a) ? a : "claude"};
+        return new String[]{"claude"};
     }
 
     private void go(int s) {
+        // no agent to choose in this fork: the Brain step is passed over both ways
+        if (s == BRAIN) s = s > step ? ACCESS : WELCOME;
         if (s > step) noAutoAdvance = false;
         step = Math.max(WELCOME, Math.min(LAST, s));
         Prefs.setOnboardStep(this, step);
@@ -313,65 +314,35 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         primary(getString(R.string.onboarding_continue), v -> go(ACCESS));
     }
 
+    /** Claude Code in Termux: what's missing, if anything, and the way to the screen that sets it up. */
     private void agents(boolean ok) {
-        header(R.drawable.ms_terminal, getString(ok ? R.string.onboarding_agents_done_title : R.string.onboarding_agents_title),
-                ok && "both".equals(Prefs.agents(this)) ? getString(R.string.onboarding_agents_done_both)
-                        : getString(ok ? R.string.onboarding_agents_done : R.string.onboarding_agents_text, agentNames()), ok);
-        boolean first = true;
-        for (String a : wanted(this)) {
-            Account acc = Account.of(a);
-            boolean installed = SetupState.installed(this, a), signed = SetupState.signedIn(this, a);
-            boolean installing = acc.step == Account.Step.INSTALLING;
-            LinearLayout card = column(this);
-            card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
-            card.setBackground(rounded(this, CARD, 16));
-            LinearLayout r = row(this);
-            r.addView(agentTile(this, a));
-            LinearLayout t = column(this);
-            t.setPaddingRelative(dp(this, 12), 0, 0, 0);
-            t.addView(title(this, acc.name(), 15));
-            t.addView(single(monoText(this, signed ? (acc.opencode() ? getString(R.string.onboarding_agent_ready,
-                    acc.plan.isEmpty() ? getString(R.string.onboarding_agent_free_models) : acc.planLabel())
-                    : acc.email.isEmpty() ? getString(R.string.onboarding_agent_signed_in)
-                    : getString(R.string.onboarding_agent_signed_in_as, acc.email))
-                    : getString(installing ? R.string.onboarding_agent_installing : installed
-                    ? R.string.onboarding_agent_installed : R.string.onboarding_agent_not_installed), 12,
-                    signed ? OK : MUTED)));
-            r.addView(t, weight1());
-            if (signed) r.addView(icon(this, R.drawable.ms_check, OK, 22));
-            else if (installing) r.addView(spinner(this, 20));
-            card.addView(r, full());
-            if (!signed) {
-                TextView how = text(this, installing ? acc.detail
-                        : acc.step == Account.Step.ERROR ? acc.detail
-                        : getString(installed ? (acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
-                        ? R.string.onboarding_agent_checking_opencode : R.string.onboarding_agent_sign_in_codex)
-                        : (acc.claude() ? R.string.onboarding_agent_download_claude
-                        : acc.opencode() ? R.string.onboarding_agent_download_opencode
-                        : R.string.onboarding_agent_download_codex)), 14,
-                        acc.step == Account.Step.ERROR ? ERR : MUTED);
-                how.setPaddingRelative(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
-                card.addView(how);
-                if (!installing && !(installed && acc.opencode())) {
-                    Button b = button(this, installed ? getString(acc.claude() ? R.string.onboarding_sign_in_claude
-                            : R.string.onboarding_sign_in_chatgpt) : getString(R.string.onboarding_install_agent, acc.name()), first);
-                    b.setOnClickListener(v -> {
-                        if (installed) startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a));
-                        else acc.install(this);
-                    });
-                    card.addView(b, wrap());
-                    first = false;
-                }
-            }
-            LinearLayout.LayoutParams p = full();
-            p.topMargin = dp(this, 12);
-            body.addView(card, p);
+        header(R.drawable.ms_terminal, getString(R.string.onboarding_termux_title),
+                getString(ok ? R.string.onboarding_termux_done : R.string.onboarding_termux_text), ok);
+        Account acc = Account.CLAUDE;
+        LinearLayout card = column(this);
+        card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        card.setBackground(rounded(this, CARD, 16));
+        LinearLayout r = row(this);
+        r.addView(agentTile(this, "claude"));
+        LinearLayout t = column(this);
+        t.setPaddingRelative(dp(this, 12), 0, 0, 0);
+        t.addView(title(this, acc.name(), 15));
+        String problem = SignInActivity.problem(this);
+        t.addView(single(monoText(this, problem == null ? (acc.email.isEmpty() ? getString(R.string.onboarding_agent_signed_in)
+                : getString(R.string.onboarding_agent_signed_in_as, acc.email)) : problem, 12, problem == null ? OK : MUTED)));
+        r.addView(t, weight1());
+        if (problem == null) r.addView(icon(this, R.drawable.ms_check, OK, 22));
+        card.addView(r, full());
+        if (problem != null) {
+            Button b = button(this, getString(R.string.onboarding_termux_set_up), true);
+            b.setOnClickListener(v -> startActivity(new Intent(this, SignInActivity.class)));
+            LinearLayout.LayoutParams bp = wrap();
+            bp.topMargin = dp(this, 12);
+            card.addView(b, bp);
         }
-        if (!ok) {
-            note(getString(R.string.onboarding_agents_wifi));
-            stuck(getString(R.string.onboarding_stuck_sign_in_q), getString(R.string.onboarding_stuck_sign_in_a),
-                    getString(R.string.onboarding_stuck_install_q), getString(R.string.onboarding_stuck_install_a));
-        }
+        LinearLayout.LayoutParams p = full();
+        p.topMargin = dp(this, 12);
+        body.addView(card, p);
     }
 
     private void background(boolean ok) {

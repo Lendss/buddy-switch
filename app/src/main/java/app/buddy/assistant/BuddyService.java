@@ -99,9 +99,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         registerReceiver(lockReceiver, f);
         bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         if (!Prefs.onboarded(this)) main.postDelayed(this::showGuide, 600);
-        main.postDelayed(() -> RemoteSession.ensure(this), 4000);
-        main.postDelayed(() -> SshServer.ensure(this), 4000);
-        main.postDelayed(() -> CodexRemote.ensure(this), 4000);
         main.postDelayed(updateCheck, 20_000);
         // the helper's answer refreshes Codex's model list
         main.postDelayed(() -> {

@@ -344,7 +344,7 @@ final class Prefs {
 
     /** Voice input engine: "phone" (Android's recognizer), "claude" (Claude Code's dictation) or "chatgpt". */
     static String voiceEngine(Context c) {
-        return sp(c).getString("voice_engine", "phone");
+        return "phone"; // this fork: Claude's and ChatGPT's voice need Buddy's built-in Linux
     }
 
     static void setVoiceEngine(Context c, String e) {
@@ -424,7 +424,7 @@ final class Prefs {
 
     /** Who reads replies aloud: "phone" (Android's voices) or "chatgpt" (ChatGPT's voice through Codex). */
     static String speechEngine(Context c) {
-        return sp(c).getString("speech_engine", "phone");
+        return "phone"; // this fork: ChatGPT's voice needs Buddy's built-in Linux
     }
 
     static void setSpeechEngine(Context c, String e) {

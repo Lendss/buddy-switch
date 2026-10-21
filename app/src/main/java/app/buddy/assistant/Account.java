@@ -33,7 +33,7 @@ final class Account {
     static final Account CLAUDE = new Account("claude");
     static final Account CODEX = new Account("codex");
     static final Account OPENCODE = new Account("opencode");
-    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE};
+    static final Account[] ALL = {CLAUDE}; // this fork offers only Claude Code (Termux's)
 
     static Account of(String agent) {
         return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : CLAUDE;

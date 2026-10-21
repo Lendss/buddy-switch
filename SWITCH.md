@@ -73,3 +73,18 @@ App ──Intent com.termux.RUN_COMMAND (background, script on stdin)──► T
 
 Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `AAPT_JAR` = platform-33 `android.jar`
 (Termux's aapt2 can't read API 36 resources).
+
+## Progress
+
+- [x] 1–3. Own identity, Termux backend, `buddy-run` for Termux: chats answer from Termux's Claude Code; nothing stays
+  running between messages (Termux's service stops by itself after a run; its process stays cached, ~56 MB, until
+  Android needs the memory).
+- [x] 4. Setup: one agent (Claude Code in Termux); the agent screen checks Termux, asks for the RUN_COMMAND permission,
+  shows the allow-external-apps line, and sends sign-in/installing to Termux. Codex, OpenCode, the built-in terminal,
+  Remote Control/Codex/SSH sessions and Claude/ChatGPT voice are out of the UI (their code stays, unused, for now).
+  Self-updates look at this fork's releases.
+- [ ] 5. Idle footprint: Buddy SW itself (~105 MB with a chat screen in Recents).
+- [ ] 6. Remote Control switch.
+- [ ] 7. Joy-Con navigation.
+
+`tools/`: `idle-monitor.sh` (what stays in memory, as root), `mcp-call.py` (Buddy's phone tools from the shell).
