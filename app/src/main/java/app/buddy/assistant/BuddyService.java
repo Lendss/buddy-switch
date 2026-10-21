@@ -105,7 +105,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.postDelayed(updateCheck, 20_000);
         // the helper's answer refreshes Codex's model list
         main.postDelayed(() -> {
-            if (Linux.installed(this)) {
+            if (Termux.ready(this)) {
                 try {
                     Helper.run(this, "ping");
                 } catch (Exception ignored) {

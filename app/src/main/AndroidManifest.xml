@@ -15,9 +15,13 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Notification rules: the agent keeps working (and an approval countdown keeps running) with the screen off -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- This fork runs the agent in Termux (RUN_COMMAND); Termux needs allow-external-apps=true -->
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
 
     <!-- Needed on Android 11+ to see launchable apps for open_app / list_apps -->
     <queries>
+        <!-- Termux runs the agent in this fork -->
+        <package android:name="com.termux" />
         <!-- the home app, to fold the bubble panel when Recents or Home opens -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -105,7 +109,7 @@
 
         <provider
             android:name=".FilesProvider"
-            android:authorities="app.buddy.assistant.files"
+            android:authorities="app.buddy.sw.files"
             android:exported="false"
             android:grantUriPermissions="true" />
 

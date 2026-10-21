@@ -32,11 +32,11 @@ final class SetupState {
 
     static boolean installed(Context c, String agent) {
         String s = Prefs.agentState(c, agent);
-        return Linux.installed(c) && s != null && !"NEED_INSTALL".equals(s);
+        return Termux.ready(c) && s != null && !"NEED_INSTALL".equals(s);
     }
 
     static boolean signedIn(Context c, String agent) {
-        return Linux.installed(c) && "SIGNED_IN".equals(Prefs.agentState(c, agent));
+        return Termux.ready(c) && "SIGNED_IN".equals(Prefs.agentState(c, agent));
     }
 
     int count() {

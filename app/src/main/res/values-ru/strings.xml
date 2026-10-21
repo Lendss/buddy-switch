@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Russian translation of Buddy's UI. Source: res/values/strings.xml. -->
 <resources>
-    <string name="service_label">Помощник Buddy</string>
+    <string name="service_label">Помощник Buddy SW</string>
     <string name="service_description">Показывает пузырёк чата Buddy и позволяет Claude Code или Codex, работающим внутри Buddy на этом телефоне, читать экран, а также нажимать, вводить текст и прокручивать за вас. С телефона ничего не передаётся, кроме того, что сам агент отправляет в Anthropic или OpenAI.</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
@@ -1366,6 +1366,7 @@
     <string name="reviewer_timed_out">время ожидания истекло</string>
 
     <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_termux_missing">Termux не готов: установите Termux, включите allow-external-apps=true в ~/.termux/termux.properties и разрешите Buddy запускать команды в Termux.</string>
     <string name="helper_linux_missing">Встроенный Linux ещё не установлен. Откройте настройки, чтобы установить его.</string>
 
     <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
@@ -1423,7 +1424,7 @@
     <string name="setup_rules_info">Пусть агент действует, когда приходит уведомление: ответит на сообщение, добавит доставку в календарь…</string>
     <string name="tools_card_reply">Ответить: %1$s · %2$s\n«%3$s»</string>
     <string name="tools_card_open_url">Открыть %1$s</string>
-    <string name="rules_service_label">Правила Buddy для уведомлений</string>
+    <string name="rules_service_label">Правила Buddy SW для уведомлений</string>
     <string name="rules_title">Правила для уведомлений</string>
     <string name="rules_intro">Когда приходит выбранное вами уведомление, Buddy передаёт агенту ваше указание, как будто вы сами написали ему сообщение. Уведомления, которые не подходят ни под одно правило, игнорируются.</string>
     <string name="rules_access_off_title">Доступ к уведомлениям выключен</string>

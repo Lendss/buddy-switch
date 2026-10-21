@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Every text Buddy shows, in English. Translations: res/values-<language>/strings.xml (see CONTRIBUTING.md). -->
 <resources>
-    <string name="app_name" translatable="false">Buddy</string>
-    <string name="service_label">Buddy assistant</string>
+    <string name="app_name" translatable="false">Buddy SW</string>
+    <string name="service_label">Buddy SW assistant</string>
     <string name="service_description">Shows the Buddy chat bubble and lets Claude Code or Codex, running inside Buddy on this phone, read the screen and tap, type and scroll for you. Nothing leaves the phone except what the agent itself sends to Anthropic or OpenAI.</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
@@ -1372,6 +1372,7 @@
     <string name="reviewer_timed_out">timed out</string>
 
     <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_termux_missing">Termux isn\'t ready: install Termux, set allow-external-apps=true in ~/.termux/termux.properties and allow Buddy to run commands in Termux.</string>
     <string name="helper_linux_missing">Buddy\'s Linux isn\'t installed yet. Open Settings to set it up.</string>
 
     <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
@@ -1422,7 +1423,7 @@
     <!-- Notification rules (Settings → Notification rules): when a notification from an app the user picks arrives
          (optionally from someone, or containing some words), Buddy gives the user's instruction to an agent. -->
     <!-- Name of Buddy's entry in Android's notification access settings. -->
-    <string name="rules_service_label">Buddy notification rules</string>
+    <string name="rules_service_label">Buddy SW notification rules</string>
     <string name="rules_title">Notification rules</string>
     <string name="rules_intro">When a notification you pick arrives, Buddy gives your instruction to an agent, like a message you\'d type. Notifications that no rule matches are ignored.</string>
     <string name="rules_access_off_title">Notification access is off</string>

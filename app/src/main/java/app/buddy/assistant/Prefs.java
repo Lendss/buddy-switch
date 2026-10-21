@@ -113,7 +113,7 @@ final class Prefs {
     }
 
     static boolean devMode(Context c) {
-        return !Flavor.PLAY && sp(c).getBoolean("dev", false);
+        return !Flavor.PLAY && sp(c).getBoolean("dev", true); // on by default here: chats get Termux's full Claude Code
     }
 
     static void setDevMode(Context c, boolean on) {

@@ -33,7 +33,7 @@ final class Models {
      *  10 minutes; the helper's answer updates the lists. */
     static void refresh(android.content.Context c) {
         long now = System.currentTimeMillis();
-        if (now - refreshedAt < 600_000 || !Linux.installed(c)) return;
+        if (now - refreshedAt < 600_000 || !Termux.ready(c)) return;
         refreshedAt = now;
         try {
             Helper.run(c, "ping");

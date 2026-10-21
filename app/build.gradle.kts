@@ -18,7 +18,8 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.buddy.assistant"
+        // this fork installs next to upstream Buddy (app.buddy.assistant); the code keeps its namespace
+        applicationId = "app.buddy.sw"
         minSdk = 30
         targetSdk = 36
         versionCode = appVersionCode

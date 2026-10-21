@@ -135,12 +135,13 @@ final class Account {
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {
-                if (!Linux.installed(app)) {
+                // this fork runs only Termux's own Claude Code: Codex and OpenCode aren't offered
+                if (!Termux.ready(app) || !claude()) {
                     set(Step.NEED_INSTALL, "");
                     return;
                 }
                 if (claude()) {
-                    String out = Linux.exec(app, "[ -x /root/.local/bin/claude ] || { echo NOTINSTALLED; exit 0; }; "
+                    String out = Termux.exec(app, "command -v claude >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "claude auth status 2>/dev/null; echo; echo VER=$(claude --version 2>/dev/null)", 60);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");

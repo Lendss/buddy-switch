@@ -7,9 +7,6 @@ import android.view.accessibility.AccessibilityWindowInfo;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -103,30 +100,14 @@ final class Reviewer {
         }
     }
 
-    /** A one-off Claude Code (Haiku unless the user picked another model; no tools, nothing saved) in Buddy's Linux. */
+    /** A one-off Claude Code (Haiku unless the user picked another model; no tools, nothing saved) in Termux. */
     private static String claude(Context c, String system, String prompt) throws Exception {
-        String id = Long.toHexString(System.nanoTime());
-        File dir = new File(Linux.root(c), "root/review");
-        dir.mkdirs();
-        File sys = new File(dir, id + ".sys"), in = new File(dir, id + ".txt");
-        write(sys, system);
-        write(in, prompt);
-        try {
-            String model = Prefs.reviewerModel(c, "claude");
-            if (!model.matches("[A-Za-z0-9._:/-]+")) model = "haiku"; // the default; anything else goes into a shell command
-            return Linux.exec(c, "cd /root/review && timeout " + (TIMEOUT_MS / 1000) + " claude -p --model " + model + " --tools '' "
-                    + "--strict-mcp-config --no-session-persistence --system-prompt \"$(cat " + id + ".sys)\" < " + id + ".txt 2>&1",
-                    (int) (TIMEOUT_MS / 1000) + 5);
-        } finally {
-            sys.delete();
-            in.delete();
-        }
-    }
-
-    private static void write(File f, String s) throws Exception {
-        try (FileOutputStream o = new FileOutputStream(f)) {
-            o.write(s.getBytes(StandardCharsets.UTF_8));
-        }
+        String model = Prefs.reviewerModel(c, "claude");
+        if (!model.matches("[A-Za-z0-9._:/-]+")) model = "haiku"; // the default; anything else goes into a shell command
+        // its own folder, so it never picks up a project's CLAUDE.md; the prompt comes in on stdin
+        return Termux.exec(c, Helper.heredoc("S", system) + "mkdir -p ~/.buddy/review && cd ~/.buddy/review && claude -p --model "
+                + model + " --tools '' --strict-mcp-config --no-session-persistence --system-prompt \"$S\" 2>&1",
+                prompt, (int) (TIMEOUT_MS / 1000));
     }
 
     /**

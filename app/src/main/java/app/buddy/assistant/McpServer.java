@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
  * Every request must carry "Authorization: Bearer <token>".
  */
 final class McpServer {
-    static final int PORT = 8765;
+    static final int PORT = 8775; // upstream Buddy uses 8765-8767: this fork can run next to it
     private static final String TAG = "BuddyMcp";
     private static final String DEFAULT_PROTOCOL = "2025-06-18";
 

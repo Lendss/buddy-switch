@@ -995,13 +995,10 @@ final class Tools {
             }
             if (out.length() < 4) return "No APK at " + path + ".";
         } else {
-            if (path == null || !path.startsWith("/") || !path.endsWith(".apk")) return "Give the full path of an .apk file.";
-            java.io.File root = Linux.root(svc).getCanonicalFile();
-            java.io.File f = new java.io.File(root, path.substring(1)).getCanonicalFile();
-            if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile()) return "No APK at " + path + ".";
-            try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream o = new java.io.FileOutputStream(out)) {
-                copy(in, o);
-            }
+            // this fork's agent works in Termux, whose files Buddy can't read
+            return "Buddy can't read files in Termux. Serve the APK from Termux on this phone and pass its URL, e.g. "
+                    + "`cd <its folder> && python -m http.server 8799 --bind 127.0.0.1` then install_apk with "
+                    + "http://127.0.0.1:8799/<name>.apk; or install it with root: `su -c 'pm install -r <path>'`.";
         }
         if (!svc.getPackageManager().canRequestPackageInstalls()) {
             svc.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,

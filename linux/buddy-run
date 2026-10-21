@@ -1,5 +1,7 @@
 #!/bin/bash
-# Run by the Buddy app inside its built-in Linux (Alpine, through proot).
+# Run by the Buddy app in Termux (this fork: Buddy for Switch), through Termux's RUN_COMMAND service, as
+#   bash -c <this script> buddy-run <token> …
+# with the app's instructions in front of it: $BUDDY_SYSTEM (the system prompt) and $BUDDY_PERMS (App permissions).
 #   buddy-run <token> ask <session> <claude|codex|opencode> <dev:0|1|rule> <message> [model] [attachment-ids]
 #     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools)
 #                                    run the agent on the message in that session, streaming events to the bubble
@@ -14,15 +16,18 @@
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
 HELPER_VERSION=12
 set -u
-export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PREFIX=${PREFIX:-/data/data/com.termux/files/usr}
+# Termux's own commands first: its claude is a launcher script in $PREFIX/bin
+export PATH=$PREFIX/bin:$HOME/.local/bin:$HOME/bin:$PATH
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
 unset BUN_OPTIONS
 D=$HOME/.buddy
-W=$D/work
+# The agent works in the home folder, like Claude Code started in the Termux terminal: same project, memory and CLAUDE.md
+W=$HOME
 mkdir -p "$W" "$D/sessions"
 TOKEN=${1:-}
 CMD=${2:-}
-URL=http://127.0.0.1:8765
+URL=http://127.0.0.1:8775   # this fork's port (McpServer.PORT)
 
 post() { # post one JSON event to the bubble
   curl -s -m 5 -o /dev/null -X POST -H "Authorization: Bearer $TOKEN" \
@@ -51,6 +56,8 @@ descendants() { # print a pid and all its descendants
 agent_of() {
   local cmd
   cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
+  # Termux's Claude Code: glibc's loader runs the real program, .../claude-native/<version>/claude
+  case "$cmd" in */ld-linux-*" "*/claude-native/*/claude|*/ld-linux-*" "*/claude-native/*/claude" "*) echo claude; return 0 ;; esac
   case "${cmd%% *}" in
     */claude/versions/*) echo claude ;;
     */codex-linux-*/*|*/bin/codex) echo codex ;;
@@ -83,7 +90,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode' 2>/dev/null); do
+      for p in $(pgrep -f 'claude-native/|claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -223,16 +230,18 @@ $(printf -- '- %s\n' "${ATT[@]}")]"
   fi
 fi
 
-SYSTEM=$(cat "$D/system-prompt.md" 2>/dev/null)
-PERMS=$(cat "$D/permissions.md" 2>/dev/null)
+SYSTEM=${BUDDY_SYSTEM:-}
+PERMS=${BUDDY_PERMS:-}
 [ -n "$PERMS" ] && SYSTEM="$SYSTEM
 
 $PERMS"
 if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 
-Developer mode is ON: you may run shell commands and create or edit files. Work inside $W (one folder per project).
-Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode) in $W and follow it."
+Developer mode is ON. You are the same Claude Code the user runs in the Termux terminal, with all of its tools,
+settings and memory: shell commands, files, the web. The phone is the user's Nintendo Switch running Android
+(LineageOS), rooted with Magisk: run root commands with su -c. You work in Termux's home folder ($W).
+Buddy can't read files in Termux: to show a file to the user, say where it is or put what matters in your reply."
 fi
 
 # ---------------------------------------------------------------- Claude Code
@@ -244,15 +253,17 @@ run_claude() {
   [ "$DEV" = rule ] && tools=("mcp__phone")
   local deny=()
   [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
-  [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
+  local perms=(--allowedTools "${tools[@]}" "${deny[@]}")
+  # developer mode: every tool without asking, like the user's Claude Code in the Termux terminal
+  [ "$DEV" = 1 ] && perms=(--permission-mode bypassPermissions)
   local args=(-p "$MSG" --output-format stream-json --verbose
     --mcp-config "$mcp" --strict-mcp-config
-    --allowedTools "${tools[@]}" "${deny[@]}"
+    "${perms[@]}"
     --append-system-prompt "$SYSTEM")
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
-  cd "$W" && claude "${args[@]}" 2>"$S/last-error.log"
+  cd "$W" && claude "${args[@]}" </dev/null 2>"$S/last-error.log"
 }
 
 stream_claude() {

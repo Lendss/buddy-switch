@@ -12,8 +12,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Runs Buddy's helper script (assets/linux/buddy-run) inside the built-in Linux. The helper streams
- * the agent's progress back to the app over the local server (POST /event), like before.
+ * Runs Buddy's helper script (assets/linux/buddy-run) in Termux (see {@link Termux}). The helper streams the
+ * agent's progress back to the app over the local server (POST /event), like before. Buddy can't write into
+ * Termux's home, so the script goes along with each run, its instructions (system prompt, App permissions)
+ * written into it.
  */
 final class Helper {
     private static final String[][] FILES = {
@@ -36,44 +38,82 @@ final class Helper {
     private Helper() {
     }
 
-    /** Whether chats can run: Linux is installed (each agent's own readiness is checked by Account). */
+    /** Whether chats can run: Termux is there and lets Buddy run commands (Claude Code's own readiness: Account). */
     static boolean ready(Context c) {
-        return Linux.installed(c);
+        return Termux.ready(c);
     }
 
-    /** Runs `buddy-run <token> args…` in the background. Throws with a readable message if Linux isn't set up. */
+    /** Runs `buddy-run <token> args…` in Termux in the background. Throws with a readable message if Termux isn't ready. */
     static void run(Context c, String... args) {
         final Context app = c.getApplicationContext();
-        if (!Linux.installed(app)) {
-            throw new IllegalStateException(app.getString(R.string.helper_linux_missing)); // shown to the user
+        if (!Termux.ready(app)) {
+            throw new IllegalStateException(app.getString(R.string.helper_termux_missing)); // shown to the user
         }
-        final String[] cmd = new String[args.length + 3];
-        cmd[0] = "/bin/bash";
-        cmd[1] = "/root/bin/buddy-run";
-        cmd[2] = Prefs.token(app);
-        System.arraycopy(args, 0, cmd, 3, args.length);
+        // bash -c <script> buddy-run <token> args…: the script sees the token as $1, like upstream's buddy-run
+        final String[] cmd = new String[args.length + 4];
+        cmd[0] = "-c";
+        cmd[2] = "buddy-run";
+        cmd[3] = Prefs.token(app);
+        System.arraycopy(args, 0, cmd, 4, args.length);
         pool.execute(() -> {
             try {
-                sync(app);
-                writePermissions(app);
-                Process p = Linux.builder(app, cmd).start();
-                p.getOutputStream().close();
-                // the helper reports through the local server; its own output is only kept for debugging
-                File log = new File(app.getCacheDir(), "helper.log");
-                try (InputStream in = p.getInputStream(); OutputStream out = new FileOutputStream(log, log.length() < 200_000)) {
-                    byte[] buf = new byte[8192];
-                    int n;
-                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-                }
-                p.waitFor();
+                cmd[1] = script(app);
+                // the helper reports through the local server; its result only matters when Termux couldn't run it
+                Termux.start(app, Termux.PREFIX + "/bin/bash", cmd, null, r -> {
+                    if (!r.error.isEmpty()) failed(args, r.error);
+                    else if (r.exitCode != 0) android.util.Log.w("Buddy", "helper exit " + r.exitCode + ": " + r.stderr);
+                });
             } catch (Exception e) {
-                android.util.Log.w("Buddy", "helper failed", e);
+                failed(args, e.getMessage());
             }
         });
     }
 
-    /** The user's App permissions choices, which buddy-run appends to the agent's instructions. */
-    static void writePermissions(Context c) {
+    /** Termux couldn't run the helper: an ask shows the error in its chat (nothing else would end it). */
+    private static void failed(String[] args, String why) {
+        android.util.Log.w("Buddy", "helper failed: " + why);
+        BuddyService s = BuddyService.get();
+        if (s == null || args.length < 2 || !"ask".equals(args[0])) return;
+        try {
+            s.onEvent(new org.json.JSONObject().put("type", "buddy_error").put("buddy_session", args[1])
+                    .put("text", "Termux: " + why));
+            s.onEvent(new org.json.JSONObject().put("type", "buddy_done").put("buddy_session", args[1]));
+        } catch (org.json.JSONException ignored) {
+        }
+    }
+
+    private static String helperScript, systemPrompt;
+
+    /** buddy-run with Buddy's instructions in front of it, as shell variables ($BUDDY_SYSTEM, $BUDDY_PERMS). */
+    private static String script(Context c) throws IOException {
+        synchronized (Helper.class) {
+            if (helperScript == null) {
+                helperScript = asset(c, "linux/buddy-run");
+                systemPrompt = asset(c, "linux/system-prompt.md");
+            }
+        }
+        return heredoc("BUDDY_SYSTEM", systemPrompt) + heredoc("BUDDY_PERMS", permissions(c)) + helperScript;
+    }
+
+    /** A shell line setting {@code name} to {@code text} exactly (a quoted here-document: nothing in it is expanded). */
+    static String heredoc(String name, String text) {
+        String end = "BUDDY_EOF";
+        while (("\n" + text + "\n").contains("\n" + end + "\n")) end += "_";
+        return name + "=$(cat <<'" + end + "'\n" + text + (text.isEmpty() || text.endsWith("\n") ? "" : "\n") + end + "\n)\n";
+    }
+
+    private static String asset(Context c, String path) throws IOException {
+        try (InputStream in = c.getAssets().open(path)) {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return new String(out.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+        }
+    }
+
+    /** The user's App permissions choices, which buddy-run appends to the agent's instructions ("" if none). */
+    static String permissions(Context c) {
         StringBuilder trusted = new StringBuilder();
         for (java.util.Map.Entry<String, String> e : Prefs.appSafetyAll(c).entrySet()) {
             if ("trust".equals(e.getValue())) trusted.append("- ").append(appName(c, e.getKey())).append(" (").append(e.getKey()).append(")\n");
@@ -91,18 +131,7 @@ final class Helper {
             text += (text.isEmpty() ? "" : "\n") + "Buttons the user marked \"Never ask\" (tap them without confirming "
                     + "when the task calls for it):\n" + never;
         }
-        File f = new File(Linux.root(c), "root/.buddy/permissions.md");
-        try {
-            if (text.isEmpty()) {
-                f.delete();
-            } else {
-                try (OutputStream o = new FileOutputStream(f)) {
-                    o.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                }
-            }
-        } catch (IOException e) {
-            android.util.Log.w("Buddy", "permissions not written", e);
-        }
+        return text;
     }
 
     private static String appName(Context c, String pkg) {
