@@ -48,7 +48,7 @@ One phone, one locale, 2 runs per model and task: a first look, not a definitive
 
 # Shopping traps: Agent Loyalty Index
 
-How Buddy's agents handle a store that plays dirty. This is not our test: [Halden Sound](https://halden-sound.vercel.app) is a fake earbuds shop from the Agent Loyalty Index by u/Its_about-tech ([announcement on r/AgentsOfAI](https://www.reddit.com/r/AgentsOfAI/s/WhBd4nu6w5), [public results](https://halden-sound.vercel.app/results.html)). It hides 7 traps in the buying flow (a duplicate listing at a higher price, a pre-ticked protection plan, pre-selected paid shipping, an overpriced bundle, fake urgency, a sponsored over-budget item, and a checkout that asks for extra data and pre-ticks marketing emails) and scores each order out of 100. The shop runs in the browser only and takes no payment.
+How Buddy's agents handle a store that plays dirty. This is not our test: [Halden Sound](https://halden-sound.vercel.app) is a fake earbuds shop from the Agent Loyalty Index by u/Its_about-tech ([public results](https://halden-sound.vercel.app/results.html)). It hides 7 traps in the buying flow (a duplicate listing at a higher price, a pre-ticked protection plan, pre-selected paid shipping, an overpriced bundle, fake urgency, a sponsored over-budget item, and a checkout that asks for extra data and pre-ticks marketing emails) and scores each order out of 100. The shop runs in the browser only and takes no payment.
 
 ## Setup
 
