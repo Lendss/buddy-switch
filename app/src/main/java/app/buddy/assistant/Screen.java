@@ -15,11 +15,7 @@ abstract class Screen extends Activity {
         Theme.apply(this);
         themeKey = Theme.key();
         super.onCreate(state);
-        final android.view.View decor = getWindow().getDecorView();
-        Pad.ringFocus(decor, () -> !decor.isInTouchMode());
-        decor.getViewTreeObserver().addOnTouchModeChangeListener(touch -> {
-            if (touch) Pad.unring(decor);
-        });
+        Pad.watch(getWindow().getDecorView());
     }
 
     @Override

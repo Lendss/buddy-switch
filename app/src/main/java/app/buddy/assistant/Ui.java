@@ -628,6 +628,7 @@ final class Ui {
             w.setDimAmount(0.55f);
             w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             w.setWindowAnimations(android.R.style.Animation_InputMethod);
+            Pad.watch(w.getDecorView());
         }
         return d;
     }

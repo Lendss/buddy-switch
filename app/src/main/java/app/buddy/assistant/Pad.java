@@ -45,13 +45,37 @@ final class Pad {
 
     /**
      * While the D-pad is in use (active), the view that takes focus gets an accent ring, so it's clear where the
-     * D-pad is; {@link #unring} takes the rings off when the screen is touched again.
+     * D-pad is; {@link #unring} takes the rings off when the screen is touched again. Scrolling areas and big
+     * containers pass the focus on to their first control.
      */
-    static void ringFocus(View root, Active pad) {
+    static void ringFocus(final View root, final Active pad) {
         root.getViewTreeObserver().addOnGlobalFocusChangeListener((was, now) -> {
-            if (now != null && pad.active() && now.getForeground() == null && ringable(now, root)) {
-                now.setForeground(new Ring(now));
+            if (now == null || !pad.active()) return;
+            if (!ringable(now, root)) {
+                // a scrolling area or a whole panel took focus (a new screen, a sheet): Android would grey it all
+                // over; the focus goes to the first control in it instead, once it's laid out
+                now.setDefaultFocusHighlightEnabled(false);
+                if (now instanceof ViewGroup) passOn((ViewGroup) now, 5);
+                return;
             }
+            if (now.getForeground() == null) now.setForeground(new Ring(now));
+        });
+    }
+
+    private static void passOn(final ViewGroup g, final int tries) {
+        g.post(() -> {
+            if (!g.isFocused()) return;
+            View first = g.isLaidOut() ? android.view.FocusFinder.getInstance().findNextFocus(g, null, View.FOCUS_DOWN) : null;
+            if (first != null) first.requestFocus();
+            else if (tries > 0) passOn(g, tries - 1);
+        });
+    }
+
+    /** {@link #ringFocus} for a window (a screen or a sheet): rings while the D-pad is used, none after a touch. */
+    static void watch(final View decor) {
+        ringFocus(decor, () -> !decor.isInTouchMode());
+        decor.getViewTreeObserver().addOnTouchModeChangeListener(touch -> {
+            if (touch) unring(decor);
         });
     }
 
@@ -59,6 +83,7 @@ final class Pad {
     private static boolean ringable(View v, View root) {
         if (v instanceof ScrollView || v instanceof android.widget.HorizontalScrollView
                 || v instanceof android.widget.AbsListView) return false;
+        if (!v.isLaidOut()) return !(v instanceof ViewGroup) || v.isClickable();
         return (long) v.getWidth() * v.getHeight() < (long) root.getWidth() * root.getHeight() / 2;
     }
 
