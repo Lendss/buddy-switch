@@ -31,6 +31,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private LinearLayout messages, strip, approval;
     private ScrollView scroll;
     private TextView title, chipText, stripText, remoteText, accessText;
+    private LinearLayout scheduled;
     private View remoteDot;
     private ImageView accessIcon;
     private Button mic;
@@ -139,6 +140,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         ap.leftMargin = ap.rightMargin = dp(this, 12);
         ap.bottomMargin = dp(this, 8);
         root.addView(approval, ap);
+
+        // messages the agent scheduled for this chat (Scheduler): when, and a way to cancel each
+        scheduled = column(this);
+        LinearLayout.LayoutParams sp2 = full();
+        sp2.leftMargin = sp2.rightMargin = dp(this, 12);
+        root.addView(scheduled, sp2);
 
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
@@ -673,6 +680,32 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             else log.finish();
         }
         renderApproval();
+        renderScheduled();
+    }
+
+    private void renderScheduled() {
+        scheduled.removeAllViews();
+        java.text.DateFormat time = android.text.format.DateFormat.getTimeFormat(this);
+        for (final Scheduler.Job j : Scheduler.forChat(this, ses.id)) {
+            LinearLayout r = row(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(dp(this, 12), 0, dp(this, 2), 0);
+            r.setBackground(rounded(this, CARD, 12));
+            boolean today = android.text.format.DateUtils.isToday(j.at);
+            String when = (today ? "" : android.text.format.DateFormat.format("EEE d MMM ", j.at)) + time.format(new java.util.Date(j.at))
+                    + (j.every > 0 ? " · " + getString(R.string.chat_scheduled_every, j.every / 60_000) : "");
+            r.addView(single(monoText(this, "⏰ " + when + " · " + j.label, 12, MUTED)), weight1());
+            ImageButton x = iconButton(this, R.drawable.ms_close, getString(R.string.chat_scheduled_cancel), MUTED);
+            x.setOnClickListener(v -> {
+                Scheduler.cancel(this, j.id);
+                Toast.makeText(this, R.string.chat_scheduled_cancelled, Toast.LENGTH_SHORT).show();
+                renderScheduled();
+            });
+            r.addView(x, new LinearLayout.LayoutParams(dp(this, 36), dp(this, 36)));
+            LinearLayout.LayoutParams rp = full();
+            rp.bottomMargin = dp(this, 6);
+            scheduled.addView(r, rp);
+        }
     }
 
     private String shownApproval;

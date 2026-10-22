@@ -56,6 +56,16 @@ final class ChatHub {
         return s;
     }
 
+    /** The hub if it exists already (for callers that shouldn't create it). */
+    static synchronized ChatHub peek() {
+        return instance;
+    }
+
+    /** The scheduled messages changed (Scheduler): screens showing them refresh. */
+    void scheduleChanged() {
+        changed();
+    }
+
     static synchronized ChatHub get(Context c) {
         if (instance == null) instance = new ChatHub(c.getApplicationContext());
         return instance;
@@ -101,6 +111,7 @@ final class ChatHub {
     }
 
     void delete(Sessions.Session s) {
+        Scheduler.cancelChat(app, s.id);
         try {
             Helper.run(app, "delete", s.id);
         } catch (Exception ignored) {
@@ -117,16 +128,27 @@ final class ChatHub {
 
     /** Sends a message with attachments (ids from Attachments); the helper fetches them before the agent runs. */
     String send(final Sessions.Session ses, String text, List<String> files) {
-        return send(ses, text, files, null);
+        return send(ses, text, files, null, false);
     }
 
     /** A notification rule's run (see Triggers): the chat shows a short line, the agent gets the whole prompt. */
     String sendFromRule(Sessions.Session ses, String shown, String prompt) {
-        return send(ses, shown, null, prompt);
+        return send(ses, shown, null, prompt, true);
     }
 
-    private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
-        if (!ses.remote.isEmpty() && prompt == null) return sendRemote(ses, text, files);
+    /**
+     * A message the agent scheduled for this chat (Scheduler), now due: shown with an alarm clock, and marked for the
+     * agent so it knows it's its own scheduled message, not the user writing.
+     */
+    void sendScheduled(Sessions.Session ses, String text, boolean repeating) {
+        String err = send(ses, "⏰ " + text, null, "[BUDDY_SCHEDULED" + (repeating ? ", repeating" : "") + "] " + text, false);
+        if (err != null) note(ses, Bubble.Kind.ERROR, err);
+        else ses.scheduledRun = true;
+    }
+
+    /** prompt: what the agent gets instead of text, if not the same; rule: a notification rule's restricted run. */
+    private String send(final Sessions.Session ses, String text, List<String> files, String prompt, boolean rule) {
+        if (!ses.remote.isEmpty() && !rule) return sendRemote(ses, text, prompt, files);
         if (ses.running) {
             if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
@@ -138,7 +160,7 @@ final class ChatHub {
         if (svc != null) svc.allowControl();
         try {
             // a rule's run works for someone else's message: no shell, files or web, even in developer mode
-            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : dev(ses), forAgent,
+            Helper.run(app, "ask", ses.id, ses.backend, rule ? "rule" : dev(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
@@ -351,7 +373,10 @@ final class ChatHub {
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
                         flash(ses.lastReply);
+                        // a reminder the user may not be looking at: also as a notification
+                        if (ses.scheduledRun && !viewing.contains(ses)) Scheduler.notifyReply(app, ses, ses.lastReply);
                     }
+                    ses.scheduledRun = false;
                     // what the user added but the agent never got (it made no phone action since): send it now
                     String left;
                     synchronized (ses.notes) {
@@ -542,12 +567,12 @@ final class ChatHub {
     }
 
     /** A message to a chat open with Remote Control: typed into its session; the reply comes back from the transcript. */
-    private String sendRemote(Sessions.Session ses, String text, List<String> files) {
+    private String sendRemote(Sessions.Session ses, String text, String prompt, List<String> files) {
         boolean hasFiles = files != null && !files.isEmpty();
         if (text.isEmpty() && !hasFiles) return null;
         if (!"active".equals(ses.remote)) return app.getString(R.string.hub_remote_starting);
         // attachments: Termux fetches them and the message says where they are, as in a run of the chat's own
-        String forAgent = text.isEmpty() ? "Have a look at what I attached." : text;
+        String forAgent = prompt != null ? prompt : text.isEmpty() ? "Have a look at what I attached." : text;
         try {
             Helper.run(app, "remote-say", ses.id, forAgent, hasFiles ? android.text.TextUtils.join(",", files) : "");
         } catch (Exception e) {

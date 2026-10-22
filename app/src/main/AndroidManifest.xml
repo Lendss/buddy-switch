@@ -17,6 +17,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- This fork runs the agent in Termux (RUN_COMMAND); Termux needs allow-external-apps=true -->
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
+    <!-- this fork: messages agents schedule for their chats (Scheduler) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Needed on Android 11+ to see launchable apps for open_app / list_apps -->
     <queries>
@@ -113,6 +116,15 @@
         <receiver
             android:name=".Updates"
             android:exported="false" />
+
+        <receiver
+            android:name=".Scheduler$Receiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".BuddyService"

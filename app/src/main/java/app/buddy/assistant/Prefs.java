@@ -120,6 +120,15 @@ final class Prefs {
         sp(c).edit().putBoolean("dev", on).apply();
     }
 
+    /** Scheduled messages (Scheduler), as JSON. */
+    static String schedule(Context c) {
+        return sp(c).getString("schedule", "[]");
+    }
+
+    static void setSchedule(Context c, String json) {
+        sp(c).edit().putString("schedule", json).apply();
+    }
+
     /** Chats also get the user's own MCP servers (their Claude Code config, claude.ai connectors), not just the
      *  phone tools. Off by default: connecting to them adds about a second to every message. */
     static boolean userMcp(Context c) {

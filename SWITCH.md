@@ -106,4 +106,12 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   made focusable while the D-pad is in use and the keyboard comes up only on A. Holding Capture for half a second
   opens or closes the panel from any app (the service filters keys for that); a short press still plays/pauses.
 
+- [x] Scheduler: the `schedule`, `list_scheduled` and `cancel_scheduled` phone tools let a chat's agent schedule a
+  message to itself (once or repeating); Android's alarm sends it into the chat at that time (marked
+  `[BUDDY_SCHEDULED]`), so reminders and later checks work although each run ends with its reply. Nothing runs in
+  between; the jobs show in the chat with a cancel button, survive reboots and updates, and the reply is a
+  notification when the chat isn't open.
+- [x] Chats: a run that's silent for minutes (a build) keeps going (buddy-run says every minute it's alive);
+  "Your MCP servers in chats" in Settings adds the user's MCP servers (off: about a second faster per message).
+
 `tools/`: `idle-monitor.sh` (what stays in memory, as root), `mcp-call.py` (Buddy's phone tools from the shell).

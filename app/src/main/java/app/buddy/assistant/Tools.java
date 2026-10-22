@@ -135,6 +135,23 @@ final class Tools {
                 "marks"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
+        t.put(tool("schedule",
+                "Schedule a message to yourself in this chat: at that time Buddy sends it here and you run again with it "
+                        + "(it arrives starting with [BUDDY_SCHEDULED]). For reminders, checking on something later, or "
+                        + "repeating work (every_minutes); nothing runs in between. Use this instead of sleep loops, cron "
+                        + "or /loop, which end with your reply. Write the message as an instruction to yourself with "
+                        + "everything you'll need then, e.g. \"Remind the user to call Anna\" or \"Check whether the "
+                        + "build in ~/app finished and tell the user\". Give at or in_minutes.",
+                props().put("message", strProp("What to do then, written to yourself"))
+                        .put("at", strProp("Local time: \"18:30\" (the next one), or \"2026-10-23 09:00\""))
+                        .put("in_minutes", intProp("Minutes from now, instead of at"))
+                        .put("every_minutes", intProp("Repeat this often (at least 1); leave out for once"))
+                        .put("label", strProp("Short name the user sees in the chat, e.g. \"Call Anna\"")),
+                "message"));
+        t.put(tool("list_scheduled", "The messages scheduled in this chat (schedule): id, time, repeat, label.",
+                props()));
+        t.put(tool("cancel_scheduled", "Cancel a scheduled message of this chat by its id (list_scheduled).",
+                props().put("id", strProp("Its id")), "id"));
         t.put(tool("reply_notification",
                 "Answer the notification that started this chat through its own reply field, without opening the app. "
                         + "Only in chats started by one of the user's notification rules, when the notification has a reply "
@@ -228,7 +245,7 @@ final class Tools {
         // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
         // operating the phone waits
         if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
-                && !"point_out".equals(name)) {
+                && !"point_out".equals(name) && !name.endsWith("schedule") && !name.endsWith("_scheduled")) {
             String held = svc.awaitResume(name);
             if (held != null) return text(held);
         }
@@ -306,6 +323,17 @@ final class Tools {
             }
             case "reply_notification":
                 return text(replyNotification(a.getString("text")));
+            case "schedule":
+                return text(schedule(a));
+            case "list_scheduled":
+                return text(listScheduled());
+            case "cancel_scheduled": {
+                Sessions.Session s = callerChat();
+                String id = a.getString("id");
+                boolean mine = false;
+                if (s != null) for (Scheduler.Job j : Scheduler.forChat(svc, s.id)) mine |= j.id.equals(id);
+                return text(mine && Scheduler.cancel(svc, id) ? "Cancelled." : "No scheduled message " + id + " in this chat.");
+            }
             default:
                 throw new IllegalArgumentException("Unknown tool " + name);
         }
@@ -427,6 +455,66 @@ final class Tools {
 
     private static JSONObject text(String s) throws JSONException {
         return new JSONObject().put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", s)));
+    }
+
+    /** The Buddy chat this tool call comes from, or null (the user's own sessions, through the MCP server directly). */
+    private Sessions.Session callerChat() {
+        String chat = McpServer.CALLER_CHAT.get();
+        return chat == null ? null : ChatHub.get(svc).sessions.find(chat);
+    }
+
+    private static final java.text.SimpleDateFormat WHEN = new java.text.SimpleDateFormat("EEE d MMM HH:mm", java.util.Locale.US);
+
+    private String schedule(JSONObject a) throws JSONException {
+        Sessions.Session s = callerChat();
+        if (s == null) return "Only in a Buddy chat: there's no chat to send it to here.";
+        if (ruleRun()) return "Not available in a notification rule's run.";
+        long now = System.currentTimeMillis(), at;
+        if (a.has("in_minutes")) {
+            at = now + Math.max(1, a.getLong("in_minutes")) * 60_000L;
+        } else if (a.has("at")) {
+            String t = a.getString("at").trim().replace('T', ' ');
+            try {
+                java.util.Calendar c = java.util.Calendar.getInstance();
+                if (t.matches("\\d{1,2}:\\d{2}")) { // the next such time
+                    String[] hm = t.split(":");
+                    c.set(java.util.Calendar.HOUR_OF_DAY, Integer.parseInt(hm[0]));
+                    c.set(java.util.Calendar.MINUTE, Integer.parseInt(hm[1]));
+                    c.set(java.util.Calendar.SECOND, 0);
+                    c.set(java.util.Calendar.MILLISECOND, 0);
+                    if (c.getTimeInMillis() <= now) c.add(java.util.Calendar.DAY_OF_MONTH, 1);
+                    at = c.getTimeInMillis();
+                } else {
+                    at = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US).parse(t).getTime();
+                }
+            } catch (Exception e) {
+                return "Couldn't read the time \"" + t + "\": use \"18:30\" or \"2026-10-23 09:00\", or in_minutes.";
+            }
+            if (at <= now) return "That time has passed.";
+        } else {
+            return "Give at or in_minutes.";
+        }
+        long every = a.has("every_minutes") ? Math.max(Scheduler.MIN_EVERY_MS, a.getLong("every_minutes") * 60_000L) : 0;
+        Scheduler.Job j = Scheduler.add(svc, s.id, a.getString("message"), a.optString("label"), at, every);
+        String warn = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+                && !svc.getSystemService(android.app.AlarmManager.class).canScheduleExactAlarms()
+                ? " (Android may deliver it a few minutes late: exact alarms aren't allowed for Buddy)" : "";
+        return "Scheduled " + j.id + " for " + WHEN.format(new java.util.Date(j.at))
+                + (every > 0 ? ", then every " + every / 60_000 + " min" : "") + warn + ". It shows in the chat; the user can cancel it there.";
+    }
+
+    private String listScheduled() {
+        Sessions.Session s = callerChat();
+        if (s == null) return "Only in a Buddy chat.";
+        List<Scheduler.Job> jobs = Scheduler.forChat(svc, s.id);
+        if (jobs.isEmpty()) return "Nothing scheduled in this chat.";
+        StringBuilder b = new StringBuilder();
+        for (Scheduler.Job j : jobs) {
+            b.append(j.id).append(" · ").append(WHEN.format(new java.util.Date(j.at)))
+                    .append(j.every > 0 ? " · every " + j.every / 60_000 + " min" : "").append(" · ").append(j.label)
+                    .append("\n  ").append(j.text).append('\n');
+        }
+        return b.toString().trim();
     }
 
     /** Answers the notification a rule's run started from, through its reply field (see Triggers). */

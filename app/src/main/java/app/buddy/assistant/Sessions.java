@@ -62,6 +62,8 @@ final class Sessions {
         int runId;
         /** Remote Control for this chat (see buddy-run remote): "", "starting" or "active", and its claude.ai link. */
         String remote = "", remoteUrl = "";
+        /** This run answers a scheduled message (Scheduler): its reply is also a notification if the chat isn't open. */
+        boolean scheduledRun;
         /** Messages Buddy typed into the remote session; their echo from the transcript isn't shown twice. */
         final List<String> echoes = new ArrayList<>();
         /** What the user added while this chat was working, not yet passed to the agent (guarded by itself). */
