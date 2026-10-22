@@ -105,6 +105,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             if (Termux.ready(this)) {
                 try {
                     Helper.run(this, "ping");
+                    Helper.run(this, "remote-status"); // chats left open with Remote Control
                 } catch (Exception ignored) {
                 }
             }

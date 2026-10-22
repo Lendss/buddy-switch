@@ -13,8 +13,15 @@
 #   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
+#   buddy-run <token> remote <session> <dev:0|1> <name> [model]   keep that chat open with Remote Control (an interactive
+#                                    Claude Code, for claude.ai/code and the Claude app) until remote-stop; its turns are
+#                                    mirrored to the bubble
+#   buddy-run <token> remote-say <session> <message>   type a message into that chat's remote session
+#   buddy-run <token> remote-key <session> esc          press a key there (esc: interrupt the turn)
+#   buddy-run <token> remote-stop <session>             end that chat's remote session
+#   buddy-run <token> remote-status                     report the chats that have a remote session (buddy_remote)
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=12
+HELPER_VERSION=13
 set -u
 PREFIX=${PREFIX:-/data/data/com.termux/files/usr}
 # Termux's own commands first: its claude is a launcher script in $PREFIX/bin
@@ -188,8 +195,36 @@ case "$CMD" in
     SID=${3:-}; valid_sid "$SID" || exit 2
     S=$D/sessions/$SID
     [ -f "$S/pid" ] && kill_tree "$(cat "$S/pid")"
+    [ -f "$S/remote.pid" ] && kill_tree "$(cat "$S/remote.pid")"
     rm -rf "${S:?}"
     exit 0 ;;
+  remote-say|remote-key)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    F=$D/sessions/$SID/remote.in
+    [ -p "$F" ] || exit 0
+    if [ "$CMD" = remote-key ]; then
+      [ "${4:-}" = esc ] && printf '\e' > "$F"
+    else
+      # a paste, so new lines stay in the message; then Enter
+      printf '\e[200~%s\e[201~' "${4:-}" > "$F"; sleep 0.5; printf '\r' > "$F"
+    fi
+    exit 0 ;;
+  remote-stop)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    P=$D/sessions/$SID/remote.pid
+    [ -f "$P" ] && kill_tree "$(cat "$P")"
+    exit 0 ;;
+  remote-status)
+    for P in "$D"/sessions/*/remote.pid; do
+      [ -f "$P" ] || continue
+      S=${P%/remote.pid}
+      if kill -0 "$(cat "$P")" 2>/dev/null; then
+        jq -cn --arg s "${S##*/}" --arg u "$(cat "$S/remote.url" 2>/dev/null)" \
+          '{type:"buddy_remote",state:(if $u == "" then "starting" else "active" end),url:$u,buddy_session:$s}' | post
+      else rm -f "$P"; fi
+    done
+    exit 0 ;;
+  remote) SID=${3:-}; DEV=${4:-1}; NAME=${5:-Buddy}; MODEL=${6:-}; BACKEND=claude; MSG=remote ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
     [[ "$EFFORT" =~ ^(low|medium|high|xhigh|max)$ ]] || EFFORT="" ;;
   *) echo "usage: buddy-run <token> ask|stop|delete|ping ..." >&2; exit 2 ;;
@@ -204,6 +239,10 @@ tag() { jq -c --arg s "$SID" '. + {buddy_session:$s}' 2>/dev/null; }
 
 if [ -f "$S/pid" ] && kill -0 "$(cat "$S/pid")" 2>/dev/null; then
   event buddy_error "This session is still working. Tap Stop first, or start another session."
+  exit 0
+fi
+if [ "$CMD" = ask ] && [ -f "$S/remote.pid" ] && kill -0 "$(cat "$S/remote.pid")" 2>/dev/null; then
+  event buddy_error "This chat is open with Remote Control: turn Remote off to use it here, or write in claude.ai."
   exit 0
 fi
 
@@ -427,6 +466,99 @@ stream_opencode() {
     jq -cn --arg s "$SID" '{type:"result", subtype:"success", result:"", buddy_session:$s}' | post
   fi
 }
+
+# ------------------------------------------------------------- Remote Control
+# The chat as an interactive Claude Code with Remote Control, so it can be continued from claude.ai/code or the
+# Claude app. Interactive mode needs a terminal: it runs under `script`, typing into it through a pipe
+# ($S/remote.in, see remote-say). It continues the chat's conversation (same session id, so the bubble's own runs
+# resume it afterwards), and its turns are mirrored to the bubble from the transcript.
+remote_event() {
+  jq -cn --arg s "$SID" --arg st "$1" --arg u "${2:-}" '{type:"buddy_remote",state:$st,url:$u,buddy_session:$s}' | post
+}
+
+# Claude Code asks whether to trust the home folder on every interactive start (it can't be answered here):
+# record the answer the user gave by running Claude Code here at all.
+trust_home() {
+  local f=$HOME/.claude.json
+  [ "$(jq -r --arg d "$W" '.projects[$d].hasTrustDialogAccepted // false' "$f" 2>/dev/null)" = true ] && return
+  jq --arg d "$W" '.projects[$d].hasTrustDialogAccepted = true' "$f" > "$f.buddy" && mv "$f.buddy" "$f"
+}
+
+# The transcript's new entries as bubble events: replies and tool calls like a run's stream, the prompts typed in
+# claude.ai, and the end of each turn.
+mirror() {
+  local f=$1 i
+  for i in $(seq 60); do [ -f "$f" ] && break; sleep 1; done
+  tail -n 0 -F "$f" 2>/dev/null | while IFS= read -r line; do
+    printf '%s' "$line" | jq -c --arg s "$SID" '
+      if .type == "assistant" then {type:"assistant", message:.message}
+      elif .type == "user" and (.isMeta | not) then
+        ((.message.content | if type == "string" then . else ([.[]? | select(.type == "text") | .text] | join("\n")) end)
+          // "") as $t
+        | if $t == "" or ($t | startswith("<")) then empty else {type:"buddy_remote_user", text:$t} end
+      elif .type == "system" and .subtype == "turn_duration" then {type:"buddy_done"}
+      else empty end | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+  done
+}
+
+run_remote() {
+  local cs mcp url pid mp i
+  echo $$ > "$S/remote.pid"
+  rm -f "$S/remote.url"
+  remote_event starting
+  trust_home
+  # the chat's conversation, or a new one with a known id (so the mirror knows its transcript)
+  if [ -s "$S/claude-session" ]; then cs=$(cat "$S/claude-session"); local sess=(--resume "$cs")
+  else cs=$(cat /proc/sys/kernel/random/uuid); printf '%s' "$cs" > "$S/claude-session"; local sess=(--session-id "$cs"); fi
+  mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
+    '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}}')
+  local perms=(--permission-mode default)
+  [ "$DEV" = 1 ] && perms=(--dangerously-skip-permissions)
+  {
+    echo "stty cols 120 rows 40"
+    printf 'cd %q && exec claude --remote-control %q' "$W" "$NAME"
+    printf ' %q' "${sess[@]}" "${perms[@]}" --mcp-config "$mcp" --strict-mcp-config --append-system-prompt "$SYSTEM"
+    [ -n "$MODEL" ] && printf ' --model %q' "$MODEL"
+    echo
+  } > "$S/remote.sh"
+  rm -f "$S/remote.in"
+  mkfifo "$S/remote.in"
+  exec 3<>"$S/remote.in"   # held open, so the session's input never ends
+  : > "$S/remote.log"
+  env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_CODE_ENTRYPOINT TERM=xterm-256color \
+    script -qfec "bash $S/remote.sh" "$S/remote.log" <"$S/remote.in" >/dev/null 2>"$S/last-error.log" &
+  pid=$!
+  for i in $(seq 120); do
+    kill -0 "$pid" 2>/dev/null || break
+    url=$(grep -ao 'https://claude\.ai/code/session_[A-Za-z0-9_]*' "$S/remote.log" | tail -1)
+    [ -n "$url" ] && break
+    sleep 1
+  done
+  if [ -n "$url" ]; then
+    printf '%s' "$url" > "$S/remote.url"
+    remote_event active "$url"
+    mirror "$HOME/.claude/projects/$(printf '%s' "$W" | tr '/.' '--')/$cs.jsonl" &
+    mp=$!
+    wait "$pid"
+    kill_tree "$mp"
+  else
+    event buddy_error "Remote Control didn't start: $(sed 's/\x1b\[[0-9;?]*[ -\/]*[@-~]//g' "$S/remote.log" | tr -s ' \r\n' ' ' | tail -c 300)"
+    kill_tree "$pid"
+  fi
+  exec 3>&-
+  rm -f "$S/remote.pid" "$S/remote.url" "$S/remote.in" "$S/remote.sh"
+  remote_event off
+}
+if [ "$CMD" = remote ]; then
+  # stopping (remote-stop kills this shell's tree): still clean up and say so
+  trap 'rm -f "$S/remote.pid" "$S/remote.url" "$S/remote.in" "$S/remote.sh"; remote_event off; exit 0' TERM
+  if [ -f "$S/remote.pid" ] && kill -0 "$(cat "$S/remote.pid")" 2>/dev/null; then
+    remote_event active "$(cat "$S/remote.url" 2>/dev/null)"
+  else
+    run_remote
+  fi
+  exit 0
+fi
 
 # ------------------------------------------------------------------------ run
 (

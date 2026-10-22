@@ -54,7 +54,7 @@ App ──Intent com.termux.RUN_COMMAND (background, script on stdin)──► T
 | Codex, OpenCode | hidden (only Claude Code is used) |
 | Built-in terminal, SSH server, mic bridge | removed: Termux is the terminal |
 | Claude/ChatGPT dictation, ChatGPT voice | removed (they need the built-in Linux); the phone's recognizer and TTS stay |
-| Remote Control session inside Buddy | ported to Termux as an on/off switch (Settings and a Quick Settings tile): `claude remote-control --name Switch` in server mode, so sessions are started from the Claude app or claude.ai/code on demand; off frees the memory, optional auto-off after hours of inactivity. Starting `/remote-control` by hand in the Termux terminal keeps working |
+| Remote Control session inside Buddy | per chat, from the chat's bar: the chat itself is opened for claude.ai/code and the Claude app (see step 6). Starting `/remote-control` by hand in the Termux terminal keeps working |
 | Self-update from upstream releases | pointed at this fork's releases, or off |
 | Developer mode (Bash, files) | chats get Claude's full tools in Termux, like the terminal session |
 
@@ -88,7 +88,13 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   `native/`), the Alpine-only helper files, and their settings and strings. `RemoteSession` too: step 6 brings it back
   from git history, rewritten for Termux. Codex and OpenCode stay only as names in the chat code (never ready).
 - [ ] 5. Idle footprint: Buddy SW itself (~105 MB with a chat screen in Recents).
-- [ ] 6. Remote Control switch.
+- [x] 6. Remote Control, per chat: a "Remote" button in the chat's bar (grey/green dot) opens that chat for
+  claude.ai/code and the Claude app. Termux runs the chat's conversation as an interactive Claude Code with
+  `--remote-control` (under `script`, input through a pipe), independent of Buddy: hiding or restarting Buddy doesn't
+  end it, only Remote off does. Its turns are mirrored to the chat from the transcript, and what's typed in the chat
+  goes into the remote session; afterwards the chat's own runs continue the same conversation. ~170 MB while on.
+  The home folder's trust question is answered in `~/.claude.json` (`hasTrustDialogAccepted`). Next to it, "Full" /
+  "Safe" sets the chat's tool access (default: Settings' developer mode, on).
 - [ ] 7. Joy-Con navigation.
 
 `tools/`: `idle-monitor.sh` (what stays in memory, as root), `mcp-call.py` (Buddy's phone tools from the shell).

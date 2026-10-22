@@ -1219,4 +1219,27 @@
     <string name="card_locked_title">Needs your OK: %1$s</string>
     <!-- Its text, with a countdown. %1$s = the countdown length, e.g. 30 s; %2$s = what it would do. -->
     <string name="rules_approval_auto">Approves itself in %1$s unless you stop it.\n%2$s</string>
+    <!-- Remote Control for a chat, and its tool access (this fork) -->
+    <string name="hub_remote_on">Remote Control is on: this chat is open in claude.ai and the Claude app. You can keep writing here too.</string>
+    <string name="hub_remote_off">Remote Control is off. The chat continues here.</string>
+    <string name="hub_access_full">Full access: every tool, without asking (like Claude Code in the terminal).</string>
+    <string name="hub_access_safe">Safe: the phone tools and the web only.</string>
+    <string name="hub_access_remote_later">The remote session keeps its access until Remote is turned off and on.</string>
+    <string name="hub_remote_busy">Wait for the reply, then turn on Remote.</string>
+    <string name="hub_remote_no_files">Attachments can\'t go through Remote Control yet. Turn Remote off to send them.</string>
+    <string name="hub_remote_starting">Remote Control is still starting. Try again in a moment.</string>
+    <string name="chat_remote">Remote</string>
+    <string name="chat_remote_starting">Remote…</string>
+    <string name="chat_remote_starting_toast">Starting Remote Control…</string>
+    <string name="chat_remote_title">Remote Control</string>
+    <string name="chat_remote_text">This chat is open in claude.ai and the Claude app as “%1$s”. What you write there shows up here, and it stays open when Buddy is hidden.</string>
+    <string name="chat_remote_starting_text">Opening “%1$s” for claude.ai and the Claude app…</string>
+    <string name="chat_remote_turn_off">Turn off</string>
+    <string name="chat_remote_copy">Copy link</string>
+    <string name="chat_remote_copied">Link copied</string>
+    <string name="chat_remote_open">Open</string>
+    <string name="chat_access_full">Full</string>
+    <string name="chat_access_safe">Safe</string>
+    <string name="chat_access_full_toast">Full access for this chat</string>
+    <string name="chat_access_safe_toast">Safe mode for this chat</string>
 </resources>

@@ -126,6 +126,7 @@ final class ChatHub {
     }
 
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
+        if (!ses.remote.isEmpty() && prompt == null) return sendRemote(ses, text, files);
         if (ses.running) {
             if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
@@ -137,7 +138,7 @@ final class ChatHub {
         if (svc != null) svc.allowControl();
         try {
             // a rule's run works for someone else's message: no shell, files or web, even in developer mode
-            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : Prefs.devMode(app) ? "1" : "0", forAgent,
+            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : dev(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
@@ -206,6 +207,14 @@ final class ChatHub {
 
     void stop(Sessions.Session ses) {
         if (!ses.running) return;
+        if (!ses.remote.isEmpty()) { // interrupt the remote session's turn, as Esc does in the terminal
+            try {
+                Helper.run(app, "remote-key", ses.id, "esc");
+            } catch (Exception e) {
+                add(ses, Bubble.Kind.ERROR, e.getMessage());
+            }
+            return;
+        }
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.stopPaused();
         try {
@@ -283,6 +292,35 @@ final class ChatHub {
                 else if (!ses.gotText && !r.isEmpty()) {
                     add(ses, Bubble.Kind.BUDDY, r);
                     ses.lastReply = r;
+                }
+                break;
+            }
+            case "buddy_remote": {
+                String st = ev.optString("state");
+                String was = ses.remote;
+                ses.remote = "off".equals(st) ? "" : st;
+                ses.remoteUrl = ev.optString("url", "");
+                if ("active".equals(st) && !"active".equals(was)) add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_remote_on));
+                if ("off".equals(st) && !was.isEmpty()) {
+                    add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_remote_off));
+                    ses.running = false;
+                    ses.status = "";
+                    synchronized (ses.echoes) {
+                        ses.echoes.clear();
+                    }
+                }
+                break;
+            }
+            case "buddy_remote_user": { // a message typed in claude.ai, or the echo of one Buddy typed
+                String t = ev.optString("text").trim();
+                boolean echo;
+                synchronized (ses.echoes) {
+                    echo = ses.echoes.remove(t);
+                }
+                if (!echo && !t.isEmpty()) {
+                    add(ses, Bubble.Kind.USER, t);
+                    if (!ses.running) startRun(ses);
+                    ses.status = app.getString(R.string.hub_thinking);
                 }
                 break;
             }
@@ -378,7 +416,7 @@ final class ChatHub {
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         try {
-            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0",
+            Helper.run(app, "ask", ses.id, ses.backend, dev(ses),
                     "(Added while you were working:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
@@ -446,6 +484,69 @@ final class ChatHub {
                 changed();
             }
         }, 8000);
+    }
+
+    /** "1" (every tool, no questions) or "0" (the phone tools and the web) for this chat's runs. */
+    String dev(Sessions.Session ses) {
+        return "full".equals(ses.access) ? "1" : "safe".equals(ses.access) ? "0" : Prefs.devMode(app) ? "1" : "0";
+    }
+
+    /** Full tool access for this chat (its own choice, or Settings' developer mode). */
+    boolean full(Sessions.Session ses) {
+        return "1".equals(dev(ses));
+    }
+
+    void setAccess(Sessions.Session ses, boolean full) {
+        ses.access = full ? "full" : "safe";
+        sessions.save();
+        add(ses, Bubble.Kind.STEP, app.getString(full ? R.string.hub_access_full : R.string.hub_access_safe)
+                + (ses.remote.isEmpty() ? "" : " " + app.getString(R.string.hub_access_remote_later)));
+        changed();
+    }
+
+    /** Opens this chat for claude.ai/code and the Claude app (Remote Control), or closes it again. */
+    void setRemote(Sessions.Session ses, boolean on) {
+        try {
+            if (on) {
+                if (!ses.remote.isEmpty()) return;
+                if (ses.running) {
+                    note(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_remote_busy));
+                    return;
+                }
+                String name = ses.label();
+                if (name.length() > 50) name = name.substring(0, 49) + "…";
+                Helper.run(app, "remote", ses.id, dev(ses), name, ses.model);
+                ses.remote = "starting";
+                ses.remoteUrl = "";
+            } else if (!ses.remote.isEmpty()) {
+                Helper.run(app, "remote-stop", ses.id);
+            }
+        } catch (Exception e) {
+            add(ses, Bubble.Kind.ERROR, e.getMessage());
+        }
+        changed();
+    }
+
+    /** A message to a chat open with Remote Control: typed into its session; the reply comes back from the transcript. */
+    private String sendRemote(Sessions.Session ses, String text, List<String> files) {
+        if (files != null && !files.isEmpty()) return app.getString(R.string.hub_remote_no_files);
+        if (text.isEmpty()) return null;
+        if (!"active".equals(ses.remote)) return app.getString(R.string.hub_remote_starting);
+        try {
+            Helper.run(app, "remote-say", ses.id, text);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        synchronized (ses.echoes) {
+            ses.echoes.add(text.trim());
+        }
+        sessions.add(ses, Bubble.Kind.USER, text, null);
+        Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+        for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
+        if (!ses.running) startRun(ses);
+        ses.status = app.getString(R.string.hub_thinking);
+        changed();
+        return null;
     }
 
     private void startRun(Sessions.Session ses) {

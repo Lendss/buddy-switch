@@ -47,6 +47,9 @@ final class Sessions {
         String model = "";
         /** Reasoning effort for this chat ("" = the agent's default); see Models.efforts. */
         String effort = "";
+        /** Tool access for this chat: "full" (every tool, no questions), "safe" (the phone tools and the web), or ""
+         *  for the default in Settings (developer mode). */
+        String access = "";
         /** The model the agent last reported using (for "Default"), or "" if it doesn't say. */
         String actualModel = "";
         long updated = System.currentTimeMillis();
@@ -57,6 +60,10 @@ final class Sessions {
         String lastReply = "";
         long lastEventAt;
         int runId;
+        /** Remote Control for this chat (see buddy-run remote): "", "starting" or "active", and its claude.ai link. */
+        String remote = "", remoteUrl = "";
+        /** Messages Buddy typed into the remote session; their echo from the transcript isn't shown twice. */
+        final List<String> echoes = new ArrayList<>();
         /** What the user added while this chat was working, not yet passed to the agent (guarded by itself). */
         final List<String> notes = new ArrayList<>();
 
@@ -158,7 +165,7 @@ final class Sessions {
                     if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
                     msgs.put(mo);
                 }
-                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
+                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("access", s.access).put("actual_model", s.actualModel)
                         .put("updated", s.updated).put("messages", msgs));
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
@@ -175,6 +182,7 @@ final class Sessions {
                 s.title = o.optString("title");
                 s.model = o.optString("model");
                 s.effort = o.optString("effort");
+                s.access = o.optString("access");
                 s.actualModel = o.optString("actual_model");
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");

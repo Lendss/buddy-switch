@@ -30,7 +30,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private Sessions.Session ses;
     private LinearLayout messages, strip, approval;
     private ScrollView scroll;
-    private TextView title, chipText, stripText;
+    private TextView title, chipText, stripText, remoteText, accessText;
+    private View remoteDot;
+    private ImageView accessIcon;
     private Button mic;
     private LinearLayout pill;
     private VoiceBar voiceBar;
@@ -76,6 +78,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         cp.topMargin = dp(this, 3);
         titles.addView(chip, cp);
         top.addView(titles, weight1());
+        // this chat open for claude.ai and the Claude app, and its tool access
+        remoteDot = new View(this);
+        remoteText = monoText(this, getString(R.string.chat_remote), 12, MUTED);
+        LinearLayout remote = pill(remoteDot, remoteText);
+        remote.setOnClickListener(v -> remoteTapped());
+        top.addView(remote);
+        accessIcon = icon(this, R.drawable.ms_terminal, MUTED, 16);
+        accessText = monoText(this, "", 12, MUTED);
+        LinearLayout access = pill(accessIcon, accessText);
+        access.setOnClickListener(v -> accessTapped());
+        LinearLayout.LayoutParams acp = wrap();
+        acp.setMarginStart(dp(this, 6));
+        top.addView(access, acp);
         speaker = iconButton(this, R.drawable.ms_volume_off, getString(R.string.chat_read_aloud), MUTED);
         speaker.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         speaker.setOnClickListener(v -> {
@@ -390,6 +405,84 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         d[0].show();
     }
 
+    /** A small rounded button in the app bar: a dot or icon, then a label. */
+    private LinearLayout pill(View lead, TextView label) {
+        LinearLayout l = row(this);
+        l.setGravity(Gravity.CENTER_VERTICAL);
+        l.setPaddingRelative(dp(this, 10), dp(this, 7), dp(this, 12), dp(this, 7));
+        l.setBackground(outlined(this, 0x00000000, 16, OUTLINE, 1));
+        boolean dot = !(lead instanceof ImageView);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(this, dot ? 8 : 16), dp(this, dot ? 8 : 16));
+        p.setMarginEnd(dp(this, 6));
+        l.addView(lead, p);
+        l.addView(label);
+        return l;
+    }
+
+    /** Remote off: open this chat for claude.ai and the Claude app. On: its link, or turn it off. */
+    private void remoteTapped() {
+        if (ses.remote.isEmpty()) {
+            hub.setRemote(ses, true);
+            if (!ses.remote.isEmpty()) Toast.makeText(this, R.string.chat_remote_starting_toast, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.chat_remote_title), 18));
+        TextView t = text(this, getString("active".equals(ses.remote) ? R.string.chat_remote_text : R.string.chat_remote_starting_text,
+                ses.label()), 14, MUTED);
+        t.setPaddingRelative(0, dp(this, 6), 0, dp(this, 4));
+        c.addView(t);
+        final Dialog[] d = new Dialog[1];
+        final String url = ses.remoteUrl;
+        if (!url.isEmpty()) {
+            TextView u = single(monoText(this, url, 12, ACCENT_TEXT));
+            u.setPaddingRelative(0, dp(this, 6), 0, dp(this, 6));
+            c.addView(u);
+        }
+        LinearLayout btns = row(this);
+        Button off = button(this, getString(R.string.chat_remote_turn_off), false);
+        off.setTextColor(ERR);
+        btns.addView(off, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        if (!url.isEmpty()) {
+            Button copy = button(this, getString(R.string.chat_remote_copy), false);
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+            cp.setMarginStart(dp(this, 8));
+            btns.addView(copy, cp);
+            copy.setOnClickListener(v -> {
+                getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Remote Control", url));
+                Toast.makeText(this, R.string.chat_remote_copied, Toast.LENGTH_SHORT).show();
+            });
+            Button open = button(this, getString(R.string.chat_remote_open), true);
+            LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+            op.setMarginStart(dp(this, 8));
+            btns.addView(open, op);
+            open.setOnClickListener(v -> {
+                d[0].dismiss();
+                try {
+                    startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)));
+                } catch (Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        LinearLayout.LayoutParams bp = full();
+        bp.topMargin = dp(this, 14);
+        c.addView(btns, bp);
+        off.setOnClickListener(v -> {
+            d[0].dismiss();
+            hub.setRemote(ses, false);
+        });
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
+    /** Full access (every tool, no questions, like the terminal) or Safe (the phone tools and the web). */
+    private void accessTapped() {
+        boolean full = !hub.full(ses);
+        hub.setAccess(ses, full);
+        Toast.makeText(this, full ? R.string.chat_access_full_toast : R.string.chat_access_safe_toast, Toast.LENGTH_SHORT).show();
+    }
+
     private View radio(boolean on) {
         FrameLayout f = new FrameLayout(this);
         f.setBackground(outlined(this, 0x00000000, 11, on ? ACCENT : MUTED, 2));
@@ -528,7 +621,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
-        chipText.setText(Prefs.devMode(this) ? getString(R.string.chat_chip_dev, Models.summary(ses)) : Models.summary(ses));
+        chipText.setText(hub.full(ses) ? getString(R.string.chat_chip_dev, Models.summary(ses)) : Models.summary(ses));
+        boolean full = hub.full(ses);
+        accessText.setText(full ? R.string.chat_access_full : R.string.chat_access_safe);
+        accessText.setTextColor(full ? ACCENT_TEXT : MUTED);
+        accessIcon.setImageResource(full ? R.drawable.ms_terminal : R.drawable.ms_shield_person);
+        accessIcon.setImageTintList(ColorStateList.valueOf(full ? ACCENT_TEXT : MUTED));
+        boolean on = "active".equals(ses.remote), starting = "starting".equals(ses.remote);
+        remoteDot.setBackground(oval(on ? OK : starting ? ACCENT : MUTED));
+        remoteText.setTextColor(on ? TEXT : MUTED);
+        remoteText.setText(starting ? R.string.chat_remote_starting : R.string.chat_remote);
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));
         stripText.setText(ses.status.isEmpty() ? getString(R.string.chat_working) : ses.status);

@@ -1182,4 +1182,27 @@
     <string name="rules_approval_title">Нужно подтверждение: %1$s · %2$s</string>
     <string name="card_locked_title">Нужно подтверждение: %1$s</string>
     <string name="rules_approval_auto">Одобрится автоматически через %1$s, если вы не остановите таймер.\n%2$s</string>
+    <!-- Remote Control for a chat, and its tool access (this fork) -->
+    <string name="hub_remote_on">Remote Control включён: этот чат открыт в claude.ai и приложении Claude. Писать можно и здесь.</string>
+    <string name="hub_remote_off">Remote Control выключен. Чат продолжается здесь.</string>
+    <string name="hub_access_full">Полный доступ: все инструменты без вопросов (как Claude Code в терминале).</string>
+    <string name="hub_access_safe">Безопасный режим: только инструменты телефона и веб.</string>
+    <string name="hub_access_remote_later">Удалённая сессия сохранит прежний доступ, пока Remote не выключить и не включить снова.</string>
+    <string name="hub_remote_busy">Дождись ответа, потом включай Remote.</string>
+    <string name="hub_remote_no_files">Вложения через Remote Control пока не передаются. Выключи Remote, чтобы их отправить.</string>
+    <string name="hub_remote_starting">Remote Control ещё запускается. Попробуй через пару секунд.</string>
+    <string name="chat_remote">Remote</string>
+    <string name="chat_remote_starting">Remote…</string>
+    <string name="chat_remote_starting_toast">Запускаю Remote Control…</string>
+    <string name="chat_remote_title">Remote Control</string>
+    <string name="chat_remote_text">Этот чат открыт в claude.ai и приложении Claude как «%1$s». Что пишешь там, видно здесь, и сессия не закрывается, когда Buddy скрыт.</string>
+    <string name="chat_remote_starting_text">Открываю «%1$s» для claude.ai и приложения Claude…</string>
+    <string name="chat_remote_turn_off">Выключить</string>
+    <string name="chat_remote_copy">Ссылка</string>
+    <string name="chat_remote_copied">Ссылка скопирована</string>
+    <string name="chat_remote_open">Открыть</string>
+    <string name="chat_access_full">Full</string>
+    <string name="chat_access_safe">Safe</string>
+    <string name="chat_access_full_toast">Полный доступ в этом чате</string>
+    <string name="chat_access_safe_toast">Безопасный режим в этом чате</string>
 </resources>
