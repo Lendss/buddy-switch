@@ -1226,7 +1226,6 @@
     <string name="hub_access_safe">Safe: the phone tools and the web only.</string>
     <string name="hub_access_remote_later">The remote session keeps its access until Remote is turned off and on.</string>
     <string name="hub_remote_busy">Wait for the reply, then turn on Remote.</string>
-    <string name="hub_remote_no_files">Attachments can\'t go through Remote Control yet. Turn Remote off to send them.</string>
     <string name="hub_remote_starting">Remote Control is still starting. Try again in a moment.</string>
     <string name="chat_remote">Remote</string>
     <string name="chat_remote_starting">Remote…</string>

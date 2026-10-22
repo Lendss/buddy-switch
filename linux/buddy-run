@@ -16,7 +16,7 @@
 #   buddy-run <token> remote <session> <dev:0|1> <name> [model]   keep that chat open with Remote Control (an interactive
 #                                    Claude Code, for claude.ai/code and the Claude app) until remote-stop; its turns are
 #                                    mirrored to the bubble
-#   buddy-run <token> remote-say <session> <message>   type a message into that chat's remote session
+#   buddy-run <token> remote-say <session> <message> [attachment-ids]   type a message into that chat's remote session
 #   buddy-run <token> remote-key <session> esc          press a key there (esc: interrupt the turn)
 #   buddy-run <token> remote-stop <session>             end that chat's remote session
 #   buddy-run <token> remote-status                     report the chats that have a remote session (buddy_remote)
@@ -44,6 +44,33 @@ have() { command -v "$1" >/dev/null 2>&1; }
 valid_sid() { [[ "$1" =~ ^[A-Za-z0-9_-]{1,64}$ ]]; }
 # OpenCode 2 (npm @opencode/cli) rather than 1.x (opencode-ai)? 2 needs --standalone, or it leaves a background service
 oc2() { [[ "$(readlink -f "$(command -v opencode)" 2>/dev/null)" == */@opencode/cli/* ]]; }
+
+# Attachments: fetch them from the app (comma-separated ids, $FILES) into the session's files folder ($S/files),
+# and add a note to $MSG saying where they are. Images are listed in IMGS too.
+ATT=()
+IMGS=()
+fetch_attachments() {
+  [ -n "${FILES:-}" ] || return 0
+  mkdir -p "$S/files"
+  local ids id
+  IFS=, read -ra ids <<< "$FILES"
+  for id in "${ids[@]}"; do
+    [[ "$id" =~ ^[A-Za-z0-9._-]{1,120}$ && "$id" != *..* ]] || continue
+    if curl -s -f -m 120 -H "Authorization: Bearer $TOKEN" "$URL/file/$id" -o "$S/files/$id"; then
+      ATT+=("$S/files/$id")
+      case "${id,,}" in *.jpg|*.jpeg|*.png|*.webp|*.gif) IMGS+=("$S/files/$id") ;; esac
+    else
+      event buddy_error "Couldn't get the attachment ${id#*_} from Buddy."
+    fi
+  done
+  if [ ${#ATT[@]} -gt 0 ]; then
+    MSG="$MSG
+
+[The user attached $( [ ${#ATT[@]} -eq 1 ] && echo "a file" || echo "${#ATT[@]} files" ), saved on this phone. Open them with your Read tool (images show as pictures):
+$(printf -- '- %s\n' "${ATT[@]}")]"
+  fi
+}
+event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
 
 # Kill a process and everything it started (claude/codex run a few levels below buddy-run).
 kill_tree() {
@@ -205,8 +232,20 @@ case "$CMD" in
     if [ "$CMD" = remote-key ]; then
       [ "${4:-}" = esc ] && printf '\e' > "$F"
     else
-      # a paste, so new lines stay in the message; then Enter
-      printf '\e[200~%s\e[201~' "${4:-}" > "$F"; sleep 0.5; printf '\r' > "$F"
+      MSG=${4:-}; FILES=${5:-}; S=$D/sessions/$SID
+      fetch_attachments
+      # Each line as a paste (typed text could trigger shortcuts), a new line as \ + Enter: a whole message pasted at
+      # once would reach Claude wrapped as <pasted_content>, not as the user's own words. Then Enter sends it.
+      {
+        first=1
+        while IFS= read -r line || [ -n "$line" ]; do
+          [ -z "$first" ] && { printf '\\'; sleep 0.2; printf '\r'; sleep 0.2; }
+          first=
+          [ -n "$line" ] && printf '\e[200~%s\e[201~' "$line"
+        done <<< "$MSG"
+        sleep 0.5
+        printf '\r'
+      } > "$F"
     fi
     exit 0 ;;
   remote-stop)
@@ -234,7 +273,6 @@ valid_sid "$SID" || exit 2
 [ -z "$MSG" ] && exit 0
 S=$D/sessions/$SID
 mkdir -p "$S"
-event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
 tag() { jq -c --arg s "$SID" '. + {buddy_session:$s}' 2>/dev/null; }
 
 if [ -f "$S/pid" ] && kill -0 "$(cat "$S/pid")" 2>/dev/null; then
@@ -246,28 +284,7 @@ if [ "$CMD" = ask ] && [ -f "$S/remote.pid" ] && kill -0 "$(cat "$S/remote.pid")
   exit 0
 fi
 
-# Attachments: fetch them from the app (comma-separated ids) into this session's files folder.
-ATT=()
-IMGS=()
-if [ -n "${FILES:-}" ]; then
-  mkdir -p "$S/files"
-  IFS=, read -ra ids <<< "$FILES"
-  for id in "${ids[@]}"; do
-    [[ "$id" =~ ^[A-Za-z0-9._-]{1,120}$ && "$id" != *..* ]] || continue
-    if curl -s -f -m 120 -H "Authorization: Bearer $TOKEN" "$URL/file/$id" -o "$S/files/$id"; then
-      ATT+=("$S/files/$id")
-      case "${id,,}" in *.jpg|*.jpeg|*.png|*.webp|*.gif) IMGS+=("$S/files/$id") ;; esac
-    else
-      event buddy_error "Couldn't get the attachment ${id#*_} from Buddy."
-    fi
-  done
-  if [ ${#ATT[@]} -gt 0 ]; then
-    MSG="$MSG
-
-[The user attached $( [ ${#ATT[@]} -eq 1 ] && echo "a file" || echo "${#ATT[@]} files" ), saved on this phone. Open them with your Read tool (images show as pictures):
-$(printf -- '- %s\n' "${ATT[@]}")]"
-  fi
-fi
+fetch_attachments
 
 SYSTEM=${BUDDY_SYSTEM:-}
 PERMS=${BUDDY_PERMS:-}
@@ -494,7 +511,7 @@ mirror() {
       if .type == "assistant" then {type:"assistant", message:.message}
       elif .type == "user" and (.isMeta | not) then
         ((.message.content | if type == "string" then . else ([.[]? | select(.type == "text") | .text] | join("\n")) end)
-          // "") as $t
+          // "" | sub("^\\s*<pasted_content[^>]*>\\s*"; "") | sub("\\s*</pasted_content[^>]*>\\s*$"; "")) as $t
         | if $t == "" or ($t | startswith("<")) then empty else {type:"buddy_remote_user", text:$t} end
       elif .type == "system" and .subtype == "turn_duration" then {type:"buddy_done"}
       else empty end | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done

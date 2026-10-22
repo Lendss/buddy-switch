@@ -314,8 +314,10 @@ final class ChatHub {
             case "buddy_remote_user": { // a message typed in claude.ai, or the echo of one Buddy typed
                 String t = ev.optString("text").trim();
                 boolean echo;
-                synchronized (ses.echoes) {
-                    echo = ses.echoes.remove(t);
+                synchronized (ses.echoes) { // Buddy's own message comes back with the attachments' note after it
+                    String hit = null;
+                    for (String e : ses.echoes) if (t.startsWith(e)) hit = e;
+                    echo = hit != null && ses.echoes.remove(hit);
                 }
                 if (!echo && !t.isEmpty()) {
                     add(ses, Bubble.Kind.USER, t);
@@ -529,18 +531,20 @@ final class ChatHub {
 
     /** A message to a chat open with Remote Control: typed into its session; the reply comes back from the transcript. */
     private String sendRemote(Sessions.Session ses, String text, List<String> files) {
-        if (files != null && !files.isEmpty()) return app.getString(R.string.hub_remote_no_files);
-        if (text.isEmpty()) return null;
+        boolean hasFiles = files != null && !files.isEmpty();
+        if (text.isEmpty() && !hasFiles) return null;
         if (!"active".equals(ses.remote)) return app.getString(R.string.hub_remote_starting);
+        // attachments: Termux fetches them and the message says where they are, as in a run of the chat's own
+        String forAgent = text.isEmpty() ? "Have a look at what I attached." : text;
         try {
-            Helper.run(app, "remote-say", ses.id, text);
+            Helper.run(app, "remote-say", ses.id, forAgent, hasFiles ? android.text.TextUtils.join(",", files) : "");
         } catch (Exception e) {
             return e.getMessage();
         }
         synchronized (ses.echoes) {
-            ses.echoes.add(text.trim());
+            ses.echoes.add(forAgent.trim());
         }
-        sessions.add(ses, Bubble.Kind.USER, text, null);
+        sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
         if (!ses.running) startRun(ses);

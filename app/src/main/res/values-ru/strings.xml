@@ -1189,7 +1189,6 @@
     <string name="hub_access_safe">Безопасный режим: только инструменты телефона и веб.</string>
     <string name="hub_access_remote_later">Удалённая сессия сохранит прежний доступ, пока Remote не выключить и не включить снова.</string>
     <string name="hub_remote_busy">Дождись ответа, потом включай Remote.</string>
-    <string name="hub_remote_no_files">Вложения через Remote Control пока не передаются. Выключи Remote, чтобы их отправить.</string>
     <string name="hub_remote_starting">Remote Control ещё запускается. Попробуй через пару секунд.</string>
     <string name="chat_remote">Remote</string>
     <string name="chat_remote_starting">Remote…</string>

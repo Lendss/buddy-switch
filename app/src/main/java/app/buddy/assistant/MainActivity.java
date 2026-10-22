@@ -237,6 +237,31 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         return r;
     }
 
+    /** A blinking dot after a chat's title: it's open with Remote Control (green), or opening (accent). */
+    private void remoteDot(TextView name, boolean active) {
+        android.graphics.drawable.GradientDrawable d = oval(active ? OK : ACCENT);
+        int size = dp(this, 8);
+        d.setBounds(0, 0, size, size);
+        name.setCompoundDrawablesRelative(null, null, d, null);
+        name.setCompoundDrawablePadding(dp(this, 8));
+        android.animation.ValueAnimator blink = android.animation.ValueAnimator.ofInt(255, 60);
+        blink.setDuration(900);
+        blink.setRepeatMode(android.animation.ValueAnimator.REVERSE);
+        blink.setRepeatCount(android.animation.ValueAnimator.INFINITE);
+        blink.addUpdateListener(a -> d.setAlpha((int) a.getAnimatedValue()));
+        name.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                blink.start();
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                blink.cancel();
+            }
+        });
+    }
+
     private View chatRow(final Sessions.Session ses) {
         LinearLayout r = listRow(this);
         r.addView(agentTile(this, ses.backend));
@@ -244,7 +269,11 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         col.setPaddingRelative(dp(this, 14), 0, 0, 0);
 
         LinearLayout first = row(this);
-        first.addView(single(title(this, ses.label(), 15)), weight1());
+        TextView name = single(title(this, ses.label(), 15));
+        LinearLayout nameBox = row(this); // the title as wide as its text, so the Remote dot sits right after it
+        nameBox.addView(name, wrap());
+        if (!ses.remote.isEmpty()) remoteDot(name, "active".equals(ses.remote));
+        first.addView(nameBox, weight1());
         TextView time = monoText(this, ago(ses.updated), 12, MUTED);
         time.setPaddingRelative(dp(this, 8), 0, 0, 0);
         first.addView(time);
