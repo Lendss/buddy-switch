@@ -290,6 +290,9 @@ final class ChatHub {
                         sessions.save();
                         changed();
                     }
+                } else if ("compact_boundary".equals(ev.optString("subtype"))) {
+                    ses.contextUsed = 0; // compacted: measured again at the next reply
+                    sessions.save();
                 } else if ("init".equals(ev.optString("subtype"))) {
                     ses.status = app.getString(R.string.hub_thinking);
                     // its commands and skills, for the composer's suggestions when the user types /
@@ -305,6 +308,13 @@ final class ChatHub {
                 break;
             case "assistant": {
                 JSONObject msg = ev.optJSONObject("message");
+                // what the context holds now: this call's input (cached or not) plus what it wrote
+                JSONObject u = msg == null ? null : msg.optJSONObject("usage");
+                if (u != null) {
+                    long used = u.optLong("input_tokens") + u.optLong("cache_read_input_tokens")
+                            + u.optLong("cache_creation_input_tokens") + u.optLong("output_tokens");
+                    if (used > 0) ses.contextUsed = used;
+                }
                 JSONArray content = msg == null ? null : msg.optJSONArray("content");
                 if (content == null) break;
                 for (int i = 0; i < content.length(); i++) {
@@ -328,6 +338,19 @@ final class ChatHub {
                 break;
             }
             case "result": {
+                JSONObject mu = ev.optJSONObject("modelUsage");
+                if (mu != null) {
+                    long w = 0;
+                    for (java.util.Iterator<String> k = mu.keys(); k.hasNext(); ) {
+                        JSONObject m = mu.optJSONObject(k.next());
+                        if (m != null) w = Math.max(w, m.optLong("contextWindow"));
+                    }
+                    if (w > 0) {
+                        ses.contextWindow = w;
+                        Prefs.setContextWindow(app, w);
+                    }
+                }
+                sessions.save();
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
                 if (error) add(ses, Bubble.Kind.ERROR, r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r);

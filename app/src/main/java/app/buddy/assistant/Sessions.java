@@ -50,6 +50,8 @@ final class Sessions {
         /** Tool access for this chat: "full" (every tool, no questions), "safe" (the phone tools and the web), or ""
          *  for the default in Settings (developer mode). */
         String access = "";
+        /** Tokens in the conversation's context at its last reply (0: not known yet), and the model's window. */
+        long contextUsed, contextWindow;
         /** The model the agent last reported using (for "Default"), or "" if it doesn't say. */
         String actualModel = "";
         long updated = System.currentTimeMillis();
@@ -167,7 +169,7 @@ final class Sessions {
                     if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
                     msgs.put(mo);
                 }
-                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("access", s.access).put("actual_model", s.actualModel)
+                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("access", s.access).put("ctx", s.contextUsed).put("ctxw", s.contextWindow).put("actual_model", s.actualModel)
                         .put("updated", s.updated).put("messages", msgs));
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
@@ -185,6 +187,8 @@ final class Sessions {
                 s.model = o.optString("model");
                 s.effort = o.optString("effort");
                 s.access = o.optString("access");
+                s.contextUsed = o.optLong("ctx");
+                s.contextWindow = o.optLong("ctxw");
                 s.actualModel = o.optString("actual_model");
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");

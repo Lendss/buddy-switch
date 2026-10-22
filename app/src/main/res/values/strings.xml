@@ -1254,4 +1254,11 @@
     <string name="update_chat_first">⬆ Bring over Buddy %1$s</string>
     <string name="update_chat_working">Update to %1$s: Claude is working on it</string>
     <string name="update_chat_waiting">Update to %1$s: waiting for you</string>
+    <string name="chat_context_title">Context</string>
+    <string name="chat_context_used">%1$s of %2$s tokens (%3$d%%).</string>
+    <string name="chat_context_unknown">Not measured yet: it shows after the next reply.</string>
+    <string name="chat_context_info">Each message sends the whole conversation again, so a long chat uses your plan faster. Compact sums it up and goes on with the summary; a new chat starts empty.</string>
+    <string name="chat_context_details">Details</string>
+    <string name="chat_context_compact">Compact</string>
+    <string name="chat_context_busy">Wait for the reply first.</string>
 </resources>

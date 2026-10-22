@@ -1217,4 +1217,11 @@
     <string name="update_chat_first">⬆ Перенести Buddy %1$s</string>
     <string name="update_chat_working">Обновление до %1$s: Claude работает</string>
     <string name="update_chat_waiting">Обновление до %1$s: ждёт тебя</string>
+    <string name="chat_context_title">Контекст</string>
+    <string name="chat_context_used">%1$s из %2$s токенов (%3$d%%).</string>
+    <string name="chat_context_unknown">Пока не измерен: появится после следующего ответа.</string>
+    <string name="chat_context_info">Каждое сообщение заново отправляет всю беседу, поэтому длинный чат быстрее расходует лимит. «Сжать» заменяет беседу кратким пересказом; новый чат начинается с нуля.</string>
+    <string name="chat_context_details">Подробнее</string>
+    <string name="chat_context_compact">Сжать</string>
+    <string name="chat_context_busy">Сначала дождись ответа.</string>
 </resources>

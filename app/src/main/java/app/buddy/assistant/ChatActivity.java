@@ -33,6 +33,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private TextView title, chipText, stripText, remoteText, accessText;
     private LinearLayout scheduled, commands;
     private View remoteDot;
+    private ContextRing ctxRing;
+    private TextView ctxText;
     private ImageView accessIcon;
     private Button mic;
     private LinearLayout pill;
@@ -79,7 +81,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         cp.topMargin = dp(this, 3);
         titles.addView(chip, cp);
         top.addView(titles, weight1());
-        // this chat open for claude.ai and the Claude app, and its tool access
+        // how full the context is (tap: the numbers, Compact), this chat open for claude.ai and the Claude app, and
+        // its tool access
+        ctxRing = new ContextRing(this);
+        ctxText = monoText(this, "", 12, MUTED);
+        LinearLayout ctx = pill(ctxRing, ctxText);
+        ctx.setOnClickListener(v -> contextTapped());
+        LinearLayout.LayoutParams cxp = wrap();
+        cxp.setMarginEnd(dp(this, 6));
+        top.addView(ctx, cxp);
         remoteDot = new View(this);
         remoteText = monoText(this, getString(R.string.chat_remote), 12, MUTED);
         LinearLayout remote = pill(remoteDot, remoteText);
@@ -221,7 +231,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         // Joy-Con: Down from the app bar goes to the message field, Up from the composer to the model chip; the
         // composer's ends don't wrap into the app bar
         input.setId(View.generateViewId());
-        for (View h : new View[]{back, chip, remote, access, speaker}) h.setNextFocusDownId(input.getId());
+        for (View h : new View[]{back, chip, ctx, remote, access, speaker}) h.setNextFocusDownId(input.getId());
         attach.setId(View.generateViewId());
         attach.setNextFocusLeftId(attach.getId());
         send.setId(View.generateViewId());
@@ -461,12 +471,57 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         l.setGravity(Gravity.CENTER_VERTICAL);
         l.setPaddingRelative(dp(this, 10), dp(this, 7), dp(this, 12), dp(this, 7));
         l.setBackground(outlined(this, 0x00000000, 16, OUTLINE, 1));
-        boolean dot = !(lead instanceof ImageView);
+        boolean dot = !(lead instanceof ImageView) && !(lead instanceof ContextRing);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(this, dot ? 8 : 16), dp(this, dot ? 8 : 16));
         p.setMarginEnd(dp(this, 6));
         l.addView(lead, p);
         l.addView(label);
         return l;
+    }
+
+    private long contextWindow() {
+        return ses.contextWindow > 0 ? ses.contextWindow : Prefs.contextWindow(this);
+    }
+
+    private static String tokens(long n) {
+        return n >= 1_000_000 ? (n % 1_000_000 == 0 ? n / 1_000_000 + "M" : String.format(java.util.Locale.US, "%.1fM", n / 1e6))
+                : n >= 1000 ? String.format(java.util.Locale.US, "%.1fk", n / 1e3) : String.valueOf(n);
+    }
+
+    /** The context's numbers, and Compact (/compact) or Details (/context). */
+    private void contextTapped() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.chat_context_title), 18));
+        long window = contextWindow();
+        String what = ses.contextUsed <= 0 ? getString(R.string.chat_context_unknown)
+                : getString(R.string.chat_context_used, tokens(ses.contextUsed), tokens(window),
+                Math.max(1, Math.round(100f * ses.contextUsed / window)));
+        TextView t = text(this, what + "\n\n" + getString(R.string.chat_context_info), 14, MUTED);
+        t.setPaddingRelative(0, dp(this, 6), 0, 0);
+        c.addView(t);
+        LinearLayout btns = row(this);
+        Button details = button(this, getString(R.string.chat_context_details), false);
+        Button compact = button(this, getString(R.string.chat_context_compact), true);
+        btns.addView(details, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        cp.setMarginStart(dp(this, 10));
+        btns.addView(compact, cp);
+        LinearLayout.LayoutParams bp = full();
+        bp.topMargin = dp(this, 16);
+        c.addView(btns, bp);
+        final Dialog d = bottomSheet(this, c);
+        View.OnClickListener run = v -> {
+            d.dismiss();
+            if (ses.running) {
+                Toast.makeText(this, R.string.chat_context_busy, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String err = hub.send(ses, v == compact ? "/compact" : "/context");
+            if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        };
+        details.setOnClickListener(run);
+        compact.setOnClickListener(run);
+        d.show();
     }
 
     /** Remote off: open this chat for claude.ai and the Claude app. On: its link, or turn it off. */
@@ -677,6 +732,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         accessText.setTextColor(full ? ACCENT_TEXT : MUTED);
         accessIcon.setImageResource(full ? R.drawable.ms_terminal : R.drawable.ms_shield_person);
         accessIcon.setImageTintList(ColorStateList.valueOf(full ? ACCENT_TEXT : MUTED));
+        long window = contextWindow();
+        ctxRing.set(window > 0 ? (float) ses.contextUsed / window : 0);
+        ctxText.setText(ses.contextUsed <= 0 ? "—" : Math.max(1, Math.round(100f * ses.contextUsed / window)) + "%");
         boolean on = "active".equals(ses.remote), starting = "starting".equals(ses.remote);
         remoteDot.setBackground(oval(on ? OK : starting ? ACCENT : MUTED));
         remoteText.setTextColor(on ? TEXT : MUTED);

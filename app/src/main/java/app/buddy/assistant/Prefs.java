@@ -150,6 +150,15 @@ final class Prefs {
         sp(c).edit().putString("update_chat", version + " " + chat).apply();
     }
 
+    /** The context window Claude Code last reported (tokens), for chats that haven't had a reply with it yet. */
+    static long contextWindow(Context c) {
+        return sp(c).getLong("ctx_window", 200_000);
+    }
+
+    static void setContextWindow(Context c, long w) {
+        sp(c).edit().putLong("ctx_window", w).apply();
+    }
+
     /** Scheduled messages (Scheduler), as JSON. */
     static String schedule(Context c) {
         return sp(c).getString("schedule", "[]");
