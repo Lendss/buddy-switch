@@ -5,7 +5,6 @@ import android.accessibilityservice.GestureDescription;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -20,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -1143,19 +1141,13 @@ final class Tools {
         svc.setBubblePassThrough(true);
         Thread.sleep(150);
         final CountDownLatch done = new CountDownLatch(1);
-        final AtomicReference<Bitmap> shot = new AtomicReference<>();
+        final AtomicReference<AccessibilityService.ScreenshotResult> shot = new AtomicReference<>();
         final AtomicReference<String> error = new AtomicReference<>();
         try {
             svc.takeScreenshot(Display.DEFAULT_DISPLAY, svc.getMainExecutor(), new AccessibilityService.TakeScreenshotCallback() {
                 @Override
                 public void onSuccess(AccessibilityService.ScreenshotResult r) {
-                    try {
-                        Bitmap hw = Bitmap.wrapHardwareBuffer(r.getHardwareBuffer(), r.getColorSpace());
-                        if (hw != null) shot.set(hw.copy(Bitmap.Config.ARGB_8888, false));
-                        r.getHardwareBuffer().close();
-                    } catch (Exception e) {
-                        error.set(String.valueOf(e.getMessage()));
-                    }
+                    shot.set(r);
                     done.countDown();
                 }
 
@@ -1170,20 +1162,20 @@ final class Tools {
         } finally {
             svc.setBubblePassThrough(false);
         }
-        Bitmap full = shot.get();
-        if (full == null) throw new IllegalStateException(error.get() != null ? error.get() : "Screenshot timed out.");
-        float scale = Math.min(1f, (float) SCREENSHOT_SHORT_SIDE / Math.min(full.getWidth(), full.getHeight()));
-        Bitmap small = scale < 1f
-                ? Bitmap.createScaledBitmap(full, Math.round(full.getWidth() * scale), Math.round(full.getHeight() * scale), true)
-                : full;
-        ByteArrayOutputStream jpg = new ByteArrayOutputStream();
-        small.compress(Bitmap.CompressFormat.JPEG, 70, jpg);
+        AccessibilityService.ScreenshotResult r = shot.get();
+        if (r == null) throw new IllegalStateException(error.get() != null ? error.get() : "Screenshot timed out.");
+        Shot.Result img;
+        try {
+            img = Shot.jpeg(svc, r.getHardwareBuffer(), r.getColorSpace(), SCREENSHOT_SHORT_SIDE);
+        } finally {
+            r.getHardwareBuffer().close();
+        }
         String note = String.format(Locale.ROOT,
                 "Screenshot %dx%d (screen is %dx%d). To tap something you see, multiply image coordinates by %.3f.",
-                small.getWidth(), small.getHeight(), full.getWidth(), full.getHeight(), 1f / scale);
+                img.w, img.h, img.fullW, img.fullH, (float) img.fullW / img.w);
         return new JSONObject().put("content", new JSONArray()
                 .put(new JSONObject().put("type", "image").put("mimeType", "image/jpeg")
-                        .put("data", Base64.encodeToString(jpg.toByteArray(), Base64.NO_WRAP)))
+                        .put("data", Base64.encodeToString(img.jpg, Base64.NO_WRAP)))
                 .put(new JSONObject().put("type", "text").put("text", note)));
     }
 }

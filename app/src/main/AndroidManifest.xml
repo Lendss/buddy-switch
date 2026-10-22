@@ -141,6 +141,11 @@
 
         <!-- Notification rules: sees notifications from the apps the user's rules watch (Settings → Notification rules) -->
         <service
+            android:name=".ShotService"
+            android:process=":shot"
+            android:exported="false" />
+
+        <service
             android:name=".NotificationWatcher"
             android:exported="true"
             android:label="@string/rules_service_label"

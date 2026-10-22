@@ -66,6 +66,14 @@ final class ChatHub {
         changed();
     }
 
+    /** Whether a chat's agent is at work (a turn under way), without starting the hub. On the main thread. */
+    static boolean anyRunning() {
+        ChatHub h = instance;
+        if (h == null) return false;
+        for (Sessions.Session s : h.sessions.all) if (s.running) return true;
+        return false;
+    }
+
     static synchronized ChatHub get(Context c) {
         if (instance == null) instance = new ChatHub(c.getApplicationContext());
         return instance;
@@ -414,6 +422,7 @@ final class ChatHub {
                         if (ses.scheduledRun && !viewing.contains(ses)) Scheduler.notifyReply(app, ses, ses.lastReply);
                     }
                     ses.scheduledRun = false;
+                    if (!anyRunning()) Shot.release(); // no turn left that may want another screenshot
                     // what the user added but the agent never got (it made no phone action since): send it now
                     String left;
                     synchronized (ses.notes) {
