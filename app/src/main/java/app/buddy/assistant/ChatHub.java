@@ -325,13 +325,21 @@ final class ChatHub {
                 }
                 JSONArray content = msg == null ? null : msg.optJSONArray("content");
                 if (content == null) break;
+                // pictures the reply points to, already copied into Buddy by buddy-run (its images)
+                JSONArray pics = ev.optJSONArray("buddy_images");
                 for (int i = 0; i < content.length(); i++) {
                     JSONObject c = content.optJSONObject(i);
                     if (c == null) continue;
                     if ("text".equals(c.optString("type"))) {
                         String t = c.optString("text").trim();
                         if (!t.isEmpty()) {
-                            add(ses, Bubble.Kind.BUDDY, t);
+                            java.util.Map<String, String> images = new java.util.LinkedHashMap<>();
+                            for (int j = 0; pics != null && j < pics.length(); j++) {
+                                JSONObject pic = pics.optJSONObject(j);
+                                String ref = pic == null ? "" : pic.optString("ref"), id = pic == null ? "" : pic.optString("id");
+                                if (!ref.isEmpty() && t.contains(ref) && Attachments.validId(id)) images.put(ref, id);
+                            }
+                            add(ses, Bubble.Kind.BUDDY, t, images);
                             ses.lastReply = t;
                             ses.gotText = true;
                         }
@@ -654,8 +662,12 @@ final class ChatHub {
     }
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text) {
+        add(ses, kind, text, null);
+    }
+
+    private void add(Sessions.Session ses, Bubble.Kind kind, String text, java.util.Map<String, String> images) {
         if (text == null) return;
-        sessions.add(ses, kind, text);
+        sessions.add(ses, kind, text, null, images);
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses)) ses.unread = true;
         if (kind == Bubble.Kind.BUDDY && Prefs.speakReplies(app)) Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);

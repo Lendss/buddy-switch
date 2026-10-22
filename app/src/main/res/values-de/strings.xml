@@ -826,4 +826,5 @@
     <string name="rules_approval_title">Braucht dein OK: %1$s · %2$s</string>
     <string name="card_locked_title">Braucht dein OK: %1$s</string>
     <string name="rules_approval_auto">Wird in %1$s automatisch erlaubt, außer du stoppst es.\n%2$s</string>
+    <string name="image_share">Teilen</string>
 </resources>

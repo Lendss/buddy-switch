@@ -1121,4 +1121,5 @@
     <string name="rules_approval_title">Necesita tu aprobación: %1$s · %2$s</string>
     <string name="card_locked_title">Necesita tu aprobación: %1$s</string>
     <string name="rules_approval_auto">Se aprobará automáticamente en %1$s si no lo detienes.\n%2$s</string>
+    <string name="image_share">Compartir</string>
 </resources>

@@ -1907,7 +1907,7 @@ final class Bubble implements ChatHub.Listener {
             messages.addView(hint, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
         }
-        for (Sessions.Msg m : ses.messages) showMessage(m.kind, m.label());
+        for (Sessions.Msg m : ses.messages) showMessage(m.kind, m.label(), m.images);
         if (log != null && !ses.running) log.finish();
         input.setHint(svc.getString(R.string.bubble_input_hint, ses.brainName()));
         updateViewing();
@@ -1974,7 +1974,7 @@ final class Bubble implements ChatHub.Listener {
 
     @Override
     public void onMessage(Sessions.Session ses, Sessions.Msg msg) {
-        if (ses == sessions.current && renderedFor == ses) showMessage(msg.kind, msg.label());
+        if (ses == sessions.current && renderedFor == ses) showMessage(msg.kind, msg.label(), msg.images);
         if (msg.kind == Kind.BUDDY && !(expanded && ses == sessions.current && !showingList)) vibrate(30);
     }
 
@@ -2352,7 +2352,8 @@ final class Bubble implements ChatHub.Listener {
     /** The open run of tool steps (grouped like the chat screen's log), or null. */
     private StepLog log;
 
-    private void showMessage(Kind kind, String text) {
+    /** images: a reply's pictures (Sessions.Msg.images). */
+    private void showMessage(Kind kind, String text, java.util.Map<String, String> images) {
         if (text == null) return;
         View hint = messages.findViewWithTag("hint");
         if (hint != null) messages.removeView(hint);
@@ -2399,8 +2400,10 @@ final class Bubble implements ChatHub.Listener {
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
                 avp.setMarginEnd(dp(8));
                 r.addView(av, avp);
-                // Markdown shown formatted (Markdown): one text, or a column with code blocks and tables
-                View body = Markdown.render(svc, text, this::collapse, cs -> {
+                // Markdown shown formatted (Markdown): one text, or a column with code blocks, tables and pictures
+                // (a picture opens full screen, the panel folded first)
+                View body = Markdown.render(svc, text, images, id -> Pictures.thumb(svc, id, dp(320), dp(200), this::collapse),
+                        this::collapse, cs -> {
                     TextView tv = Ui.text(svc, "", 15, Ui.TEXT);
                     tv.setText(cs);
                     tv.setLineSpacing(0, 1.15f);
@@ -2410,7 +2413,8 @@ final class Bubble implements ChatHub.Listener {
                 });
                 body.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
                 body.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
-                if (body instanceof TextView) {
+                if (body instanceof TextView || body.getTag() == Markdown.NARROW) {
+                    if (!(body instanceof TextView)) copyOnLongPress(body, Ui.linkCopy(text));
                     r.addView(body);
                 } else {
                     copyOnLongPress(body, Ui.linkCopy(text));

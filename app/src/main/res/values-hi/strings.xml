@@ -819,4 +819,5 @@
     <string name="rules_approval_title">आपकी मंज़ूरी चाहिए: %1$s · %2$s</string>
     <string name="card_locked_title">आपकी मंज़ूरी चाहिए: %1$s</string>
     <string name="rules_approval_auto">%1$s में अपने-आप मंज़ूर हो जाएगा, जब तक कि आप इसे रोक न दें.\n%2$s</string>
+    <string name="image_share">शेयर करें</string>
 </resources>

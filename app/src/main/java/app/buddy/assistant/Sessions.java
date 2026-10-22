@@ -7,7 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** Bubble conversations. Each has its own brain (claude/codex), history and agent session in Buddy's Linux. */
@@ -19,15 +21,18 @@ final class Sessions {
         final String text;
         /** Attachment ids (see Attachments); empty for most messages. */
         final List<String> files;
+        /** Pictures in a reply: each path as written in the text → the copy in Buddy's storage (an attachment id). */
+        final Map<String, String> images;
 
         Msg(Bubble.Kind kind, String text) {
-            this(kind, text, null);
+            this(kind, text, null, null);
         }
 
-        Msg(Bubble.Kind kind, String text, List<String> files) {
+        Msg(Bubble.Kind kind, String text, List<String> files, Map<String, String> images) {
             this.kind = kind;
             this.text = text;
             this.files = files == null ? new ArrayList<>() : files;
+            this.images = images == null ? new LinkedHashMap<>() : images;
         }
 
         /** Text for places that can't show attachments (bubble panel, previews). */
@@ -146,7 +151,11 @@ final class Sessions {
     }
 
     void add(Session s, Bubble.Kind kind, String text, List<String> files) {
-        s.messages.add(new Msg(kind, text, files));
+        add(s, kind, text, files, null);
+    }
+
+    void add(Session s, Bubble.Kind kind, String text, List<String> files, Map<String, String> images) {
+        s.messages.add(new Msg(kind, text, files, images));
         while (s.messages.size() > MAX_MESSAGES) s.messages.remove(0);
         s.updated = System.currentTimeMillis();
         if (kind == Bubble.Kind.USER && s.title.isEmpty()) {
@@ -167,6 +176,7 @@ final class Sessions {
                 for (Msg m : s.messages) {
                     JSONObject mo = new JSONObject().put("k", m.kind.name()).put("t", m.text);
                     if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
+                    if (!m.images.isEmpty()) mo.put("i", new JSONObject(m.images));
                     msgs.put(mo);
                 }
                 arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("access", s.access).put("ctx", s.contextUsed).put("ctxw", s.contextWindow).put("actual_model", s.actualModel)
@@ -197,7 +207,13 @@ final class Sessions {
                     List<String> files = new ArrayList<>();
                     JSONArray f = m.optJSONArray("f");
                     if (f != null) for (int k = 0; k < f.length(); k++) files.add(f.getString(k));
-                    s.messages.add(new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files));
+                    Map<String, String> images = new LinkedHashMap<>();
+                    JSONObject im = m.optJSONObject("i");
+                    if (im != null) for (java.util.Iterator<String> k = im.keys(); k.hasNext(); ) {
+                        String ref = k.next();
+                        images.put(ref, im.getString(ref));
+                    }
+                    s.messages.add(new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files, images));
                 }
                 all.add(s);
             }

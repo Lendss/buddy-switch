@@ -843,4 +843,5 @@
     <string name="rules_approval_title">Wymaga zgody: %1$s · %2$s</string>
     <string name="card_locked_title">Wymaga zgody: %1$s</string>
     <string name="rules_approval_auto">Zatwierdzi się samo za %1$s, chyba że to zatrzymasz.\n%2$s</string>
+    <string name="image_share">Udostępnij</string>
 </resources>

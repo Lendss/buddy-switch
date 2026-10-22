@@ -74,6 +74,33 @@ $(printf -- '- %s\n' "${ATT[@]}")]"
 }
 event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
 
+# Pictures in a reply (one event on stdin, printed back): a full path in its text (/… or ~/…, outside code blocks) to
+# a .png/.jpg/.webp/.gif that exists is copied into Buddy (PUT /file/<id>), and the event gets
+# buddy_images [{ref: the path as written, id}], so the chat shows the picture with the reply.
+PIC_RE='(~|/)[^][[:space:]`"'"'"'<>()*|]*\.(png|jpe?g|webp|gif)'
+images() {
+  local ev ref p name id list="[]"
+  ev=$(cat)
+  # most events are no reply, or one without a picture
+  if [[ "$ev" != *'"type":"assistant"'* ]] || ! grep -qiE '\.(png|jpe?g|webp|gif)' <<< "$ev"; then
+    printf '%s' "$ev"
+    return
+  fi
+  while IFS= read -r ref; do
+    p=$ref
+    [[ "$p" == "~/"* ]] && p=$HOME/${p#\~/}
+    [ -f "$p" ] && [ -r "$p" ] && [ "$(stat -c %s "$p")" -le 26214400 ] || continue
+    name=$(printf '%s' "${p##*/}" | tr -c 'A-Za-z0-9._-' '_' | tail -c 60)
+    id=$(printf '%04x%04x' $RANDOM $RANDOM)_${name//../__}   # an attachment id (Attachments.validId)
+    curl -s -f -m 60 -o /dev/null -X PUT -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/octet-stream' \
+      -H 'Expect:' --data-binary @"$p" "$URL/file/$id" || continue   # Expect: no waiting for a 100 Continue
+    list=$(jq -c --arg r "$ref" --arg i "$id" '. + [{ref:$r, id:$i}]' <<< "$list")
+  done < <(printf '%s' "$ev" | jq -r '[.message.content[]? | select(.type == "text") | .text] | join("\n")' 2>/dev/null \
+    | awk '/^[[:space:]]*```/ { code = !code; next } !code' | grep -oiE "$PIC_RE" | awk '!seen[$0]++' | head -n 8)
+  if [ "$list" = "[]" ]; then printf '%s' "$ev"
+  else printf '%s' "$ev" | jq -c --argjson i "$list" '. + {buddy_images: $i}'; fi
+}
+
 # Kill a process and everything it started (claude/codex run a few levels below buddy-run).
 kill_tree() {
   local p=$1 c
@@ -328,7 +355,8 @@ if [ "$DEV" = 1 ]; then
 Developer mode is ON. You are the same Claude Code the user runs in the Termux terminal, with all of its tools,
 settings and memory: shell commands, files, the web. The phone is the user's Nintendo Switch running Android
 (LineageOS), rooted with Magisk: run root commands with su -c. You work in Termux's home folder ($W).
-Buddy can't read files in Termux: to show a file to the user, say where it is or put what matters in your reply."
+Pictures show in the chat when you write their full path (see above); Buddy can't open other files in Termux: for
+those, say where they are or put what matters in your reply."
 fi
 
 # ---------------------------------------------------------------- Claude Code
@@ -370,7 +398,7 @@ HOOK
 stream_claude() {
   while IFS= read -r line; do
     [ -z "$line" ] && continue
-    printf '%s' "$line" | tag | post
+    printf '%s' "$line" | tag | images | post
     sid=$(printf '%s' "$line" | jq -r 'select(.session_id != null) | .session_id' 2>/dev/null)
     [ -n "$sid" ] && printf '%s' "$sid" > "$S/claude-session"
   done
@@ -585,7 +613,7 @@ mirror() {
           // "" | sub("^\\s*<pasted_content[^>]*>\\s*"; "") | sub("\\s*</pasted_content[^>]*>\\s*$"; "")) as $t
         | if $t == "" or ($t | startswith("<")) then empty else {type:"buddy_remote_user", text:$t} end
       elif .type == "system" and .subtype == "turn_duration" then {type:"buddy_done"}
-      else empty end | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+      else empty end | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | images | post; done
   done
 }
 

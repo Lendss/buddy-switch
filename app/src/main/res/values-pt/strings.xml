@@ -1135,4 +1135,5 @@
     <string name="rules_approval_title">Precisa do seu OK: %1$s · %2$s</string>
     <string name="card_locked_title">Precisa do seu OK: %1$s</string>
     <string name="rules_approval_auto">Aprovação automática em %1$s, a menos que você interrompa.\n%2$s</string>
+    <string name="image_share">Compartilhar</string>
 </resources>

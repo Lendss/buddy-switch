@@ -1224,4 +1224,5 @@
     <string name="chat_context_details">Подробнее</string>
     <string name="chat_context_compact">Сжать</string>
     <string name="chat_context_busy">Сначала дождись ответа.</string>
+    <string name="image_share">Поделиться</string>
 </resources>

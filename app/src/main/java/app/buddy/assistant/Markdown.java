@@ -22,14 +22,18 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Agents' replies in Markdown, shown formatted: headings, bold, italic, strikethrough, `code`, lists, quotes and
- * links in the text; code blocks and tables as their own scrollable boxes. A reply without code blocks or tables
- * stays one TextView.
+ * links in the text; code blocks and tables as their own scrollable boxes; the reply's pictures (see Pictures). A
+ * reply without code blocks, tables or pictures stays one TextView.
  */
 final class Markdown {
     private Markdown() {
@@ -40,26 +44,49 @@ final class Markdown {
         TextView make(CharSequence text);
     }
 
+    /** Makes the view for one of a reply's pictures (an attachment id), sized by its own LinearLayout.LayoutParams. */
+    interface Images {
+        View make(String id);
+    }
+
+    /** The tag of a column with only text and pictures: it can be as narrow as they are (code and tables need width). */
+    static final Object NARROW = new Object();
+
     /** The reply as one TextView (plain text and inline Markdown) or a column of blocks (with code or tables). */
     static View render(Context c, String text, Runnable linkThen, Texts texts) {
-        List<Object> blocks = blocks(text);
+        return render(c, text, null, null, linkThen, texts);
+    }
+
+    /**
+     * The same with the reply's pictures: {@code images} maps each path as written in the text to its copy in Buddy
+     * (an attachment id). A line's ![alt](path) of one becomes the picture there; the others follow the text.
+     */
+    static View render(Context c, String text, Map<String, String> images, Images pictures, Runnable linkThen, Texts texts) {
+        List<Object> blocks = blocks(text, pictures == null ? null : images);
         if (blocks.size() == 1 && blocks.get(0) instanceof String) {
             return texts.make(paragraphs(c, (String) blocks.get(0), linkThen));
         }
         LinearLayout col = new LinearLayout(c);
         col.setOrientation(LinearLayout.VERTICAL);
-        for (int i = 0; i < blocks.size(); i++) {
-            Object b = blocks.get(i);
+        boolean narrow = true;
+        for (Object b : blocks) {
             View v;
-            if (b instanceof String) v = texts.make(paragraphs(c, (String) b, linkThen));
-            else if (b instanceof Code) v = code(c, ((Code) b).text);
-            else if (b instanceof Table) v = table(c, (Table) b, linkThen);
-            else v = rule(c);
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (i > 0) p.topMargin = Ui.dp(c, 8);
+            if (b instanceof String) v = texts.make(paragraphs(c, (String) b, linkThen));
+            else if (b instanceof Picture) {
+                v = pictures.make(((Picture) b).id);
+                if (v.getLayoutParams() instanceof LinearLayout.LayoutParams) p = (LinearLayout.LayoutParams) v.getLayoutParams();
+            } else {
+                narrow = false;
+                if (b instanceof Code) v = code(c, ((Code) b).text);
+                else if (b instanceof Table) v = table(c, (Table) b, linkThen);
+                else v = rule(c);
+            }
+            if (col.getChildCount() > 0) p.topMargin = Ui.dp(c, 8);
             col.addView(v, p);
         }
+        if (narrow) col.setTag(NARROW);
         return col;
     }
 
@@ -80,11 +107,23 @@ final class Markdown {
     private static final class Rule {
     }
 
+    private static final class Picture {
+        final String id;
+
+        Picture(String id) {
+            this.id = id;
+        }
+    }
+
+    /** ![alt](path), the path maybe in <…>. */
+    private static final Pattern IMAGE = Pattern.compile("!\\[[^\\]\\n]*\\]\\(<?([^()<>\\s]+)>?\\)");
+
     private static final Pattern TABLE_SEP = Pattern.compile("^\\s*\\|?\\s*:?-{2,}:?\\s*(\\|\\s*:?-{2,}:?\\s*)*\\|?\\s*$");
     private static final Pattern RULE = Pattern.compile("^\\s*([-*_])(\\s*\\1){2,}\\s*$");
 
-    /** Text runs (String), code blocks, tables and rules, in order. */
-    private static List<Object> blocks(String text) {
+    /** Text runs (String), code blocks, tables, rules and pictures (images: see render, or null), in order. */
+    private static List<Object> blocks(String text, Map<String, String> images) {
+        Set<String> placed = new HashSet<>();
         List<Object> out = new ArrayList<>();
         String[] lines = text.split("\n", -1);
         StringBuilder run = new StringBuilder();
@@ -113,14 +152,34 @@ final class Markdown {
                 block = new Rule();
             }
             if (block == null) {
+                // ![alt](path) of one of the reply's pictures: the picture in its place
+                int at = 0;
+                Matcher m = images == null || images.isEmpty() ? null : IMAGE.matcher(l);
+                while (m != null && m.find()) {
+                    String id = images.get(m.group(1));
+                    if (id == null) continue;
+                    String before = l.substring(at, m.start());
+                    if (!before.trim().isEmpty()) {
+                        if (run.length() > 0) run.append('\n');
+                        run.append(before);
+                    }
+                    flush(out, run);
+                    out.add(new Picture(id));
+                    placed.add(id);
+                    at = m.end();
+                }
+                String rest = l.substring(at);
+                if (at > 0 && rest.trim().isEmpty()) continue;
                 if (run.length() > 0) run.append('\n');
-                run.append(l);
+                run.append(rest);
                 continue;
             }
             flush(out, run);
             out.add(block);
         }
         flush(out, run);
+        // the pictures the text only names (a path) follow it
+        if (images != null) for (String id : new LinkedHashSet<>(images.values())) if (placed.add(id)) out.add(new Picture(id));
         if (out.isEmpty()) out.add("");
         return out;
     }

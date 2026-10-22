@@ -77,6 +77,13 @@
             android:name=".TranscriptActivity"
             android:exported="false" />
 
+        <!-- a picture from a chat, full screen (Pictures.open: from the bubble in a task of its own) -->
+        <activity
+            android:name=".ImageActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity="app.buddy.sw.image" />
+
         <activity
             android:name=".AppPermissionsActivity"
             android:exported="false" />

@@ -1043,7 +1043,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             messages.addView(col, p);
             return;
         }
-        show(m.kind, m.text);
+        show(m.kind, m.text, m.images);
     }
 
     // --------------------------------------------------------- attachments
@@ -1222,6 +1222,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     }
 
     private void openAttachment(String id) {
+        if (Attachments.isImage(id)) {
+            Pictures.open(this, id);
+            return;
+        }
         android.net.Uri u = FilesProvider.attachmentUri(id);
         android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW)
                 .setDataAndType(u, getContentResolver().getType(u))
@@ -1234,6 +1238,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     }
 
     private void show(Bubble.Kind kind, final String text) {
+        show(kind, text, null);
+    }
+
+    /** images: the reply's pictures (Sessions.Msg.images), or null. */
+    private void show(Bubble.Kind kind, final String text, java.util.Map<String, String> images) {
         if (kind == Bubble.Kind.STEP) {
             if (log == null) {
                 log = new ToolLog();
@@ -1276,9 +1285,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
                 avp.setMarginEnd(dp(this, 8));
                 r.addView(av, avp);
-                // Markdown shown formatted (Markdown): one text, or a column with code blocks and tables
-                View body = Markdown.render(this, text, null, cs -> {
+                // Markdown shown formatted (Markdown): one text, or a column with code blocks, tables and pictures
+                int pictureW = Math.min(dp(this, 420), maxBubble - dp(this, 60));
+                View body = Markdown.render(this, text, images, id -> Pictures.thumb(this, id, pictureW, dp(this, 320), null), null, cs -> {
                     TextView tv = text(this, "", 15, TEXT);
+                    tv.setMaxWidth(maxBubble - dp(this, 60)); // in a column; one text alone gets its own below
                     tv.setTextIsSelectable(true);
                     tv.setText(cs);
                     links(tv);
@@ -1290,6 +1301,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 body.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
                 if (body instanceof TextView) {
                     ((TextView) body).setMaxWidth(maxBubble - dp(this, 32));
+                    r.addView(body);
+                } else if (body.getTag() == Markdown.NARROW) { // text and pictures: as wide as they are
+                    copyOnLongPress(body, Ui.linkCopy(text));
                     r.addView(body);
                 } else {
                     copyOnLongPress(body, Ui.linkCopy(text));

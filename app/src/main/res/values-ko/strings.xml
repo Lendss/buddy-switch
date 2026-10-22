@@ -815,4 +815,5 @@
     <string name="rules_approval_title">승인 필요: %1$s · %2$s</string>
     <string name="card_locked_title">승인 필요: %1$s</string>
     <string name="rules_approval_auto">중지하지 않으면 %1$s 후 자동으로 승인돼요.\n%2$s</string>
+    <string name="image_share">공유</string>
 </resources>

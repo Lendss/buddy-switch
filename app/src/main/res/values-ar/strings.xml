@@ -855,4 +855,5 @@
     <string name="rules_approval_title">يتطلب موافقتك: %1$s · %2$s</string>
     <string name="card_locked_title">يتطلب موافقتك: %1$s</string>
     <string name="rules_approval_auto">ستتم الموافقة تلقائيًا بعد %1$s ما لم توقف العد التنازلي.\n%2$s</string>
+    <string name="image_share">مشاركة</string>
 </resources>

@@ -826,4 +826,5 @@
     <string name="rules_approval_title">Akkoord nodig: %1$s · %2$s</string>
     <string name="card_locked_title">Akkoord nodig: %1$s</string>
     <string name="rules_approval_auto">Wordt over %1$s vanzelf toegestaan, tenzij je het stopt.\n%2$s</string>
+    <string name="image_share">Delen</string>
 </resources>

@@ -113,5 +113,10 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   notification when the chat isn't open.
 - [x] Chats: a run that's silent for minutes (a build) keeps going (buddy-run says every minute it's alive);
   "Your MCP servers in chats" in Settings adds the user's MCP servers (off: about a second faster per message).
+- [x] Pictures in replies: a full path in a reply's text (`/sdcard/…/x.png`, `~/…/x.jpg`; png/jpg/webp/gif, outside
+  code blocks) to a picture that exists is copied into Buddy by buddy-run (`images`: PUT /file/<id>, at most 8 per
+  message, 25 MB each) and shown with the message, in the chat and the bubble's panel; `![alt](path)` puts it in that
+  place. A tap opens it full screen (`ImageActivity`: pinch/double-tap zoom, Share); attached photos open there too.
+  The copies are attachments (Buddy's storage, gone after 30 days like the others).
 
 `tools/`: `idle-monitor.sh` (what stays in memory, as root), `mcp-call.py` (Buddy's phone tools from the shell).

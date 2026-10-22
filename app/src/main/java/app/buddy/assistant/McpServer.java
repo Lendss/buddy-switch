@@ -24,7 +24,8 @@ import java.util.concurrent.Executors;
 
 /**
  * Minimal MCP server (Streamable HTTP, JSON responses only) bound to 127.0.0.1.
- * Also accepts POST /event from the helper in Buddy's Linux to stream Claude Code output to the bubble.
+ * Also accepts POST /event from the helper in Buddy's Linux to stream Claude Code output to the bubble, and files
+ * both ways: GET /file/&lt;id&gt; (an attachment, for the agent) and PUT /file/&lt;id&gt; (a picture a reply points to).
  * Every request must carry "Authorization: Bearer <token>".
  */
 final class McpServer {
@@ -123,6 +124,15 @@ final class McpServer {
                 if (c > 0) {
                     headers.put(line.substring(0, c).trim().toLowerCase(Locale.ROOT), line.substring(c + 1).trim());
                 }
+            }
+            if (path.startsWith("/file/") && "PUT".equals(method)) {
+                // a picture an agent's reply points to, sent by the helper (its images): stored like an attachment
+                if (!("Bearer " + token).equals(headers.get("authorization"))) {
+                    send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
+                } else {
+                    send(out, receive(in, headers, handler.attachment(path.substring(6))), null, null);
+                }
+                return;
             }
             byte[] body = readBody(in, headers);
             CALLER_GONE.set(() -> gone(s, in));
@@ -275,15 +285,49 @@ final class McpServer {
         out.flush();
     }
 
+    /** Saves a PUT's body (Content-Length, at most Attachments.MAX_BYTES) as {@code f}; the status to answer with. */
+    private static int receive(InputStream in, Map<String, String> headers, java.io.File f) throws IOException {
+        if (f == null) return 400;
+        long n;
+        try {
+            n = Long.parseLong(headers.get("content-length").trim());
+        } catch (Exception e) {
+            return 411;
+        }
+        if (n < 0 || n > Attachments.MAX_BYTES) return 413;
+        java.io.File part = new java.io.File(f.getPath() + ".part");
+        try (OutputStream o = new java.io.FileOutputStream(part)) {
+            byte[] buf = new byte[64 * 1024];
+            while (n > 0) {
+                int r = in.read(buf, 0, (int) Math.min(buf.length, n));
+                if (r == -1) throw new IOException("unexpected end of body");
+                o.write(buf, 0, r);
+                n -= r;
+            }
+        } catch (IOException e) {
+            part.delete();
+            throw e;
+        }
+        if (!part.renameTo(f)) {
+            part.delete();
+            return 500;
+        }
+        return 204;
+    }
+
     private static String reason(int code) {
         switch (code) {
             case 200: return "OK";
             case 202: return "Accepted";
             case 204: return "No Content";
+            case 400: return "Bad Request";
             case 401: return "Unauthorized";
             case 403: return "Forbidden";
             case 404: return "Not Found";
             case 405: return "Method Not Allowed";
+            case 411: return "Length Required";
+            case 413: return "Payload Too Large";
+            case 500: return "Internal Server Error";
             default: return "Status";
         }
     }

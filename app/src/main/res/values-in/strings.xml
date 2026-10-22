@@ -1127,4 +1127,5 @@
     <string name="rules_approval_title">Perlu persetujuan Anda: %1$s · %2$s</string>
     <string name="card_locked_title">Perlu persetujuan Anda: %1$s</string>
     <string name="rules_approval_auto">Disetujui otomatis dalam %1$s kecuali Anda menghentikannya.\n%2$s</string>
+    <string name="image_share">Bagikan</string>
 </resources>

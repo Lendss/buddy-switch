@@ -1154,4 +1154,5 @@
     <string name="rules_approval_title">Потрібен ваш дозвіл: %1$s · %2$s</string>
     <string name="card_locked_title">Потрібен ваш дозвіл: %1$s</string>
     <string name="rules_approval_auto">Буде схвалено автоматично через %1$s, якщо ви не зупините таймер.\n%2$s</string>
+    <string name="image_share">Поділитися</string>
 </resources>

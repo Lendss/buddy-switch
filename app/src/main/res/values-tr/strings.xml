@@ -825,4 +825,5 @@
     <string name="rules_approval_title">Onayınız gerekiyor: %1$s · %2$s</string>
     <string name="card_locked_title">Onayınız gerekiyor: %1$s</string>
     <string name="rules_approval_auto">Siz durdurmazsanız %1$s sonra otomatik onaylanacak.\n%2$s</string>
+    <string name="image_share">Paylaş</string>
 </resources>
