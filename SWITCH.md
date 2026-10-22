@@ -87,7 +87,11 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   `SshServer`, `CodexRemote`, Claude/ChatGPT dictation and voice, `MicServer`, proot and the pty helper (`jniLibs`,
   `native/`), the Alpine-only helper files, and their settings and strings. `RemoteSession` too: step 6 brings it back
   from git history, rewritten for Termux. Codex and OpenCode stay only as names in the chat code (never ready).
-- [ ] 5. Idle footprint: Buddy SW itself (~105 MB with a chat screen in Recents).
+- [x] 5. Idle footprint: Buddy SW itself. Measured on this build: ~20 MB with no screen, 36–56 MB with a chat in
+  Recents or the bubble's panel used, steady while an agent answers; an open screen briefly 80–115 MB, back within
+  a minute. Over 80 minutes of normal use (`tools/idle-monitor.sh`): 52 MB on average, above 60 MB in 5% of samples.
+  The earlier ~105 MB (native heap held after the panel closed, likely Tegra's graphics driver) didn't come back;
+  Android doesn't let an app trim that itself (`WindowManagerGlobal.trimMemory` is blocked).
 - [x] 6. Remote Control, per chat: a "Remote" button in the chat's bar (grey/green dot) opens that chat for
   claude.ai/code and the Claude app. Termux runs the chat's conversation as an interactive Claude Code with
   `--remote-control` (under `script`, input through a pipe), independent of Buddy: hiding or restarting Buddy doesn't
