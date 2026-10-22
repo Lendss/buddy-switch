@@ -1247,4 +1247,6 @@
     <string name="chat_scheduled_cancel">Cancel</string>
     <string name="chat_scheduled_cancelled">Cancelled</string>
     <string name="scheduled_channel_name">Scheduled messages</string>
+    <string name="setup_short_replies">Short replies</string>
+    <string name="setup_short_replies_info">The agent answers in one to three plain sentences, handy in the small bubble. Off: as fully as the answer needs, like Claude Code in the terminal.</string>
 </resources>

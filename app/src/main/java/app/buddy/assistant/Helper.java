@@ -67,6 +67,10 @@ final class Helper {
     private static String helperScript, systemPrompt;
 
     /** buddy-run with Buddy's instructions in front of it, as shell variables ($BUDDY_SYSTEM, $BUDDY_PERMS). */
+    /** Settings › Short replies. */
+    private static final String SHORT = "Replies appear in a small bubble: keep them short and plain — one to three "
+            + "sentences, no headings or tables. When you finish a task, say what you did in one line.";
+
     private static String script(Context c) throws IOException {
         synchronized (Helper.class) {
             if (helperScript == null) {
@@ -74,7 +78,8 @@ final class Helper {
                 systemPrompt = asset(c, "linux/system-prompt.md");
             }
         }
-        return heredoc("BUDDY_SYSTEM", systemPrompt) + heredoc("BUDDY_PERMS", permissions(c))
+        String system = systemPrompt + (Prefs.shortReplies(c) ? "\n" + SHORT : "");
+        return heredoc("BUDDY_SYSTEM", system) + heredoc("BUDDY_PERMS", permissions(c))
                 + "BUDDY_USER_MCP=" + (Prefs.userMcp(c) ? 1 : 0) + "\n" + helperScript;
     }
 

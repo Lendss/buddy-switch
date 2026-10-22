@@ -357,6 +357,12 @@ public class SetupActivity extends Screen implements Account.Listener {
             })), full());
             ex.addView(divider(), lineParams());
         }
+        ex.addView(switchRow(this, getString(R.string.setup_short_replies), getString(R.string.setup_short_replies_info),
+                Prefs.shortReplies(this), on -> {
+            Prefs.setShortReplies(this, on);
+            render();
+        }), full());
+        ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, getString(R.string.setup_user_mcp), getString(R.string.setup_user_mcp_info),
                 Prefs.userMcp(this), on -> {
             Prefs.setUserMcp(this, on);

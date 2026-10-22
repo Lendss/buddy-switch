@@ -1210,4 +1210,6 @@
     <string name="chat_scheduled_cancel">Отменить</string>
     <string name="chat_scheduled_cancelled">Отменено</string>
     <string name="scheduled_channel_name">Запланированные сообщения</string>
+    <string name="setup_short_replies">Короткие ответы</string>
+    <string name="setup_short_replies_info">Агент отвечает одним–тремя простыми предложениями, удобно в маленьком пузыре. Выключено: так подробно, как нужно, как Claude Code в терминале.</string>
 </resources>

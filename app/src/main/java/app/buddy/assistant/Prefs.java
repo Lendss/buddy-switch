@@ -120,6 +120,16 @@ final class Prefs {
         sp(c).edit().putBoolean("dev", on).apply();
     }
 
+    /** Ask the agent for short, plain replies (one to three sentences), for reading in the bubble. Off: as long as
+     *  the answer needs, like the terminal. */
+    static boolean shortReplies(Context c) {
+        return sp(c).getBoolean("short_replies", false);
+    }
+
+    static void setShortReplies(Context c, boolean on) {
+        sp(c).edit().putBoolean("short_replies", on).apply();
+    }
+
     /** Scheduled messages (Scheduler), as JSON. */
     static String schedule(Context c) {
         return sp(c).getString("schedule", "[]");
