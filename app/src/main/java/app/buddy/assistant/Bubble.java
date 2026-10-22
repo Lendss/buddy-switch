@@ -842,12 +842,17 @@ final class Bubble implements ChatHub.Listener {
         if (expanded) return;
         expanded = true;
         svc.marks().setPanelOpen(true);
-        root.setVisibility(View.VISIBLE);
+        // Hidden while the window grows from the bubble into the panel, shown on the next frame. Resized while a
+        // frame was being drawn, the window sometimes lost the buffer it was drawing into and the whole screen
+        // stalled for 4 s (HWUI's dequeueBuffer timing out).
+        root.setVisibility(View.INVISIBLE);
         badge.setVisibility(View.GONE);
         placePanel();
         // with Back/Home/Recents buttons the keyboard would cover them (it's layered above Buddy's overlay, so
-        // above the navigation bar): open it only when the text field is tapped
-        boolean keyboard = pendingConfirm == null && !sessions.current.running && !showingList && !navButtons();
+        // above the navigation bar): open it only when the text field is tapped. This fork never opens it with the
+        // panel: on the Switch it covers half the chat, and asking for it while the window grows into the panel
+        // sometimes stalled the whole screen for 4 s (the panel's drawing and the keyboard waiting on each other)
+        boolean keyboard = false;
         int room = keyboard ? lastKeyboard[keyboardSlot()] : 0;
         if (room > 0) {
             // room for the keyboard before it slides in, as much as it took last time: it can be slow to say where it
@@ -860,6 +865,9 @@ final class Bubble implements ChatHub.Listener {
         applyExpandedParams();
         Voice.prepare(svc); // so the mic is quick
         wm.updateViewLayout(root, lp);
+        root.post(() -> {
+            if (expanded) root.setVisibility(View.VISIBLE);
+        });
         fitPanelHeight();
         boolean right = Prefs.bubblePos(svc)[0] != 0;
         panel.setPivotX(headButtons != null ? lp.width / 2f : right ? lp.width : 0); // chat heads: from Buddy's face
@@ -907,9 +915,11 @@ final class Bubble implements ChatHub.Listener {
         root.setPaddingRelative(0, 0, 0, 0);
         root.addView(collapsed);
         applyCollapsedParams();
+        root.setVisibility(View.INVISIBLE); // hidden while it shrinks back (see expand)
         wm.updateViewLayout(root, lp);
-        applyEnabled();
-        popIn();
+        root.post(() -> {
+            if (!expanded) applyEnabled(); // shows the bubble again, popping in
+        });
         if (themeDirty) restyle();
     }
 
