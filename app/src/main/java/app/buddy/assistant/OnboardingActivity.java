@@ -128,7 +128,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     static String[] wanted(Context c) {
         String a = Prefs.agents(c);
         if ("both".equals(a)) return new String[]{"claude", "codex"};
-        return new String[]{"codex".equals(a) || "opencode".equals(a) ? a : "claude"};
+        return new String[]{Account.known(a) ? a : "claude"};
     }
 
     private void go(int s) {
@@ -178,7 +178,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                     note("opencode".equals(agents) ? getString(R.string.onboarding_access_privacy_opencode, agentNames())
                             : "both".equals(agents) ? getString(R.string.onboarding_access_privacy_both)
                             : getString(R.string.onboarding_access_privacy, agentNames(),
-                            "codex".equals(agents) ? "OpenAI" : "Anthropic"));
+                            "codex".equals(agents) ? "OpenAI" : "agy".equals(agents) ? "Google" : "Anthropic"));
                     if (accessTries > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) restrictedHelp();
                     note(getString(R.string.onboarding_access_list_hint));
                     primary(getString(R.string.onboarding_access_open), v -> {
@@ -265,6 +265,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 {"claude", "Claude Code", getString(R.string.onboarding_brain_claude)},
                 {"codex", "Codex", getString(R.string.onboarding_brain_codex)},
                 {"opencode", "OpenCode", getString(R.string.onboarding_brain_opencode)},
+                {"agy", "Antigravity", getString(R.string.onboarding_brain_agy)},
                 {"both", "Claude Code + Codex", getString(R.string.onboarding_brain_both)},
         };
         for (String[] o : opts) {
@@ -303,7 +304,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             r.addView(radio(on));
             r.setOnClickListener(v -> {
                 Prefs.setAgents(this, o[0]);
-                Prefs.setBackend(this, "codex".equals(o[0]) || "opencode".equals(o[0]) ? o[0] : "claude");
+                Prefs.setBackend(this, Account.known(o[0]) ? o[0] : "claude");
                 render();
             });
             LinearLayout.LayoutParams p = full();
@@ -345,16 +346,19 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 TextView how = text(this, installing ? acc.detail
                         : acc.step == Account.Step.ERROR ? acc.detail
                         : getString(installed ? (acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
-                        ? R.string.onboarding_agent_checking_opencode : R.string.onboarding_agent_sign_in_codex)
+                        ? R.string.onboarding_agent_checking_opencode : acc.agy() ? R.string.onboarding_agent_sign_in_agy
+                        : R.string.onboarding_agent_sign_in_codex)
                         : (acc.claude() ? R.string.onboarding_agent_download_claude
                         : acc.opencode() ? R.string.onboarding_agent_download_opencode
+                        : acc.agy() ? R.string.onboarding_agent_download_agy
                         : R.string.onboarding_agent_download_codex)), 14,
                         acc.step == Account.Step.ERROR ? ERR : MUTED);
                 how.setPaddingRelative(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
                 card.addView(how);
                 if (!installing && !(installed && acc.opencode())) {
                     Button b = button(this, installed ? getString(acc.claude() ? R.string.onboarding_sign_in_claude
-                            : R.string.onboarding_sign_in_chatgpt) : getString(R.string.onboarding_install_agent, acc.name()), first);
+                            : acc.agy() ? R.string.onboarding_sign_in_google : R.string.onboarding_sign_in_chatgpt)
+                            : getString(R.string.onboarding_install_agent, acc.name()), first);
                     b.setOnClickListener(v -> {
                         if (installed) startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a));
                         else acc.install(this);

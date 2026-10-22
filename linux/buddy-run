@@ -6,7 +6,7 @@
 #   buddy-run <token> stop <session>       stop that session's running request
 #   buddy-run <token> delete <session>     forget that session
 #   buddy-run <token> ping                 answer the app's setup check
-#   buddy-run <token> procs                list running Claude Code / Codex processes (buddy_procs)
+#   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity processes (buddy_procs)
 #   buddy-run <token> kill <pid>           stop a running Claude Code / Codex process and its children
 #   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)

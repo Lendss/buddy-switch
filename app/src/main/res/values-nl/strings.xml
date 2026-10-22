@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Dutch (je). Source and translator notes: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy-assistent</string>
-    <string name="service_description">Toont de chatbubbel van Buddy en laat Claude Code of Codex, die binnen Buddy op deze telefoon draaien, het scherm lezen en voor je tikken, typen en scrollen. Niets verlaat de telefoon, behalve wat de agent zelf naar Anthropic of OpenAI stuurt.</string>
+    <string name="service_description">Toont de chatbubbel van Buddy en laat de door jou gekozen agent (Claude Code, Codex, OpenCode of Antigravity), die binnen Buddy op deze telefoon draait, het scherm lezen en voor je tikken, typen en scrollen. Niets verlaat de telefoon, behalve wat de agent zelf naar zijn AI-dienst stuurt (Anthropic, OpenAI, Google of de aanbieder van je OpenCode-model).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">Vraag het in gewone taal</string>
     <string name="onboarding_welcome_ask_text">“Antwoord Sam dat ik later kom”, “zet melk in mijn winkelmandje”.</string>
     <string name="onboarding_welcome_plan_title">Je eigen abonnement, geen API-sleutel</string>
-    <string name="onboarding_welcome_plan_text">Draait Claude Code met je Claude-abonnement. Codex met een ChatGPT-abonnement werkt ook.</string>
+    <string name="onboarding_welcome_plan_text">Draait Claude Code met je Claude-abonnement. Codex met een ChatGPT-abonnement, Antigravity met een Google-account en de gratis modellen van OpenCode werken ook.</string>
     <string name="onboarding_welcome_control_title">Jij houdt de controle</string>
     <string name="onboarding_welcome_control_text">Voor verzenden, plaatsen, kopen en verwijderen wordt altijd eerst gevraagd.</string>
     <string name="onboarding_welcome_time">instellen duurt ongeveer 5 minuten</string>
@@ -33,6 +33,7 @@
     <string name="onboarding_brain_claude">Gebruikt je Claude-abonnement (Pro of Max).</string>
     <string name="onboarding_brain_codex">Gebruikt je ChatGPT-abonnement.</string>
     <string name="onboarding_brain_opencode">Gratis modellen, geen account nodig. Koppel later je eigen aanbieders.</string>
+    <string name="onboarding_brain_agy">Gebruikt je Google-account: het gratis abonnement, Google AI Pro of Ultra.</string>
     <string name="onboarding_brain_both">Installeer beide en kies per chat. Claude Code blijft de standaard.</string>
     <string name="onboarding_recommended">aanbevolen</string>
 
@@ -68,11 +69,14 @@
     <string name="onboarding_agent_sign_in_claude">Log in met je Claude-account. Je browser wordt geopend; tik op Autoriseren en Buddy komt vanzelf terug.</string>
     <string name="onboarding_agent_checking_opencode">OpenCode controleren…</string>
     <string name="onboarding_agent_sign_in_codex">Log in met je ChatGPT-account in de browser en kom daarna terug.</string>
+    <string name="onboarding_agent_sign_in_agy">Log in met je Google-account. Je browser wordt geopend; log daar in en Buddy pakt de code vanzelf op.</string>
     <string name="onboarding_agent_download_claude">Downloadt eenmalig ongeveer 235 MB (Buddy\'s Linux en Claude Code van Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Downloadt eenmalig ongeveer 230 MB (Buddy\'s Linux, Node.js en OpenCode). Geen account nodig.</string>
     <string name="onboarding_agent_download_codex">Downloadt eenmalig ongeveer 150 MB (Buddy\'s Linux, Node.js en Codex van OpenAI).</string>
+    <string name="onboarding_agent_download_agy">Downloadt eenmalig ongeveer 200 MB (Buddy\'s Linux en de Antigravity CLI van Google).</string>
     <string name="onboarding_sign_in_claude">Inloggen met Claude</string>
     <string name="onboarding_sign_in_chatgpt">Inloggen met ChatGPT</string>
+    <string name="onboarding_sign_in_google">Inloggen met Google</string>
     <string name="onboarding_install_agent">%1$s installeren</string>
     <string name="onboarding_agents_wifi">Gebruik wifi als dat kan. Je kunt dit scherm verlaten tijdens de installatie.</string>
     <string name="onboarding_stuck_sign_in_q">Kom je na het inloggen niet terug?</string>
@@ -115,7 +119,7 @@
     <string name="main_section_working">Bezig</string>
     <string name="main_section_recent">Recent</string>
     <string name="main_empty_title">Nog geen chats</string>
-    <string name="main_empty_text">Tik op “Nieuwe chat” om een chat met Claude Code of Codex te beginnen. Houd een chat ingedrukt om hem te verwijderen.</string>
+    <string name="main_empty_text">Tik op “Nieuwe chat” om een chat met Claude Code, Codex, OpenCode of Antigravity te beginnen. Houd een chat ingedrukt om hem te verwijderen.</string>
     <string name="main_chat_working">bezig…</string>
     <string name="main_chat_last_you">Jij: %1$s</string>
     <string name="main_delete_title">Deze chat verwijderen?</string>
@@ -446,7 +450,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Hoe Buddy toegankelijkheid gebruikt</string>
     <string name="ui_a11y_what">Buddy gebruikt de toegankelijkheidsservice van Android om in andere apps te doen wat je vraagt: Buddy leest wat er op het scherm staat en tikt, typt en scrolt voor je. Buddy toont ook de zwevende bubbel.</string>
-    <string name="ui_a11y_data">Terwijl een taak loopt, wordt de scherminhoud, die persoonlijke gegevens kan bevatten zoals berichten, namen of adressen, naar de AI-dienst van de door jou gekozen agent gestuurd (Anthropic voor Claude Code, OpenAI voor Codex of de aanbieder van je OpenCode-model), uitsluitend om je verzoek uit te voeren.</string>
+    <string name="ui_a11y_data">Terwijl een taak loopt, wordt de scherminhoud, die persoonlijke gegevens kan bevatten zoals berichten, namen of adressen, naar de AI-dienst van de door jou gekozen agent gestuurd (Anthropic voor Claude Code, OpenAI voor Codex, Google voor Antigravity of de aanbieder van je OpenCode-model), uitsluitend om je verzoek uit te voeren.</string>
     <string name="ui_a11y_no_servers">Buddy heeft geen eigen servers. Buddy verzamelt, verkoopt of deelt deze gegevens niet en gebruikt ze niet voor advertenties.</string>
     <string name="ui_a11y_asks">Voordat er iets wordt verzonden, geplaatst, gekocht of verwijderd, vraagt Buddy om je akkoord. Je kunt de service altijd uitzetten in de toegankelijkheidsinstellingen van Android.</string>
     <string name="ui_privacy_policy">Privacybeleid</string>
@@ -635,7 +639,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Instellingen</string>
-    <string name="setup_settings_subtitle">Buddy draait Claude Code, Codex of OpenCode in de app, met je eigen abonnement (of de gratis modellen van OpenCode).</string>
+    <string name="setup_settings_subtitle">Buddy draait Claude Code, Codex, OpenCode of Antigravity in de app, met je eigen abonnement (of de gratis modellen van OpenCode en het gratis abonnement van Antigravity).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Instellen</string>
@@ -688,7 +692,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Agent</string>
     <string name="setup_default_brain">Standaardagent</string>
-    <string name="setup_default_brain_info">Wie nieuwe chats beantwoordt die je via de bubbel of de knop “Nieuwe chat” start. Claude Code gebruikt je Claude-abonnement, Codex je ChatGPT-abonnement en OpenCode zijn gratis modellen of je eigen aanbieders. Je kunt alleen agents kiezen die zijn ingesteld.</string>
+    <string name="setup_default_brain_info">Wie nieuwe chats beantwoordt die je via de bubbel of de knop “Nieuwe chat” start. Claude Code gebruikt je Claude-abonnement, Codex je ChatGPT-abonnement, Antigravity je Google-account en OpenCode zijn gratis modellen of je eigen aanbieders. Je kunt alleen agents kiezen die zijn ingesteld.</string>
     <string name="setup_default_brain_set">Nieuwe chats gebruiken %1$s. Met de knop “Nieuwe chat” kun je per chat kiezen.</string>
     <string name="setup_set_up_first">Stel eerst %1$s in.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
@@ -812,7 +816,7 @@
     <string name="terminal_session_ended_code">Sessie beëindigd · exitcode %1$d</string>
     <string name="terminal_close">Sluiten</string>
     <string name="terminal_restart">Opnieuw starten</string>
-    <string name="terminal_needs_linux">Installeer eerst Claude Code, Codex of OpenCode via Instellingen: daarmee wordt Buddy\'s Linux ingesteld.</string>
+    <string name="terminal_needs_linux">Installeer eerst Claude Code, Codex, OpenCode of Antigravity via Instellingen: daarmee wordt Buddy\'s Linux ingesteld.</string>
     <string name="terminal_start_failed">Kan de terminal niet starten: %1$s</string>
     <string name="terminal_close_title">%1$s sluiten?</string>
     <string name="terminal_close_running">Er draait nog iets. Sluiten stopt het, samen met alles wat het heeft gestart.</string>
@@ -834,7 +838,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sessies</string>
-    <string name="monitor_subtitle">Alle sessies van Claude Code en Codex op deze telefoon.</string>
+    <string name="monitor_subtitle">Alle sessies van Claude Code, Codex, OpenCode en Antigravity op deze telefoon.</string>
     <string name="monitor_terminal_running">Er draait een shell · tik om terug te gaan</string>
     <string name="monitor_terminal_idle">Een shell in Buddy\'s Linux</string>
     <string name="monitor_running_now">Nu actief</string>
@@ -875,7 +879,7 @@
     <string name="perms_smart_reviewer">Beoordelaar voor Slim</string>
     <string name="perms_reviewer_same">Als de chat</string>
     <string name="perms_reviewer_sign_in">Log eerst in bij %1$s (Instellingen).</string>
-    <string name="perms_reviewer_about">Een tijdelijke sessie per tik, zonder tools: die ziet je verzoek, de notitie van de agent en het scherm, en zegt “toestaan”, “jou vragen” of “afraden”. Ongeveer 3 seconden per tik. OpenCode-chats worden beoordeeld door Claude Code (of Codex).</string>
+    <string name="perms_reviewer_about">Een tijdelijke sessie per tik, zonder tools: die ziet je verzoek, de notitie van de agent en het scherm, en zegt “toestaan”, “jou vragen” of “afraden”. Ongeveer 3 seconden per tik. OpenCode- en Antigravity-chats worden beoordeeld door Claude Code (of Codex).</string>
     <string name="perms_reviewer_rules">Die controleert ook antwoorden voordat het aftellen van een meldingsregel ze verzendt.</string>
     <string name="reviewer_default_claude">Haiku: snel en licht. Aanbevolen.</string>
     <string name="reviewer_default_codex">Een klein, snel model. Aanbevolen.</string>

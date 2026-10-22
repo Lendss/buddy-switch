@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Simplified Chinese (zh-CN). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy 助手</string>
-    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的 Claude Code 或 Codex 替你读取屏幕、点按、输入和滚动。除了智能体自身发送给 Anthropic 或 OpenAI 的内容外，任何数据都不会离开手机。</string>
+    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的、你所选的智能体（Claude Code、Codex、OpenCode 或 Antigravity）替你读取屏幕、点按、输入和滚动。除了智能体自身发送给其 AI 服务（Anthropic、OpenAI、Google 或你所用 OpenCode 模型的提供商）的内容外，任何数据都不会离开手机。</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“回复小王说我要迟到了”、“把牛奶加入购物车”。</string>
     <string name="onboarding_welcome_plan_title">用你自己的套餐，无需 API 密钥</string>
-    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex。</string>
+    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex、用 Google 账号运行 Antigravity，或使用 OpenCode 的免费模型。</string>
     <string name="onboarding_welcome_control_title">一切由你掌控</string>
     <string name="onboarding_welcome_control_text">发送、发布、购买和删除之前，总会先问你。</string>
     <!-- Small lowercase mono line under the list. -->
@@ -42,6 +42,7 @@
     <string name="onboarding_brain_claude">使用你的 Claude 订阅（Pro 或 Max）。</string>
     <string name="onboarding_brain_codex">使用你的 ChatGPT 套餐。</string>
     <string name="onboarding_brain_opencode">免费模型，无需账号。之后可以连接你自己的模型提供商。</string>
+    <string name="onboarding_brain_agy">使用你的 Google 账号：免费套餐、Google AI Pro 或 Ultra。</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">两个都安装，每个对话可单独选择。默认仍为 Claude Code。</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -95,13 +96,16 @@
     <string name="onboarding_agent_sign_in_claude">使用你的 Claude 账号登录。浏览器会打开，点按“Authorize”（授权）后，Buddy 会自动返回。</string>
     <string name="onboarding_agent_checking_opencode">正在检查 OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">在浏览器中使用你的 ChatGPT 账号登录，然后返回这里。</string>
+    <string name="onboarding_agent_sign_in_agy">使用你的 Google 账号登录。浏览器会打开，在那里登录后，Buddy 会自动获取代码。</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">需一次性下载约 235 MB（Buddy 的 Linux，以及来自 Anthropic 的 Claude Code）。</string>
     <string name="onboarding_agent_download_opencode">需一次性下载约 230 MB（Buddy 的 Linux、Node.js 和 OpenCode）。无需账号。</string>
     <string name="onboarding_agent_download_codex">需一次性下载约 150 MB（Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex）。</string>
+    <string name="onboarding_agent_download_agy">需一次性下载约 200 MB（Buddy 的 Linux，以及来自 Google 的 Antigravity CLI）。</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">使用 Claude 登录</string>
     <string name="onboarding_sign_in_chatgpt">使用 ChatGPT 登录</string>
+    <string name="onboarding_sign_in_google">使用 Google 登录</string>
     <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
     <string name="onboarding_install_agent">安装 %1$s</string>
     <string name="onboarding_agents_wifi">建议使用 WLAN。安装期间可以离开此屏幕。</string>
@@ -161,7 +165,7 @@
     <string name="main_section_recent">最近</string>
     <string name="main_empty_title">还没有对话</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">点按“新对话”，即可与 Claude Code 或 Codex 开始对话。长按对话可将其删除。</string>
+    <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode 或 Antigravity 开始对话。长按对话可将其删除。</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">处理中…</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
@@ -637,7 +641,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy 如何使用无障碍功能</string>
     <string name="ui_a11y_what">Buddy 使用 Android 的无障碍服务在其他应用中完成你的要求：它会读取屏幕上的内容，并替你点按、输入和滚动。它还会显示悬浮气泡。</string>
-    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
+    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，Antigravity 对应 Google，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
     <string name="ui_a11y_no_servers">Buddy 没有自己的服务器。它不会收集、出售或分享这些数据，也不会将其用于广告。</string>
     <string name="ui_a11y_asks">在执行任何发送、发布、购买或删除操作之前，Buddy 都会先请你确认。你可以随时在 Android 的无障碍设置中关闭此服务。</string>
     <string name="ui_privacy_policy">隐私政策</string>
@@ -903,7 +907,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">设置</string>
-    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex 或 OpenCode，使用你自己的订阅（或 OpenCode 的免费模型）。</string>
+    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode 或 Antigravity，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -981,7 +985,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">默认智能体</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
+    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，Antigravity 使用你的 Google 账号，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">新对话将使用 %1$s。你也可以通过“新对话”按钮为每个对话单独选择。</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1150,7 +1154,7 @@
     <string name="terminal_close">关闭</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">重新启动</string>
-    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex 或 OpenCode，这会同时设置好 Buddy 的 Linux。</string>
+    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex、OpenCode 或 Antigravity，这会同时设置好 Buddy 的 Linux。</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">无法启动终端：%1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1178,7 +1182,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">会话</string>
-    <string name="monitor_subtitle">这部手机上的所有 Claude Code 和 Codex 会话。</string>
+    <string name="monitor_subtitle">这部手机上的所有 Claude Code、Codex、OpenCode 和 Antigravity 会话。</string>
     <string name="monitor_terminal_running">有 shell 正在运行 · 点按返回</string>
     <string name="monitor_terminal_idle">Buddy 的 Linux 中的 shell</string>
     <string name="monitor_running_now">正在运行</string>
@@ -1239,7 +1243,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">请先登录 %1$s（在“设置”中）。</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode 对话由 Claude Code（或 Codex）审核。</string>
+    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode 和 Antigravity 对话由 Claude Code（或 Codex）审核。</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">在通知规则的倒计时发送回复之前，它也会检查这些回复。</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->

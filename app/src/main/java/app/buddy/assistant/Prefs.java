@@ -274,7 +274,7 @@ final class Prefs {
         sp(c).edit().putInt("onboard_step", step).apply();
     }
 
-    /** Which agents the user wants: "claude", "codex", "opencode" or "both" (Claude Code and Codex). */
+    /** Which agents the user wants: "claude", "codex", "opencode", "agy" or "both" (Claude Code and Codex). */
     static String agents(Context c) {
         return sp(c).getString("agents", "claude");
     }

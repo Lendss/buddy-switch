@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Japanese (です/ます). Source of truth: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy アシスタント</string>
-    <string name="service_description">Buddy のチャットバブルを表示し、このスマートフォンの Buddy 内で動作する Claude Code または Codex が、画面を読み取って、あなたの代わりにタップ、入力、スクロールできるようにします。エージェント自身が Anthropic または OpenAI に送信する内容以外は、スマートフォンの外に出ません。</string>
+    <string name="service_description">Buddy のチャットバブルを表示し、このスマートフォンの Buddy 内で動作する、選択したエージェント（Claude Code、Codex、OpenCode、または Antigravity）が、画面を読み取って、あなたの代わりにタップ、入力、スクロールできるようにします。エージェント自身がその AI サービス（Anthropic、OpenAI、Google、または OpenCode で選択したモデルのプロバイダー）に送信する内容以外は、スマートフォンの外に出ません。</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">いつもの言葉で頼めます</string>
     <string name="onboarding_welcome_ask_text">「佐藤さんに遅れるって返信して」「カートに牛乳を入れて」など。</string>
     <string name="onboarding_welcome_plan_title">お使いのプランで、API キー不要</string>
-    <string name="onboarding_welcome_plan_text">Claude のサブスクリプションで Claude Code が動きます。ChatGPT のプランで Codex も使えます。</string>
+    <string name="onboarding_welcome_plan_text">Claude のサブスクリプションで Claude Code が動きます。ChatGPT のプランで Codex、Google アカウントで Antigravity、さらに OpenCode の無料モデルも使えます。</string>
     <string name="onboarding_welcome_control_title">主導権はいつもあなたに</string>
     <string name="onboarding_welcome_control_text">送信、投稿、購入、削除の前には必ず確認します。</string>
     <string name="onboarding_welcome_time">セットアップは約 5 分で完了します</string>
@@ -33,6 +33,7 @@
     <string name="onboarding_brain_claude">Claude のサブスクリプション（Pro または Max）を使用します。</string>
     <string name="onboarding_brain_codex">ChatGPT のプランを使用します。</string>
     <string name="onboarding_brain_opencode">無料モデルをアカウントなしで使えます。お使いのプロバイダーは後から接続できます。</string>
+    <string name="onboarding_brain_agy">Google アカウント（無料プラン、Google AI Pro、または Ultra）を使用します。</string>
     <string name="onboarding_brain_both">両方をインストールして、チャットごとに選べます。デフォルトは Claude Code です。</string>
     <string name="onboarding_recommended">おすすめ</string>
 
@@ -68,11 +69,14 @@
     <string name="onboarding_agent_sign_in_claude">Claude アカウントでログインします。ブラウザが開いたら「承認」（Authorize）をタップしてください。自動的に Buddy に戻ります。</string>
     <string name="onboarding_agent_checking_opencode">OpenCode を確認中…</string>
     <string name="onboarding_agent_sign_in_codex">ブラウザで ChatGPT アカウントにログインしてから、戻ってきてください。</string>
+    <string name="onboarding_agent_sign_in_agy">Google アカウントでログインします。ブラウザが開いたらそこでログインしてください。Buddy が自動的にコードを受け取ります。</string>
     <string name="onboarding_agent_download_claude">初回のみ約 235 MB をダウンロードします（Buddy の Linux と Anthropic の Claude Code）。</string>
     <string name="onboarding_agent_download_opencode">初回のみ約 230 MB をダウンロードします（Buddy の Linux、Node.js、OpenCode）。アカウントは不要です。</string>
     <string name="onboarding_agent_download_codex">初回のみ約 150 MB をダウンロードします（Buddy の Linux、Node.js、OpenAI の Codex）。</string>
+    <string name="onboarding_agent_download_agy">初回のみ約 200 MB をダウンロードします（Buddy の Linux と Google の Antigravity CLI）。</string>
     <string name="onboarding_sign_in_claude">Claude でログイン</string>
     <string name="onboarding_sign_in_chatgpt">ChatGPT でログイン</string>
+    <string name="onboarding_sign_in_google">Google でログイン</string>
     <string name="onboarding_install_agent">%1$s をインストール</string>
     <string name="onboarding_agents_wifi">できれば Wi-Fi を使用してください。インストール中はこの画面を離れてもかまいません。</string>
     <string name="onboarding_stuck_sign_in_q">ログイン後に Buddy に戻りませんか？</string>
@@ -115,7 +119,7 @@
     <string name="main_section_working">実行中</string>
     <string name="main_section_recent">最近</string>
     <string name="main_empty_title">チャットはまだありません</string>
-    <string name="main_empty_text">「新しいチャット」をタップすると、Claude Code または Codex とのチャットを開始できます。チャットを長押しすると削除できます。</string>
+    <string name="main_empty_text">「新しいチャット」をタップすると、Claude Code、Codex、OpenCode、または Antigravity とのチャットを開始できます。チャットを長押しすると削除できます。</string>
     <string name="main_chat_working">実行中…</string>
     <string name="main_chat_last_you">あなた：%1$s</string>
     <string name="main_delete_title">このチャットを削除しますか？</string>
@@ -437,7 +441,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy によるユーザー補助の使用について</string>
     <string name="ui_a11y_what">Buddy は Android のユーザー補助サービスを使って、他のアプリであなたが頼んだことを実行します。画面に表示されている内容を読み取り、あなたの代わりにタップ、入力、スクロールを行います。フローティングバブルの表示にも使用します。</string>
-    <string name="ui_a11y_data">タスクの実行中は、画面の内容（メッセージ、名前、住所などの個人情報が含まれる場合があります）が、リクエストを実行する目的でのみ、選択したエージェントの AI サービス（Claude Code は Anthropic、Codex は OpenAI、OpenCode は選択したモデルのプロバイダー）に送信されます。</string>
+    <string name="ui_a11y_data">タスクの実行中は、画面の内容（メッセージ、名前、住所などの個人情報が含まれる場合があります）が、リクエストを実行する目的でのみ、選択したエージェントの AI サービス（Claude Code は Anthropic、Codex は OpenAI、Antigravity は Google、OpenCode は選択したモデルのプロバイダー）に送信されます。</string>
     <string name="ui_a11y_no_servers">Buddy は独自のサーバーを持っていません。このデータを収集、販売、共有することはなく、広告に使用することもありません。</string>
     <string name="ui_a11y_asks">送信、投稿、購入、削除を行う前に、Buddy は承認を求めます。このサービスは Android のユーザー補助の設定でいつでもオフにできます。</string>
     <string name="ui_privacy_policy">プライバシーポリシー</string>
@@ -625,7 +629,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">設定</string>
-    <string name="setup_settings_subtitle">Buddy は、お使いのサブスクリプション（または OpenCode の無料モデル）を使って、アプリ内で Claude Code、Codex、OpenCode を実行します。</string>
+    <string name="setup_settings_subtitle">Buddy は、お使いのサブスクリプション（または OpenCode の無料モデルや Antigravity の無料プラン）を使って、アプリ内で Claude Code、Codex、OpenCode、Antigravity を実行します。</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">セットアップ</string>
@@ -678,7 +682,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">エージェント</string>
     <string name="setup_default_brain">デフォルトのエージェント</string>
-    <string name="setup_default_brain_info">バブルや「新しいチャット」ボタンから始めたチャットに応答するエージェントです。Claude Code は Claude のプラン、Codex は ChatGPT のプラン、OpenCode は無料モデルまたはお使いのプロバイダーを使用します。選べるのは設定済みのエージェントのみです。</string>
+    <string name="setup_default_brain_info">バブルや「新しいチャット」ボタンから始めたチャットに応答するエージェントです。Claude Code は Claude のプラン、Codex は ChatGPT のプラン、Antigravity は Google アカウント、OpenCode は無料モデルまたはお使いのプロバイダーを使用します。選べるのは設定済みのエージェントのみです。</string>
     <string name="setup_default_brain_set">新しいチャットでは %1$s を使用します。「新しいチャット」ボタンからチャットごとに選ぶこともできます。</string>
     <string name="setup_set_up_first">先に %1$s を設定してください。</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
@@ -799,7 +803,7 @@
     <string name="terminal_session_ended_code">セッション終了 · 終了コード %1$d</string>
     <string name="terminal_close">閉じる</string>
     <string name="terminal_restart">再起動</string>
-    <string name="terminal_needs_linux">先に「設定」で Claude Code、Codex、OpenCode のいずれかをインストールしてください。これで Buddy の Linux がセットアップされます。</string>
+    <string name="terminal_needs_linux">先に「設定」で Claude Code、Codex、OpenCode、Antigravity のいずれかをインストールしてください。これで Buddy の Linux がセットアップされます。</string>
     <string name="terminal_start_failed">ターミナルを起動できませんでした：%1$s</string>
     <string name="terminal_close_title">%1$s を閉じますか？</string>
     <string name="terminal_close_running">まだ実行中です。閉じると、このセッションとそこから起動したものがすべて停止します。</string>
@@ -821,7 +825,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">セッション</string>
-    <string name="monitor_subtitle">このスマートフォン上のすべての Claude Code と Codex のセッションです。</string>
+    <string name="monitor_subtitle">このスマートフォン上のすべての Claude Code、Codex、OpenCode、Antigravity のセッションです。</string>
     <string name="monitor_terminal_running">シェルを実行中 · タップして戻る</string>
     <string name="monitor_terminal_idle">Buddy の Linux のシェル</string>
     <string name="monitor_running_now">実行中</string>
@@ -861,7 +865,7 @@
     <string name="perms_smart_reviewer">スマートモードのレビュー AI</string>
     <string name="perms_reviewer_same">チャットと同じ</string>
     <string name="perms_reviewer_sign_in">先に %1$s にログインしてください（設定）。</string>
-    <string name="perms_reviewer_about">タップごとに、ツールなしの一時的なセッションで確認します。リクエスト、エージェントのメモ、画面を見て、「許可」「確認を求める」「おすすめしない」のいずれかで答えます。1 回のタップにつき約 3 秒かかります。OpenCode のチャットは Claude Code（または Codex）がレビューします。</string>
+    <string name="perms_reviewer_about">タップごとに、ツールなしの一時的なセッションで確認します。リクエスト、エージェントのメモ、画面を見て、「許可」「確認を求める」「おすすめしない」のいずれかで答えます。1 回のタップにつき約 3 秒かかります。OpenCode と Antigravity のチャットは Claude Code（または Codex）がレビューします。</string>
     <string name="perms_reviewer_rules">通知ルールのカウントダウンで返信が送信される前にも、内容を確認します。</string>
     <string name="reviewer_default_claude">Haiku：高速で軽量です。おすすめです。</string>
     <string name="reviewer_default_codex">小型で高速なモデルです。おすすめです。</string>

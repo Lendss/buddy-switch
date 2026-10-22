@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Accessibility service: draws the Buddy bubble, hosts the local MCP server,
- * and performs the screen actions the agent (Claude Code or Codex) asks for.
+ * and performs the screen actions the agent (Claude Code, Codex, OpenCode or Antigravity) asks for.
  */
 public class BuddyService extends AccessibilityService implements McpServer.Handler {
     private static volatile BuddyService instance;

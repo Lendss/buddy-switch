@@ -2,7 +2,7 @@
 <!-- Buddy's UI text in Arabic (Modern Standard Arabic). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">مساعد Buddy</string>
-    <string name="service_description">تعرض فقاعة المحادثة في Buddy، وتتيح لـ Claude Code أو Codex، اللذين يعملان داخل Buddy على هذا الهاتف، قراءة الشاشة والنقر والكتابة والتمرير نيابةً عنك. لا يخرج أي شيء من الهاتف إلا ما يرسله الوكيل نفسه إلى Anthropic أو OpenAI.</string>
+    <string name="service_description">تعرض فقاعة المحادثة في Buddy، وتتيح للوكيل الذي تختاره (Claude Code أو Codex أو OpenCode أو Antigravity)، الذي يعمل داخل Buddy على هذا الهاتف، قراءة الشاشة والنقر والكتابة والتمرير نيابةً عنك. لا يخرج أي شيء من الهاتف إلا ما يرسله الوكيل نفسه إلى خدمة الذكاء الاصطناعي الخاصة به (Anthropic أو OpenAI أو Google أو مزوّد النموذج الذي تستخدمه في OpenCode).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">اطلب بكلمات بسيطة</string>
     <string name="onboarding_welcome_ask_text">«ردّ على سامي بأنني سأتأخر»، «أضف الحليب إلى سلّتي».</string>
     <string name="onboarding_welcome_plan_title">اشتراكك الخاص، بلا مفتاح API</string>
-    <string name="onboarding_welcome_plan_text">يشغّل Claude Code من اشتراكك في Claude. ويعمل Codex أيضًا مع اشتراك ChatGPT.</string>
+    <string name="onboarding_welcome_plan_text">يشغّل Claude Code من اشتراكك في Claude. ويعمل Codex أيضًا مع اشتراك ChatGPT، وكذلك Antigravity مع حساب Google ونماذج OpenCode المجانية.</string>
     <string name="onboarding_welcome_control_title">القرار بيدك</string>
     <string name="onboarding_welcome_control_text">يستأذنك دائمًا قبل الإرسال أو النشر أو الشراء أو الحذف.</string>
     <string name="onboarding_welcome_time">يستغرق الإعداد نحو 5 دقائق</string>
@@ -33,6 +33,7 @@
     <string name="onboarding_brain_claude">يستخدم اشتراكك في Claude (خطة Pro أو Max).</string>
     <string name="onboarding_brain_codex">يستخدم اشتراكك في ChatGPT.</string>
     <string name="onboarding_brain_opencode">نماذج مجانية، دون الحاجة إلى حساب. يمكنك ربط مزوّديك لاحقًا.</string>
+    <string name="onboarding_brain_agy">يستخدم حسابك في Google: الخطة المجانية أو Google AI Pro أو Ultra.</string>
     <string name="onboarding_brain_both">ثبّت الاثنين واختر أحدهما لكل محادثة. يظل Claude Code هو الافتراضي.</string>
     <string name="onboarding_recommended">موصى به</string>
 
@@ -67,11 +68,14 @@
     <string name="onboarding_agent_sign_in_claude">سجّل الدخول بحسابك في Claude. سيُفتح المتصفح؛ انقر على «Authorize» وسيعود Buddy تلقائيًا.</string>
     <string name="onboarding_agent_checking_opencode">جارٍ التحقق من OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">سجّل الدخول بحسابك في ChatGPT من المتصفح، ثم ارجع إلى هنا.</string>
+    <string name="onboarding_agent_sign_in_agy">سجّل الدخول بحسابك في Google. سيُفتح المتصفح؛ سجّل الدخول هناك وسيأخذ Buddy الرمز تلقائيًا.</string>
     <string name="onboarding_agent_download_claude">يتم تنزيل نحو 235 ميغابايت مرة واحدة (نظام Linux في Buddy وClaude Code من Anthropic).</string>
     <string name="onboarding_agent_download_opencode">يتم تنزيل نحو 230 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وOpenCode). لا حاجة إلى حساب.</string>
     <string name="onboarding_agent_download_codex">يتم تنزيل نحو 150 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وCodex من OpenAI).</string>
+    <string name="onboarding_agent_download_agy">يتم تنزيل نحو 200 ميغابايت مرة واحدة (نظام Linux في Buddy وAntigravity CLI من Google).</string>
     <string name="onboarding_sign_in_claude">تسجيل الدخول باستخدام Claude</string>
     <string name="onboarding_sign_in_chatgpt">تسجيل الدخول باستخدام ChatGPT</string>
+    <string name="onboarding_sign_in_google">تسجيل الدخول باستخدام Google</string>
     <string name="onboarding_install_agent">تثبيت %1$s</string>
     <string name="onboarding_agents_wifi">استخدم شبكة Wi-Fi إن أمكن. يمكنك مغادرة هذه الشاشة أثناء التثبيت.</string>
     <string name="onboarding_stuck_sign_in_q">لم يعُد Buddy بعد تسجيل الدخول؟</string>
@@ -114,7 +118,7 @@
     <string name="main_section_working">قيد العمل</string>
     <string name="main_section_recent">الأخيرة</string>
     <string name="main_empty_title">لا توجد محادثات بعد</string>
-    <string name="main_empty_text">انقر على «محادثة جديدة» لبدء محادثة مع Claude Code أو Codex. اضغط مطولًا على محادثة لحذفها.</string>
+    <string name="main_empty_text">انقر على «محادثة جديدة» لبدء محادثة مع Claude Code أو Codex أو OpenCode أو Antigravity. اضغط مطولًا على محادثة لحذفها.</string>
     <string name="main_chat_working">جارٍ العمل…</string>
     <string name="main_chat_last_you">أنت: %1$s</string>
     <string name="main_delete_title">هل تريد حذف هذه المحادثة؟</string>
@@ -475,7 +479,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">كيف يستخدم Buddy خدمة سهولة الاستخدام</string>
     <string name="ui_a11y_what">يستخدم Buddy خدمة سهولة الاستخدام في Android لتنفيذ ما تطلبه في التطبيقات الأخرى: فهو يقرأ ما على الشاشة وينقر ويكتب ويمرّر نيابةً عنك. كما يعرض الفقاعة العائمة.</string>
-    <string name="ui_a11y_data">أثناء تنفيذ مهمة، يُرسَل محتوى الشاشة، الذي قد يتضمن معلومات شخصية مثل الرسائل أو الأسماء أو العناوين، إلى خدمة الذكاء الاصطناعي الخاصة بالوكيل الذي تختاره (Anthropic لـ Claude Code، أو OpenAI لـ Codex، أو مزوّد النموذج الذي تستخدمه في OpenCode)، وذلك لتنفيذ طلبك فقط.</string>
+    <string name="ui_a11y_data">أثناء تنفيذ مهمة، يُرسَل محتوى الشاشة، الذي قد يتضمن معلومات شخصية مثل الرسائل أو الأسماء أو العناوين، إلى خدمة الذكاء الاصطناعي الخاصة بالوكيل الذي تختاره (Anthropic لـ Claude Code، أو OpenAI لـ Codex، أو Google لـ Antigravity، أو مزوّد النموذج الذي تستخدمه في OpenCode)، وذلك لتنفيذ طلبك فقط.</string>
     <string name="ui_a11y_no_servers">ليس لدى Buddy خوادم خاصة به. ولا يجمع هذه البيانات أو يبيعها أو يشاركها، ولا يستخدمها للإعلانات.</string>
     <string name="ui_a11y_asks">قبل أي إجراء يتضمن الإرسال أو النشر أو الشراء أو الحذف، يطلب Buddy موافقتك. ويمكنك إيقاف الخدمة في أي وقت من إعدادات سهولة الاستخدام في Android.</string>
     <string name="ui_privacy_policy">سياسة الخصوصية</string>
@@ -667,7 +671,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">الإعدادات</string>
-    <string name="setup_settings_subtitle">يشغّل Buddy داخل التطبيق Claude Code أو Codex أو OpenCode باستخدام اشتراكك الخاص (أو نماذج OpenCode المجانية).</string>
+    <string name="setup_settings_subtitle">يشغّل Buddy داخل التطبيق Claude Code أو Codex أو OpenCode أو Antigravity باستخدام اشتراكك الخاص (أو نماذج OpenCode المجانية وخطة Antigravity المجانية).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">الإعداد</string>
@@ -719,7 +723,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">الوكيل</string>
     <string name="setup_default_brain">الوكيل الافتراضي</string>
-    <string name="setup_default_brain_info">الوكيل الذي يردّ على المحادثات الجديدة من الفقاعة أو زر «محادثة جديدة». يستخدم Claude Code اشتراكك في Claude، وCodex اشتراكك في ChatGPT، وOpenCode نماذجه المجانية أو مزوّديك الخاصين. لا يمكن اختيار إلا الوكلاء الذين تم إعدادهم.</string>
+    <string name="setup_default_brain_info">الوكيل الذي يردّ على المحادثات الجديدة من الفقاعة أو زر «محادثة جديدة». يستخدم Claude Code اشتراكك في Claude، وCodex اشتراكك في ChatGPT، وAntigravity حسابك في Google، وOpenCode نماذجه المجانية أو مزوّديك الخاصين. لا يمكن اختيار إلا الوكلاء الذين تم إعدادهم.</string>
     <string name="setup_default_brain_set">ستستخدم المحادثات الجديدة %1$s. ويمكنك الاختيار لكل محادثة باستخدام زر «محادثة جديدة».</string>
     <string name="setup_set_up_first">أعِدّ %1$s أولًا.</string>
     <string name="setup_agent_installing">جارٍ التثبيت…</string>
@@ -854,7 +858,7 @@
     <string name="terminal_session_ended_code">انتهت الجلسة · رمز الخروج %1$d</string>
     <string name="terminal_close">إغلاق</string>
     <string name="terminal_restart">إعادة التشغيل</string>
-    <string name="terminal_needs_linux">ثبّت Claude Code أو Codex أو OpenCode من الإعدادات أولًا: سيؤدي ذلك إلى إعداد نظام Linux في Buddy.</string>
+    <string name="terminal_needs_linux">ثبّت Claude Code أو Codex أو OpenCode أو Antigravity من الإعدادات أولًا: سيؤدي ذلك إلى إعداد نظام Linux في Buddy.</string>
     <string name="terminal_start_failed">تعذّر تشغيل الطرفية: %1$s</string>
     <string name="terminal_close_title">هل تريد إغلاق %1$s؟</string>
     <string name="terminal_close_running">لا تزال قيد التشغيل. سيؤدي إغلاقها إلى إيقافها وإيقاف كل ما بدأته.</string>
@@ -876,7 +880,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">الجلسات</string>
-    <string name="monitor_subtitle">كل جلسات Claude Code وCodex على هذا الهاتف.</string>
+    <string name="monitor_subtitle">كل جلسات Claude Code وCodex وOpenCode وAntigravity على هذا الهاتف.</string>
     <string name="monitor_terminal_running">توجد صدفة قيد التشغيل · انقر للعودة</string>
     <string name="monitor_terminal_idle">صدفة ضمن نظام Linux في Buddy</string>
     <string name="monitor_running_now">قيد التشغيل الآن</string>
@@ -916,7 +920,7 @@
     <string name="perms_smart_reviewer">المراجِع الذكي</string>
     <string name="perms_reviewer_same">مثل المحادثة</string>
     <string name="perms_reviewer_sign_in">سجّل الدخول إلى %1$s أولًا (من الإعدادات).</string>
-    <string name="perms_reviewer_about">جلسة مؤقتة لكل نقرة، بدون أدوات: يرى طلبك وملاحظة الوكيل والشاشة، ثم يقرر السماح أو سؤالك أو النصح بعدم التنفيذ. تستغرق نحو 3 ثوانٍ لكل نقرة. تتم مراجعة محادثات OpenCode بواسطة Claude Code (أو Codex).</string>
+    <string name="perms_reviewer_about">جلسة مؤقتة لكل نقرة، بدون أدوات: يرى طلبك وملاحظة الوكيل والشاشة، ثم يقرر السماح أو سؤالك أو النصح بعدم التنفيذ. تستغرق نحو 3 ثوانٍ لكل نقرة. تتم مراجعة محادثات OpenCode وAntigravity بواسطة Claude Code (أو Codex).</string>
     <string name="perms_reviewer_rules">كما يتحقق من الردود قبل أن ترسلها إحدى قواعد الإشعارات عند انتهاء العد التنازلي.</string>
     <string name="reviewer_default_claude">نموذج Haiku: سريع وخفيف. موصى به.</string>
     <string name="reviewer_default_codex">نموذج صغير وسريع. موصى به.</string>

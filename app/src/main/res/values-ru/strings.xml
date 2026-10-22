@@ -2,7 +2,7 @@
 <!-- Russian translation of Buddy's UI. Source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Помощник Buddy</string>
-    <string name="service_description">Показывает пузырёк чата Buddy и позволяет Claude Code или Codex, работающим внутри Buddy на этом телефоне, читать экран, а также нажимать, вводить текст и прокручивать за вас. С телефона ничего не передаётся, кроме того, что сам агент отправляет в Anthropic или OpenAI.</string>
+    <string name="service_description">Показывает пузырёк чата Buddy и позволяет выбранному вами агенту (Claude Code, Codex, OpenCode или Antigravity), работающему внутри Buddy на этом телефоне, читать экран, а также нажимать, вводить текст и прокручивать за вас. С телефона ничего не передаётся, кроме того, что сам агент отправляет своему ИИ-сервису (Anthropic, OpenAI, Google или провайдеру вашей модели в OpenCode).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">«Ответь Саше, что я опаздываю», «добавь молоко в корзину».</string>
     <string name="onboarding_welcome_plan_title">Ваша подписка, без API-ключа</string>
-    <string name="onboarding_welcome_plan_text">Claude Code работает по вашей подписке Claude. Codex с подпиской ChatGPT тоже подойдёт.</string>
+    <string name="onboarding_welcome_plan_text">Claude Code работает по вашей подписке Claude. Codex с подпиской ChatGPT, Antigravity с аккаунтом Google и бесплатные модели OpenCode тоже подойдут.</string>
     <string name="onboarding_welcome_control_title">Всё под вашим контролем</string>
     <string name="onboarding_welcome_control_text">Перед отправкой, публикацией, покупкой и удалением Buddy всегда спрашивает.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -42,6 +42,7 @@
     <string name="onboarding_brain_claude">Использует вашу подписку Claude (Pro или Max).</string>
     <string name="onboarding_brain_codex">Использует вашу подписку ChatGPT.</string>
     <string name="onboarding_brain_opencode">Бесплатные модели, аккаунт не нужен. Своих провайдеров можно подключить позже.</string>
+    <string name="onboarding_brain_agy">Использует ваш аккаунт Google: бесплатный тариф, Google AI Pro или Ultra.</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">Установить оба и выбирать для каждого чата. По умолчанию — Claude Code.</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -95,13 +96,16 @@
     <string name="onboarding_agent_sign_in_claude">Войдите в аккаунт Claude. Откроется браузер: нажмите «Authorize», и Buddy вернётся сам.</string>
     <string name="onboarding_agent_checking_opencode">Проверка OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">Войдите в аккаунт ChatGPT в браузере, затем вернитесь сюда.</string>
+    <string name="onboarding_agent_sign_in_agy">Войдите в аккаунт Google. Откроется браузер: войдите там, и Buddy сам получит код.</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">Однократная загрузка около 235 МБ (встроенный Linux и Claude Code от Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Однократная загрузка около 230 МБ (встроенный Linux, Node.js и OpenCode). Аккаунт не нужен.</string>
     <string name="onboarding_agent_download_codex">Однократная загрузка около 150 МБ (встроенный Linux, Node.js и Codex от OpenAI).</string>
+    <string name="onboarding_agent_download_agy">Однократная загрузка около 200 МБ (встроенный Linux и Antigravity CLI от Google).</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">Войти через Claude</string>
     <string name="onboarding_sign_in_chatgpt">Войти через ChatGPT</string>
+    <string name="onboarding_sign_in_google">Войти через Google</string>
     <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
     <string name="onboarding_install_agent">Установить %1$s</string>
     <string name="onboarding_agents_wifi">По возможности используйте Wi-Fi. Во время установки можно уйти с этого экрана.</string>
@@ -161,7 +165,7 @@
     <string name="main_section_recent">Недавние</string>
     <string name="main_empty_title">Чатов пока нет</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Нажмите «Новый чат», чтобы начать чат с Claude Code или Codex. Чтобы удалить чат, нажмите на него и удерживайте.</string>
+    <string name="main_empty_text">Нажмите «Новый чат», чтобы начать чат с Claude Code, Codex, OpenCode или Antigravity. Чтобы удалить чат, нажмите на него и удерживайте.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">работает…</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
@@ -661,7 +665,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Как Buddy использует специальные возможности</string>
     <string name="ui_a11y_what">Buddy использует сервис специальных возможностей Android, чтобы выполнять ваши просьбы в других приложениях: он считывает содержимое экрана, а также нажимает, вводит текст и прокручивает за вас. Ещё он показывает плавающий пузырёк.</string>
-    <string name="ui_a11y_data">Пока выполняется задача, содержимое экрана (а в нём могут быть личные данные, например сообщения, имена или адреса) отправляется ИИ-сервису выбранного вами агента — Anthropic для Claude Code, OpenAI для Codex или провайдеру вашей модели в OpenCode — и только для выполнения вашего запроса.</string>
+    <string name="ui_a11y_data">Пока выполняется задача, содержимое экрана (а в нём могут быть личные данные, например сообщения, имена или адреса) отправляется ИИ-сервису выбранного вами агента — Anthropic для Claude Code, OpenAI для Codex, Google для Antigravity или провайдеру вашей модели в OpenCode — и только для выполнения вашего запроса.</string>
     <string name="ui_a11y_no_servers">У Buddy нет собственных серверов. Он не собирает, не продаёт и не распространяет эти данные и не использует их для рекламы.</string>
     <string name="ui_a11y_asks">Прежде чем что-либо отправить, опубликовать, купить или удалить, Buddy запрашивает ваше подтверждение. Сервис можно отключить в любой момент в настройках специальных возможностей Android.</string>
     <string name="ui_privacy_policy">Политика конфиденциальности</string>
@@ -930,7 +934,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Настройки</string>
-    <string name="setup_settings_subtitle">Buddy запускает Claude Code, Codex или OpenCode прямо в приложении — по вашей подписке (или на бесплатных моделях OpenCode).</string>
+    <string name="setup_settings_subtitle">Buddy запускает Claude Code, Codex, OpenCode или Antigravity прямо в приложении — по вашей подписке (или на бесплатных моделях OpenCode и бесплатном тарифе Antigravity).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1008,7 +1012,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Агент по умолчанию</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Кто отвечает в новых чатах, открытых из пузырька или кнопкой «Новый чат». Claude Code работает по подписке Claude, Codex — по подписке ChatGPT, OpenCode — на своих бесплатных моделях или через ваших провайдеров. Выбрать можно только настроенных агентов.</string>
+    <string name="setup_default_brain_info">Кто отвечает в новых чатах, открытых из пузырька или кнопкой «Новый чат». Claude Code работает по подписке Claude, Codex — по подписке ChatGPT, Antigravity — с аккаунтом Google, OpenCode — на своих бесплатных моделях или через ваших провайдеров. Выбрать можно только настроенных агентов.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">В новых чатах будет отвечать %1$s. Агента для отдельного чата можно выбрать кнопкой «Новый чат».</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1186,7 +1190,7 @@
     <string name="terminal_close">Закрыть</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Перезапустить</string>
-    <string name="terminal_needs_linux">Сначала установите Claude Code, Codex или OpenCode в настройках — при этом настроится встроенный Linux.</string>
+    <string name="terminal_needs_linux">Сначала установите Claude Code, Codex, OpenCode или Antigravity в настройках — при этом настроится встроенный Linux.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Не удалось запустить терминал: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1214,7 +1218,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Сеансы</string>
-    <string name="monitor_subtitle">Все сеансы Claude Code и Codex на этом телефоне.</string>
+    <string name="monitor_subtitle">Все сеансы Claude Code, Codex, OpenCode и Antigravity на этом телефоне.</string>
     <string name="monitor_terminal_running">Оболочка запущена · нажмите, чтобы вернуться</string>
     <string name="monitor_terminal_idle">Оболочка во встроенном Linux</string>
     <string name="monitor_running_now">Сейчас работают</string>
@@ -1275,7 +1279,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Сначала войдите в %1$s (в настройках).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">Для каждого нажатия — временный сеанс без инструментов: он видит ваш запрос, пояснение агента и экран и отвечает «разрешить», «спросить вас» или «не рекомендовать». Около 3 секунд на нажатие. Чаты OpenCode проверяет Claude Code (или Codex).</string>
+    <string name="perms_reviewer_about">Для каждого нажатия — временный сеанс без инструментов: он видит ваш запрос, пояснение агента и экран и отвечает «разрешить», «спросить вас» или «не рекомендовать». Около 3 секунд на нажатие. Чаты OpenCode и Antigravity проверяет Claude Code (или Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">Он также проверяет ответы, прежде чем правило для уведомлений отправит их по таймеру.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->

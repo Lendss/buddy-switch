@@ -3,7 +3,7 @@
 <resources>
     <string name="app_name" translatable="false">Buddy</string>
     <string name="service_label">Buddy assistant</string>
-    <string name="service_description">Shows the Buddy chat bubble and lets Claude Code or Codex, running inside Buddy on this phone, read the screen and tap, type and scroll for you. Nothing leaves the phone except what the agent itself sends to Anthropic or OpenAI.</string>
+    <string name="service_description">Shows the Buddy chat bubble and lets the agent you choose (Claude Code, Codex, OpenCode or Antigravity), running inside Buddy on this phone, read the screen and tap, type and scroll for you. Nothing leaves the phone except what the agent itself sends to its AI service (Anthropic, OpenAI, Google or your OpenCode model\'s provider).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -29,7 +29,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">\"Reply to Sam that I\'m late\", \"add milk to my basket\".</string>
     <string name="onboarding_welcome_plan_title">Your own plan, no API key</string>
-    <string name="onboarding_welcome_plan_text">Runs Claude Code from your Claude subscription. Codex with a ChatGPT plan works too.</string>
+    <string name="onboarding_welcome_plan_text">Runs Claude Code from your Claude subscription. Codex with a ChatGPT plan, Antigravity with a Google account and OpenCode\'s free models work too.</string>
     <string name="onboarding_welcome_control_title">You stay in control</string>
     <string name="onboarding_welcome_control_text">Sending, posting, buying and deleting always ask first.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -43,6 +43,8 @@
     <string name="onboarding_brain_claude">Uses your Claude subscription (Pro or Max).</string>
     <string name="onboarding_brain_codex">Uses your ChatGPT plan.</string>
     <string name="onboarding_brain_opencode">Free models, no account needed. Connect your own providers later.</string>
+    <!-- Under "Antigravity" (Google's agent) in the agent choice. Google AI Pro and Ultra are Google's paid plans (names stay as they are). -->
+    <string name="onboarding_brain_agy">Uses your Google account: the free plan, Google AI Pro or Ultra.</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">Install both; pick per chat. Claude Code stays the default.</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -74,11 +76,11 @@
     <string name="onboarding_agents_title">Install and sign in</string>
     <!-- Title once every chosen agent is installed and signed in. -->
     <string name="onboarding_agents_done_title">Ready</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="onboarding_agents_done">%1$s is installed and signed in.</string>
     <!-- Same as onboarding_agents_done, when both Claude Code and Codex are set up. -->
     <string name="onboarding_agents_done_both">Claude Code and Codex are installed and signed in.</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode) or onboarding_agent_names_both. -->
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode, Antigravity) or onboarding_agent_names_both. -->
     <string name="onboarding_agents_text">Buddy installs %1$s inside the app, then you sign in once. No Termux needed.</string>
     <!-- Both agents together, inserted as %1$s into onboarding_agents_text. -->
     <string name="onboarding_agent_names_both">Claude Code and Codex</string>
@@ -96,14 +98,18 @@
     <string name="onboarding_agent_sign_in_claude">Sign in with your Claude account. Your browser opens; tap Authorize and Buddy comes back by itself.</string>
     <string name="onboarding_agent_checking_opencode">Checking OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">Sign in with your ChatGPT account in the browser, then come back.</string>
+    <!-- Antigravity: the sign-in page shows a code that Buddy reads by itself. -->
+    <string name="onboarding_agent_sign_in_agy">Sign in with your Google account. Your browser opens; sign in there and Buddy picks up the code by itself.</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">Downloads about 235 MB once (Buddy\'s Linux and Claude Code from Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Downloads about 230 MB once (Buddy\'s Linux, Node.js and OpenCode). No account needed.</string>
     <string name="onboarding_agent_download_codex">Downloads about 150 MB once (Buddy\'s Linux, Node.js and Codex from OpenAI).</string>
+    <string name="onboarding_agent_download_agy">Downloads about 200 MB once (Buddy\'s Linux and the Antigravity CLI from Google).</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">Sign in with Claude</string>
     <string name="onboarding_sign_in_chatgpt">Sign in with ChatGPT</string>
-    <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
+    <string name="onboarding_sign_in_google">Sign in with Google</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="onboarding_install_agent">Install %1$s</string>
     <string name="onboarding_agents_wifi">Use Wi-Fi if you can. You can leave this screen while it installs.</string>
     <!-- Help questions and answers under "Stuck?". "Copy Code" = a button on Claude's web page. -->
@@ -162,7 +168,7 @@
     <string name="main_section_recent">Recent</string>
     <string name="main_empty_title">No chats yet</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Tap New chat to start one with Claude Code or Codex. Long-press a chat to delete it.</string>
+    <string name="main_empty_text">Tap New chat to start one with Claude Code, Codex, OpenCode or Antigravity. Long-press a chat to delete it.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">working…</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
@@ -305,7 +311,7 @@
     <string name="bubble_nothing_running_chat">Nothing is running in this chat.</string>
     <string name="bubble_allow_mic_tap_mic">Allow the microphone in Buddy, then tap the mic again.</string>
     <string name="bubble_allow_mic_tap_bubble">Allow the microphone in Buddy, then tap the bubble again.</string>
-    <!-- After dictating an instruction while the agent works. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <!-- After dictating an instruction while the agent works. %1$s: the agent's name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="bubble_note_added">Got it: %1$s will take it into account</string>
     <!-- A message was copied to the clipboard. -->
     <string name="bubble_copied">Copied</string>
@@ -336,13 +342,13 @@
 
     <!-- Composer at the bottom of the chat panel. -->
     <string name="bubble_attach">Attach a photo or file</string>
-    <!-- Hint in the empty text field. %1$s: the agent's name (Claude Code, Codex or OpenCode). -->
+    <!-- Hint in the empty text field. %1$s: the agent's name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="bubble_input_hint">Ask %1$s…</string>
     <!-- Verb: pastes copied text into the field. -->
     <string name="bubble_paste">Paste</string>
     <!-- Verb: sends the message (read by TalkBack). -->
     <string name="bubble_send">Send</string>
-    <!-- A chat with no messages yet. %1$s: the agent's name (Claude Code, Codex or OpenCode); "me" is Buddy. -->
+    <!-- A chat with no messages yet. %1$s: the agent's name (Claude Code, Codex, OpenCode or Antigravity); "me" is Buddy. -->
     <string name="bubble_empty_chat">New %1$s chat. Ask me to do something on your phone.</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="bubble_tool_calls">
@@ -450,7 +456,7 @@
     <!-- Chat screen: composer and empty chat -->
     <!-- Read by TalkBack for the paperclip button. -->
     <string name="chat_attach_description">Attach a photo or file</string>
-    <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity). -->
     <string name="chat_input_hint">Ask %1$s…</string>
     <!-- Hint in the message box while the agent works: what you type now reaches it at its next step. -->
     <string name="chat_input_hint_running">Add an instruction while it works…</string>
@@ -458,7 +464,7 @@
     <string name="chat_talk">Talk</string>
     <!-- Read by TalkBack for the send button. Verb. -->
     <string name="chat_send">Send</string>
-    <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode). -->
+    <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity). -->
     <string name="chat_empty_hint">New %1$s chat. Ask it to do something on your phone.</string>
     <!-- Same, when developer mode is on. %1$s = agent name. -->
     <string name="chat_empty_hint_dev">New %1$s chat. Ask it to do something on your phone, or to build an app (developer mode is on).</string>
@@ -657,7 +663,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">How Buddy uses accessibility</string>
     <string name="ui_a11y_what">Buddy uses Android\'s accessibility service to do what you ask in other apps: it reads what\'s on the screen and taps, types and scrolls for you. It also shows the floating bubble.</string>
-    <string name="ui_a11y_data">While a task runs, the screen content, which can include personal information such as messages, names or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, OpenAI for Codex, or your OpenCode model\'s provider), only to carry out your request.</string>
+    <string name="ui_a11y_data">While a task runs, the screen content, which can include personal information such as messages, names or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, OpenAI for Codex, Google for Antigravity, or your OpenCode model\'s provider), only to carry out your request.</string>
     <string name="ui_a11y_no_servers">Buddy has no servers of its own. It doesn\'t collect, sell or share this data, and doesn\'t use it for ads.</string>
     <string name="ui_a11y_asks">Before anything that sends, posts, buys or deletes, Buddy asks for your OK. You can turn the service off anytime in Android\'s accessibility settings.</string>
     <string name="ui_privacy_policy">Privacy policy</string>
@@ -708,7 +714,7 @@
 
     <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
 
-    <!-- Sign-in screen (one per agent: Claude Code, Codex or OpenCode). Product and plan names
+    <!-- Sign-in screen (one per agent: Claude Code, Codex, OpenCode or Antigravity). Product and plan names
          (Claude, ChatGPT, Codex, OpenCode, Anthropic, OpenAI, Pro, Max, Plus, Business) stay as they are. -->
     <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
     <string name="signin_back">Back</string>
@@ -716,7 +722,7 @@
     <string name="signin_checking">Checking…</string>
 
     <!-- Sign-in screen: the agent isn't installed yet. -->
-    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="signin_install">Install %1$s</string>
     <string name="signin_install_sub_claude">Runs Claude Code inside Buddy on your Claude subscription.</string>
     <string name="signin_install_sub_opencode">Runs OpenCode inside Buddy. Its free models work right away, no account needed; connect your own providers (Anthropic, OpenAI, GitHub Copilot…) anytime.</string>
@@ -930,7 +936,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Settings</string>
-    <string name="setup_settings_subtitle">Buddy runs Claude Code, Codex or OpenCode inside the app, on your own subscription (or OpenCode\'s free models).</string>
+    <string name="setup_settings_subtitle">Buddy runs Claude Code, Codex, OpenCode or Antigravity inside the app, on your own subscription (or OpenCode\'s free models and Antigravity\'s free plan).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -947,7 +953,7 @@
     <string name="setup_open_settings">Open settings</string>
     <!-- Button: opens Android's App info page for Buddy (Android's own label). -->
     <string name="setup_app_info">App info</string>
-    <!-- %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <!-- %1$s = agent name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="setup_step_install_title">Install %1$s</string>
     <!-- %1$s = agent name. -->
     <string name="setup_step_install_done">%1$s is installed in Buddy.</string>
@@ -1008,7 +1014,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Default brain</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Who answers new chats from the bubble or the New chat button. Claude Code uses your Claude plan, Codex your ChatGPT plan, OpenCode its free models or your own providers. Only agents that are set up can be picked.</string>
+    <string name="setup_default_brain_info">Who answers new chats from the bubble or the New chat button. Claude Code uses your Claude plan, Codex your ChatGPT plan, Antigravity your Google account, OpenCode its free models or your own providers. Only agents that are set up can be picked.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">New chats will use %1$s. You can pick per chat with the New chat button.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1188,7 +1194,7 @@
     <string name="terminal_close">Close</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Restart</string>
-    <string name="terminal_needs_linux">Install Claude Code, Codex or OpenCode in Settings first: that sets up Buddy\'s Linux.</string>
+    <string name="terminal_needs_linux">Install Claude Code, Codex, OpenCode or Antigravity in Settings first: that sets up Buddy\'s Linux.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Couldn\'t start the terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1216,7 +1222,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sessions</string>
-    <string name="monitor_subtitle">Every Claude Code and Codex session on this phone.</string>
+    <string name="monitor_subtitle">Every Claude Code, Codex, OpenCode and Antigravity session on this phone.</string>
     <string name="monitor_terminal_running">A shell is running · tap to return</string>
     <string name="monitor_terminal_idle">A shell in Buddy\'s Linux</string>
     <string name="monitor_running_now">Running now</string>
@@ -1242,7 +1248,7 @@
     <string name="monitor_open_chat">Open chat</string>
     <!-- Button (verb): stops the session. -->
     <string name="monitor_stop">Stop</string>
-    <!-- Sheet title. %1$s = agent name (Claude Code, Codex or OpenCode). -->
+    <!-- Sheet title. %1$s = agent name (Claude Code, Codex, OpenCode or Antigravity). -->
     <string name="monitor_stop_title">Stop this %1$s session?</string>
     <string name="monitor_stop_background_body">It runs in the background, for example a chat you\'re continuing from the Claude app. It could even be the one controlling Buddy. Stopping it ends that conversation\'s current work.</string>
     <string name="monitor_stop_terminal_body">It may be a session you\'re using in a terminal right now. It could even be the one controlling Buddy. Stopping it ends that conversation\'s current work.</string>
@@ -1277,7 +1283,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Sign in to %1$s first (Settings).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">A temporary session per tap, without tools: it sees your request, the agent\'s note and the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode chats are reviewed by Claude Code (or Codex).</string>
+    <string name="perms_reviewer_about">A temporary session per tap, without tools: it sees your request, the agent\'s note and the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode and Antigravity chats are reviewed by Claude Code (or Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">It also checks replies before a notification rule\'s countdown sends them.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->

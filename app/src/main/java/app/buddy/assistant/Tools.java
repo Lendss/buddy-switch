@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** The phone-control tools exposed to Claude Code and Codex over MCP. */
+/** The phone-control tools exposed to the agents (Claude Code, Codex, OpenCode, Antigravity) over MCP. */
 final class Tools {
     private static final int MAX_NODES = 350;
     /** Screenshots are scaled so their shorter side is at most this, the same in portrait and landscape. */
