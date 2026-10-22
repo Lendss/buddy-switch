@@ -2396,14 +2396,24 @@ final class Bubble implements ChatHub.Listener {
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
                 avp.setMarginEnd(dp(8));
                 r.addView(av, avp);
-                TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
-                tv.setText(Ui.markdownLinks(text, this::collapse)); // [text](url): the text, as a link
-                tv.setLineSpacing(0, 1.15f);
-                tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
-                tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
-                Ui.linkifyForService(tv, this::collapse);
-                copyOnLongPress(tv, Ui.linkCopy(text)); // links as "text (address)"
-                r.addView(tv);
+                // Markdown shown formatted (Markdown): one text, or a column with code blocks and tables
+                View body = Markdown.render(svc, text, this::collapse, cs -> {
+                    TextView tv = Ui.text(svc, "", 15, Ui.TEXT);
+                    tv.setText(cs);
+                    tv.setLineSpacing(0, 1.15f);
+                    Ui.linkifyForService(tv, this::collapse);
+                    copyOnLongPress(tv, Ui.linkCopy(text)); // links as "text (address)"
+                    return tv;
+                });
+                body.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
+                body.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
+                if (body instanceof TextView) {
+                    r.addView(body);
+                } else {
+                    copyOnLongPress(body, Ui.linkCopy(text));
+                    r.addView(body, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                    p.width = LinearLayout.LayoutParams.MATCH_PARENT; // the row as wide as the panel: tables scroll in it
+                }
                 p.setMarginEnd(dp(24));
                 v = r;
                 break;

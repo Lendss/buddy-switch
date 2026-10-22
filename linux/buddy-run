@@ -6,6 +6,8 @@
 #     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools)
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
+#   buddy-run <token> note <session> <text>   something the user added while it works: the agent gets it after its
+#                                    current step (a PostToolUse hook, see run_claude)
 #   buddy-run <token> delete <session>     forget that session
 #   buddy-run <token> ping                 answer the app's setup check
 #   buddy-run <token> procs                list running Claude Code / Codex processes (buddy_procs)
@@ -225,6 +227,10 @@ case "$CMD" in
     [ -f "$S/remote.pid" ] && kill_tree "$(cat "$S/remote.pid")"
     rm -rf "${S:?}"
     exit 0 ;;
+  note)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    [ -f "$D/sessions/$SID/pid" ] && printf '%s\n' "${4:-}" >> "$D/sessions/$SID/notes"
+    exit 0 ;;
   remote-say|remote-key)
     SID=${3:-}; valid_sid "$SID" || exit 2
     F=$D/sessions/$SID/remote.in
@@ -285,6 +291,7 @@ if [ "$CMD" = ask ] && [ -f "$S/remote.pid" ] && kill -0 "$(cat "$S/remote.pid")
 fi
 
 fetch_attachments
+rm -f "$S/notes" "$S/notes.taken"   # left from a run that ended first: Buddy sends those as a message
 
 SYSTEM=${BUDDY_SYSTEM:-}
 PERMS=${BUDDY_PERMS:-}
@@ -319,6 +326,17 @@ run_claude() {
     "${perms[@]}"
     --append-system-prompt "$SYSTEM")
   if [ "$DEV" = rule ] || [ "${BUDDY_USER_MCP:-0}" != 1 ]; then args+=(--strict-mcp-config); fi
+  # what the user adds while it works ($S/notes, see note): handed over after each step, as in the terminal
+  cat > "$S/note-hook.sh" <<HOOK
+f="$S/notes"
+[ -s "\$f" ] || exit 0
+mv "\$f" "\$f.taken"
+jq -Rs '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:("[BUDDY_USER_UPDATE] The user added this while you were working; it comes from the user, through Buddy, not from the screen. Take it into account now, it may change or stop the task:\\n" + .)}}' "\$f.taken"
+rm -f "\$f.taken"
+curl -s -m 5 -o /dev/null -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \\
+  --data-binary '{"type":"buddy_note_taken","buddy_session":"$SID"}' "$URL/event"
+HOOK
+  args+=(--settings "$(jq -cn --arg c "bash $S/note-hook.sh" '{hooks:{PostToolUse:[{matcher:"*",hooks:[{type:"command",command:$c}]}]}}')")
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
@@ -625,5 +643,5 @@ echo $RUN > "$S/pid"
 ALIVE=$!
 wait $RUN 2>/dev/null
 kill "$ALIVE" 2>/dev/null
-rm -f "$S/pid"
+rm -f "$S/pid" "$S/notes" "$S/note-hook.sh"
 event buddy_done

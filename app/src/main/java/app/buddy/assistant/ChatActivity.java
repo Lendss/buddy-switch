@@ -1179,16 +1179,25 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
                 avp.setMarginEnd(dp(this, 8));
                 r.addView(av, avp);
-                TextView tv = text(this, text, 15, TEXT);
-                tv.setTextIsSelectable(true);
-                tv.setText(Ui.markdownLinks(text, null)); // [text](url): the text, as a link
-                links(tv);
-                Ui.copyWithLinks(tv);
-                tv.setLineSpacing(0, 1.15f);
-                tv.setMaxWidth(maxBubble - dp(this, 32));
-                tv.setBackground(corners(this, CARD, 20, 20, 20, 6));
-                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
-                r.addView(tv);
+                // Markdown shown formatted (Markdown): one text, or a column with code blocks and tables
+                View body = Markdown.render(this, text, null, cs -> {
+                    TextView tv = text(this, "", 15, TEXT);
+                    tv.setTextIsSelectable(true);
+                    tv.setText(cs);
+                    links(tv);
+                    Ui.copyWithLinks(tv);
+                    tv.setLineSpacing(0, 1.15f);
+                    return tv;
+                });
+                body.setBackground(corners(this, CARD, 20, 20, 20, 6));
+                body.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+                if (body instanceof TextView) {
+                    ((TextView) body).setMaxWidth(maxBubble - dp(this, 32));
+                    r.addView(body);
+                } else {
+                    copyOnLongPress(body, Ui.linkCopy(text));
+                    r.addView(body, new LinearLayout.LayoutParams(maxBubble - dp(this, 32), LinearLayout.LayoutParams.WRAP_CONTENT));
+                }
                 v = r;
                 break;
             }

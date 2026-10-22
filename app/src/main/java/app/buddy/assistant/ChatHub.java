@@ -345,6 +345,12 @@ final class ChatHub {
                 }
                 break;
             }
+            case "buddy_note_taken": // the agent got what the user added (buddy-run's note hook)
+                synchronized (ses.notes) {
+                    ses.notes.clear();
+                }
+                add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_note_passed));
+                break;
             case "buddy_remote_user": { // a message typed in claude.ai, or the echo of one Buddy typed
                 String t = ev.optString("text").trim();
                 boolean echo;
@@ -427,7 +433,8 @@ final class ChatHub {
 
     /**
      * Something the user says while the chat works (typed or dictated): shown in the chat now, passed to the
-     * agent with its next phone action (see takeNotes), or sent as the next message if the task ends first.
+     * agent after its current step (Claude Code: buddy-run's note hook; others: with their next phone action, see
+     * takeNotes), or sent as the next message if the task ends first.
      */
     String addNote(Sessions.Session ses, String text) {
         text = text == null ? "" : text.trim();
@@ -435,6 +442,13 @@ final class ChatHub {
         if (!ses.running) return send(ses, text, null);
         synchronized (ses.notes) {
             ses.notes.add(text);
+        }
+        if ("claude".equals(ses.backend)) {
+            try {
+                Helper.run(app, "note", ses.id, text);
+            } catch (Exception ignored) {
+                // then it goes as the next message
+            }
         }
         add(ses, Bubble.Kind.USER, text);
         add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_note_added, ses.brainName()));
@@ -480,7 +494,7 @@ final class ChatHub {
      */
     String takeNotes() {
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
-            if (!s.running) continue;
+            if (!s.running || "claude".equals(s.backend)) continue; // Claude Code gets them from its hook
             String joined;
             synchronized (s.notes) {
                 if (s.notes.isEmpty()) continue;
