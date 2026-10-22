@@ -11,6 +11,8 @@ import android.view.View;
  */
 abstract class Screen extends Activity {
     private String themeKey;
+    /** Buddy's screens on display now: while there is one, the bubble keeps out of the way (Bubble.applyEnabled). */
+    static int shown;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -18,6 +20,26 @@ abstract class Screen extends Activity {
         themeKey = Theme.key();
         super.onCreate(state);
         Pad.watch(getWindow().getDecorView());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        shown++;
+        bubbleChanged();
+    }
+
+    @Override
+    protected void onStop() {
+        shown = Math.max(0, shown - 1);
+        bubbleChanged();
+        super.onStop();
+    }
+
+    private static void bubbleChanged() {
+        BuddyService s = BuddyService.get();
+        Bubble b = s == null ? null : s.bubble();
+        if (b != null) b.applyEnabled();
     }
 
     @Override

@@ -952,8 +952,11 @@ final class Bubble implements ChatHub.Listener {
 
     /** The bubble can be turned off in the app; it then only appears for approval cards. */
     void applyEnabled() {
-        if (locked && expanded && pendingConfirm == null) collapse();
-        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling || svc.paused());
+        // inside Buddy's own screens the bubble only repeats them: it keeps out of the way, unless an approval waits
+        boolean inApp = Screen.shown > 0 && pendingConfirm == null;
+        if ((locked || inApp) && expanded && pendingConfirm == null) collapse();
+        boolean show = !locked && !inApp
+                && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling || svc.paused());
         boolean wasHidden = root.getVisibility() != View.VISIBLE;
         root.setVisibility(show ? View.VISIBLE : View.GONE);
         if (show && wasHidden && !expanded) popIn();
