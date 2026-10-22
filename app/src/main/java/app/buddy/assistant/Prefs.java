@@ -120,6 +120,16 @@ final class Prefs {
         sp(c).edit().putBoolean("dev", on).apply();
     }
 
+    /** Chats also get the user's own MCP servers (their Claude Code config, claude.ai connectors), not just the
+     *  phone tools. Off by default: connecting to them adds about a second to every message. */
+    static boolean userMcp(Context c) {
+        return sp(c).getBoolean("user_mcp", false);
+    }
+
+    static void setUserMcp(Context c, boolean on) {
+        sp(c).edit().putBoolean("user_mcp", on).apply();
+    }
+
     /** The user agreed to the accessibility disclosure (shown before Android's accessibility settings). */
     static boolean a11yConsent(Context c) {
         return sp(c).getBoolean("a11y_consent_v3", false);

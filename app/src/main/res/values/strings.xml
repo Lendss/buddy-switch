@@ -1241,4 +1241,6 @@
     <string name="chat_access_safe">Safe</string>
     <string name="chat_access_full_toast">Full access for this chat</string>
     <string name="chat_access_safe_toast">Safe mode for this chat</string>
+    <string name="setup_user_mcp">Your MCP servers in chats</string>
+    <string name="setup_user_mcp_info">Chats also get the MCP servers from your Claude Code (yours and claude.ai connectors), not just the phone tools. Each message then takes about a second longer to start.</string>
 </resources>

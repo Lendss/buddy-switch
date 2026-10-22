@@ -312,10 +312,13 @@ run_claude() {
   local perms=(--allowedTools "${tools[@]}" "${deny[@]}")
   # developer mode: every tool without asking, like the user's Claude Code in the Termux terminal
   [ "$DEV" = 1 ] && perms=(--permission-mode bypassPermissions)
+  # the chat's own phone server (same name: it takes the place of the user's); with "Your MCP servers in chats"
+  # on (BUDDY_USER_MCP) the user's other servers too, like the terminal, though never for a rule's run
   local args=(-p "$MSG" --output-format stream-json --verbose
-    --mcp-config "$mcp" --strict-mcp-config
+    --mcp-config "$mcp"
     "${perms[@]}"
     --append-system-prompt "$SYSTEM")
+  if [ "$DEV" = rule ] || [ "${BUDDY_USER_MCP:-0}" != 1 ]; then args+=(--strict-mcp-config); fi
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
@@ -534,7 +537,8 @@ run_remote() {
   {
     echo "stty cols 120 rows 40"
     printf 'cd %q && exec claude --remote-control %q' "$W" "$NAME"
-    printf ' %q' "${sess[@]}" "${perms[@]}" --mcp-config "$mcp" --strict-mcp-config --append-system-prompt "$SYSTEM"
+    printf ' %q' "${sess[@]}" "${perms[@]}" --mcp-config "$mcp" --append-system-prompt "$SYSTEM"
+    [ "${BUDDY_USER_MCP:-0}" = 1 ] || printf ' --strict-mcp-config'
     [ -n "$MODEL" ] && printf ' --model %q' "$MODEL"
     echo
   } > "$S/remote.sh"
@@ -614,7 +618,12 @@ fi
     event buddy_error "$name failed: $(tail -c 400 "$S/last-error.log")"
   fi
 ) &
-echo $! > "$S/pid"
-wait $! 2>/dev/null
+RUN=$!
+echo $RUN > "$S/pid"
+# a long silent step (a build, a download) sends no events: say every minute that the run is alive
+( while sleep 60 && kill -0 "$RUN" 2>/dev/null; do event buddy_alive; done ) &
+ALIVE=$!
+wait $RUN 2>/dev/null
+kill "$ALIVE" 2>/dev/null
 rm -f "$S/pid"
 event buddy_done

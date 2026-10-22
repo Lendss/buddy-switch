@@ -157,21 +157,33 @@ final class ChatHub {
                 changed();
             }
         }, NO_RESPONSE_MS);
-        main.postDelayed(() -> {
-            if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
-                ses.running = false;
-                new Thread(() -> {
-                    String err = lastError(ses); // asks Termux: off the main thread
-                    main.post(() -> {
-                        add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
-                                + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
-                                + ": " + err));
-                        changed();
-                    });
-                }).start();
-            }
-        }, GIVE_UP_MS);
+        giveUpLater(ses, id, GIVE_UP_MS);
         return null;
+    }
+
+    /**
+     * Gives up on a run that has sent nothing for GIVE_UP_MS (helper and agent gone). Checked again while it's
+     * still sending: buddy-run says every minute that a run is alive, so a long silent step isn't taken for a hang.
+     */
+    private void giveUpLater(final Sessions.Session ses, final int id, long delay) {
+        main.postDelayed(() -> {
+            if (!ses.running || id != ses.runId) return;
+            long quiet = SystemClock.elapsedRealtime() - ses.lastEventAt;
+            if (quiet < GIVE_UP_MS - 100) {
+                giveUpLater(ses, id, GIVE_UP_MS - quiet);
+                return;
+            }
+            ses.running = false;
+            new Thread(() -> {
+                String err = lastError(ses); // asks Termux: off the main thread
+                main.post(() -> {
+                    add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
+                            + ("codex".equals(ses.backend) ? "Codex" : "opencode".equals(ses.backend) ? "OpenCode" : "Claude Code")
+                            + ": " + err));
+                    changed();
+                });
+            }).start();
+        }, delay);
     }
 
     /** The end of what the agent wrote to stderr this run (buddy-run keeps it), or "": a hung agent often says why there. */

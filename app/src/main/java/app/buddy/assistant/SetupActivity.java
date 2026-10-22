@@ -357,6 +357,12 @@ public class SetupActivity extends Screen implements Account.Listener {
             })), full());
             ex.addView(divider(), lineParams());
         }
+        ex.addView(switchRow(this, getString(R.string.setup_user_mcp), getString(R.string.setup_user_mcp_info),
+                Prefs.userMcp(this), on -> {
+            Prefs.setUserMcp(this, on);
+            render();
+        }), full());
+        ex.addView(divider(), lineParams());
         ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
                 Prefs.agentsTapBuddy(this), on -> {
             Prefs.setAgentsTapBuddy(this, on);

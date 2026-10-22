@@ -74,7 +74,8 @@ final class Helper {
                 systemPrompt = asset(c, "linux/system-prompt.md");
             }
         }
-        return heredoc("BUDDY_SYSTEM", systemPrompt) + heredoc("BUDDY_PERMS", permissions(c)) + helperScript;
+        return heredoc("BUDDY_SYSTEM", systemPrompt) + heredoc("BUDDY_PERMS", permissions(c))
+                + "BUDDY_USER_MCP=" + (Prefs.userMcp(c) ? 1 : 0) + "\n" + helperScript;
     }
 
     /** A shell line setting {@code name} to {@code text} exactly (a quoted here-document: nothing in it is expanded). */
