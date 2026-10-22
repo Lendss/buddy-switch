@@ -442,7 +442,8 @@ final class ChatHub {
     String addNote(Sessions.Session ses, String text) {
         text = text == null ? "" : text.trim();
         if (text.isEmpty()) return null;
-        if (!ses.running) return send(ses, text, null);
+        // open with Remote Control: the interactive session queues it itself, like the terminal
+        if (!ses.running || !ses.remote.isEmpty()) return send(ses, text, null);
         synchronized (ses.notes) {
             ses.notes.add(text);
         }

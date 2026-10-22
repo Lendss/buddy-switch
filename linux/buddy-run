@@ -239,7 +239,20 @@ case "$CMD" in
       [ "${4:-}" = esc ] && printf '\e' > "$F"
     else
       MSG=${4:-}; FILES=${5:-}; S=$D/sessions/$SID
+      reply() { # a reply in the chat without a turn of the remote session
+        jq -cn --arg t "$1" --arg s "$SID" '{type:"assistant", message:{content:[{type:"text", text:$t}]}, buddy_session:$s}' | post
+        jq -cn --arg s "$SID" '{type:"buddy_done", buddy_session:$s}' | post
+      }
+      # The interactive session shows these in a screen of its own, which Buddy can't read: a separate run over the
+      # same conversation answers them in Markdown, as without Remote, and saves nothing to it.
+      if [[ "$MSG" =~ ^/(context|cost|usage)([[:space:]]|$) ]] && [ -s "$S/claude-session" ]; then
+        out=$(cd "$W" && claude -p "$MSG" --resume "$(cat "$S/claude-session")" --no-session-persistence \
+          --output-format json </dev/null 2>/dev/null | jq -r '.result // empty')
+        reply "${out:-No answer from $MSG.}"
+        exit 0
+      fi
       fetch_attachments
+      size=$(stat -c %s "$S/remote.log" 2>/dev/null || echo 0)
       # Each line as a paste (typed text could trigger shortcuts), a new line as \ + Enter: a whole message pasted at
       # once would reach Claude wrapped as <pasted_content>, not as the user's own words. Then Enter sends it.
       {
@@ -252,6 +265,17 @@ case "$CMD" in
         sleep 0.5
         printf '\r'
       } > "$F"
+      # Another command that opens a menu there (/model, /config…) would hold the session: close it, and say why.
+      if [[ "$MSG" == /* ]]; then
+        for i in 1 2 3 4 5 6 7 8; do
+          sleep 0.5
+          if tail -c +$((size + 1)) "$S/remote.log" | sed 's/\x1b\[[0-9;?]*[ -\/]*[@-~]//g' | tr -d ' ' | grep -aqiE 'Esctocancel|Esctoclose|Esctoexit'; then
+            printf '\e' > "$F"
+            reply "${MSG%% *} opens a menu in Claude Code's terminal, which Buddy can't show: use it in claude.ai or the Claude app (this chat is open there), or turn Remote off and send it here."
+            break
+          fi
+        done
+      fi
     fi
     exit 0 ;;
   remote-stop)
@@ -525,9 +549,35 @@ trust_home() {
 # The transcript's new entries as bubble events: replies and tool calls like a run's stream, the prompts typed in
 # claude.ai, and the end of each turn.
 mirror() {
-  local f=$1 i
+  local f=$1 i out=""
   for i in $(seq 60); do [ -f "$f" ] && break; sleep 1; done
-  tail -n 0 -F "$f" 2>/dev/null | while IFS= read -r line; do
+  # A local command (/context, /cost…) runs without a turn: its output comes as a system entry (coloured, for the
+  # terminal) and usually a hidden user entry with the same in Markdown. Shown as the reply, then the turn ends.
+  say_output() {
+    [ -n "$out" ] || return 0
+    jq -cn --arg t "$out" --arg s "$SID" '{type:"assistant", message:{content:[{type:"text", text:$t}]}, buddy_session:$s}' | post
+    jq -cn --arg s "$SID" '{type:"buddy_done", buddy_session:$s}' | post
+    out=""
+  }
+  tail -n 0 -F "$f" 2>/dev/null | while :; do
+    if ! IFS= read -r -t 2 line; then say_output; continue; fi   # no Markdown copy came: the coloured one
+    case "$(printf '%s' "$line" | jq -r '[.type, (.subtype // ""), (.isMeta // false | tostring)] | join(" ")' 2>/dev/null)" in
+      "system local_command "*)
+        local o
+        o=$(printf '%s' "$line" | jq -r '.content // ""' 2>/dev/null)
+        if [[ "$o" == *"<local-command-stdout>"* ]]; then
+          out=$(printf '%s' "$o" | sed -e 's/<\/\?local-command-stdout>//g' -e 's/\x1b\[[0-9;]*m//g')
+        fi
+        continue ;;
+      "user  true")
+        if [ -n "$out" ]; then
+          o=$(printf '%s' "$line" | jq -r 'if (.message.content | type) == "string" then .message.content else "" end' 2>/dev/null)
+          [ -n "$o" ] && out=$o
+          say_output
+          continue
+        fi ;;
+    esac
+    say_output
     printf '%s' "$line" | jq -c --arg s "$SID" '
       if .type == "assistant" then {type:"assistant", message:.message}
       elif .type == "user" and (.isMeta | not) then
