@@ -121,7 +121,40 @@ final class Bubble implements ChatHub.Listener {
                     if (e.getAction() == KeyEvent.ACTION_UP) onBack();
                     return true;
                 }
+                if (expanded && Pad.key(e, showingList ? listScroll : scroll, pad)) return true;
+                if (padFocus && input.isFocused() && e.getAction() == KeyEvent.ACTION_UP
+                        && (e.getKeyCode() == KeyEvent.KEYCODE_BUTTON_A || e.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER)) {
+                    // A on the field: now the keyboard (it doesn't come up just because the D-pad passed by)
+                    svc.getSystemService(InputMethodManager.class).showSoftInput(input, 0);
+                    return true;
+                }
+                if (expanded && Pad.isMove(e) && e.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (!padFocus) input.setShowSoftInputOnFocus(false);
+                    padFocus = true;
+                    Pad.overlayFocus(panel, scroll, true); // again each time: the panel's rows change
+                    View f = panel.findFocus();
+                    if (f == null || Pad.inside(f, scroll)) { // a message may still hold focus from a touch
+                        input.requestFocus();
+                        return true;
+                    }
+                    // like the chat screen: Up from the composer to the model chip, Down from the bar to the field
+                    int k = e.getKeyCode();
+                    if (k == KeyEvent.KEYCODE_DPAD_UP && Pad.inside(f, composerRow)) return modelChip.requestFocus();
+                    if (k == KeyEvent.KEYCODE_DPAD_DOWN && Pad.inside(f, panelTop)) return input.requestFocus();
+                }
                 return super.dispatchKeyEvent(e);
+            }
+
+            @Override
+            public boolean dispatchTouchEvent(MotionEvent e) {
+                if (padFocus && e.getActionMasked() == MotionEvent.ACTION_DOWN) endPadFocus();
+                return super.dispatchTouchEvent(e);
+            }
+
+            @Override
+            public boolean dispatchGenericMotionEvent(MotionEvent e) {
+                if (expanded) Pad.motion(e, showingList ? listScroll : scroll);
+                return super.dispatchGenericMotionEvent(e);
             }
         };
         buildCollapsed();
@@ -290,6 +323,7 @@ final class Bubble implements ChatHub.Listener {
 
         // header like the chat screen: the chat's title (tap: all chats) and agent · model, then plain icons
         LinearLayout top = new LinearLayout(svc);
+        panelTop = top;
         top.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout titles = new LinearLayout(svc);
         titles.setOrientation(LinearLayout.VERTICAL);
@@ -366,6 +400,8 @@ final class Bubble implements ChatHub.Listener {
         messages.setPaddingRelative(0, dp(8), 0, dp(8));
         scroll.addView(messages);
         panel.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        Pad.keepFocusOut(scroll);
+        Pad.ringFocus(panel, () -> padFocus);
         listScroll = new ScrollView(svc);
         sessionList = new LinearLayout(svc);
         sessionList.setOrientation(LinearLayout.VERTICAL);
@@ -467,6 +503,7 @@ final class Bubble implements ChatHub.Listener {
 
         // composer: one pill with the text field, a mic and a round send button (like the chat screen)
         LinearLayout inputRow = new LinearLayout(svc);
+        composerRow = inputRow;
         inputRow.setGravity(Gravity.CENTER_VERTICAL);
         inputRow.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
         inputRow.setBackground(rounded(Ui.CARD, 26, Ui.OUTLINE, 1));
@@ -844,8 +881,20 @@ final class Bubble implements ChatHub.Listener {
         }
     }
 
+    /** The D-pad is in use in the panel (see Pad.overlayFocus). */
+    private boolean padFocus;
+    private LinearLayout panelTop, composerRow;
+
+    private void endPadFocus() {
+        padFocus = false;
+        input.setShowSoftInputOnFocus(true);
+        Pad.unring(panel);
+        Pad.overlayFocus(panel, scroll, false);
+    }
+
     void collapse() {
         if (!expanded) return;
+        if (padFocus) endPadFocus();
         if (Voice.listening()) Voice.stopListening();
         expanded = false;
         svc.marks().setPanelOpen(false);
@@ -1555,6 +1604,18 @@ final class Bubble implements ChatHub.Listener {
         input.setHint(changing ? svc.getString(R.string.card_change_hint)
                 : svc.getString(R.string.bubble_input_hint, sessions.current.brainName()));
     }
+
+    private final Pad.Actions pad = new Pad.Actions() {
+        @Override
+        public void send() {
+            Bubble.this.send();
+        }
+
+        @Override
+        public void stop() {
+            Bubble.this.stop();
+        }
+    };
 
     private void stop() {
         if (!sessions.current.running) toast(svc.getString(R.string.bubble_nothing_running_chat));

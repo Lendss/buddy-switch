@@ -131,6 +131,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         scroll.addView(messages);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        Pad.keepFocusOut(scroll);
 
         // inline approval card (when an agent asks for an OK)
         approval = protect(column(this)); // the inline approval card: only the user answers it
@@ -201,6 +202,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             }
         });
         paintSend();
+        // Joy-Con: Down from the app bar goes to the message field, Up from the composer to the model chip; the
+        // composer's ends don't wrap into the app bar
+        input.setId(View.generateViewId());
+        for (View h : new View[]{back, chip, remote, access, speaker}) h.setNextFocusDownId(input.getId());
+        attach.setId(View.generateViewId());
+        attach.setNextFocusLeftId(attach.getId());
+        send.setId(View.generateViewId());
+        send.setNextFocusRightId(send.getId());
+        chip.setId(View.generateViewId());
+        for (View c : new View[]{attach, input, mic, send}) c.setNextFocusUpId(chip.getId());
         LinearLayout.LayoutParams pp = full();
         pp.leftMargin = pp.rightMargin = dp(this, 12);
         pp.bottomMargin = dp(this, 10);
@@ -294,6 +305,29 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         View v = new View(this);
         v.setBackgroundColor(LINE);
         return v;
+    }
+
+    private final Pad.Actions pad = new Pad.Actions() {
+        @Override
+        public void send() {
+            ChatActivity.this.send();
+        }
+
+        @Override
+        public void stop() {
+            hub.stop(ses);
+        }
+    };
+
+    @Override
+    public boolean dispatchKeyEvent(android.view.KeyEvent e) {
+        return Pad.key(e, scroll, pad) || super.dispatchKeyEvent(e);
+    }
+
+    @Override
+    public boolean dispatchGenericMotionEvent(android.view.MotionEvent e) {
+        Pad.motion(e, scroll);
+        return super.dispatchGenericMotionEvent(e);
     }
 
     private void paintSend() {

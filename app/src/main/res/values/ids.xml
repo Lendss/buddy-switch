@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- view tags -->
+    <item name="pad_scroller" type="id" />
+    <item name="pad_touch_focus" type="id" />
+</resources>

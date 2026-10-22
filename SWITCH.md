@@ -99,6 +99,11 @@ Build on the Switch: `build.sh` with `SDK_JAR` = platform-36 `android.jar` and `
   goes into the remote session; afterwards the chat's own runs continue the same conversation. ~170 MB while on.
   The home folder's trust question is answered in `~/.claude.json` (`hasTrustDialogAccepted`). Next to it, "Full" /
   "Safe" sets the chat's tool access (default: Settings' developer mode, on).
-- [ ] 7. Joy-Con navigation.
+- [x] 7. Joy-Con (`Pad.java`). Android already gives D-pad/left stick focus moves, A = press, B/− = Back. On top:
+  in a chat and the bubble's panel the D-pad moves only between the app bar and the composer (the messages stay out
+  of focus), the right stick scrolls the conversation, L / R a page, + sends, ZR stops; the focused control gets an
+  accent ring on every screen. The panel is an overlay that Android keeps in touch mode, so there its controls are
+  made focusable while the D-pad is in use and the keyboard comes up only on A. Holding Capture for half a second
+  opens or closes the panel from any app (the service filters keys for that); a short press still plays/pauses.
 
 `tools/`: `idle-monitor.sh` (what stays in memory, as root), `mcp-call.py` (Buddy's phone tools from the shell).

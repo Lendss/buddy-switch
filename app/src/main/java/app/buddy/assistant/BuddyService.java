@@ -187,6 +187,40 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     public void onInterrupt() {
     }
 
+    // ------------------------------------------------- Joy-Con: Capture held opens the chat panel
+
+    private boolean captureHeld;
+    private final Runnable captureLong = () -> {
+        captureHeld = true;
+        if (bubble == null) return;
+        if (bubble.expanded()) bubble.collapse();
+        else bubble.expand();
+    };
+
+    /**
+     * The Joy-Con's Capture button (a play/pause key): held for half a second it opens or closes the bubble's chat
+     * panel, from any app. A short press still plays or pauses, sent on when it's let go. Every other key goes
+     * straight on.
+     */
+    @Override
+    protected boolean onKeyEvent(android.view.KeyEvent e) {
+        if (e.getKeyCode() != android.view.KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) return false;
+        android.view.InputDevice d = e.getDevice();
+        if (d == null || !d.supportsSource(android.view.InputDevice.SOURCE_GAMEPAD)) return false;
+        if (e.getAction() == android.view.KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+            captureHeld = false;
+            main.postDelayed(captureLong, 500);
+        } else if (e.getAction() == android.view.KeyEvent.ACTION_UP) {
+            main.removeCallbacks(captureLong);
+            if (!captureHeld) {
+                android.media.AudioManager am = getSystemService(android.media.AudioManager.class);
+                am.dispatchMediaKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, e.getKeyCode()));
+                am.dispatchMediaKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, e.getKeyCode()));
+            }
+        }
+        return true;
+    }
+
     @Override
     public void onDestroy() {
         try {

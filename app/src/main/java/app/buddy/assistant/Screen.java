@@ -3,7 +3,10 @@ package app.buddy.assistant;
 import android.app.Activity;
 import android.os.Bundle;
 
-/** Base for Buddy's screens: applies the theme and rebuilds when the appearance settings change. */
+/**
+ * Base for Buddy's screens: applies the theme and rebuilds when the appearance settings change. With a Joy-Con, the
+ * focused control is ringed (see Pad).
+ */
 abstract class Screen extends Activity {
     private String themeKey;
 
@@ -12,6 +15,11 @@ abstract class Screen extends Activity {
         Theme.apply(this);
         themeKey = Theme.key();
         super.onCreate(state);
+        final android.view.View decor = getWindow().getDecorView();
+        Pad.ringFocus(decor, () -> !decor.isInTouchMode());
+        decor.getViewTreeObserver().addOnTouchModeChangeListener(touch -> {
+            if (touch) Pad.unring(decor);
+        });
     }
 
     @Override
