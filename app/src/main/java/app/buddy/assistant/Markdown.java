@@ -73,8 +73,13 @@ final class Markdown {
             View v;
             LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (b instanceof String) v = texts.make(paragraphs(c, (String) b, linkThen));
-            else if (b instanceof Picture) {
+            if (b instanceof String) {
+                v = texts.make(paragraphs(c, (String) b, linkThen));
+                // as wide as its lines: a narrow column (WRAP_CONTENT) then fits both it and the pictures. MATCH_PARENT
+                // made the column as wide as its pictures alone, and LinearLayout's remeasure of the text at that width
+                // kept its old height: the lines that wrapped further were cut off under the picture.
+                p.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            } else if (b instanceof Picture) {
                 v = pictures.make(((Picture) b).id);
                 if (v.getLayoutParams() instanceof LinearLayout.LayoutParams) p = (LinearLayout.LayoutParams) v.getLayoutParams();
             } else {
