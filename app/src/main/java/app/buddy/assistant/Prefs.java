@@ -139,6 +139,17 @@ final class Prefs {
         sp(c).edit().putString("slash_commands", json).apply();
     }
 
+    /** The chat bringing over an upstream version (Updates): {version, chat id}, or null. */
+    static String[] updateChat(Context c) {
+        String v = sp(c).getString("update_chat", "");
+        int i = v.indexOf(' ');
+        return i < 0 ? null : new String[]{v.substring(0, i), v.substring(i + 1)};
+    }
+
+    static void setUpdateChat(Context c, String version, String chat) {
+        sp(c).edit().putString("update_chat", version + " " + chat).apply();
+    }
+
     /** Scheduled messages (Scheduler), as JSON. */
     static String schedule(Context c) {
         return sp(c).getString("schedule", "[]");

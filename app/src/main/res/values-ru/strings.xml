@@ -166,9 +166,9 @@
     <!-- Notification category name in Android's notification settings for Buddy. -->
     <string name="update_channel_name">Обновления Buddy</string>
     <!-- Notification and sheet title. %1$s = the new version number, e.g. 2.1.14. -->
-    <string name="update_available_title">Доступен Buddy %1$s</string>
+    <string name="update_available_title">Вышла Buddy %1$s</string>
     <!-- %1$s = the installed version number. -->
-    <string name="update_notification_text">У вас версия %1$s. Нажмите, чтобы узнать, что нового, и обновить. Чаты сохранятся.</string>
+    <string name="update_notification_text">Buddy SW основан на %1$s. Нажми, чтобы Claude изучил новое и перенёс его.</string>
     <!-- Verb: download and install the new version. Notification button and sheet button (half width). Keep short. -->
     <string name="update_action">Обновить</string>
     <!-- Notification button: stop update notifications. Keep short. -->
@@ -178,9 +178,9 @@
     <string name="update_checking">Проверка обновлений…</string>
     <string name="update_check_failed">Не удалось связаться с GitHub. Повторите попытку позже.</string>
     <!-- %1$s = the installed version number. -->
-    <string name="update_up_to_date">Buddy %1$s — последняя версия.</string>
+    <string name="update_up_to_date">Buddy SW в актуальном состоянии: последняя версия Buddy — %1$s.</string>
     <!-- Under the sheet title. %1$s = the installed version number. -->
-    <string name="update_sheet_text">У вас версия %1$s. После обновления сохранятся ваши чаты, настройки и входы в аккаунты.</string>
+    <string name="update_sheet_text">У тебя Buddy SW %1$s на основе Buddy %2$s. Update откроет чат: Claude изучит все версии с тех пор и скажет, что взять и что пропустить; без твоего согласия ничего не меняет.</string>
     <!-- Sheet button (half width): close without updating. -->
     <string name="update_later">Позже</string>
     <!-- On the Update button while the new version downloads. -->
@@ -868,7 +868,7 @@
     <string name="setup_update_notices_info">Buddy раз в день проверяет GitHub и сообщает, когда выходит новая версия.</string>
     <string name="setup_check_updates">Проверить обновления</string>
     <!-- %1$s = Buddy's version number. "update yourself" is what you can say to an agent: translate it. -->
-    <string name="setup_check_updates_info">У вас Buddy %1$s. Или попросите любого агента: «обновись».</string>
+    <string name="setup_check_updates_info">У тебя Buddy SW %1$s на основе Buddy %2$s.</string>
     <!-- Name of the App permissions screen. -->
     <string name="setup_app_permissions">Разрешения для приложений</string>
     <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
@@ -1212,4 +1212,9 @@
     <string name="scheduled_channel_name">Запланированные сообщения</string>
     <string name="setup_short_replies">Короткие ответы</string>
     <string name="setup_short_replies_info">Агент отвечает одним–тремя простыми предложениями, удобно в маленьком пузыре. Выключено: так подробно, как нужно, как Claude Code в терминале.</string>
+    <string name="update_open_chat">Открыть чат обновления</string>
+    <string name="update_chat_title">Обновление до Buddy %1$s</string>
+    <string name="update_chat_first">⬆ Перенести Buddy %1$s</string>
+    <string name="update_chat_working">Обновление до %1$s: Claude работает</string>
+    <string name="update_chat_waiting">Обновление до %1$s: ждёт тебя</string>
 </resources>

@@ -315,7 +315,9 @@ public class SetupActivity extends Screen implements Account.Listener {
             upd.setGravity(Gravity.CENTER_VERTICAL);
             LinearLayout ut = column(this);
             ut.addView(title(this, getString(R.string.setup_check_updates), 15));
-            ut.addView(text(this, getString(R.string.setup_check_updates_info, BuildInfo.VERSION), 13, MUTED), topGap(2));
+            String ust = Updates.chatStatus(this);
+            ut.addView(text(this, ust != null ? ust : getString(R.string.setup_check_updates_info, BuildInfo.VERSION, BuildInfo.UPSTREAM),
+                    13, ust != null ? ACCENT_TEXT : MUTED), topGap(2));
             upd.addView(ut, weight1());
             upd.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
             upd.setOnClickListener(v -> Updates.showSheet(this));

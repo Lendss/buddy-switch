@@ -166,9 +166,8 @@ final class Tools {
                             + "call wait_for_install next.",
                     props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
             t.put(tool("update_buddy",
-                    "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
-                            + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
-                            + "there's a new version. Only the user can tap Update.",
+                    "Check whether upstream Buddy has released a version newer than this build is based on, and what's "
+                            + "new. Use it when the user asks to update Buddy or whether there's a new version.",
                     props().put("install", boolProp("true: download the update and open the installer (after the user said yes)"))));
             t.put(tool("wait_for_install",
                     "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
@@ -1100,31 +1099,19 @@ final class Tools {
         return "The installer is open. The user must tap Install/Update and confirm (you can't). Call wait_for_install now.";
     }
 
-    /** Buddy's own updates (see {@link Updates}). */
+    /** Buddy's own updates (see {@link Updates}): this fork brings over upstream versions in an update chat. */
     private String updateBuddy(boolean install) {
         Updates.Release r;
         try {
             r = Updates.latest();
         } catch (Exception e) {
-            return "Couldn't reach GitHub to check for updates (" + e.getMessage() + "). " + Updates.MANUAL;
+            return "Couldn't reach GitHub to check for updates (" + e.getMessage() + ").";
         }
-        String head = "Installed: Buddy " + BuildInfo.VERSION + ". Latest release: " + r.version + ".";
-        if (!r.newer()) return head + " Buddy is up to date.";
-        if (!install) {
-            return head + " An update is available. What's new:\n" + r.notes + "\n\nAsk the user if they want it now; "
-                    + "if yes, call update_buddy with install=true.";
-        }
-        svc.showStatus(svc.getString(R.string.tools_status_downloading, r.version));
-        String res = Updates.install(svc, r);
-        if (Updates.NEEDS_PERMISSION.equals(res)) {
-            return "Downloaded Buddy " + r.version + ", but Buddy isn't allowed to install apps yet. Android's settings page "
-                    + "for that is open now: ask the user to turn on 'Allow from this source' for Buddy, then call "
-                    + "update_buddy with install=true again.";
-        }
-        if (!Updates.OPENED.equals(res)) return res + " " + Updates.MANUAL;
-        return "The installer is open with Buddy " + r.version + ". Tell the user now, in one line, to tap Update (only "
-                + "they can): Buddy restarts once it's installed, which ends this task, and their chats stay. Then stop; "
-                + "don't call wait_for_install.";
+        String head = "Installed: Buddy SW " + BuildInfo.VERSION + ", based on upstream Buddy " + BuildInfo.UPSTREAM + ".";
+        if (!r.newer()) return head + " Upstream has nothing newer: up to date.";
+        return head + " Upstream has released " + android.text.TextUtils.join(", ", r.versions) + ". What's new:\n" + r.notes
+                + "\n\nThis fork doesn't install upstream's APK: tell the user to open Settings › Check for updates and "
+                + "tap Update, which opens a chat where Claude reviews these versions and brings over what they want.";
     }
 
     private static void copy(java.io.InputStream in, java.io.OutputStream o) throws java.io.IOException {

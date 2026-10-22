@@ -131,6 +131,11 @@ final class ChatHub {
         return send(ses, text, files, null, false);
     }
 
+    /** A message whose agent text differs from what the chat shows (the update chat's first message, see Updates). */
+    String sendAs(Sessions.Session ses, String shown, String prompt) {
+        return send(ses, shown, null, prompt, false);
+    }
+
     /** A notification rule's run (see Triggers): the chat shows a short line, the agent gets the whole prompt. */
     String sendFromRule(Sessions.Session ses, String shown, String prompt) {
         return send(ses, shown, null, prompt, true);
