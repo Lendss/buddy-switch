@@ -130,6 +130,15 @@ final class Prefs {
         sp(c).edit().putBoolean("short_replies", on).apply();
     }
 
+    /** Claude Code's slash commands and skills, as it last listed them (a JSON array of names). */
+    static String slashCommands(Context c) {
+        return sp(c).getString("slash_commands", "[\"compact\",\"context\",\"cost\",\"usage\",\"init\",\"review\"]");
+    }
+
+    static void setSlashCommands(Context c, String json) {
+        sp(c).edit().putString("slash_commands", json).apply();
+    }
+
     /** Scheduled messages (Scheduler), as JSON. */
     static String schedule(Context c) {
         return sp(c).getString("schedule", "[]");

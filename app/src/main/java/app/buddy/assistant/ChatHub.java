@@ -287,6 +287,9 @@ final class ChatHub {
                     }
                 } else if ("init".equals(ev.optString("subtype"))) {
                     ses.status = app.getString(R.string.hub_thinking);
+                    // its commands and skills, for the composer's suggestions when the user types /
+                    JSONArray cmds = ev.optJSONArray("slash_commands");
+                    if (cmds != null && cmds.length() > 0) Prefs.setSlashCommands(app, cmds.toString());
                     // the model really in use (Claude Code says it here), shown when the chat is on "Default"
                     String m = ev.optString("model", "");
                     if (!m.isEmpty() && !m.equals(ses.actualModel)) {

@@ -31,7 +31,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private LinearLayout messages, strip, approval;
     private ScrollView scroll;
     private TextView title, chipText, stripText, remoteText, accessText;
-    private LinearLayout scheduled;
+    private LinearLayout scheduled, commands;
     private View remoteDot;
     private ImageView accessIcon;
     private Button mic;
@@ -142,6 +142,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         root.addView(approval, ap);
 
         // messages the agent scheduled for this chat (Scheduler): when, and a way to cancel each
+        commands = column(this);
+        commands.setBackground(rounded(this, CARD, 14));
+        commands.setVisibility(View.GONE);
+        LinearLayout.LayoutParams cmp = full();
+        cmp.leftMargin = cmp.rightMargin = dp(this, 12);
+        cmp.bottomMargin = dp(this, 6);
+        root.addView(commands, cmp);
+
         scheduled = column(this);
         LinearLayout.LayoutParams sp2 = full();
         sp2.leftMargin = sp2.rightMargin = dp(this, 12);
@@ -206,6 +214,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             @Override
             public void afterTextChanged(Editable e) {
                 paintSend();
+                suggestCommands(e.toString());
             }
         });
         paintSend();
@@ -681,6 +690,36 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         }
         renderApproval();
         renderScheduled();
+    }
+
+    /** Typing /…: Claude Code's commands and skills that start with it (at most 6); a tap puts one in the field. */
+    private void suggestCommands(String typed) {
+        commands.removeAllViews();
+        java.util.List<String> hits = new java.util.ArrayList<>();
+        if (typed.matches("/[\\w:.-]*")) {
+            String want = typed.substring(1).toLowerCase(java.util.Locale.ROOT);
+            try {
+                org.json.JSONArray all = new org.json.JSONArray(Prefs.slashCommands(this));
+                for (int i = 0; i < all.length(); i++) {
+                    String n = all.optString(i);
+                    if (!n.startsWith("__") && n.toLowerCase(java.util.Locale.ROOT).startsWith(want)) hits.add(n);
+                }
+            } catch (org.json.JSONException ignored) {
+            }
+            java.util.Collections.sort(hits);
+            if (hits.size() == 1 && hits.get(0).equalsIgnoreCase(want)) hits.clear(); // typed in full already
+        }
+        for (final String n : hits.subList(0, Math.min(6, hits.size()))) {
+            TextView t = single(monoText(this, "/" + n, 14, TEXT));
+            t.setPaddingRelative(dp(this, 14), dp(this, 9), dp(this, 14), dp(this, 9));
+            t.setBackgroundResource(ripple(this, false));
+            t.setOnClickListener(v -> {
+                input.setText("/" + n + " ");
+                input.setSelection(input.getText().length());
+            });
+            commands.addView(t, full());
+        }
+        commands.setVisibility(hits.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
     private void renderScheduled() {
